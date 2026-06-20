@@ -1,0 +1,69 @@
+@{
+    ViewData["Title"] = "Chính sách bảo mật";
+}
+
+<div class="max-w-4xl mx-auto space-y-8 py-4">
+    <!-- Header banner -->
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-3xl p-8 sm:p-10 text-white shadow-md">
+        <h1 class="text-3xl sm:text-4xl font-bold tracking-tight mb-2">@ViewData["Title"]</h1>
+        <p class="text-blue-100 text-sm sm:text-base">
+            Cập nhật lần cuối: 20 tháng 6, 2026. Tìm hiểu cách chúng tôi bảo vệ thông tin của bạn.
+        </p>
+    </div>
+
+    <!-- Main Content Card -->
+    <div class="bg-white border border-slate-200/60 rounded-3xl p-6 sm:p-10 shadow-xs space-y-6">
+        <p class="text-slate-600 leading-relaxed">
+            Hệ thống Quản lý Học tập (LMS) cam kết bảo mật tuyệt đối thông tin cá nhân của sinh viên, giảng viên và cán bộ quản trị. Tài liệu này mô tả chi tiết cách thức chúng tôi thu thập, sử dụng và bảo vệ dữ liệu của bạn.
+        </p>
+
+        <hr class="border-slate-100" />
+
+        <!-- Policy sections -->
+        <div class="space-y-6">
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="w-2 h-5 rounded-full bg-blue-600"></span>
+                    1. Dữ liệu thu thập
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed pl-4">
+                    Chúng tôi thu thập các thông tin cơ bản phục vụ quá trình học tập và kiểm tra bao gồm: họ tên, địa chỉ email sinh viên, mã số sinh viên, lịch sử hoạt động học tập, điểm số bài tập và các thông tin liên quan khác phục vụ đồ án tốt nghiệp.
+                </p>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="w-2 h-5 rounded-full bg-blue-600"></span>
+                    2. Mục đích sử dụng dữ liệu
+                </h2>
+                <ul class="list-disc pl-9 text-slate-600 text-sm space-y-1.5">
+                    <li>Duy trì và cung cấp các dịch vụ học tập trực tuyến trực quan.</li>
+                    <li>Đánh giá tiến độ hoàn thành các khóa học và bài kiểm tra tự động.</li>
+                    <li>Hỗ trợ giảng viên theo dõi quá trình làm việc của học viên.</li>
+                    <li>Cải tiến chất lượng giao diện và hiệu năng phần mềm.</li>
+                </ul>
+            </section>
+
+            <section class="space-y-2">
+                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                    <span class="w-2 h-5 rounded-full bg-blue-600"></span>
+                    3. Bảo mật thông tin
+                </h2>
+                <p class="text-slate-600 text-sm leading-relaxed pl-4">
+                    Mọi dữ liệu truyền tải giữa người dùng và máy chủ đều được mã hóa bằng chuẩn SSL tiên tiến. Chúng tôi không bao giờ chia sẻ, bán hoặc chuyển giao dữ liệu người dùng cho bên thứ ba ngoại trừ các yêu cầu chính thức phục vụ công tác thanh tra giáo dục của nhà trường.
+                </p>
+            </section>
+        </div>
+
+        <hr class="border-slate-100" />
+
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+            <p class="text-xs text-slate-500">
+                Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với bộ phận hỗ trợ kỹ thuật.
+            </p>
+            <a href="#" class="btn-primary-custom text-xs font-semibold px-4 py-2">
+                Liên hệ hỗ trợ
+            </a>
+        </div>
+    </div>
+</div>

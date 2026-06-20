@@ -1,0 +1,248 @@
+@{
+    ViewData["Title"] = "Trang chủ - Hệ thống LMS Hiện đại";
+}
+
+<!-- Homepage Layout Container -->
+<div class="space-y-20 py-4 sm:py-6">
+
+    <!-- 1. Hero Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <!-- Hero Content -->
+        <div class="lg:col-span-7 space-y-6 text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-semibold">
+                <span class="flex h-2 w-2 rounded-full bg-blue-600 animate-pulse"></span>
+                Phiên bản mới 2.0 đã ra mắt
+            </div>
+            
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 leading-tight">
+                Học tập thông minh <br />
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">Định hình tương lai</span>
+            </h1>
+            
+            <p class="text-lg text-slate-600 max-w-xl">
+                Nền tảng quản lý học tập hiện đại mang đến giao diện trực quan, tối ưu và trải nghiệm học tập đỉnh cao. Giúp sinh viên và giảng viên kết nối dễ dàng hơn bao giờ hết.
+            </p>
+            
+            <div class="flex flex-wrap gap-4 pt-2">
+                <a href="#" class="btn-primary-custom text-sm font-semibold">
+                    Khám phá ngay
+                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
+                <a href="#" class="btn-secondary-custom text-sm font-semibold">
+                    Xem tài liệu
+                </a>
+            </div>
+            
+            <!-- Quick Features Badges -->
+            <div class="grid grid-cols-3 gap-4 pt-6 border-t border-slate-200/60 max-w-md">
+                <div>
+                    <span class="block text-2xl font-bold text-slate-800">100%</span>
+                    <span class="text-xs text-slate-500">Hỗ trợ trực tuyến</span>
+                </div>
+                <div>
+                    <span class="block text-2xl font-bold text-slate-800">Mới</span>
+                    <span class="text-xs text-slate-500">Giao diện Tailwind v4</span>
+                </div>
+                <div>
+                    <span class="block text-2xl font-bold text-slate-800">280px</span>
+                    <span class="text-xs text-slate-500">Bố cục chuẩn</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Illustration -->
+        <div class="lg:col-span-5 flex justify-center">
+            <div class="relative w-full max-w-md lg:max-w-full">
+                <!-- Decorative background elements -->
+                <div class="absolute -top-6 -left-6 w-32 h-32 bg-blue-100/50 rounded-full blur-2xl"></div>
+                <div class="absolute -bottom-8 -right-8 w-40 h-40 bg-indigo-100/50 rounded-full blur-3xl"></div>
+                
+                <div class="relative bg-white p-4 rounded-3xl shadow-xl border border-slate-100 hover-lift">
+                    <img src="~/images/hero-illustration.png" alt="LMS Graduation Project Illustration" class="w-full h-auto rounded-2xl object-cover" />
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Features Section -->
+    <section class="space-y-10">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-800">Tính năng nổi bật</h2>
+            <p class="text-slate-600">
+                Được thiết kế đáp ứng các tiêu chuẩn khắt khe nhất của đồ án tốt nghiệp, tối ưu hóa cả giao diện lẫn trải nghiệm.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Feature Card 1 -->
+            <div class="bg-white border border-slate-200/60 p-8 rounded-2xl hover-lift flex flex-col justify-between h-full">
+                <div class="space-y-5">
+                    <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-slate-800">Bảng điều khiển trực quan</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Xem nhanh tiến độ hoàn thành các khóa học, kết quả điểm số và các biểu đồ phân tích hiệu quả hoạt động cá nhân.
+                        </p>
+                    </div>
+                </div>
+                <div class="pt-6">
+                    <a href="#" class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                        Tìm hiểu thêm
+                        <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feature Card 2 -->
+            <div class="bg-white border border-slate-200/60 p-8 rounded-2xl hover-lift flex flex-col justify-between h-full">
+                <div class="space-y-5">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-slate-800">Bài học tương tác phong phú</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Truy cập bài giảng đa phương tiện, video chất lượng cao và làm bài trắc nghiệm trực tuyến chấm điểm tự động.
+                        </p>
+                    </div>
+                </div>
+                <div class="pt-6">
+                    <a href="#" class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                        Tìm hiểu thêm
+                        <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Feature Card 3 -->
+            <div class="bg-white border border-slate-200/60 p-8 rounded-2xl hover-lift flex flex-col justify-between h-full">
+                <div class="space-y-5">
+                    <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-xl font-bold text-slate-800">Quản lý nhiệm vụ hiệu quả</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed">
+                            Lên lịch học, đặt deadline bài tập và nhận thông báo nhắc nhở tự động, tránh bỏ sót bất kỳ mốc thời gian quan trọng nào.
+                        </p>
+                    </div>
+                </div>
+                <div class="pt-6">
+                    <a href="#" class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+                        Tìm hiểu thêm
+                        <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Statistics Section -->
+    <section class="bg-blue-600 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-lg shadow-blue-500/20">
+        <!-- Background accents -->
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-700 to-indigo-700 opacity-90"></div>
+        <div class="absolute -right-20 -bottom-20 w-80 h-80 rounded-full border border-blue-500/30"></div>
+        
+        <div class="relative grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-blue-500/40">
+            <div class="pt-6 md:pt-0">
+                <span class="block text-4xl sm:text-5xl font-extrabold">15,000+</span>
+                <span class="text-sm text-blue-100 mt-2 block font-medium">Học viên hoạt động</span>
+            </div>
+            <div class="pt-6 md:pt-0">
+                <span class="block text-4xl sm:text-5xl font-extrabold">650+</span>
+                <span class="text-sm text-blue-100 mt-2 block font-medium">Khóa học đăng tải</span>
+            </div>
+            <div class="pt-6 md:pt-0">
+                <span class="block text-4xl sm:text-5xl font-extrabold">98.5%</span>
+                <span class="text-sm text-blue-100 mt-2 block font-medium">Tỷ lệ hài lòng</span>
+            </div>
+            <div class="pt-6 md:pt-0">
+                <span class="block text-4xl sm:text-5xl font-extrabold">24/7</span>
+                <span class="text-sm text-blue-100 mt-2 block font-medium">Hỗ trợ kỹ thuật</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Testimonials Section -->
+    <section class="space-y-10">
+        <div class="text-center max-w-2xl mx-auto space-y-3">
+            <h2 class="text-3xl font-bold tracking-tight text-slate-800">Nhận xét từ người dùng</h2>
+            <p class="text-slate-600">
+                Được kiểm chứng chất lượng và trải nghiệm từ sinh viên và giảng viên tại các trường đại học hàng đầu.
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Testimonial 1 -->
+            <div class="bg-white border border-slate-200/50 p-8 rounded-2xl shadow-xs relative hover-lift">
+                <!-- Star rating -->
+                <div class="flex gap-1 mb-4 text-amber-400">
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                    }
+                </div>
+                
+                <p class="text-slate-600 italic text-sm leading-relaxed mb-6">
+                    "Giao diện hiện đại này thực sự rất tuyệt vời. Tốc độ tải trang nhanh, bố cục rõ ràng dễ nhìn giúp tôi tập trung tối đa vào bài giảng."
+                </p>
+                
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" alt="User 1" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Tran+H&background=2563EB&color=fff'"/>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Trần Thị H.</h4>
+                        <span class="text-xs text-slate-400">Sinh viên năm 4 - CNTT</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testimonial 2 -->
+            <div class="bg-white border border-slate-200/50 p-8 rounded-2xl shadow-xs relative hover-lift">
+                <!-- Star rating -->
+                <div class="flex gap-1 mb-4 text-amber-400">
+                    @for (var i = 0; i < 5; i++)
+                    {
+                        <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                    }
+                </div>
+                
+                <p class="text-slate-600 italic text-sm leading-relaxed mb-6">
+                    "Tôi đánh giá cao khả năng tùy chỉnh theme và giao diện Sidebar trên thiết bị di động. Việc chuyển hướng danh mục rất linh hoạt, không còn cảm giác cồng kềnh như giao diện cũ."
+                </p>
+                
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-full bg-blue-100 flex items-center justify-center font-bold text-blue-600 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" alt="User 2" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Le+V&background=2563EB&color=fff'"/>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Lê Văn V.</h4>
+                        <span class="text-xs text-slate-400">Giảng viên khoa CNTT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</div>
