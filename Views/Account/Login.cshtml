@@ -222,7 +222,7 @@
                         <input asp-for="RememberMe" class="form-check-input" />
                         <label asp-for="RememberMe" class="form-check-label text-secondary" style="font-size: 14px;">Ghi nhớ đăng nhập</label>
                     </div>
-                    <a href="#" class="text-link" style="font-size: 14px;">Quên mật khẩu?</a>
+                    <a asp-controller="Account" asp-action="ForgotPassword" class="text-link" style="font-size: 14px;">Quên mật khẩu?</a>
                 </div>
 
                 <div class="d-grid mb-4">
