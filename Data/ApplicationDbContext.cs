@@ -116,6 +116,10 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<UserSession> UserSessions { get; set; }
 
+    public virtual DbSet<LoginLog> LoginLogs { get; set; }
+
+    public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -1876,6 +1880,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("full_name");
             entity.Property(e => e.LastLoginAt).HasColumnName("last_login_at");
+            entity.Property(e => e.FailedLoginCount)
+                .HasDefaultValue(0)
+                .HasColumnName("failed_login_count");
+            entity.Property(e => e.LockoutUntil).HasColumnName("lockout_until");
             entity.Property(e => e.PasswordHash)
                 .HasMaxLength(500)
                 .IsUnicode(false)
@@ -1890,6 +1898,7 @@ public partial class ApplicationDbContext : DbContext
                 .IsUnicode(false)
                 .HasDefaultValue("ACTIVE")
                 .HasColumnName("status");
+            entity.ToTable(t => t.HasCheckConstraint("CK_User_Status", "[status] IN ('ACTIVE', 'LOCKED', 'PENDING', 'DELETED')"));
             entity.Property(e => e.UpdatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("updated_at");
@@ -1953,6 +1962,7 @@ public partial class ApplicationDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("ip_address");
             entity.Property(e => e.LastActivityAt).HasColumnName("last_activity_at");
+            entity.Property(e => e.RevokedAt).HasColumnName("revoked_at");
             entity.Property(e => e.SessionToken)
                 .HasMaxLength(500)
                 .IsUnicode(false)
@@ -1967,6 +1977,60 @@ public partial class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_user_sessions_users");
         });
+
+        modelBuilder.Entity<LoginLog>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("login_logs");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.IpAddress).HasMaxLength(50).HasColumnName("ip_address");
+            entity.Property(e => e.UserAgent).HasMaxLength(255).HasColumnName("user_agent");
+            entity.Property(e => e.FailureReason).HasMaxLength(255).HasColumnName("failure_reason");
+            entity.Property(e => e.IsSuccess).HasColumnName("is_success");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
+
+            entity.HasOne(d => d.User).WithMany(p => p.LoginLogs)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_login_logs_users");
+        });
+
+        modelBuilder.Entity<PasswordResetToken>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("password_reset_tokens");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.TokenHash).HasMaxLength(255).IsRequired().HasColumnName("token_hash");
+            entity.Property(e => e.ExpiresAt).HasColumnName("expires_at");
+            entity.Property(e => e.UsedAt).HasColumnName("used_at");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
+
+            entity.HasOne(d => d.User).WithMany(p => p.PasswordResetTokens)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_password_reset_tokens_users");
+        });
+
+        modelBuilder.Entity<Role>().HasData(
+            new Role { Id = 1, RoleCode = "ADMIN", RoleName = "Administrator", CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Role { Id = 2, RoleCode = "TEACHER", RoleName = "Teacher", CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+            new Role { Id = 3, RoleCode = "STUDENT", RoleName = "Student", CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
+        );
+
+        modelBuilder.Entity<User>().HasData(
+            new User {
+                Id = 1,
+                Email = "admin@aistudy.com",
+                FullName = "System Admin",
+                PasswordHash = "AQAAAAEAACcQAAAAENP...", // Placeholder
+                RoleId = 1,
+                Status = "ACTIVE",
+                CreatedAt = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                FailedLoginCount = 0
+            }
+        );
 
         OnModelCreatingPartial(modelBuilder);
     }

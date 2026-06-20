@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -22,6 +22,10 @@ public partial class User
     public string? Phone { get; set; }
 
     public DateTime? LastLoginAt { get; set; }
+
+    public int FailedLoginCount { get; set; }
+
+    public DateTime? LockoutUntil { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
@@ -102,4 +106,8 @@ public partial class User
     public virtual UserProfile? UserProfile { get; set; }
 
     public virtual ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
+
+    public virtual ICollection<LoginLog> LoginLogs { get; set; } = new List<LoginLog>();
+
+    public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
 }
