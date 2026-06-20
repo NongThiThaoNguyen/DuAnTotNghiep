@@ -79,7 +79,7 @@
                         <span class="badge @roleClass rounded-pill px-4 py-2 fs-6">@Model.RoleName</span>
                     </div>
                     
-                    <div>
+                    <div class="mb-4">
                         <p class="text-muted font-weight-bold small text-uppercase mb-2">Trạng thái tài khoản</p>
                         @{
                             var statusClass = Model.Status switch
@@ -90,7 +90,37 @@
                                 _ => "bg-secondary text-white"
                             };
                         }
-                        <span class="badge @statusClass rounded-pill px-4 py-2 fs-6">@Model.Status</span>
+                        <span class="badge @statusClass rounded-pill px-4 py-2 fs-6 mb-4 d-inline-block">@Model.Status</span>
+                    </div>
+
+                    <hr class="text-muted opacity-25">
+                    
+                    <div class="d-grid gap-2 mt-4">
+                        @if (Model.Status == "ACTIVE")
+                        {
+                            <form asp-action="Lock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này không?');">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-warning rounded-pill w-100 fw-medium text-white">
+                                    <i class="bi bi-lock-fill me-2"></i> Khóa tài khoản
+                                </button>
+                            </form>
+                        }
+                        else if (Model.Status == "LOCKED")
+                        {
+                            <form asp-action="Unlock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn MỞ KHÓA tài khoản này không?');">
+                                <input type="hidden" name="id" value="@Model.Id" />
+                                <button type="submit" class="btn btn-success rounded-pill w-100 fw-medium">
+                                    <i class="bi bi-unlock-fill me-2"></i> Mở khóa tài khoản
+                                </button>
+                            </form>
+                        }
+                        
+                        <form asp-action="ResetPassword" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? (Gửi mật khẩu mới qua email)');">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-danger rounded-pill w-100 fw-medium">
+                                <i class="bi bi-key-fill me-2"></i> Reset Password
+                            </button>
+                        </form>
                     </div>
 
                 </div>
@@ -98,3 +128,4 @@
         </div>
     </div>
 </div>
+

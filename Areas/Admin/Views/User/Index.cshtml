@@ -4,6 +4,21 @@
 }
 
 <div class="container-fluid py-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2 class="h3 mb-0 text-gray-800 font-weight-bold">Quản lý Tài Khoản</h2>
     </div>
@@ -109,9 +124,40 @@
                                     </td>
                                     <td class="px-4 py-3 text-muted">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
                                     <td class="px-4 py-3 text-end">
-                                        <a asp-action="Details" asp-route-id="@user.Id" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-medium">
-                                            Chi tiết
-                                        </a>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-medium dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Thao tác
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                                <li>
+                                                    <a asp-action="Details" asp-route-id="@user.Id" class="dropdown-item">
+                                                        <i class="bi bi-info-circle text-primary me-2"></i> Chi tiết
+                                                    </a>
+                                                </li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                @if (user.Status == "ACTIVE")
+                                                {
+                                                    <li>
+                                                        <button type="button" class="dropdown-item text-warning" onclick="showActionModal('Lock', @user.Id, 'Khóa tài khoản', 'Bạn có chắc chắn muốn KHÓA tài khoản này không? Người dùng sẽ bị chặn đăng nhập ngay lập tức.')">
+                                                            <i class="bi bi-lock-fill me-2"></i> Khóa tài khoản
+                                                        </button>
+                                                    </li>
+                                                }
+                                                else if (user.Status == "LOCKED")
+                                                {
+                                                    <li>
+                                                        <button type="button" class="dropdown-item text-success" onclick="showActionModal('Unlock', @user.Id, 'Mở khóa tài khoản', 'Bạn có chắc chắn muốn MỞ KHÓA cho tài khoản này không? Người dùng sẽ được phép đăng nhập lại.')">
+                                                            <i class="bi bi-unlock-fill me-2"></i> Mở khóa
+                                                        </button>
+                                                    </li>
+                                                }
+                                                <li>
+                                                    <button type="button" class="dropdown-item text-danger" onclick="showActionModal('ResetPassword', @user.Id, 'Reset Mật Khẩu', 'Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? Một mật khẩu mới sẽ được tạo và gửi qua email của họ.')">
+                                                        <i class="bi bi-key-fill me-2"></i> Reset Password
+                                                    </button>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                                 stt++;
@@ -160,3 +206,52 @@
         }
     </div>
 </div>
+
+<!-- Shared Action Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title font-weight-bold" id="actionModalLabel">Xác nhận</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-4">
+                <p id="actionModalMessage" class="mb-0 fs-6">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+            </div>
+            <div class="modal-footer border-top-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
+                <form id="actionForm" method="post" style="display:inline;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" id="actionUserId" value="" />
+                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="actionSubmitBtn">Đồng ý</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function showActionModal(action, userId, title, message) {
+            // Set data
+            document.getElementById('actionUserId').value = userId;
+            document.getElementById('actionModalLabel').innerText = title;
+            document.getElementById('actionModalMessage').innerText = message;
+            
+            // Set form action URL
+            document.getElementById('actionForm').action = '/Admin/User/' + action;
+            
+            // Change button color based on action
+            const submitBtn = document.getElementById('actionSubmitBtn');
+            submitBtn.className = 'btn rounded-pill px-4 text-white ';
+            if (action === 'Lock') submitBtn.className += 'btn-warning';
+            else if (action === 'Unlock') submitBtn.className += 'btn-success';
+            else if (action === 'ResetPassword') submitBtn.className += 'btn-danger';
+            else submitBtn.className += 'btn-primary';
+
+            // Show modal
+            var myModal = new bootstrap.Modal(document.getElementById('actionModal'));
+            myModal.show();
+        }
+    </script>
+}

@@ -82,7 +82,7 @@ namespace DuAnTotNghiep.Services
         {
             var user = await _userRepository.GetByEmailAsync(email);
 
-            // Ghi log thất bại dùng chung
+            // Hàm ghi log thất bại dùng chung (không tự động tăng FailedLoginCount nữa)
             async Task LogFailedLoginAsync(string reason)
             {
                 var failedLog = new LoginLog
@@ -92,19 +92,13 @@ namespace DuAnTotNghiep.Services
                     UserAgent = userAgent,
                     IsSuccess = false,
                     FailureReason = reason,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.Now
                 };
                 await _loginLogRepository.AddAsync(failedLog);
                 await _loginLogRepository.SaveChangesAsync();
-                
-                if (user != null)
-                {
-                    user.FailedLoginCount++;
-                    _userRepository.Update(user);
-                    await _userRepository.SaveChangesAsync();
-                }
             }
 
+            // Bước 1: Kiểm tra User tồn tại
             if (user == null)
             {
                 await LogFailedLoginAsync("User not found");
@@ -117,48 +111,94 @@ namespace DuAnTotNghiep.Services
                 return new LoginResultDto { IsSuccess = false, ErrorMessage = "Email hoặc mật khẩu không đúng" };
             }
 
+            // Bước 2: Kiểm tra khóa vĩnh viễn bởi Admin
             if (user.Status == "LOCKED")
             {
                 await LogFailedLoginAsync("Account locked");
                 return new LoginResultDto { IsSuccess = false, ErrorMessage = "Tài khoản đang bị khóa" };
             }
 
+            // Bước 3: Kiểm tra khóa tạm thời (Lockout) bằng DateTime.Now theo yêu cầu Document
+            if (user.LockoutUntil.HasValue && user.LockoutUntil.Value > DateTime.Now)
+            {
+                await LogFailedLoginAsync("Account temporarily locked out");
+                return new LoginResultDto { 
+                    IsSuccess = false, 
+                    ErrorMessage = "Tài khoản đang bị khóa tạm thời. Vui lòng thử lại sau 15 phút." 
+                };
+            }
+
+            // Bước 4: Kiểm tra mật khẩu
             var hasher = new PasswordHasher<User>();
             var verificationResult = hasher.VerifyHashedPassword(user, user.PasswordHash, password);
 
             if (verificationResult == PasswordVerificationResult.Failed)
             {
+                // Tăng bộ đếm sai
+                user.FailedLoginCount++;
+                
+                // Nếu sai 5 lần -> Tạm khóa 15 phút
+                if (user.FailedLoginCount >= 5)
+                {
+                    user.LockoutUntil = DateTime.Now.AddMinutes(15);
+                    _userRepository.Update(user);
+                    await _userRepository.SaveChangesAsync();
+                    
+                    var auditLog = new AuditLog
+                    {
+                        UserId = user.Id,
+                        Action = "AUTO_LOCK_ACCOUNT",
+                        EntityName = "User",
+                        EntityId = user.Id,
+                        CreatedAt = DateTime.Now,
+                        IpAddress = ipAddress
+                    };
+                    await _auditLogRepository.AddAsync(auditLog);
+                    await _auditLogRepository.SaveChangesAsync();
+
+                    await LogFailedLoginAsync("Account auto locked due to 5 failed attempts");
+                    return new LoginResultDto { 
+                        IsSuccess = false, 
+                        ErrorMessage = "Tài khoản đang bị khóa tạm thời. Vui lòng thử lại sau 15 phút." 
+                    };
+                }
+
+                // Nếu chưa đủ 5 lần thì chỉ lưu DB cập nhật FailedLoginCount
+                _userRepository.Update(user);
+                await _userRepository.SaveChangesAsync();
+
                 await LogFailedLoginAsync("Invalid password");
                 return new LoginResultDto { IsSuccess = false, ErrorMessage = "Email hoặc mật khẩu không đúng" };
             }
 
-            // Đăng nhập thành công
+            // Bước 5: Đăng nhập thành công -> Reset toàn bộ cờ khóa và log thành công
             var successLog = new LoginLog
             {
                 UserId = user.Id,
                 IpAddress = ipAddress,
                 UserAgent = userAgent,
                 IsSuccess = true,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.Now
             };
             await _loginLogRepository.AddAsync(successLog);
             await _loginLogRepository.SaveChangesAsync();
 
-            var auditLog = new AuditLog
+            var successAuditLog = new AuditLog
             {
                 UserId = user.Id,
                 Action = "LOGIN",
                 EntityName = "User",
                 EntityId = user.Id,
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = DateTime.Now,
                 IpAddress = ipAddress
             };
-            await _auditLogRepository.AddAsync(auditLog);
+            await _auditLogRepository.AddAsync(successAuditLog);
             await _auditLogRepository.SaveChangesAsync();
 
-            // Reset failed count and update last login
+            // Xóa bộ đếm sai và cờ khóa tạm
             user.FailedLoginCount = 0;
-            user.LastLoginAt = DateTime.UtcNow;
+            user.LockoutUntil = null;
+            user.LastLoginAt = DateTime.Now;
             _userRepository.Update(user);
             await _userRepository.SaveChangesAsync();
 
