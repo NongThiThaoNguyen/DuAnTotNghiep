@@ -2,6 +2,7 @@ using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -205,6 +206,49 @@ namespace DuAnTotNghiep.Controllers
 
             TempData["SuccessMessage"] = "Đổi mật khẩu thành công! Vui lòng đăng nhập lại.";
             return RedirectToAction("Login");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public IActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(userIdString, out int userId))
+            {
+                return RedirectToAction("Login");
+            }
+
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+            var result = await _authService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword, ipAddress);
+
+            if (!result.IsSuccess)
+            {
+                ModelState.AddModelError(string.Empty, result.ErrorMessage);
+                return View(model);
+            }
+
+            TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+            return RedirectToAction("ChangePassword"); // Hoặc redirect về trang cá nhân
+        }
+
+        [HttpGet]
+        public IActionResult AccessDenied()
+        {
+            return View();
         }
     }
 }

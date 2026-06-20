@@ -9,5 +9,7 @@ namespace DuAnTotNghiep.Repositories.Interfaces
         Task<IEnumerable<User>> GetUsersAsync();
         Task LockUserAsync(int userId, DateTime lockoutEnd);
         Task UnlockUserAsync(int userId);
+        Task<(IEnumerable<User> Users, int TotalCount)> GetPagedUsersAsync(string keyword, string role, string status, int page, int pageSize);
+        Task<User?> GetUserWithRoleByIdAsync(int id);
     }
 }

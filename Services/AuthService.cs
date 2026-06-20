@@ -25,9 +25,52 @@ namespace DuAnTotNghiep.Services
             _loginLogRepository = loginLogRepository;
         }
 
-        public Task<bool> ChangePasswordAsync(int userId, string oldPassword, string newPassword)
+        public async Task<(bool IsSuccess, string ErrorMessage)> ChangePasswordAsync(int userId, string oldPassword, string newPassword, string ipAddress)
         {
-            throw new NotImplementedException();
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return (false, "Tài khoản không tồn tại");
+            }
+
+            var hasher = new PasswordHasher<User>();
+
+            // Kiểm tra mật khẩu hiện tại
+            var verificationResult = hasher.VerifyHashedPassword(user, user.PasswordHash, oldPassword);
+            if (verificationResult == PasswordVerificationResult.Failed)
+            {
+                return (false, "Mật khẩu hiện tại không đúng");
+            }
+
+            // Kiểm tra mật khẩu mới không được trùng mật khẩu cũ
+            var newPasswordVerification = hasher.VerifyHashedPassword(user, user.PasswordHash, newPassword);
+            if (newPasswordVerification == PasswordVerificationResult.Success)
+            {
+                return (false, "Mật khẩu mới phải khác mật khẩu hiện tại");
+            }
+
+            // Hash mật khẩu mới
+            user.PasswordHash = hasher.HashPassword(user, newPassword);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            _userRepository.Update(user);
+
+            // Ghi AuditLog
+            var auditLog = new AuditLog
+            {
+                UserId = user.Id,
+                Action = "CHANGE_PASSWORD",
+                EntityName = "User",
+                EntityId = user.Id,
+                CreatedAt = DateTime.UtcNow,
+                IpAddress = ipAddress
+            };
+            await _auditLogRepository.AddAsync(auditLog);
+
+            await _userRepository.SaveChangesAsync();
+            await _auditLogRepository.SaveChangesAsync();
+
+            return (true, string.Empty);
         }
 
         public Task<bool> ForgotPasswordAsync(string email)

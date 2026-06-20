@@ -9,6 +9,6 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task LogoutAsync(int userId, string sessionToken);
         Task<bool> ForgotPasswordAsync(string email);
         Task<bool> ResetPasswordAsync(string token, string newPassword);
-        Task<bool> ChangePasswordAsync(int userId, string oldPassword, string newPassword);
+        Task<(bool IsSuccess, string ErrorMessage)> ChangePasswordAsync(int userId, string oldPassword, string newPassword, string ipAddress);
     }
 }
