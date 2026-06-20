@@ -28,6 +28,8 @@ namespace DuAnTotNghiep.Areas.Admin.ViewModels
         public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
         public DateTime? LastLoginAt { get; set; }
+        public int FailedLoginCount { get; set; }
+        public DateTime? LockoutUntil { get; set; }
     }
 
     public class UserListViewModel

@@ -48,10 +48,37 @@
                     </div>
                     <hr class="text-muted opacity-25">
                     
-                    <div class="row">
+                    <div class="row mb-4">
                         <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Đăng nhập gần nhất</div>
                         <div class="col-sm-8 text-dark fw-medium">
                             @(Model.LastLoginAt.HasValue ? Model.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm:ss") : "Chưa từng đăng nhập")
+                        </div>
+                    </div>
+                    <hr class="text-muted opacity-25">
+                    
+                    <div class="row mb-4">
+                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Số lần đăng nhập sai</div>
+                        <div class="col-sm-8 text-dark fw-medium">
+                            <span class="badge @(Model.FailedLoginCount > 0 ? "bg-warning text-dark" : "bg-success text-white") rounded-pill px-3 py-1">
+                                @Model.FailedLoginCount lần
+                            </span>
+                        </div>
+                    </div>
+                    <hr class="text-muted opacity-25">
+                    
+                    <div class="row">
+                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Trạng thái khóa tạm thời</div>
+                        <div class="col-sm-8 text-dark fw-medium">
+                            @if (Model.LockoutUntil.HasValue && Model.LockoutUntil.Value > DateTime.Now)
+                            {
+                                <span class="badge bg-danger text-white rounded-pill px-3 py-1">
+                                    <i class="bi bi-clock-history me-1"></i> Bị khóa đến @Model.LockoutUntil.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success text-white rounded-pill px-3 py-1">Không bị khóa</span>
+                            }
                         </div>
                     </div>
                 </div>

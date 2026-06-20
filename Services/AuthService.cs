@@ -124,7 +124,7 @@ namespace DuAnTotNghiep.Services
                 await LogFailedLoginAsync("Account temporarily locked out");
                 return new LoginResultDto { 
                     IsSuccess = false, 
-                    ErrorMessage = "Tài khoản đang bị khóa tạm thời. Vui lòng thử lại sau 15 phút." 
+                    ErrorMessage = "Tài khoản đang bị khóa tạm thời. Vui lòng thử lại sau 2 phút." 
                 };
             }
 
@@ -137,10 +137,10 @@ namespace DuAnTotNghiep.Services
                 // Tăng bộ đếm sai
                 user.FailedLoginCount++;
                 
-                // Nếu sai 5 lần -> Tạm khóa 15 phút
+                // Nếu sai 5 lần -> Tạm khóa 2 phút
                 if (user.FailedLoginCount >= 5)
                 {
-                    user.LockoutUntil = DateTime.Now.AddMinutes(15);
+                    user.LockoutUntil = DateTime.Now.AddMinutes(2);
                     _userRepository.Update(user);
                     await _userRepository.SaveChangesAsync();
                     
@@ -159,7 +159,7 @@ namespace DuAnTotNghiep.Services
                     await LogFailedLoginAsync("Account auto locked due to 5 failed attempts");
                     return new LoginResultDto { 
                         IsSuccess = false, 
-                        ErrorMessage = "Tài khoản đang bị khóa tạm thời. Vui lòng thử lại sau 15 phút." 
+                        ErrorMessage = "Tài khoản đang bị khóa tạm thời. Vui lòng thử lại sau 2 phút." 
                     };
                 }
 

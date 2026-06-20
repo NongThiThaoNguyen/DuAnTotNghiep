@@ -63,7 +63,9 @@ namespace DuAnTotNghiep.Services
                 RoleName = user.Role?.RoleName ?? "Unknown",
                 Status = user.Status,
                 CreatedAt = user.CreatedAt,
-                LastLoginAt = user.LastLoginAt
+                LastLoginAt = user.LastLoginAt,
+                FailedLoginCount = user.FailedLoginCount,
+                LockoutUntil = user.LockoutUntil
             };
         }
 
