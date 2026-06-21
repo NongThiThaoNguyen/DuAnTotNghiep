@@ -11,10 +11,12 @@ namespace DuAnTotNghiep.Controllers
     public class AccountController : Controller
     {
         private readonly IAuthService _authService;
+        private readonly DuAnTotNghiep.Repositories.Interfaces.IUserSessionRepository _userSessionRepository;
 
-        public AccountController(IAuthService authService)
+        public AccountController(IAuthService authService, DuAnTotNghiep.Repositories.Interfaces.IUserSessionRepository userSessionRepository)
         {
             _authService = authService;
+            _userSessionRepository = userSessionRepository;
         }
 
         [HttpGet]
@@ -73,12 +75,14 @@ namespace DuAnTotNghiep.Controllers
             var user = result.User;
 
             // Tạo Claims
+            string sessionToken = Guid.NewGuid().ToString();
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Role, user.Role.RoleCode)
+                new Claim(ClaimTypes.Role, user.Role.RoleCode),
+                new Claim("SessionToken", sessionToken)
             };
 
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -95,6 +99,21 @@ namespace DuAnTotNghiep.Controllers
                 CookieAuthenticationDefaults.AuthenticationScheme, 
                 new ClaimsPrincipal(claimsIdentity), 
                 authProperties);
+
+            // Ghi nhận UserSession
+            var session = new DuAnTotNghiep.Models.UserSession
+            {
+                UserId = user.Id,
+                SessionToken = sessionToken,
+                IpAddress = ipAddress,
+                UserAgent = userAgent,
+                DeviceType = "Web",
+                CreatedAt = DateTime.UtcNow,
+                LastActivityAt = DateTime.UtcNow,
+                ExpiresAt = authProperties.ExpiresUtc?.UtcDateTime ?? DateTime.UtcNow.AddHours(2)
+            };
+            await _userSessionRepository.AddAsync(session);
+            await _userSessionRepository.SaveChangesAsync();
 
             // Điều hướng theo Role
             return user.Role.RoleCode switch
@@ -120,13 +139,9 @@ namespace DuAnTotNghiep.Controllers
                 return View(model);
             }
 
-            var result = await passwordResetService.SendOtpAsync(model.Email);
-            if (!result)
-            {
-                ModelState.AddModelError("Email", "Email không tồn tại trong hệ thống.");
-                return View(model);
-            }
-
+            await passwordResetService.SendOtpAsync(model.Email);
+            
+            TempData["SuccessMessage"] = "Nếu Email tồn tại trong hệ thống, mã OTP đã được gửi đến bạn.";
             TempData["ResetEmail"] = model.Email;
             return RedirectToAction("VerifyOtp");
         }
@@ -243,6 +258,26 @@ namespace DuAnTotNghiep.Controllers
 
             TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
             return RedirectToAction("ChangePassword"); // Hoặc redirect về trang cá nhân
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            // Hủy session trong DB nếu có
+            var sessionToken = User.FindFirstValue("SessionToken");
+            if (!string.IsNullOrEmpty(sessionToken))
+            {
+                var currentSession = await _userSessionRepository.GetBySessionTokenAsync(sessionToken);
+                if (currentSession != null)
+                {
+                    currentSession.RevokedAt = DateTime.UtcNow;
+                    _userSessionRepository.Update(currentSession);
+                    await _userSessionRepository.SaveChangesAsync();
+                }
+            }
+
+            await HttpContext.SignOutAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpGet]

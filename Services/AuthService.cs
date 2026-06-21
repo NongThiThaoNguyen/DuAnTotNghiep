@@ -30,7 +30,7 @@ namespace DuAnTotNghiep.Services
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
-                return (false, "Tài khoản không tồn tại");
+                return (false, "Tài khoản hoặc mật khẩu không hợp lệ");
             }
 
             var hasher = new PasswordHasher<User>();
@@ -39,7 +39,7 @@ namespace DuAnTotNghiep.Services
             var verificationResult = hasher.VerifyHashedPassword(user, user.PasswordHash, oldPassword);
             if (verificationResult == PasswordVerificationResult.Failed)
             {
-                return (false, "Mật khẩu hiện tại không đúng");
+                return (false, "Tài khoản hoặc mật khẩu không hợp lệ");
             }
 
             // Kiểm tra mật khẩu mới không được trùng mật khẩu cũ

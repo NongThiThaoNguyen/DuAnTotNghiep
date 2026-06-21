@@ -9,7 +9,7 @@ namespace DuAnTotNghiep.ViewModels
         public string CurrentPassword { get; set; } = null!;
 
         [Required(ErrorMessage = "Mật khẩu mới bắt buộc")]
-        [MinLength(8, ErrorMessage = "Mật khẩu mới phải có ít nhất 8 ký tự")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", ErrorMessage = "Mật khẩu phải từ 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường và 1 số")]
         [DataType(DataType.Password)]
         public string NewPassword { get; set; } = null!;
 

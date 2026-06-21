@@ -14,7 +14,7 @@ namespace DuAnTotNghiep.ViewModels
         public string Email { get; set; } = null!;
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu")]
-        [MinLength(8, ErrorMessage = "Mật khẩu phải từ 8 ký tự trở lên")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$", ErrorMessage = "Mật khẩu phải từ 8 ký tự, có ít nhất 1 chữ hoa, 1 chữ thường và 1 số")]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu")]
         public string Password { get; set; } = null!;

@@ -18,7 +18,7 @@ namespace DuAnTotNghiep.Data.Seeders
         public async Task SeedAsync()
         {
             await SeedRolesAsync();
-            await SeedAdminAsync();
+            await SeedUsersAsync();
         }
 
         private async Task SeedRolesAsync()
@@ -47,29 +47,48 @@ namespace DuAnTotNghiep.Data.Seeders
             }
         }
 
-        private async Task SeedAdminAsync()
+        private async Task SeedUsersAsync()
         {
-            var adminEmail = "admin@aistudyenglish.com";
+            var adminRole = await _roleRepository.GetByCodeAsync("ADMIN");
+            var teacherRole = await _roleRepository.GetByCodeAsync("TEACHER");
+            var studentRole = await _roleRepository.GetByCodeAsync("STUDENT");
 
-            // Kiểm tra xem đã có admin chưa
-            if (!await _userRepository.ExistsByEmailAsync(adminEmail))
+            if (adminRole == null || teacherRole == null || studentRole == null) return;
+
+            var defaultPassword = PasswordHelper.HashPassword("Password@123");
+
+            var usersToSeed = new List<User>
             {
-                // Lấy Role ADMIN
-                var adminRole = await _roleRepository.GetByCodeAsync("ADMIN");
-                if (adminRole == null) return; // Nếu chưa có role admin thì bỏ qua
+                // Admin Account
+                new User { Email = "admin@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "System Administrator", RoleId = adminRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 },
+                
+                // Teacher Account
+                new User { Email = "teacher@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "English Teacher", RoleId = teacherRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 },
+                
+                // Student Accounts
+                new User { Email = "student1@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Student One", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 },
+                new User { Email = "student2@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Student Two", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 },
+                
+                // Locked Account (dùng để test Lockout / Invalidation)
+                new User { Email = "lockeduser@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Locked User", RoleId = studentRole.Id, Status = "LOCKED", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0, LockoutUntil = DateTime.UtcNow.AddYears(100) },
+                
+                // Test OTP User
+                new User { Email = "testotp@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Test OTP User", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 }
+            };
 
-                var newAdmin = new User
+            bool changesMade = false;
+
+            foreach (var user in usersToSeed)
+            {
+                if (!await _userRepository.ExistsByEmailAsync(user.Email))
                 {
-                    Email = adminEmail,
-                    PasswordHash = PasswordHelper.HashPassword("Admin@123"),
-                    FullName = "System Administrator",
-                    RoleId = adminRole.Id,
-                    Status = "ACTIVE",
-                    CreatedAt = DateTime.UtcNow,
-                    FailedLoginCount = 0
-                };
+                    await _userRepository.AddAsync(user);
+                    changesMade = true;
+                }
+            }
 
-                await _userRepository.AddAsync(newAdmin);
+            if (changesMade)
+            {
                 await _userRepository.SaveChangesAsync();
             }
         }

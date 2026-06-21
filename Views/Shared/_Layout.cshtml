@@ -1,3 +1,4 @@
+@using System.Security.Claims
 <!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
 <head>
@@ -40,18 +41,60 @@
             <nav class="hidden md:flex items-center gap-6">
                 <a class="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
                 <a class="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách</a>
-                <a class="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" asp-area="" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                @if (!User.Identity?.IsAuthenticated ?? true)
+                {
+                    <a class="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors" asp-area="" asp-controller="Account" asp-action="Login">Đăng nhập</a>
+                }
             </nav>
 
             <!-- User Menu & Actions -->
-            <div class="flex items-center gap-4">
-                <div class="hidden sm:flex flex-col text-right">
-                    <span class="text-xs font-semibold text-slate-800">Nguyễn Văn A</span>
-                    <span class="text-[10px] text-slate-400">Sinh viên</span>
-                </div>
-                <div class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-xs flex items-center justify-center text-blue-600 font-bold overflow-hidden cursor-pointer">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=256&auto=format&fit=crop" alt="Avatar" class="w-full h-full object-cover" onerror="this.src='https://ui-avatars.com/api/?name=Nguyen+Van+A&background=2563EB&color=fff'" />
-                </div>
+            <div class="flex items-center gap-4 relative">
+                @if (User.Identity?.IsAuthenticated == true)
+                {
+                    var userName = User.FindFirstValue(ClaimTypes.Name) ?? "Người dùng";
+                    var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "Thành viên";
+                    var email = User.FindFirstValue(ClaimTypes.Email) ?? "";
+
+                    <div class="hidden sm:flex flex-col text-right">
+                        <span class="text-xs font-semibold text-slate-800">@userName</span>
+                        <span class="text-[10px] text-slate-400">@userRole</span>
+                    </div>
+                    <button id="userMenuBtn" class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-xs flex items-center justify-center text-blue-600 font-bold overflow-hidden cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-blue-600 focus:ring-offset-2">
+                        <img src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(userName)&background=2563EB&color=fff" alt="Avatar" class="w-full h-full object-cover" />
+                    </button>
+
+                    <!-- User Dropdown Menu -->
+                    <div id="userDropdown" class="hidden absolute right-0 top-12 mt-2 w-56 rounded-xl bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-hidden z-50">
+                        <div class="px-4 py-3 border-b border-slate-100">
+                            <p class="text-sm font-medium text-slate-900 truncate">@userName</p>
+                            <p class="text-xs text-slate-500 truncate">@email</p>
+                        </div>
+                        <div class="py-1">
+                            <a href="#" class="group flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors">
+                                <svg class="mr-3 h-5 w-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                                Trang cá nhân
+                            </a>
+                            <a asp-controller="Account" asp-action="ChangePassword" class="group flex items-center px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-blue-600 transition-colors">
+                                <svg class="mr-3 h-5 w-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                                Đổi mật khẩu
+                            </a>
+                        </div>
+                        <div class="py-1 border-t border-slate-100">
+                            <!-- Temporary use of a link to Login as a mockup for Logout if Logout not implemented -->
+                            <!-- Recommend implementing a proper POST /Account/Logout in the future -->
+                            <a asp-controller="Account" asp-action="Logout" class="group flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                                <svg class="mr-3 h-5 w-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                                Đăng xuất
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <a asp-controller="Account" asp-action="Login" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-xs text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors">
+                        Đăng nhập
+                    </a>
+                }
             </div>
         </div>
     </header>
@@ -63,15 +106,16 @@
         <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 lg:hidden"></div>
 
         <!-- Sidebar Navigation (Responsive) -->
-        <aside id="mobileSidebar" class="fixed inset-y-0 left-0 z-50 w-70 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:h-[calc(100vh-4rem)] flex flex-col justify-between shrink-0">
+        <aside id="mobileSidebar" class="fixed inset-y-0 left-0 z-50 w-70 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:h-[calc(100vh-4rem)] flex flex-col justify-between shrink-0 overflow-y-auto">
             <div class="p-6">
                 <div class="lg:hidden flex items-center gap-2 mb-6">
                     <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">D</div>
                     <span class="font-bold text-lg text-slate-800">DuAn<span class="text-blue-600">TotNghiep</span></span>
                 </div>
                 
+                <!-- MENU CHÍNH (GUEST & USER) -->
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-4">Danh mục chính</span>
-                <ul class="space-y-1">
+                <ul class="space-y-1 mb-8">
                     <li>
                         <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="" asp-controller="Home" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -82,59 +126,109 @@
                     </li>
                     <li>
                         <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                             </svg>
                             Khóa học
                         </a>
                     </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                            </svg>
-                            Nhiệm vụ & Bài tập
-                        </a>
-                    </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Login">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H3m12 0l-4-4m4 4l-4 4M21 12h-2a3 3 0 00-3-3H9a3 3 0 00-3 3v6a3 3 0 003 3h7a3 3 0 003-3h2"></path>
-                            </svg>
-                            Đăng nhập
-                        </a>
-                    </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                            </svg>
-                            Lịch học
-                        </a>
-                    </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="" asp-controller="Home" asp-action="Privacy">
-                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
-                            </svg>
-                            Chính sách bảo mật
-                        </a>
-                    </li>
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                </svg>
+                                Nhiệm vụ & Bài tập
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                Lịch học
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Login">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H3m12 0l-4-4m4 4l-4 4M21 12h-2a3 3 0 00-3-3H9a3 3 0 00-3 3v6a3 3 0 003 3h7a3 3 0 003-3h2"></path>
+                                </svg>
+                                Đăng nhập
+                            </a>
+                        </li>
+                    }
                 </ul>
+
+                <!-- MENU ADMIN -->
+                @if (User.IsInRole("ADMIN"))
+                {
+                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-4">Quản Trị Viên</span>
+                    <ul class="space-y-1 mb-8">
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                                </svg>
+                                Dashboard
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="User" asp-action="Index">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                Quản lý tài khoản
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
+                                </svg>
+                                Login Logs
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                Session Logs
+                            </a>
+                        </li>
+                        <li>
+                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                                <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                </svg>
+                                Audit Logs
+                            </a>
+                        </li>
+                    </ul>
+                }
             </div>
             
-            <div class="p-6 border-t border-slate-200">
-                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" href="#">
-                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                    Đăng xuất
-                </a>
-            </div>
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="p-6 border-t border-slate-200">
+                    <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" asp-controller="Account" asp-action="Logout">
+                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Đăng xuất
+                    </a>
+                </div>
+            }
         </aside>
 
         <!-- Content Area -->
-        <main role="main" class="flex-1 overflow-y-auto min-h-0 flex flex-col">
+        <main role="main" class="flex-1 overflow-y-auto min-h-0 flex flex-col bg-slate-50">
             <div class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
                 @RenderBody()
             </div>
@@ -156,9 +250,10 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     
-    <!-- Sidebar Toggle Script -->
+    <!-- Sidebar & Dropdown Toggle Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Sidebar toggle
             const sidebarToggle = document.getElementById('sidebarToggle');
             const mobileSidebar = document.getElementById('mobileSidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -172,6 +267,24 @@
 
                 sidebarToggle.addEventListener('click', toggleSidebar);
                 sidebarOverlay.addEventListener('click', toggleSidebar);
+            }
+
+            // User dropdown toggle
+            const userMenuBtn = document.getElementById('userMenuBtn');
+            const userDropdown = document.getElementById('userDropdown');
+
+            if (userMenuBtn && userDropdown) {
+                userMenuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
             }
         });
     </script>
