@@ -32,6 +32,7 @@ builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IUserSessionService, UserSessionService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IUserProfileService, DuAnTotNghiep.Services.UserProfileService>();
 
 // Đăng ký Seeder
 // Đăng ký Seeder

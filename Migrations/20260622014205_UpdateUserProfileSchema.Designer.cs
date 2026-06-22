@@ -4,6 +4,7 @@ using DuAnTotNghiep.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DuAnTotNghiep.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622014205_UpdateUserProfileSchema")]
+    partial class UpdateUserProfileSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2954,12 +2957,6 @@ namespace DuAnTotNghiep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AvatarUrl")
-                        .HasMaxLength(500)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(500)")
-                        .HasColumnName("avatar_url");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -2999,12 +2996,6 @@ namespace DuAnTotNghiep.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(500)")
                         .HasColumnName("password_hash");
-
-                    b.Property<string>("Phone")
-                        .HasMaxLength(20)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(20)")
-                        .HasColumnName("phone");
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int")
@@ -3053,40 +3044,6 @@ namespace DuAnTotNghiep.Migrations
                         });
                 });
 
-            modelBuilder.Entity("DuAnTotNghiep.Models.UserAvatarHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ChangedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("changed_at")
-                        .HasDefaultValueSql("(sysutcdatetime())");
-
-                    b.Property<string>("NewAvatarUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("new_avatar_url");
-
-                    b.Property<string>("OldAvatarUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)")
-                        .HasColumnName("old_avatar_url");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("user_avatar_histories", (string)null);
-                });
-
             modelBuilder.Entity("DuAnTotNghiep.Models.UserProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -3095,6 +3052,12 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("id");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AvatarUrl")
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(500)")
+                        .HasColumnName("avatar_url");
 
                     b.Property<string>("Bio")
                         .HasColumnType("nvarchar(max)")
@@ -3122,6 +3085,30 @@ namespace DuAnTotNghiep.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)")
                         .HasColumnName("gender");
+
+                    b.Property<string>("Language")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("vi-VN")
+                        .HasColumnName("language");
+
+                    b.Property<string>("NotificationPreferences")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("notification_preferences");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(20)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("phone");
+
+                    b.Property<string>("Timezone")
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Asia/Ho_Chi_Minh")
+                        .HasColumnName("timezone");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -3203,58 +3190,6 @@ namespace DuAnTotNghiep.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("user_sessions", (string)null);
-                });
-
-            modelBuilder.Entity("DuAnTotNghiep.Models.UserSetting", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("EmailNotifications")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasColumnName("email_notifications");
-
-                    b.Property<string>("Language")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasDefaultValue("vi-VN")
-                        .HasColumnName("language");
-
-                    b.Property<bool>("StudyReminderEnabled")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(true)
-                        .HasColumnName("study_reminder_enabled");
-
-                    b.Property<string>("Theme")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)")
-                        .HasDefaultValue("light")
-                        .HasColumnName("theme");
-
-                    b.Property<string>("Timezone")
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasDefaultValue("Asia/Ho_Chi_Minh")
-                        .HasColumnName("timezone");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("user_settings", (string)null);
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.AiFeedback", b =>
@@ -4192,17 +4127,6 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("DuAnTotNghiep.Models.UserAvatarHistory", b =>
-                {
-                    b.HasOne("DuAnTotNghiep.Models.User", "User")
-                        .WithMany("UserAvatarHistories")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("DuAnTotNghiep.Models.UserProfile", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.User", "User")
@@ -4222,17 +4146,6 @@ namespace DuAnTotNghiep.Migrations
                         .HasForeignKey("UserId")
                         .IsRequired()
                         .HasConstraintName("FK_user_sessions_users");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DuAnTotNghiep.Models.UserSetting", b =>
-                {
-                    b.HasOne("DuAnTotNghiep.Models.User", "User")
-                        .WithOne("UserSetting")
-                        .HasForeignKey("DuAnTotNghiep.Models.UserSetting", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
 
                     b.Navigation("User");
                 });
@@ -4525,13 +4438,9 @@ namespace DuAnTotNghiep.Migrations
 
                     b.Navigation("TestAttempts");
 
-                    b.Navigation("UserAvatarHistories");
-
                     b.Navigation("UserProfile");
 
                     b.Navigation("UserSessions");
-
-                    b.Navigation("UserSetting");
                 });
 #pragma warning restore 612, 618
         }

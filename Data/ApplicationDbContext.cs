@@ -114,6 +114,10 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<UserProfile> UserProfiles { get; set; }
 
+    public virtual DbSet<UserSetting> UserSettings { get; set; }
+
+    public virtual DbSet<UserAvatarHistory> UserAvatarHistories { get; set; }
+
     public virtual DbSet<UserSession> UserSessions { get; set; }
 
     public virtual DbSet<LoginLog> LoginLogs { get; set; }
@@ -1865,10 +1869,7 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.Email, "UQ__users__AB6E6164B7147E19").IsUnique();
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.AvatarUrl)
-                .HasMaxLength(500)
-                .IsUnicode(false)
-                .HasColumnName("avatar_url");
+
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -1879,6 +1880,14 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.FullName)
                 .HasMaxLength(255)
                 .HasColumnName("full_name");
+            entity.Property(e => e.AvatarUrl)
+                .HasMaxLength(500)
+                .IsUnicode(false)
+                .HasColumnName("avatar_url");
+            entity.Property(e => e.Phone)
+                .HasMaxLength(20)
+                .IsUnicode(false)
+                .HasColumnName("phone");
             entity.Property(e => e.LastLoginAt).HasColumnName("last_login_at");
             entity.Property(e => e.FailedLoginCount)
                 .HasDefaultValue(0)
@@ -1888,10 +1897,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(500)
                 .IsUnicode(false)
                 .HasColumnName("password_hash");
-            entity.Property(e => e.Phone)
-                .HasMaxLength(20)
-                .IsUnicode(false)
-                .HasColumnName("phone");
+
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.Status)
                 .HasMaxLength(30)
@@ -1938,7 +1944,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.User).WithOne(p => p.UserProfile)
                 .HasForeignKey<UserProfile>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_user_profiles_users");
         });
 
@@ -2031,6 +2037,38 @@ public partial class ApplicationDbContext : DbContext
                 FailedLoginCount = 0
             }
         );
+        modelBuilder.Entity<UserSetting>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("user_settings");
+            entity.HasIndex(e => e.UserId).IsUnique();
+
+            entity.Property(e => e.Language).HasMaxLength(50).HasDefaultValue("vi-VN").HasColumnName("language");
+            entity.Property(e => e.Timezone).HasMaxLength(50).HasDefaultValue("Asia/Ho_Chi_Minh").HasColumnName("timezone");
+            entity.Property(e => e.EmailNotifications).HasDefaultValue(true).HasColumnName("email_notifications");
+            entity.Property(e => e.StudyReminderEnabled).HasDefaultValue(true).HasColumnName("study_reminder_enabled");
+            entity.Property(e => e.Theme).HasMaxLength(20).HasDefaultValue("light").HasColumnName("theme");
+
+            entity.HasOne(d => d.User)
+                  .WithOne(p => p.UserSetting)
+                  .HasForeignKey<UserSetting>(d => d.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<UserAvatarHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("user_avatar_histories");
+
+            entity.Property(e => e.OldAvatarUrl).HasMaxLength(500).HasColumnName("old_avatar_url");
+            entity.Property(e => e.NewAvatarUrl).HasMaxLength(500).HasColumnName("new_avatar_url");
+            entity.Property(e => e.ChangedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("changed_at");
+
+            entity.HasOne(d => d.User)
+                  .WithMany(p => p.UserAvatarHistories)
+                  .HasForeignKey(d => d.UserId)
+                  .OnDelete(DeleteBehavior.Cascade);
+        });
 
         OnModelCreatingPartial(modelBuilder);
     }

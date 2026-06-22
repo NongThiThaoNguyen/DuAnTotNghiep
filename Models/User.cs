@@ -13,13 +13,13 @@ public partial class User
 
     public string FullName { get; set; } = null!;
 
-    public int RoleId { get; set; }
-
-    public string Status { get; set; } = null!;
-
     public string? AvatarUrl { get; set; }
 
     public string? Phone { get; set; }
+
+    public int RoleId { get; set; }
+
+    public string Status { get; set; } = null!;
 
     public DateTime? LastLoginAt { get; set; }
 
@@ -104,6 +104,10 @@ public partial class User
     public virtual ICollection<TestAttempt> TestAttempts { get; set; } = new List<TestAttempt>();
 
     public virtual UserProfile? UserProfile { get; set; }
+
+    public virtual UserSetting? UserSetting { get; set; }
+
+    public virtual ICollection<UserAvatarHistory> UserAvatarHistories { get; set; } = new List<UserAvatarHistory>();
 
     public virtual ICollection<UserSession> UserSessions { get; set; } = new List<UserSession>();
 
