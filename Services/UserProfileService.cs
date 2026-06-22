@@ -23,6 +23,7 @@ public class UserProfileService : IUserProfileService
     public async Task<ProfileViewModel> GetProfileAsync(int userId)
     {
         var user = await _context.Users
+            .AsNoTracking()
             .Include(u => u.UserProfile)
             .Include(u => u.UserSetting)
             .FirstOrDefaultAsync(u => u.Id == userId);
@@ -58,8 +59,8 @@ public class UserProfileService : IUserProfileService
         if (user == null)
             throw new NotFoundException("Người dùng không tồn tại.");
 
-        user.FullName = model.FullName;
-        user.Phone = model.Phone;
+        user.FullName = model.FullName?.Trim();
+        user.Phone = model.Phone?.Trim();
 
         if (user.UserProfile == null)
         {
@@ -74,10 +75,23 @@ public class UserProfileService : IUserProfileService
 
         user.UserProfile.DateOfBirth = model.DateOfBirth;
         user.UserProfile.Gender = model.Gender;
-        user.UserProfile.Country = model.Country;
-        user.UserProfile.Bio = model.Bio;
+        user.UserProfile.Country = model.Country?.Trim();
+        user.UserProfile.Bio = model.Bio?.Trim();
         user.UserProfile.UpdatedAt = DateTime.UtcNow;
         user.UpdatedAt = DateTime.UtcNow;
+
+        var auditLog = new AuditLog
+        {
+            UserId = userId,
+            Action = "Update Profile",
+            EntityName = "UserProfile",
+            EntityId = user.UserProfile.Id > 0 ? user.UserProfile.Id : userId,
+            OldValue = "Hidden",
+            NewValue = "Hidden",
+            IpAddress = "System",
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.AuditLogs.Add(auditLog);
 
         await _context.SaveChangesAsync();
     }
@@ -85,6 +99,7 @@ public class UserProfileService : IUserProfileService
     public async Task<AccountSettingViewModel> GetAccountSettingsAsync(int userId)
     {
         var setting = await _context.UserSettings
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.UserId == userId);
 
         if (setting == null)
@@ -133,6 +148,19 @@ public class UserProfileService : IUserProfileService
         user.UserSetting.StudyReminderEnabled = model.StudyReminderEnabled;
         user.UserSetting.Theme = model.Theme;
 
+        var auditLog = new AuditLog
+        {
+            UserId = userId,
+            Action = "Update Account Settings",
+            EntityName = "UserSetting",
+            EntityId = user.UserSetting.Id > 0 ? user.UserSetting.Id : userId,
+            OldValue = "Hidden",
+            NewValue = "Hidden",
+            IpAddress = "System",
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.AuditLogs.Add(auditLog);
+
         await _context.SaveChangesAsync();
     }
 
@@ -151,6 +179,19 @@ public class UserProfileService : IUserProfileService
         };
         _context.UserAvatarHistories.Add(history);
 
+        var auditLog = new AuditLog
+        {
+            UserId = userId,
+            Action = "Change Avatar",
+            EntityName = "User",
+            EntityId = userId,
+            OldValue = user.AvatarUrl ?? "None",
+            NewValue = avatarUrl,
+            IpAddress = "System",
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.AuditLogs.Add(auditLog);
+
         user.AvatarUrl = avatarUrl;
         user.UpdatedAt = DateTime.UtcNow;
 
@@ -163,11 +204,47 @@ public class UserProfileService : IUserProfileService
         if (user == null)
             throw new NotFoundException("Người dùng không tồn tại.");
 
-        if (!BCrypt.Net.BCrypt.Verify(oldPassword, user.PasswordHash))
+        bool isPasswordCorrect = false;
+
+        if (string.IsNullOrEmpty(user.PasswordHash))
+        {
+            throw new BusinessException("Tài khoản này chưa có mật khẩu (có thể được tạo qua Google/Facebook).");
+        }
+
+        try
+        {
+            isPasswordCorrect = BCrypt.Net.BCrypt.Verify(oldPassword, user.PasswordHash);
+        }
+        catch (Exception)
+        {
+            // Fallback cho dữ liệu seed mẫu nếu PasswordHash không phải là mã băm BCrypt hợp lệ (VD: "123456")
+            if (user.PasswordHash == oldPassword)
+            {
+                isPasswordCorrect = true;
+            }
+        }
+
+        if (!isPasswordCorrect)
             throw new BusinessException("Mật khẩu hiện tại không chính xác.");
+
+        if (oldPassword == newPassword)
+            throw new BusinessException("Mật khẩu mới không được trùng với mật khẩu hiện tại.");
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
         user.UpdatedAt = DateTime.UtcNow;
+
+        var auditLog = new AuditLog
+        {
+            UserId = userId,
+            Action = "Change Password",
+            EntityName = "User",
+            EntityId = userId,
+            OldValue = "Hidden",
+            NewValue = "Hidden",
+            IpAddress = "System",
+            CreatedAt = DateTime.UtcNow
+        };
+        _context.AuditLogs.Add(auditLog);
 
         await _context.SaveChangesAsync();
     }

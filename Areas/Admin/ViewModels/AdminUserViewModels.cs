@@ -6,6 +6,7 @@ namespace DuAnTotNghiep.Areas.Admin.ViewModels
         public string FullName { get; set; } = null!;
         public string Email { get; set; } = null!;
         public string RoleName { get; set; } = null!;
+        public string RoleCode { get; set; } = null!;
         public string Status { get; set; } = null!;
         public DateTime CreatedAt { get; set; }
     }

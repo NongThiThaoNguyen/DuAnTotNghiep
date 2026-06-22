@@ -3,50 +3,59 @@
     ViewData["Title"] = "Quản lý tài khoản";
 }
 
-<div class="container-fluid py-4">
+<div class="w-full">
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="p-4 mb-6 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                <span class="font-medium text-sm">@TempData["SuccessMessage"]</span>
+            </div>
         </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="p-4 mb-6 rounded-xl bg-red-50 text-red-800 border border-red-200 flex items-center justify-between shadow-sm">
+            <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                <span class="font-medium text-sm">@TempData["ErrorMessage"]</span>
+            </div>
         </div>
     }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 mb-0 text-gray-800 font-weight-bold">Quản lý Tài Khoản</h2>
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Quản lý Tài Khoản</h2>
+            <p class="text-sm text-slate-500 mt-1">Quản trị danh sách người dùng, phân quyền và trạng thái hoạt động.</p>
+        </div>
     </div>
 
     <!-- Filter Card -->
-    <div class="card shadow-sm mb-4 border-0 rounded-3">
-        <div class="card-body bg-light rounded-3">
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200 mb-6 overflow-hidden">
+        <div class="p-5 bg-slate-50/50">
             <form method="get" asp-action="Index">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label font-weight-bold text-secondary small">Tìm kiếm</label>
-                        <div class="input-group">
-                            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
-                            <input type="text" class="form-control border-start-0 ps-0" asp-for="Filter.Keyword" placeholder="Nhập họ tên, email...">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-4">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tìm kiếm</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input type="text" class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" asp-for="Filter.Keyword" placeholder="Nhập họ tên, email...">
                         </div>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label font-weight-bold text-secondary small">Vai trò</label>
-                        <select class="form-select" asp-for="Filter.Role">
+                    <div class="md:col-span-3">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Vai trò</label>
+                        <select class="block w-full py-2.5 pl-3 pr-10 border border-slate-300 bg-white rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" asp-for="Filter.Role">
                             <option value="">Tất cả vai trò</option>
                             <option value="ADMIN">Quản trị viên (ADMIN)</option>
                             <option value="TEACHER">Giáo viên (TEACHER)</option>
                             <option value="STUDENT">Học viên (STUDENT)</option>
                         </select>
                     </div>
-                    <div class="col-md-3">
-                        <label class="form-label font-weight-bold text-secondary small">Trạng thái</label>
-                        <select class="form-select" asp-for="Filter.Status">
+                    <div class="md:col-span-3">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Trạng thái</label>
+                        <select class="block w-full py-2.5 pl-3 pr-10 border border-slate-300 bg-white rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" asp-for="Filter.Status">
                             <option value="">Tất cả trạng thái</option>
                             <option value="ACTIVE">Hoạt động (ACTIVE)</option>
                             <option value="LOCKED">Đã khóa (LOCKED)</option>
@@ -54,9 +63,10 @@
                             <option value="DELETED">Đã xóa (DELETED)</option>
                         </select>
                     </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary w-100 fw-medium">
-                            <i class="bi bi-funnel me-1"></i> Lọc dữ liệu
+                    <div class="md:col-span-2 flex items-end">
+                        <button type="submit" class="w-full flex justify-center items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            Lọc
                         </button>
                     </div>
                 </div>
@@ -65,166 +75,202 @@
     </div>
 
     <!-- Data Table Card -->
-    <div class="card shadow-sm border-0 rounded-3">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">STT</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Người dùng</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Vai trò</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Trạng thái</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Ngày tạo</th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-100">
+                    @if (!Model.Users.Any())
+                    {
                         <tr>
-                            <th class="px-4 py-3 text-secondary text-uppercase" style="font-size: 0.75rem; font-weight: 600;">STT</th>
-                            <th class="px-4 py-3 text-secondary text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Họ tên</th>
-                            <th class="px-4 py-3 text-secondary text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Email</th>
-                            <th class="px-4 py-3 text-secondary text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Vai trò</th>
-                            <th class="px-4 py-3 text-secondary text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Trạng thái</th>
-                            <th class="px-4 py-3 text-secondary text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Ngày tạo</th>
-                            <th class="px-4 py-3 text-end text-secondary text-uppercase" style="font-size: 0.75rem; font-weight: 600;">Thao tác</th>
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <svg class="mx-auto h-12 w-12 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
+                                <p class="text-sm text-slate-500 font-medium">Không tìm thấy dữ liệu phù hợp.</p>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (!Model.Users.Any())
+                    }
+                    else
+                    {
+                        int stt = (Model.Filter.Page - 1) * Model.Filter.PageSize + 1;
+                        foreach (var user in Model.Users)
                         {
-                            <tr>
-                                <td colspan="7" class="text-center py-5 text-muted">
-                                    <i class="bi bi-inbox fs-1 d-block mb-3"></i>
-                                    Không tìm thấy dữ liệu phù hợp.
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">@stt</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="h-10 w-10 shrink-0">
+                                            <img class="h-10 w-10 rounded-full object-cover border-2 border-white shadow-xs" src="https://ui-avatars.com/api/?name=@Uri.EscapeDataString(user.FullName)&background=F1F5F9&color=475569" alt="">
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-semibold text-slate-900">@user.FullName</div>
+                                            <div class="text-xs text-slate-500">@user.Email</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @{
+                                        var roleClass = user.RoleCode switch
+                                        {
+                                            "ADMIN" => "bg-purple-100 text-purple-800 border-purple-200",
+                                            "TEACHER" => "bg-blue-100 text-blue-800 border-blue-200",
+                                            _ => "bg-slate-100 text-slate-800 border-slate-200"
+                                        };
+                                        var roleLabel = user.RoleCode switch
+                                        {
+                                            "ADMIN" => "Quản trị viên",
+                                            "TEACHER" => "Giáo viên",
+                                            "STUDENT" => "Học viên",
+                                            _ => user.RoleName
+                                        };
+                                    }
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border @roleClass">
+                                        @roleLabel
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @{
+                                        var statusClass = user.Status switch
+                                        {
+                                            "ACTIVE" => "bg-emerald-100 text-emerald-800 border-emerald-200",
+                                            "LOCKED" => "bg-amber-100 text-amber-800 border-amber-200",
+                                            "DELETED" => "bg-red-100 text-red-800 border-red-200",
+                                            _ => "bg-slate-100 text-slate-800 border-slate-200"
+                                        };
+                                    }
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border @statusClass">
+                                        <span class="w-1.5 h-1.5 rounded-full mr-1.5 @(user.Status == "ACTIVE" ? "bg-emerald-500" : (user.Status == "LOCKED" ? "bg-amber-500" : "bg-red-500"))"></span>
+                                        @user.Status
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                    @user.CreatedAt.ToString("dd/MM/yyyy")
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <a asp-action="Details" asp-route-id="@user.Id" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors" title="Chi tiết">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                        </a>
+                                        
+                                        @if (user.Status == "ACTIVE")
+                                        {
+                                            <button type="button" onclick="showActionModal('Lock', @user.Id, 'Khóa tài khoản', 'Bạn có chắc chắn muốn KHÓA tài khoản này không? Người dùng sẽ bị chặn đăng nhập ngay lập tức.')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition-colors" title="Khóa tài khoản">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                            </button>
+                                        }
+                                        else if (user.Status == "LOCKED")
+                                        {
+                                            <button type="button" onclick="showActionModal('Unlock', @user.Id, 'Mở khóa tài khoản', 'Bạn có chắc chắn muốn MỞ KHÓA cho tài khoản này không? Người dùng sẽ được phép đăng nhập lại.')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:text-emerald-700 transition-colors" title="Mở khóa">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                                            </button>
+                                        }
+                                        
+                                        <button type="button" onclick="showActionModal('ResetPassword', @user.Id, 'Reset Mật Khẩu', 'Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? Một mật khẩu mới sẽ được tạo và gửi qua email của họ.')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors" title="Reset Password">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
+                            stt++;
                         }
-                        else
-                        {
-                            int stt = (Model.Filter.Page - 1) * Model.Filter.PageSize + 1;
-                            foreach (var user in Model.Users)
-                            {
-                                <tr>
-                                    <td class="px-4 py-3">@stt</td>
-                                    <td class="px-4 py-3 fw-medium">@user.FullName</td>
-                                    <td class="px-4 py-3 text-muted">@user.Email</td>
-                                    <td class="px-4 py-3">
-                                        @{
-                                            var roleClass = user.RoleName switch
-                                            {
-                                                "ADMIN" => "bg-danger text-white",
-                                                "TEACHER" => "bg-info text-dark",
-                                                _ => "bg-secondary text-white"
-                                            };
-                                        }
-                                        <span class="badge @roleClass rounded-pill px-3 py-2" style="font-weight: 500;">@user.RoleName</span>
-                                    </td>
-                                    <td class="px-4 py-3">
-                                        @{
-                                            var statusClass = user.Status switch
-                                            {
-                                                "ACTIVE" => "bg-success text-white",
-                                                "LOCKED" => "bg-warning text-dark",
-                                                "DELETED" => "bg-danger text-white",
-                                                _ => "bg-secondary text-white"
-                                            };
-                                        }
-                                        <span class="badge @statusClass rounded-pill px-3 py-2" style="font-weight: 500;">@user.Status</span>
-                                    </td>
-                                    <td class="px-4 py-3 text-muted">@user.CreatedAt.ToString("dd/MM/yyyy")</td>
-                                    <td class="px-4 py-3 text-end">
-                                        <div class="dropdown">
-                                            <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-medium dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Thao tác
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                                                <li>
-                                                    <a asp-action="Details" asp-route-id="@user.Id" class="dropdown-item">
-                                                        <i class="bi bi-info-circle text-primary me-2"></i> Chi tiết
-                                                    </a>
-                                                </li>
-                                                <li><hr class="dropdown-divider"></li>
-                                                @if (user.Status == "ACTIVE")
-                                                {
-                                                    <li>
-                                                        <button type="button" class="dropdown-item text-warning" onclick="showActionModal('Lock', @user.Id, 'Khóa tài khoản', 'Bạn có chắc chắn muốn KHÓA tài khoản này không? Người dùng sẽ bị chặn đăng nhập ngay lập tức.')">
-                                                            <i class="bi bi-lock-fill me-2"></i> Khóa tài khoản
-                                                        </button>
-                                                    </li>
-                                                }
-                                                else if (user.Status == "LOCKED")
-                                                {
-                                                    <li>
-                                                        <button type="button" class="dropdown-item text-success" onclick="showActionModal('Unlock', @user.Id, 'Mở khóa tài khoản', 'Bạn có chắc chắn muốn MỞ KHÓA cho tài khoản này không? Người dùng sẽ được phép đăng nhập lại.')">
-                                                            <i class="bi bi-unlock-fill me-2"></i> Mở khóa
-                                                        </button>
-                                                    </li>
-                                                }
-                                                <li>
-                                                    <button type="button" class="dropdown-item text-danger" onclick="showActionModal('ResetPassword', @user.Id, 'Reset Mật Khẩu', 'Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? Một mật khẩu mới sẽ được tạo và gửi qua email của họ.')">
-                                                        <i class="bi bi-key-fill me-2"></i> Reset Password
-                                                    </button>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                                stt++;
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
+                    }
+                </tbody>
+            </table>
         </div>
         
         <!-- Pagination -->
         @if (Model.TotalPages > 1)
         {
-            <div class="card-footer bg-white py-3 border-0">
-                <nav aria-label="Page navigation">
-                    <ul class="pagination justify-content-center mb-0">
-                        <li class="page-item @(Model.Filter.Page == 1 ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index" 
+            <div class="px-6 py-4 border-t border-slate-200 bg-white flex items-center justify-between sm:px-6">
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-slate-700">
+                            Hiển thị trang <span class="font-medium text-slate-900">@Model.Filter.Page</span> trên <span class="font-medium text-slate-900">@Model.TotalPages</span>
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-lg shadow-xs -space-x-px" aria-label="Pagination">
+                            <a asp-action="Index" 
                                asp-route-Keyword="@Model.Filter.Keyword" 
                                asp-route-Role="@Model.Filter.Role" 
                                asp-route-Status="@Model.Filter.Status" 
-                               asp-route-Page="@(Model.Filter.Page - 1)">Trước</a>
-                        </li>
-                        
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(Model.Filter.Page == i ? "active" : "")">
-                                <a class="page-link" asp-action="Index" 
+                               asp-route-Page="@(Model.Filter.Page - 1)"
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-lg border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 @(Model.Filter.Page == 1 ? "pointer-events-none opacity-50" : "")">
+                                <span class="sr-only">Trước</span>
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                            </a>
+                            
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <a asp-action="Index" 
                                    asp-route-Keyword="@Model.Filter.Keyword" 
                                    asp-route-Role="@Model.Filter.Role" 
                                    asp-route-Status="@Model.Filter.Status" 
-                                   asp-route-Page="@i">@i</a>
-                            </li>
-                        }
-                        
-                        <li class="page-item @(Model.Filter.Page == Model.TotalPages ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index" 
+                                   asp-route-Page="@i"
+                                   class="relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium @(Model.Filter.Page == i ? "z-10 bg-blue-50 border-blue-500 text-blue-600" : "bg-white text-slate-500 hover:bg-slate-50")">
+                                    @i
+                                </a>
+                            }
+                            
+                            <a asp-action="Index" 
                                asp-route-Keyword="@Model.Filter.Keyword" 
                                asp-route-Role="@Model.Filter.Role" 
                                asp-route-Status="@Model.Filter.Status" 
-                               asp-route-Page="@(Model.Filter.Page + 1)">Tiếp</a>
-                        </li>
-                    </ul>
-                </nav>
+                               asp-route-Page="@(Model.Filter.Page + 1)"
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-lg border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 @(Model.Filter.Page == Model.TotalPages ? "pointer-events-none opacity-50" : "")">
+                                <span class="sr-only">Tiếp</span>
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
             </div>
         }
     </div>
 </div>
 
 <!-- Shared Action Modal -->
-<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow">
-            <div class="modal-header border-bottom-0 pb-0">
-                <h5 class="modal-title font-weight-bold" id="actionModalLabel">Xác nhận</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div id="actionModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeActionModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        
+        <!-- Modal panel -->
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div id="modalIconContainer" class="mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10 bg-blue-100 text-blue-600">
+                        <!-- Icon will be inserted here via JS -->
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg leading-6 font-bold text-slate-900" id="actionModalLabel">Xác nhận</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-slate-500" id="actionModalMessage">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body py-4">
-                <p id="actionModalMessage" class="mb-0 fs-6">Bạn có chắc chắn muốn thực hiện hành động này?</p>
-            </div>
-            <div class="modal-footer border-top-0 pt-0">
-                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy bỏ</button>
-                <form id="actionForm" method="post" style="display:inline;">
+            <div class="bg-slate-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse border-t border-slate-100 gap-2">
+                <form id="actionForm" method="post" class="w-full sm:w-auto">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="id" id="actionUserId" value="" />
-                    <button type="submit" class="btn btn-primary rounded-pill px-4" id="actionSubmitBtn">Đồng ý</button>
+                    <button type="submit" id="actionSubmitBtn" class="w-full inline-flex justify-center rounded-xl border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm transition-colors">
+                        Đồng ý
+                    </button>
                 </form>
+                <button type="button" onclick="closeActionModal()" class="mt-3 w-full inline-flex justify-center rounded-xl border border-slate-300 bg-white px-4 py-2 text-base font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus:outline-hidden focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 sm:mt-0 sm:w-auto sm:text-sm transition-colors">
+                    Hủy bỏ
+                </button>
             </div>
         </div>
     </div>
@@ -233,25 +279,49 @@
 @section Scripts {
     <script>
         function showActionModal(action, userId, title, message) {
-            // Set data
             document.getElementById('actionUserId').value = userId;
             document.getElementById('actionModalLabel').innerText = title;
             document.getElementById('actionModalMessage').innerText = message;
-            
-            // Set form action URL
             document.getElementById('actionForm').action = '/Admin/User/' + action;
             
-            // Change button color based on action
             const submitBtn = document.getElementById('actionSubmitBtn');
-            submitBtn.className = 'btn rounded-pill px-4 text-white ';
-            if (action === 'Lock') submitBtn.className += 'btn-warning';
-            else if (action === 'Unlock') submitBtn.className += 'btn-success';
-            else if (action === 'ResetPassword') submitBtn.className += 'btn-danger';
-            else submitBtn.className += 'btn-primary';
-
+            const iconContainer = document.getElementById('modalIconContainer');
+            
+            // Reset classes
+            submitBtn.className = 'w-full inline-flex justify-center rounded-xl border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm transition-colors';
+            iconContainer.className = 'mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10';
+            
+            let svgIcon = '';
+            
+            if (action === 'Lock') {
+                submitBtn.classList.add('bg-amber-600', 'hover:bg-amber-700', 'focus:ring-amber-500');
+                iconContainer.classList.add('bg-amber-100', 'text-amber-600');
+                svgIcon = '<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>';
+            }
+            else if (action === 'Unlock') {
+                submitBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700', 'focus:ring-emerald-500');
+                iconContainer.classList.add('bg-emerald-100', 'text-emerald-600');
+                svgIcon = '<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>';
+            }
+            else if (action === 'ResetPassword') {
+                submitBtn.classList.add('bg-red-600', 'hover:bg-red-700', 'focus:ring-red-500');
+                iconContainer.classList.add('bg-red-100', 'text-red-600');
+                svgIcon = '<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>';
+            }
+            else {
+                submitBtn.classList.add('bg-blue-600', 'hover:bg-blue-700', 'focus:ring-blue-500');
+                iconContainer.classList.add('bg-blue-100', 'text-blue-600');
+                svgIcon = '<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
+            }
+            
+            iconContainer.innerHTML = svgIcon;
+            
             // Show modal
-            var myModal = new bootstrap.Modal(document.getElementById('actionModal'));
-            myModal.show();
+            document.getElementById('actionModal').classList.remove('hidden');
+        }
+
+        function closeActionModal() {
+            document.getElementById('actionModal').classList.add('hidden');
         }
     </script>
 }

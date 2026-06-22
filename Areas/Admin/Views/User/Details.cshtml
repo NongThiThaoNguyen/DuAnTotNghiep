@@ -1,4 +1,4 @@
-@model DuAnTotNghiep.Areas.Admin.ViewModels.UserDetailsViewModel
+@model DuAnTotNghiep.Areas.Admin.ViewModels.AdminUserProfileViewModel
 @{
     ViewData["Title"] = "Chi tiết tài khoản";
 }
@@ -66,7 +66,7 @@
                     </div>
                     <hr class="text-muted opacity-25">
                     
-                    <div class="row">
+                    <div class="row mb-4">
                         <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Trạng thái khóa tạm thời</div>
                         <div class="col-sm-8 text-dark fw-medium">
                             @if (Model.LockoutUntil.HasValue && Model.LockoutUntil.Value > DateTime.Now)
@@ -80,6 +80,39 @@
                                 <span class="badge bg-success text-white rounded-pill px-3 py-1">Không bị khóa</span>
                             }
                         </div>
+                    </div>
+
+                    <hr class="text-muted opacity-25">
+                    
+                    <h6 class="mt-4 mb-3 font-weight-bold text-primary"><i class="bi bi-person-lines-fill me-2"></i> Chi tiết Hồ sơ</h6>
+                    
+                    <div class="row mb-4">
+                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Số điện thoại</div>
+                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</div>
+                    </div>
+                    <hr class="text-muted opacity-25">
+                    
+                    <div class="row mb-4">
+                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Ngày sinh</div>
+                        <div class="col-sm-8 text-dark fw-medium">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</div>
+                    </div>
+                    <hr class="text-muted opacity-25">
+
+                    <div class="row mb-4">
+                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Giới tính</div>
+                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Gender) ? "Chưa cập nhật" : Model.Gender)</div>
+                    </div>
+                    <hr class="text-muted opacity-25">
+
+                    <div class="row mb-4">
+                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Quốc gia</div>
+                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Country) ? "Chưa cập nhật" : Model.Country)</div>
+                    </div>
+                    <hr class="text-muted opacity-25">
+
+                    <div class="row">
+                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Tiểu sử</div>
+                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Bio) ? "Chưa cập nhật" : Model.Bio)</div>
                     </div>
                 </div>
             </div>
@@ -126,7 +159,7 @@
                         @if (Model.Status == "ACTIVE")
                         {
                             <form asp-action="Lock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này không?');">
-                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="id" value="@Model.UserId" />
                                 <button type="submit" class="btn btn-warning rounded-pill w-100 fw-medium text-white">
                                     <i class="bi bi-lock-fill me-2"></i> Khóa tài khoản
                                 </button>
@@ -135,7 +168,7 @@
                         else if (Model.Status == "LOCKED")
                         {
                             <form asp-action="Unlock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn MỞ KHÓA tài khoản này không?');">
-                                <input type="hidden" name="id" value="@Model.Id" />
+                                <input type="hidden" name="id" value="@Model.UserId" />
                                 <button type="submit" class="btn btn-success rounded-pill w-100 fw-medium">
                                     <i class="bi bi-unlock-fill me-2"></i> Mở khóa tài khoản
                                 </button>
@@ -143,7 +176,7 @@
                         }
                         
                         <form asp-action="ResetPassword" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? (Gửi mật khẩu mới qua email)');">
-                            <input type="hidden" name="id" value="@Model.Id" />
+                            <input type="hidden" name="id" value="@Model.UserId" />
                             <button type="submit" class="btn btn-danger rounded-pill w-100 fw-medium">
                                 <i class="bi bi-key-fill me-2"></i> Reset Password
                             </button>

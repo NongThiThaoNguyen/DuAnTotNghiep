@@ -38,6 +38,7 @@ namespace DuAnTotNghiep.Services
                 FullName = u.FullName,
                 Email = u.Email,
                 RoleName = u.Role?.RoleName ?? "Unknown",
+                RoleCode = u.Role?.RoleCode ?? "UNKNOWN",
                 Status = u.Status,
                 CreatedAt = u.CreatedAt
             }).ToList();
@@ -128,8 +129,7 @@ namespace DuAnTotNghiep.Services
             string newPassword = GenerateRandomPassword();
 
             // 2. Mã hóa mật khẩu
-            var hasher = new PasswordHasher<User>();
-            user.PasswordHash = hasher.HashPassword(user, newPassword);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
             user.UpdatedAt = DateTime.UtcNow;
 
             _userRepository.Update(user);

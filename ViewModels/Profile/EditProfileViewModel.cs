@@ -6,6 +6,7 @@ namespace DuAnTotNghiep.ViewModels.Profile;
 public class EditProfileViewModel
 {
     [Required(ErrorMessage = "Vui lòng nhập họ và tên")]
+    [RegularExpression(@"^(?!\s*$).+", ErrorMessage = "Họ và tên không được để trống hoặc chỉ chứa khoảng trắng")]
     [MaxLength(255)]
     [Display(Name = "Họ và tên")]
     public string FullName { get; set; } = null!;

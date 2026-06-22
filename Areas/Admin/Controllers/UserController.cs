@@ -11,10 +11,12 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _userService;
+        private readonly IUserProfileService _profileService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IUserProfileService profileService)
         {
             _userService = userService;
+            _profileService = profileService;
         }
 
         public async Task<IActionResult> Index([FromQuery] UserFilterViewModel filter)
@@ -25,13 +27,15 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         public async Task<IActionResult> Details(int id)
         {
-            var userDetails = await _userService.GetUserDetailsAsync(id);
-            if (userDetails == null)
+            try
+            {
+                var userDetails = await _profileService.GetAdminUserProfileAsync(id);
+                return View(userDetails);
+            }
+            catch (DuAnTotNghiep.Exceptions.NotFoundException)
             {
                 return NotFound();
             }
-
-            return View(userDetails);
         }
 
         [HttpPost]

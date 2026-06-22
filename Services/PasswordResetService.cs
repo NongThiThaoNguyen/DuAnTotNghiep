@@ -109,8 +109,8 @@ namespace DuAnTotNghiep.Services
             if (token == null) return false;
 
             // Đổi mật khẩu
-            var hasher = new PasswordHasher<User>();
-            user.PasswordHash = hasher.HashPassword(user, newPassword);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
             
             _userRepository.Update(user);
 

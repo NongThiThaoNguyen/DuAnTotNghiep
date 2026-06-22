@@ -15,10 +15,12 @@ namespace DuAnTotNghiep.Controllers;
 public class ProfileController : Controller
 {
     private readonly IUserProfileService _profileService;
+    private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _webHostEnvironment;
 
-    public ProfileController(IUserProfileService profileService)
+    public ProfileController(IUserProfileService profileService, Microsoft.AspNetCore.Hosting.IWebHostEnvironment webHostEnvironment)
     {
         _profileService = profileService;
+        _webHostEnvironment = webHostEnvironment;
     }
 
     private int GetCurrentUserId()
@@ -47,10 +49,10 @@ public class ProfileController : Controller
             TempData["ErrorMessage"] = "Tài khoản của bạn không tồn tại hoặc đã bị xóa.";
             return RedirectToAction("Login", "Account");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             // Ideally return View("Error", new ErrorViewModel { ... })
-            TempData["ErrorMessage"] = "Lỗi hệ thống: " + ex.Message;
+            TempData["ErrorMessage"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
             return RedirectToAction("Index", "Home");
         }
     }
@@ -61,6 +63,8 @@ public class ProfileController : Controller
         try
         {
             int userId = GetCurrentUserId();
+            if (userId == 0) return RedirectToAction("Login", "Account");
+
             var profile = await _profileService.GetProfileAsync(userId);
 
             var model = new EditProfileViewModel
@@ -92,6 +96,8 @@ public class ProfileController : Controller
         try
         {
             int userId = GetCurrentUserId();
+            if (userId == 0) return RedirectToAction("Login", "Account");
+
             await _profileService.UpdateProfileAsync(userId, model);
             
             TempData["SuccessMessage"] = "Cập nhật hồ sơ thành công!";
@@ -102,9 +108,9 @@ public class ProfileController : Controller
             ModelState.AddModelError(string.Empty, ex.Message);
             return View(model);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi khi cập nhật: " + ex.Message);
+            ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi khi cập nhật. Vui lòng thử lại sau.");
             return View(model);
         }
     }
@@ -113,6 +119,9 @@ public class ProfileController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> UploadAvatar(AvatarUploadViewModel model)
     {
+        int userId = GetCurrentUserId();
+        if (userId == 0) return RedirectToAction("Login", "Account");
+
         if (model.AvatarFile == null || model.AvatarFile.Length == 0)
         {
             TempData["ErrorMessage"] = "Vui lòng chọn file hợp lệ.";
@@ -125,20 +134,27 @@ public class ProfileController : Controller
             return RedirectToAction(nameof(Index));
         }
 
-        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
+        var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
         var ext = Path.GetExtension(model.AvatarFile.FileName).ToLowerInvariant();
-        if (!allowedExtensions.Contains(ext))
+        if (!allowedExtensions.Contains(ext) || !model.AvatarFile.ContentType.StartsWith("image/"))
         {
-            TempData["ErrorMessage"] = "Chỉ hỗ trợ file ảnh (jpg, png, gif).";
+            TempData["ErrorMessage"] = "Chỉ hỗ trợ file ảnh định dạng hợp lệ (jpg, png, gif, webp).";
             return RedirectToAction(nameof(Index));
+        }
+
+        using (var stream = model.AvatarFile.OpenReadStream())
+        {
+            if (!IsValidImageSignature(stream))
+            {
+                TempData["ErrorMessage"] = "Nội dung file không phải là hình ảnh hợp lệ (nghi ngờ giả mạo).";
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         try
         {
-            // Giả lập logic upload file lên wwwroot/uploads hoặc Cloud (cần FileService)
-            // Lấy tên file an toàn
             string fileName = Guid.NewGuid().ToString() + ext;
-            string uploadFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "avatars");
+            string uploadFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads", "avatars");
             
             if (!Directory.Exists(uploadFolder))
             {
@@ -153,14 +169,13 @@ public class ProfileController : Controller
 
             string newAvatarUrl = $"/uploads/avatars/{fileName}";
 
-            int userId = GetCurrentUserId();
             await _profileService.UpdateAvatarAsync(userId, newAvatarUrl);
             
             TempData["SuccessMessage"] = "Cập nhật ảnh đại diện thành công!";
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            TempData["ErrorMessage"] = "Lỗi khi upload ảnh: " + ex.Message;
+            TempData["ErrorMessage"] = "Đã xảy ra lỗi hệ thống trong quá trình upload ảnh. Vui lòng thử lại.";
         }
 
         return RedirectToAction(nameof(Index));
@@ -169,6 +184,9 @@ public class ProfileController : Controller
     [HttpGet("Profile/ChangePassword")]
     public IActionResult ChangePassword()
     {
+        int userId = GetCurrentUserId();
+        if (userId == 0) return RedirectToAction("Login", "Account");
+
         return View(new ChangePasswordViewModel());
     }
 
@@ -182,6 +200,8 @@ public class ProfileController : Controller
         try
         {
             int userId = GetCurrentUserId();
+            if (userId == 0) return RedirectToAction("Login", "Account");
+
             await _profileService.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword);
             
             TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
@@ -199,7 +219,7 @@ public class ProfileController : Controller
         }
         catch (Exception)
         {
-            ModelState.AddModelError(string.Empty, "Lỗi hệ thống.");
+            ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.");
             return View(model);
         }
     }
@@ -210,6 +230,8 @@ public class ProfileController : Controller
         try
         {
             int userId = GetCurrentUserId();
+            if (userId == 0) return RedirectToAction("Login", "Account");
+
             var settings = await _profileService.GetAccountSettingsAsync(userId);
             return View(settings);
         }
@@ -230,15 +252,40 @@ public class ProfileController : Controller
         try
         {
             int userId = GetCurrentUserId();
+            if (userId == 0) return RedirectToAction("Login", "Account");
+
             await _profileService.UpdateAccountSettingsAsync(userId, model);
             
             TempData["SuccessMessage"] = "Cập nhật cài đặt thành công!";
             return RedirectToAction(nameof(Settings));
         }
-        catch (Exception ex)
+        catch (NotFoundException)
         {
-            ModelState.AddModelError(string.Empty, "Lỗi: " + ex.Message);
+            return RedirectToAction("Login", "Account");
+        }
+        catch (Exception)
+        {
+            ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi hệ thống trong quá trình lưu cài đặt.");
             return View(model);
         }
+    }
+
+    private bool IsValidImageSignature(Stream stream)
+    {
+        stream.Position = 0;
+        using var reader = new BinaryReader(stream, System.Text.Encoding.UTF8, true);
+        var signatures = new System.Collections.Generic.List<byte[]>
+        {
+            new byte[] { 0xFF, 0xD8, 0xFF }, // JPEG
+            new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }, // PNG
+            new byte[] { 0x47, 0x49, 0x46, 0x38 }, // GIF
+            new byte[] { 0x52, 0x49, 0x46, 0x46 }  // WEBP (starts with RIFF)
+        };
+
+        var headerBytes = reader.ReadBytes(8);
+        stream.Position = 0;
+
+        return signatures.Any(signature => 
+            headerBytes.Take(signature.Length).SequenceEqual(signature));
     }
 }

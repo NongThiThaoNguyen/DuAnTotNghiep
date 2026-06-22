@@ -118,9 +118,9 @@ namespace DuAnTotNghiep.Controllers
             // Điều hướng theo Role
             return user.Role.RoleCode switch
             {
-                "ADMIN" => RedirectToAction("Index", "Admin"), // Giả sử có AdminController
-                "TEACHER" => RedirectToAction("Index", "Teacher"), // Giả sử có TeacherController
-                _ => RedirectToAction("Index", "Home") // STUDENT hoặc mặc định
+                "ADMIN" => RedirectToAction("Index", "Home", new { area = "Admin" }),
+                "TEACHER" => RedirectToAction("Index", "Home", new { area = "Teacher" }),
+                _ => RedirectToAction("Index", "Home", new { area = "Student" }) // STUDENT
             };
         }
 

@@ -4,14 +4,12 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DuAnTotNghiep</title>
+    <title>@ViewData["Title"] - DuAnTotNghiep (Teacher)</title>
     
-    <!-- Google Fonts - Roboto -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     
-    <!-- Compiled Tailwind CSS -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DuAnTotNghiep.styles.css" asp-append-version="true" />
 </head>
@@ -19,13 +17,10 @@
 
     <partial name="_Navbar" />
 
-    <!-- Main Container Layout -->
     <div class="flex flex-1 relative overflow-hidden">
         
-        <!-- Mobile Sidebar Backdrop Overlay -->
         <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 lg:hidden"></div>
 
-        <!-- Sidebar Navigation (Responsive) -->
         <aside id="mobileSidebar" class="fixed inset-y-0 left-0 z-50 w-70 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:h-[calc(100vh-4rem)] flex flex-col justify-between shrink-0 overflow-y-auto">
             <div class="p-6">
                 <div class="lg:hidden flex items-center gap-2 mb-6">
@@ -33,15 +28,14 @@
                     <span class="font-bold text-lg text-slate-800">DuAn<span class="text-blue-600">TotNghiep</span></span>
                 </div>
                 
-                <!-- MENU CHÍNH (GUEST) -->
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-4">Danh mục chính</span>
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-4">Giáo Viên</span>
                 <ul class="space-y-1 mb-8">
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="" asp-controller="Home" asp-action="Index">
+                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Teacher" asp-controller="Home" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                             </svg>
-                            Trang chủ
+                            Dashboard
                         </a>
                     </li>
                     <li>
@@ -49,26 +43,34 @@
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                             </svg>
-                            Khóa học
+                            My Courses
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Login">
+                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H3m12 0l-4-4m4 4l-4 4M21 12h-2a3 3 0 00-3-3H9a3 3 0 00-3 3v6a3 3 0 003 3h7a3 3 0 003-3h2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
                             </svg>
-                            Đăng nhập
+                            Students
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            </svg>
+                            Assignments
                         </a>
                     </li>
                 </ul>
             </div>
             
             <div class="p-6 border-t border-slate-200">
-                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-500 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="" asp-controller="Home" asp-action="Privacy">
-                    <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Logout">
+                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                     </svg>
-                    Trợ giúp
+                    Đăng xuất
                 </a>
             </div>
         </aside>
@@ -79,15 +81,9 @@
                 @RenderBody()
             </div>
             
-            <!-- Footer -->
             <footer class="bg-white border-t border-slate-200 py-6 px-8 text-center text-sm text-slate-500">
                 <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
                     <span>&copy; 2026 - DuAnTotNghiep - Thiết kế bởi Nông Thị Thảo Nguyên</span>
-                    <div class="flex gap-4">
-                        <a class="hover:text-blue-600 transition-colors" asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a>
-                        <span>&middot;</span>
-                        <a class="hover:text-blue-600 transition-colors" href="#">Điều khoản sử dụng</a>
-                    </div>
                 </div>
             </footer>
         </main>
@@ -96,10 +92,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     
-    <!-- Sidebar & Dropdown Toggle Script -->
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Sidebar toggle
             const sidebarToggle = document.getElementById('sidebarToggle');
             const mobileSidebar = document.getElementById('mobileSidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
@@ -110,12 +104,10 @@
                     sidebarOverlay.classList.toggle('hidden');
                     document.body.classList.toggle('overflow-hidden');
                 }
-
                 sidebarToggle.addEventListener('click', toggleSidebar);
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
 
-            // User dropdown toggle
             const userMenuBtn = document.getElementById('userMenuBtn');
             const userDropdown = document.getElementById('userDropdown');
 
@@ -124,8 +116,6 @@
                     e.stopPropagation();
                     userDropdown.classList.toggle('hidden');
                 });
-
-                // Close dropdown when clicking outside
                 document.addEventListener('click', function(e) {
                     if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
                         userDropdown.classList.add('hidden');

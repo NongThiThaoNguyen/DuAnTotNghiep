@@ -1,0 +1,194 @@
+@model DuAnTotNghiep.ViewModels.Profile.ProfileViewModel
+@{
+    ViewData["Title"] = "Hồ Sơ Cá Nhân";
+}
+
+<div class="container mx-auto px-4 py-10 max-w-5xl font-sans">
+
+    <!-- Tiêu đề trang & Nút Settings -->
+    <div class="flex justify-between items-baseline mb-6">
+        <div>
+            <p class="text-[11px] font-semibold tracking-wider uppercase text-blue-600 mb-1">Tài khoản</p>
+            <h1 class="text-3xl font-bold text-slate-900">Hồ sơ của tôi</h1>
+        </div>
+        <a href="/Profile/Settings" class="text-sm text-slate-600 hover:text-blue-600 font-medium flex items-center gap-1.5 transition-colors group">
+            <svg class="w-4.5 h-4.5 w-[18px] h-[18px] transition-transform duration-300 group-hover:rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+            Cài đặt
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="mb-6 px-4 py-3 bg-green-50 border-l-[3px] border-green-500 text-green-700 rounded-lg text-sm flex items-center">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-6 px-4 py-3 bg-red-50 border-l-[3px] border-red-500 text-red-700 rounded-lg text-sm flex items-center">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <!-- Hero / Cover -->
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-8">
+        <div class="relative h-32 sm:h-40 bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900">
+        </div>
+
+        <div class="px-6 sm:px-8 pb-8 relative z-10">
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 -mt-12 sm:-mt-14">
+
+                <div class="flex flex-col sm:flex-row sm:items-end gap-5">
+                    <div class="w-28 h-28 rounded-full ring-4 ring-white shadow-md shrink-0 bg-white">
+                        <img id="avatarPreview" src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "/default-images/avatar.png" : Model.AvatarUrl)"
+                             alt="Avatar của @Model.FullName"
+                             class="w-full h-full object-cover rounded-full" />
+                    </div>
+                    <div class="pb-1">
+                        <h2 class="text-2xl font-bold text-slate-900">@Model.FullName</h2>
+                        <p class="text-slate-500 text-sm mt-0.5">@Model.Email</p>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-2.5 pb-1">
+                    <a href="/Profile/Edit" class="py-2.5 px-5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl transition-colors text-sm shadow-sm">
+                        Chỉnh sửa hồ sơ
+                    </a>
+                    <button type="button" onclick="$('#avatarForm').slideToggle(300)" class="py-2.5 px-5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-medium rounded-xl transition-colors text-sm">
+                        Đổi ảnh đại diện
+                    </button>
+                    <a href="/Profile/ChangePassword" class="py-2.5 px-5 text-slate-500 hover:text-blue-600 font-medium text-sm transition-colors cursor-pointer">
+                        Đổi mật khẩu
+                    </a>
+                </div>
+            </div>
+
+            <!-- Form ẩn upload avatar -->
+            <form id="avatarForm" asp-action="UploadAvatar" method="post" enctype="multipart/form-data" style="display: none;" class="mt-5 p-4 bg-slate-50 border border-dashed border-slate-200 rounded-xl flex flex-wrap items-center gap-3">
+                <input type="file" id="avatarFileInput" name="AvatarFile" accept="image/*" class="text-xs text-slate-500 flex-1 min-w-[180px]" required />
+                <button type="submit" class="py-1.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-xs transition-colors shadow-sm">Tải lên</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Lưới Layout: nội dung chính bên trái, cài đặt dạng sidebar bên phải -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Cột chính -->
+        <div class="lg:col-span-8 space-y-6">
+
+            <!-- Thông tin cá nhân -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 sm:px-8 pt-6 pb-4">
+                    <p class="text-[11px] font-semibold tracking-wider uppercase text-blue-600 mb-1">Chi tiết</p>
+                    <h3 class="text-lg font-bold text-slate-900">Thông tin cá nhân</h3>
+                </div>
+                <div class="border-t border-slate-100 px-6 sm:px-8 py-6">
+                    <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Họ và tên</dt>
+                            <dd class="text-slate-900 font-medium">@(string.IsNullOrWhiteSpace(Model.FullName) ? "Chưa cập nhật" : Model.FullName)</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Số điện thoại</dt>
+                            <dd class="text-slate-900 font-medium">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Ngày sinh</dt>
+                            <dd class="text-slate-900 font-medium">@(Model.DateOfBirth.HasValue ? Model.DateOfBirth.Value.ToString("dd/MM/yyyy") : "Chưa cập nhật")</dd>
+                        </div>
+                        <div>
+                            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Giới tính</dt>
+                            <dd class="text-slate-900 font-medium">
+                                @(string.IsNullOrWhiteSpace(Model.Gender) ? "Chưa cập nhật" :
+                                  Model.Gender == "MALE" ? "Nam" :
+                                  Model.Gender == "FEMALE" ? "Nữ" :
+                                  Model.Gender == "OTHER" ? "Khác" : Model.Gender)
+                            </dd>
+                        </div>
+                        <div class="sm:col-span-2">
+                            <dt class="text-xs font-medium text-slate-500 uppercase tracking-wide mb-1.5">Quốc gia</dt>
+                            <dd class="text-slate-900 font-medium">@(string.IsNullOrWhiteSpace(Model.Country) ? "Chưa cập nhật" : Model.Country)</dd>
+                        </div>
+                    </dl>
+                </div>
+            </section>
+
+            <!-- Giới thiệu (Bio) -->
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+                <div class="px-6 sm:px-8 pt-6 pb-4">
+                    <p class="text-[11px] font-semibold tracking-wider uppercase text-blue-600 mb-1">Câu chuyện</p>
+                    <h3 class="text-lg font-bold text-slate-900">Giới thiệu bản thân</h3>
+                </div>
+                <div class="border-t border-slate-100 px-6 sm:px-8 py-6">
+                    @if (string.IsNullOrWhiteSpace(Model.Bio))
+                    {
+                        <p class="text-slate-500 italic text-base">Bạn chưa có bài giới thiệu nào.</p>
+                    }
+                    else
+                    {
+                        <p class="text-slate-700 whitespace-pre-wrap leading-relaxed">@Model.Bio</p>
+                    }
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Sidebar bên phải -->
+        <div class="lg:col-span-4">
+            <section class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden lg:sticky lg:top-6">
+                <div class="px-6 py-5">
+                    <p class="text-[11px] font-semibold tracking-wider uppercase text-blue-600 mb-1">Tuỳ chỉnh</p>
+                    <h3 class="text-lg font-bold text-slate-900">Cài đặt cơ bản</h3>
+                </div>
+
+                <div class="border-t border-slate-100 px-6 py-5 space-y-4">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Ngôn ngữ</span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-medium">
+                            @(Model.Language ?? "vi-VN")
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Múi giờ</span>
+                        <span class="inline-flex items-center px-3 py-1 rounded-full bg-slate-50 border border-slate-200 text-slate-700 text-sm font-medium">
+                            @(Model.Timezone ?? "Asia/Ho_Chi_Minh")
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm text-slate-500">Thông báo Email</span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full @(Model.EmailNotifications ? "bg-green-50 border border-green-200 text-green-700" : "bg-slate-50 border border-slate-200 text-slate-500") text-sm font-medium">
+                            <span class="w-1.5 h-1.5 rounded-full @(Model.EmailNotifications ? "bg-green-500" : "bg-slate-400")"></span>
+                            @(Model.EmailNotifications ? "Bật" : "Tắt")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 px-6 py-4">
+                    <a href="/Profile/Settings" class="text-sm text-slate-700 hover:text-blue-600 font-medium underline decoration-slate-200 hover:decoration-blue-600 transition-colors">
+                        Chỉnh sửa cài đặt →
+                    </a>
+                </div>
+            </section>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('avatarFileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+}

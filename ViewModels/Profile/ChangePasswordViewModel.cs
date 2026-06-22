@@ -10,7 +10,7 @@ public class ChangePasswordViewModel
     public string OldPassword { get; set; } = null!;
 
     [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
-    [StringLength(100, ErrorMessage = "{0} phải dài ít nhất {2} ký tự.", MinimumLength = 6)]
+    [StringLength(100, ErrorMessage = "{0} phải dài ít nhất {2} ký tự.", MinimumLength = 8)]
     [DataType(DataType.Password)]
     [Display(Name = "Mật khẩu mới")]
     public string NewPassword { get; set; } = null!;
