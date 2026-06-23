@@ -1,0 +1,166 @@
+@model DuAnTotNghiep.ViewModels.Onboarding.OnboardingStep3ViewModel
+@{
+    ViewData["Title"] = "Kỹ năng ưu tiên";
+}
+
+<style>
+    .skill-checkbox:checked + .skill-card-body {
+        border-color: #3b82f6 !important;
+        background-color: #eff6ff !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+    .skill-card-body {
+        transition: all 0.2s ease-in-out;
+        border: 2px solid #e2e8f0;
+    }
+    .skill-card-body:hover {
+        border-color: #bfdbfe;
+    }
+    .skill-checkbox:checked + .skill-card-body .skill-icon-container {
+        background-color: #3b82f6;
+        color: #ffffff;
+    }
+    .skill-checkbox:checked + .skill-card-body .check-indicator {
+        opacity: 1;
+        transform: scale(1);
+    }
+    .check-indicator {
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.2s ease-in-out;
+    }
+    .skill-card-disabled {
+        opacity: 0.5;
+        cursor: not-allowed !important;
+    }
+</style>
+
+<div class="max-w-4xl mx-auto py-12">
+    
+    <div class="text-center mb-10">
+        <p class="text-slate-500 uppercase text-xs font-bold mb-3 tracking-wider">Bước 3 / 5</p>
+        <div class="w-full max-w-3xl mx-auto bg-slate-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full" style="width: 60%"></div>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">
+        
+        <h2 class="text-3xl font-bold mb-4 text-center text-slate-800">Bạn muốn cải thiện kỹ năng nào nhất?</h2>
+        <p class="text-slate-500 text-center mb-8">Chọn <span class="font-bold text-blue-600">tối thiểu 1</span> và <span class="font-bold text-blue-600">tối đa 4</span> kỹ năng. AI sẽ ưu tiên phân bổ bài học theo thứ tự bạn chọn.</p>
+
+        <form method="post" asp-action="Skills" id="skillsForm">
+            @Html.AntiForgeryToken()
+            
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-6 text-sm font-medium text-center bg-red-50 py-3 rounded-lg"></div>
+
+            <div class="flex justify-between items-center mb-4">
+                <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Danh sách kỹ năng</span>
+                <span class="text-sm font-bold px-3 py-1 bg-slate-100 text-slate-600 rounded-full"><span id="selectedCount">0</span> / 4</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+                @if (ViewBag.Skills != null)
+                {
+                    foreach (var skill in ViewBag.Skills)
+                    {
+                        var isChecked = Model.SelectedSkillCodes != null && Model.SelectedSkillCodes.Contains((string)skill.SkillCode);
+                        
+                        <label class="cursor-pointer block relative skill-label">
+                            <input type="checkbox" name="SelectedSkillCodes" value="@skill.SkillCode" class="hidden skill-checkbox" @(isChecked ? "checked" : "") />
+                            
+                            <div class="skill-card-body h-full rounded-2xl p-5 bg-white relative overflow-hidden flex flex-col items-center text-center">
+                                
+                                <div class="absolute top-3 right-3 text-blue-600 check-indicator">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                </div>
+
+                                <div class="skill-icon-container w-16 h-16 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center text-2xl shadow-sm mb-4 transition-colors">
+                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                    </svg>
+                                </div>
+                                
+                                <h6 class="font-bold text-slate-800 text-lg mb-2">@skill.SkillName</h6>
+                                <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">@skill.Description</p>
+                            </div>
+                        </label>
+                    }
+                }
+            </div>
+
+            <div class="text-center">
+                <span asp-validation-for="SelectedSkillCodes" class="text-red-500 font-bold block text-sm" id="clientErrorMsg"></span>
+            </div>
+
+            <div class="flex items-center justify-between mt-10 pt-6 border-t border-slate-100">
+                <a asp-action="Level" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Quay lại</a>
+                <button type="submit" id="btnSubmit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
+                    Tiếp tục
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const checkboxes = document.querySelectorAll('.skill-checkbox');
+            const selectedCountDisplay = document.getElementById('selectedCount');
+            const errorMsg = document.getElementById('clientErrorMsg');
+            const form = document.getElementById('skillsForm');
+            const MAX_SKILLS = 4;
+
+            function updateUI() {
+                let checkedCount = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) checkedCount++;
+                });
+
+                selectedCountDisplay.textContent = checkedCount;
+
+                if (checkedCount >= MAX_SKILLS) {
+                    checkboxes.forEach(cb => {
+                        if (!cb.checked) {
+                            cb.closest('label').classList.add('skill-card-disabled');
+                            cb.disabled = true;
+                        }
+                    });
+                } else {
+                    checkboxes.forEach(cb => {
+                        cb.closest('label').classList.remove('skill-card-disabled');
+                        cb.disabled = false;
+                    });
+                }
+                
+                if (checkedCount > 0 && checkedCount <= MAX_SKILLS) {
+                    errorMsg.textContent = '';
+                }
+            }
+
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateUI);
+            });
+
+            form.addEventListener('submit', function(e) {
+                let checkedCount = 0;
+                checkboxes.forEach(cb => {
+                    if (cb.checked) checkedCount++;
+                });
+
+                if (checkedCount === 0) {
+                    e.preventDefault();
+                    errorMsg.textContent = 'Vui lòng chọn ít nhất 1 kỹ năng ưu tiên.';
+                } else if (checkedCount > MAX_SKILLS) {
+                    e.preventDefault();
+                    errorMsg.textContent = 'Bạn chỉ được chọn tối đa 4 kỹ năng ưu tiên.';
+                }
+            });
+
+            updateUI();
+        });
+    </script>
+}

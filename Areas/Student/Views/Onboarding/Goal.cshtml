@@ -1,0 +1,90 @@
+@model DuAnTotNghiep.ViewModels.Onboarding.OnboardingStep1ViewModel
+@{
+    ViewData["Title"] = "Mục tiêu học tập";
+}
+
+<style>
+    /* Custom CSS cho Card Selection kết hợp Tailwind */
+    .goal-radio:checked + .goal-card-body {
+        border-color: #3b82f6 !important; /* blue-500 */
+        background-color: #eff6ff !important; /* blue-50 */
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        transform: translateY(-2px);
+    }
+    
+    .goal-card-body {
+        transition: all 0.2s ease-in-out;
+        border: 2px solid #e2e8f0; /* slate-200 */
+    }
+    
+    .goal-card-body:hover {
+        border-color: #bfdbfe; /* blue-200 */
+        transform: translateY(-2px);
+    }
+    
+    .goal-radio:checked + .goal-card-body .card-icon-container {
+        background-color: #3b82f6;
+        color: #ffffff;
+    }
+</style>
+
+<div class="max-w-3xl mx-auto py-12">
+    <!-- Progress Indicator -->
+    <div class="text-center mb-10">
+        <p class="text-slate-500 uppercase text-xs font-bold mb-3 tracking-wider">Bước 1 / 5</p>
+        <div class="w-full bg-slate-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full" style="width: 20%"></div>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">
+        <h2 class="text-3xl font-bold mb-4 text-center text-slate-800">Mục tiêu chính của bạn là gì?</h2>
+        <p class="text-slate-500 text-center mb-10">Hãy chọn 1 mục tiêu quan trọng nhất lúc này để AI tối ưu hóa lộ trình dành riêng cho bạn.</p>
+
+        <form method="post" asp-action="Goal">
+            @Html.AntiForgeryToken()
+            
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 text-sm font-medium"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                @if (ViewBag.Goals != null)
+                {
+                    foreach (var goal in ViewBag.Goals)
+                    {
+                        <label class="cursor-pointer block relative">
+                            <input type="radio" asp-for="MainGoalId" value="@goal.Id" class="hidden goal-radio" />
+                            <div class="goal-card-body h-full rounded-2xl p-6 text-center bg-white relative overflow-hidden">
+                                <div class="flex justify-center mb-4">
+                                    <div class="card-icon-container w-14 h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-2xl shadow-sm transition-colors">
+                                        <!-- SVG Target Icon thay cho Bootstrap Icons -->
+                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <h5 class="font-bold text-slate-800 text-lg mb-2">@goal.GoalName</h5>
+                                <p class="text-slate-500 text-sm leading-relaxed">@goal.Description</p>
+                            </div>
+                        </label>
+                    }
+                }
+            </div>
+
+            <div class="text-center mt-6">
+                <span asp-validation-for="MainGoalId" class="text-red-500 font-bold block mb-4 text-sm"></span>
+            </div>
+
+            <div class="flex items-center justify-between mt-12 pt-6 border-t border-slate-100">
+                <a asp-action="Start" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Quay lại</a>
+                <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
+                    Tiếp tục
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
