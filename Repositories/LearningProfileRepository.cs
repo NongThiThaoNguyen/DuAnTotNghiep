@@ -27,33 +27,21 @@ namespace DuAnTotNghiep.Repositories
 
         public async Task UpdatePrioritySkillsAsync(int profileId, List<string> skillCodes)
         {
-            await using var transaction = await _context.Database.BeginTransactionAsync();
-            try
-            {
-                var oldSkills = await _context.Set<StudentSkillPreference>()
-                    .Where(s => s.StudentProfileId == profileId)
-                    .ToListAsync();
-                
-                _context.Set<StudentSkillPreference>().RemoveRange(oldSkills);
+            var oldSkills = await _context.Set<StudentSkillPreference>()
+                .Where(s => s.StudentProfileId == profileId)
+                .ToListAsync();
+            
+            _context.Set<StudentSkillPreference>().RemoveRange(oldSkills);
 
-                var newSkills = skillCodes.Select((code, index) => new StudentSkillPreference
-                {
-                    StudentProfileId = profileId,
-                    SkillCode = code,
-                    PriorityLevel = index + 1,
-                    CreatedAt = DateTime.UtcNow
-                }).ToList();
-
-                await _context.Set<StudentSkillPreference>().AddRangeAsync(newSkills);
-                
-                await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch
+            var newSkills = skillCodes.Select((code, index) => new StudentSkillPreference
             {
-                await transaction.RollbackAsync();
-                throw;
-            }
+                StudentProfileId = profileId,
+                SkillCode = code,
+                PriorityLevel = index + 1,
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
+
+            await _context.Set<StudentSkillPreference>().AddRangeAsync(newSkills);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace DuAnTotNghiep.ViewModels.Onboarding
         public List<string> SelectedSkillCodes { get; set; } = new List<string>();
 
         [Required(ErrorMessage = "Vui lòng chọn thời gian học mỗi ngày")]
-        [Range(1, 1440, ErrorMessage = "Thời gian học mỗi ngày không hợp lệ")]
+        [Range(10, 240, ErrorMessage = "Thời gian học mỗi ngày phải từ 10 đến 240 phút")]
         public int? DailyStudyMinutes { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn số ngày học mỗi tuần")]
@@ -29,6 +29,8 @@ namespace DuAnTotNghiep.ViewModels.Onboarding
 
         public int? TargetLevelId { get; set; }
 
+        [StringLength(500, ErrorMessage = "Ghi chú không được vượt quá 500 ký tự.")]
+        [RegularExpression(@"^[^<>]*$", ErrorMessage = "Ghi chú không được chứa ký tự HTML để đảm bảo an toàn.")]
         public string? LearningNote { get; set; }
     }
 }

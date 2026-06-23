@@ -38,6 +38,7 @@ builder.Services.AddScoped<IUserSessionService, UserSessionService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IUserProfileService, DuAnTotNghiep.Services.UserProfileService>();
 builder.Services.AddScoped<ILearningProfileService, LearningProfileService>();
+builder.Services.AddScoped<IPlacementTestService, PlacementTestService>();
 
 // Đăng ký Seeder
 // Đăng ký Seeder

@@ -14,6 +14,9 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task<LearningProfileSummaryDto?> GetProfileSummaryAsync(int userId);
         Task<bool> SaveStepAsync(int userId, object stepViewModel);
         Task<bool> UpdateFullProfileAsync(int userId, UpdateLearningProfileViewModel model);
+        Task<bool> EditLearningProfileAsync(int userId, UpdateLearningProfileViewModel model);
         Task<bool> MarkOnboardingCompletedAsync(int userId);
+        Task<bool> ResetOnboardingStatusAsync(int studentId, int adminId, string ipAddress);
+        Task<bool> ValidateProfileActiveDataAsync(int userId);
     }
 }

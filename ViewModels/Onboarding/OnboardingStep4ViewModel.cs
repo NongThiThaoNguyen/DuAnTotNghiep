@@ -5,13 +5,15 @@ namespace DuAnTotNghiep.ViewModels.Onboarding
     public class OnboardingStep4ViewModel
     {
         [Required(ErrorMessage = "Vui lòng chọn thời gian học mỗi ngày")]
-        [Range(1, 1440, ErrorMessage = "Thời gian học mỗi ngày không hợp lệ")]
+        [Range(10, 240, ErrorMessage = "Thời gian học mỗi ngày phải từ 10 đến 240 phút")]
         public int? DailyStudyMinutes { get; set; }
 
         [Required(ErrorMessage = "Vui lòng chọn số ngày học mỗi tuần")]
         [Range(1, 7, ErrorMessage = "Số ngày học mỗi tuần phải từ 1 đến 7")]
         public int? WeeklyStudyDays { get; set; }
 
+        [Required(ErrorMessage = "Vui lòng chọn khung giờ học ưu tiên")]
+        [RegularExpression("^(Sáng|Trưa|Chiều|Tối)$", ErrorMessage = "Khung giờ học không hợp lệ")]
         public string? PreferredStudyTime { get; set; }
     }
 }

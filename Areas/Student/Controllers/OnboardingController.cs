@@ -188,6 +188,9 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             var missing = GetMissingStep(profile);
             if (missing != null && missing != "StudyTime") return RedirectToAction(missing);
 
+            ViewBag.GoalCode = profile?.MainGoal?.GoalCode;
+            ViewBag.PreferredStudyTimes = new List<string> { "Sáng", "Trưa", "Chiều", "Tối" };
+
             var model = new OnboardingStep4ViewModel
             {
                 DailyStudyMinutes = profile?.DailyStudyMinutes,
@@ -204,6 +207,9 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         {
             if (!ModelState.IsValid)
             {
+                var profile = await _profileService.GetProfileByUserIdAsync(GetUserId());
+                ViewBag.GoalCode = profile?.MainGoal?.GoalCode;
+                ViewBag.PreferredStudyTimes = new List<string> { "Sáng", "Trưa", "Chiều", "Tối" };
                 return View(model);
             }
 
@@ -211,6 +217,9 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             if (!success)
             {
                 ModelState.AddModelError(string.Empty, "Không thể lưu dữ liệu. Vui lòng thử lại.");
+                var profile = await _profileService.GetProfileByUserIdAsync(GetUserId());
+                ViewBag.GoalCode = profile?.MainGoal?.GoalCode;
+                ViewBag.PreferredStudyTimes = new List<string> { "Sáng", "Trưa", "Chiều", "Tối" };
                 return View(model);
             }
 
@@ -235,6 +244,13 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             var missing = GetMissingStep(profile);
             if (missing != null) return RedirectToAction(missing);
 
+            var isDataActive = await _profileService.ValidateProfileActiveDataAsync(GetUserId());
+            if (!isDataActive)
+            {
+                ModelState.AddModelError(string.Empty, "Dữ liệu cấu hình đã thay đổi. Vui lòng cập nhật lại hồ sơ học tập.");
+                return View("Confirm", profile);
+            }
+
             var success = await _profileService.MarkOnboardingCompletedAsync(GetUserId());
             if (!success)
             {
@@ -242,7 +258,7 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                 return View("Confirm", profile);
             }
 
-            return RedirectToAction("Index", "Home", new { area = "Student" });
+            return RedirectToAction("Suggestion", "PlacementTest", new { area = "Student" });
         }
     }
 }

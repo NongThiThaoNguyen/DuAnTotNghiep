@@ -29,14 +29,7 @@
 </style>
 
 <div class="max-w-3xl mx-auto py-12">
-    <!-- Progress Indicator -->
-    <div class="text-center mb-10">
-        <p class="text-slate-500 uppercase text-xs font-bold mb-3 tracking-wider">Bước 1 / 5</p>
-        <div class="w-full bg-slate-200 rounded-full h-2">
-            <div class="bg-blue-600 h-2 rounded-full" style="width: 20%"></div>
-        </div>
-    </div>
-
+    <partial name="_OnboardingStepper" model="1" />
     <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">
         <h2 class="text-3xl font-bold mb-4 text-center text-slate-800">Mục tiêu chính của bạn là gì?</h2>
         <p class="text-slate-500 text-center mb-10">Hãy chọn 1 mục tiêu quan trọng nhất lúc này để AI tối ưu hóa lộ trình dành riêng cho bạn.</p>
@@ -87,4 +80,14 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            if ($(this).valid()) {
+                var btn = this.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = 'Đang lưu... <svg class="animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            }
+        });
+    </script>
 }

@@ -12,11 +12,19 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
     {
         private readonly IUserService _userService;
         private readonly IUserProfileService _profileService;
+        private readonly ILearningProfileService _learningProfileService;
+        private readonly DuAnTotNghiep.Repositories.Interfaces.IAuditLogRepository _auditRepository;
 
-        public UserController(IUserService userService, IUserProfileService profileService)
+        public UserController(
+            IUserService userService, 
+            IUserProfileService profileService,
+            ILearningProfileService learningProfileService,
+            DuAnTotNghiep.Repositories.Interfaces.IAuditLogRepository auditRepository)
         {
             _userService = userService;
             _profileService = profileService;
+            _learningProfileService = learningProfileService;
+            _auditRepository = auditRepository;
         }
 
         public async Task<IActionResult> Index([FromQuery] UserFilterViewModel filter)
@@ -99,6 +107,70 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> LearningProfile(int id)
+        {
+            var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int.TryParse(adminIdString, out int adminId);
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "System";
+
+            try
+            {
+                var profile = await _learningProfileService.GetProfileByUserIdAsync(id);
+                if (profile == null)
+                {
+                    TempData["ErrorMessage"] = "Người dùng này chưa có hồ sơ học tập.";
+                    return RedirectToAction("Details", new { id });
+                }
+
+                await _auditRepository.AddAsync(new DuAnTotNghiep.Models.AuditLog
+                {
+                    UserId = id,
+                    Action = "ADMIN_VIEW_LEARNING_PROFILE",
+                    EntityName = "StudentLearningProfile",
+                    EntityId = profile.Id,
+                    OldValue = "Hidden",
+                    NewValue = $"Viewed by Admin ID {adminId}",
+                    IpAddress = ipAddress,
+                    CreatedAt = System.DateTime.UtcNow
+                });
+                await _auditRepository.SaveChangesAsync();
+
+                var auditLogs = await _auditRepository.GetAuditsByUserAsync(id);
+                ViewBag.AuditLogs = auditLogs
+                    .Where(a => a.EntityName == "StudentLearningProfile")
+                    .OrderByDescending(a => a.CreatedAt)
+                    .ToList();
+
+                ViewBag.StudentId = id;
+                return View(profile);
+            }
+            catch (DuAnTotNghiep.Exceptions.NotFoundException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetOnboarding(int id)
+        {
+            var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int.TryParse(adminIdString, out int adminId);
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "System";
+
+            var result = await _learningProfileService.ResetOnboardingStatusAsync(id, adminId, ipAddress);
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Đã reset trạng thái Onboarding về Bắt đầu.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể reset trạng thái Onboarding (hồ sơ không tồn tại hoặc lỗi).";
+            }
+
+            return RedirectToAction("LearningProfile", new { id });
         }
     }
 }

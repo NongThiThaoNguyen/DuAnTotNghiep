@@ -172,13 +172,25 @@ namespace DuAnTotNghiep.Data.Seeders
                 new EnglishProficiencyLevel { Code = "PRE_INTERMEDIATE", Name = "Pre Intermediate", OrderIndex = 3, Description = "Tiền trung cấp" },
                 new EnglishProficiencyLevel { Code = "INTERMEDIATE", Name = "Intermediate", OrderIndex = 4, Description = "Trung cấp" },
                 new EnglishProficiencyLevel { Code = "UPPER_INTERMEDIATE", Name = "Upper Intermediate", OrderIndex = 5, Description = "Trung cấp trên" },
-                new EnglishProficiencyLevel { Code = "ADVANCED", Name = "Advanced", OrderIndex = 6, Description = "Cao cấp" }
+                new EnglishProficiencyLevel { Code = "ADVANCED", Name = "Advanced", OrderIndex = 6, Description = "Cao cấp" },
+                new EnglishProficiencyLevel { Code = "PROFICIENT", Name = "Proficient", OrderIndex = 7, Description = "Sử dụng tiếng Anh linh hoạt, thành thạo" }
             };
 
             bool changesMade = false;
+            var existingLevels = await _levelRepository.GetAllAsync();
+
             foreach (var level in levels)
             {
-                if (!await _levelRepository.ExistsAsync(l => l.Code == level.Code))
+                var existing = existingLevels.FirstOrDefault(l => l.Code == level.Code);
+                if (existing != null)
+                {
+                    existing.Name = level.Name;
+                    existing.Description = level.Description;
+                    existing.OrderIndex = level.OrderIndex;
+                    _levelRepository.Update(existing);
+                    changesMade = true;
+                }
+                else
                 {
                     await _levelRepository.AddAsync(level);
                     changesMade = true;
