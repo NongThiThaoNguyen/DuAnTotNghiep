@@ -1,0 +1,143 @@
+@model DuAnTotNghiep.DTOs.PagedResult<DuAnTotNghiep.ViewModels.Admin.PlacementAttemptListItemViewModel>
+@{
+    ViewData["Title"] = "Placement Attempts";
+    var filter = ViewBag.Filter as DuAnTotNghiep.DTOs.PlacementTest.PlacementAttemptFilter;
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Placement Attempts</h2>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label">Search (Name, Email)</label>
+                    <input type="text" name="Keyword" class="form-control" value="@filter?.Keyword" placeholder="Search..." />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Status</label>
+                    <select name="Status" class="form-select">
+                        <option value="">All Statuses</option>
+                        <option value="IN_PROGRESS" selected="@(filter?.Status == "IN_PROGRESS")">In Progress</option>
+                        <option value="SUBMITTED" selected="@(filter?.Status == "SUBMITTED")">Submitted</option>
+                        <option value="GRADED" selected="@(filter?.Status == "GRADED")">Graded</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">From Date</label>
+                    <input type="date" name="FromDate" class="form-control" value="@filter?.FromDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">To Date</label>
+                    <input type="date" name="ToDate" class="form-control" value="@filter?.ToDate?.ToString("yyyy-MM-dd")" />
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Result -->
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Student</th>
+                            <th>Test</th>
+                            <th>Score</th>
+                            <th>Level</th>
+                            <th>Status</th>
+                            <th>Submitted At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Items.Any())
+                        {
+                            foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>@item.AttemptId</td>
+                                    <td>
+                                        <strong>@item.StudentName</strong><br/>
+                                        <small class="text-muted">@item.Email</small>
+                                    </td>
+                                    <td>@item.TestTitle</td>
+                                    <td>@item.TotalScore</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.EstimatedLevel))
+                                        {
+                                            <span class="badge bg-info">@item.EstimatedLevel</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge @(item.Status == "GRADED" ? "bg-success" : (item.Status == "SUBMITTED" ? "bg-warning" : "bg-secondary"))">
+                                            @item.Status
+                                        </span>
+                                    </td>
+                                    <td>@(item.SubmittedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
+                                    <td>
+                                        <a asp-action="Details" asp-route-id="@item.AttemptId" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="8" class="text-center py-4">No attempts found matching the criteria.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- Paging -->
+        @if (Model.TotalCount > 0)
+        {
+            var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <small class="text-muted">Showing @((Model.PageIndex - 1) * Model.PageSize + 1) to @Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount) of @Model.TotalCount attempts</small>
+                
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        @if (Model.PageIndex > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = Model.PageIndex - 1 })">Previous</a>
+                            </li>
+                        }
+                        
+                        @for (int i = 1; i <= Math.Ceiling((double)Model.TotalCount / Model.PageSize); i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = i })">@i</a>
+                            </li>
+                        }
+                        
+                        @if (Model.PageIndex < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
+                        {
+                            <li class="page-item">
+                                <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = Model.PageIndex + 1 })">Next</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        }
+    </div>
+</div>

@@ -138,17 +138,64 @@ namespace DuAnTotNghiep.Services
                 
                 var answersInSkill = attempt.TestAnswers.Where(a => qIdsInSkill.Contains(a.QuestionId)).ToList();
                 
-                int totalQs = qIdsInSkill.Count;
-                int correctQs = answersInSkill.Count(a => a.IsCorrect == true);
-                decimal score = answersInSkill.Sum(a => a.Score ?? 0);
+                decimal maxScore = group.Sum(pq => pq.Points);
+                decimal earnedScore = answersInSkill.Sum(a => a.Score ?? 0);
+                decimal percentage = maxScore > 0 ? (earnedScore / maxScore) * 100 : 0;
 
                 result.Add(new SkillScoreDto
                 {
                     SkillId = skill.Id,
                     SkillName = skill.SkillName,
-                    TotalQuestions = totalQs,
-                    CorrectQuestions = correctQs,
-                    Score = score
+                    EarnedScore = earnedScore,
+                    MaxScore = maxScore,
+                    Percentage = percentage
+                });
+            }
+
+            return result;
+        }
+
+        public async Task<List<TopicScoreDto>> CalculateTopicScoresAsync(int attemptId)
+        {
+            var attempt = await _dbContext.TestAttempts
+                .Include(a => a.TestAnswers)
+                .FirstOrDefaultAsync(a => a.Id == attemptId);
+
+            if (attempt == null) return new List<TopicScoreDto>();
+
+            var questionIds = attempt.TestAnswers.Select(a => a.QuestionId).ToList();
+
+            var ptQuestions = await _dbContext.PlacementTestQuestions
+                .Include(pq => pq.Question)
+                .ThenInclude(q => q.Topic)
+                .Where(pq => pq.Section.PlacementTestId == attempt.PlacementTestId && questionIds.Contains(pq.QuestionId))
+                .ToListAsync();
+
+            var result = new List<TopicScoreDto>();
+
+            // Lọc ra những câu hỏi có Topic khác null
+            var topicGroups = ptQuestions
+                .Where(pq => pq.Question.Topic != null)
+                .GroupBy(pq => pq.Question.Topic!);
+
+            foreach (var group in topicGroups)
+            {
+                var topic = group.Key;
+                var qIdsInTopic = group.Select(pq => pq.QuestionId).ToList();
+                
+                var answersInTopic = attempt.TestAnswers.Where(a => qIdsInTopic.Contains(a.QuestionId)).ToList();
+                
+                decimal maxScore = group.Sum(pq => pq.Points);
+                decimal earnedScore = answersInTopic.Sum(a => a.Score ?? 0);
+                decimal percentage = maxScore > 0 ? (earnedScore / maxScore) * 100 : 0;
+
+                result.Add(new TopicScoreDto
+                {
+                    TopicId = topic.Id,
+                    TopicName = topic.Title,
+                    EarnedScore = earnedScore,
+                    MaxScore = maxScore,
+                    Percentage = percentage
                 });
             }
 
@@ -172,9 +219,22 @@ namespace DuAnTotNghiep.Services
 
             // Simple rule: <40% A1, <60% A2, <80% B1, >=80% B2
             string levelCode = "A1";
-            if (percentage >= 80) levelCode = "B2";
-            else if (percentage >= 60) levelCode = "B1";
-            else if (percentage >= 40) levelCode = "A2";
+            string description = "Người dùng ở trình độ cơ bản (Beginner).";
+            if (percentage >= 80)
+            {
+                levelCode = "B2";
+                description = "Người dùng ở trình độ trung cấp trên (Upper-Intermediate).";
+            }
+            else if (percentage >= 60)
+            {
+                levelCode = "B1";
+                description = "Người dùng ở trình độ trung cấp (Intermediate).";
+            }
+            else if (percentage >= 40)
+            {
+                levelCode = "A2";
+                description = "Người dùng ở trình độ sơ cấp (Pre-Intermediate).";
+            }
 
             var level = await _dbContext.EnglishProficiencyLevels
                 .FirstOrDefaultAsync(l => l.Code == levelCode);
@@ -182,7 +242,9 @@ namespace DuAnTotNghiep.Services
             return new EstimatedLevelDto
             {
                 LevelId = level?.Id,
-                LevelName = level?.Name
+                LevelName = level?.Name,
+                Percentage = percentage,
+                Description = description
             };
         }
     }

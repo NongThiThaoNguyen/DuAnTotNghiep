@@ -40,6 +40,7 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedLevelsAsync();
             await SeedSkillsAsync();
             await SeedPlacementTestsAsync();
+            await SeedPlacementTestDemoAsync();
             await SeedDemoProfilesAsync();
         }
 
@@ -95,7 +96,10 @@ namespace DuAnTotNghiep.Data.Seeders
                 new User { Email = "lockeduser@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Locked User", RoleId = studentRole.Id, Status = "LOCKED", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0, LockoutUntil = DateTime.UtcNow.AddYears(100) },
                 
                 // Test OTP User
-                new User { Email = "testotp@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Test OTP User", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 }
+                new User { Email = "testotp@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Test OTP User", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 },
+
+                // Demo User for Task 20
+                new User { Email = "student.demo@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Student Demo", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 }
             };
 
             bool changesMade = false;
@@ -323,6 +327,23 @@ namespace DuAnTotNghiep.Data.Seeders
                 }
             }
 
+            var studentDemo = await _userRepository.GetByEmailAsync("student.demo@aistudyenglish.com");
+            if (studentDemo != null && ieltsGoal != null && beginnerLevel != null)
+            {
+                if (!await _profileRepository.ExistsAsync(p => p.UserId == studentDemo.Id))
+                {
+                    await _profileRepository.AddAsync(new StudentLearningProfile
+                    {
+                        UserId = studentDemo.Id,
+                        MainGoalId = ieltsGoal.Id,
+                        CurrentLevelId = beginnerLevel.Id,
+                        LearningNote = "Demo Account for Placement Test",
+                        OnboardingStatus = "COMPLETED",
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
+
             await _profileRepository.SaveChangesAsync();
         }
 
@@ -349,6 +370,139 @@ namespace DuAnTotNghiep.Data.Seeders
                     await _context.SaveChangesAsync();
                 }
             }
+        }
+        private async Task SeedPlacementTestDemoAsync()
+        {
+            if (_context.PlacementTests.Any(t => t.Title == "English Placement Test Demo"))
+                return;
+
+            var adminUser = await _userRepository.GetByEmailAsync("admin@aistudyenglish.com");
+            var a2Level = _context.EnglishProficiencyLevels.FirstOrDefault(l => l.Code == "ELEMENTARY");
+            if (adminUser == null || a2Level == null) return;
+
+            // 1. Create Placement Test
+            var test = new PlacementTest
+            {
+                Title = "English Placement Test Demo",
+                Description = "Bài kiểm tra đánh giá năng lực demo (A2 -> B1).",
+                TimeLimitMinutes = 30,
+                TargetLevelId = a2Level.Id,
+                CreatedBy = adminUser.Id,
+                Status = "PUBLISHED",
+                TotalScore = 100,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            _context.PlacementTests.Add(test);
+            await _context.SaveChangesAsync();
+
+            // 2. Create Sections
+            var skills = _context.EnglishSkills.ToList();
+            var vocabSkill = skills.FirstOrDefault(s => s.SkillCode == "VOCABULARY");
+            var grammarSkill = skills.FirstOrDefault(s => s.SkillCode == "GRAMMAR");
+            var readingSkill = skills.FirstOrDefault(s => s.SkillCode == "READING");
+            var listeningSkill = skills.FirstOrDefault(s => s.SkillCode == "LISTENING");
+
+            var sections = new List<PlacementTestSection>();
+            if (vocabSkill != null) sections.Add(new PlacementTestSection { PlacementTestId = test.Id, SkillId = vocabSkill.Id, SectionName = "Vocabulary", Instruction = "Choose the best word to complete the sentence.", OrderIndex = 1 });
+            if (grammarSkill != null) sections.Add(new PlacementTestSection { PlacementTestId = test.Id, SkillId = grammarSkill.Id, SectionName = "Grammar", Instruction = "Choose the correct grammar structure.", OrderIndex = 2 });
+            if (readingSkill != null) sections.Add(new PlacementTestSection { PlacementTestId = test.Id, SkillId = readingSkill.Id, SectionName = "Reading", Instruction = "Read the passage and answer the questions.", OrderIndex = 3 });
+            if (listeningSkill != null) sections.Add(new PlacementTestSection { PlacementTestId = test.Id, SkillId = listeningSkill.Id, SectionName = "Listening", Instruction = "Listen and choose the correct answer.", OrderIndex = 4 });
+
+            foreach (var sec in sections) _context.PlacementTestSections.Add(sec);
+            await _context.SaveChangesAsync();
+
+            // 3. Create 20 Questions
+            var questions = new List<QuestionBank>();
+            
+            // Vocab Questions
+            if (vocabSkill != null)
+            {
+                for (int i = 1; i <= 5; i++)
+                {
+                    questions.Add(CreateMCQ(vocabSkill.Id, a2Level.Id, adminUser.Id, $"Vocabulary Question {i}", $"Vocab Option {i}A", $"Vocab Option {i}B", $"Vocab Option {i}C", $"Vocab Option {i}D", 1));
+                }
+            }
+
+            // Grammar Questions
+            if (grammarSkill != null)
+            {
+                for (int i = 1; i <= 5; i++)
+                {
+                    questions.Add(CreateMCQ(grammarSkill.Id, a2Level.Id, adminUser.Id, $"Grammar Question {i}", $"Grammar Option {i}A", $"Grammar Option {i}B", $"Grammar Option {i}C", $"Grammar Option {i}D", 2));
+                }
+            }
+
+            // Reading Questions
+            if (readingSkill != null)
+            {
+                for (int i = 1; i <= 5; i++)
+                {
+                    questions.Add(CreateMCQ(readingSkill.Id, a2Level.Id, adminUser.Id, $"Reading Question {i} based on passage", $"Reading Option {i}A", $"Reading Option {i}B", $"Reading Option {i}C", $"Reading Option {i}D", 3));
+                }
+            }
+
+            // Listening Questions
+            if (listeningSkill != null)
+            {
+                for (int i = 1; i <= 5; i++)
+                {
+                    var q = CreateMCQ(listeningSkill.Id, a2Level.Id, adminUser.Id, $"Listening Question {i}", $"Listen Option {i}A", $"Listen Option {i}B", $"Listen Option {i}C", $"Listen Option {i}D", 4);
+                    q.AudioUrl = "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3";
+                    questions.Add(q);
+                }
+            }
+
+            foreach (var q in questions) _context.QuestionBanks.Add(q);
+            await _context.SaveChangesAsync();
+
+            // 4. Link Questions to Sections
+            foreach (var section in sections)
+            {
+                int skillId = section.SkillId;
+                var sectionQs = questions.Where(q => q.SkillId == skillId).ToList();
+                int order = 1;
+                foreach (var sq in sectionQs)
+                {
+                    _context.PlacementTestQuestions.Add(new PlacementTestQuestion
+                    {
+                        SectionId = section.Id,
+                        QuestionId = sq.Id,
+                        Points = 5,
+                        OrderIndex = order++
+                    });
+                }
+            }
+            await _context.SaveChangesAsync();
+        }
+
+        private QuestionBank CreateMCQ(int skillId, int levelId, int adminId, string text, string opt1, string opt2, string opt3, string opt4, int correctIndex)
+        {
+            var options = new List<QuestionOption>
+            {
+                new QuestionOption { OptionText = opt1, IsCorrect = correctIndex == 1, OrderIndex = 1 },
+                new QuestionOption { OptionText = opt2, IsCorrect = correctIndex == 2, OrderIndex = 2 },
+                new QuestionOption { OptionText = opt3, IsCorrect = correctIndex == 3, OrderIndex = 3 },
+                new QuestionOption { OptionText = opt4, IsCorrect = correctIndex == 4, OrderIndex = 4 }
+            };
+
+            return new QuestionBank
+            {
+                SkillId = skillId,
+                LevelId = levelId,
+                QuestionType = "MCQ",
+                QuestionText = text,
+                DifficultyLevel = "MEDIUM",
+                SourceType = "SYSTEM",
+                ReviewStatus = "APPROVED",
+                CreatedBy = adminId,
+                ApprovedBy = adminId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                ApprovedAt = DateTime.UtcNow,
+                CorrectAnswer = options[correctIndex - 1].OptionText,
+                QuestionOptions = options
+            };
         }
     }
 }

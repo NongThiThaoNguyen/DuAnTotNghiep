@@ -21,10 +21,23 @@ namespace DuAnTotNghiep.DTOs.PlacementTest
         
         public string SkillName { get; set; } = null!;
         
-        public int TotalQuestions { get; set; }
+        public decimal EarnedScore { get; set; }
         
-        public int CorrectQuestions { get; set; }
+        public decimal MaxScore { get; set; }
         
-        public decimal Score { get; set; }
+        public decimal Percentage { get; set; }
+    }
+
+    public class TopicScoreDto
+    {
+        public int TopicId { get; set; }
+        
+        public string TopicName { get; set; } = null!;
+        
+        public decimal EarnedScore { get; set; }
+        
+        public decimal MaxScore { get; set; }
+        
+        public decimal Percentage { get; set; }
     }
 }

@@ -15,11 +15,13 @@ namespace DuAnTotNghiep.Services
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IPlacementTestValidationService _validationService;
+        private readonly IAuditService _auditService;
 
-        public PlacementTestManagementService(ApplicationDbContext dbContext, IPlacementTestValidationService validationService)
+        public PlacementTestManagementService(ApplicationDbContext dbContext, IPlacementTestValidationService validationService, IAuditService auditService)
         {
             _dbContext = dbContext;
             _validationService = validationService;
+            _auditService = auditService;
         }
 
         public async Task<int> CreateAsync(CreatePlacementTestDto dto, int createdBy)
@@ -45,6 +47,8 @@ namespace DuAnTotNghiep.Services
 
             _dbContext.PlacementTests.Add(newTest);
             await _dbContext.SaveChangesAsync();
+
+            await _auditService.LogAsync(createdBy, "CREATE_TEST", "PlacementTest", newTest.Id, null, dto.Title);
 
             return newTest.Id;
         }
@@ -74,6 +78,10 @@ namespace DuAnTotNghiep.Services
             test.UpdatedAt = DateTime.UtcNow;
             _dbContext.PlacementTests.Update(test);
             await _dbContext.SaveChangesAsync();
+
+            // Lấy ID user từ context có thể không cần thiết nếu update không truyền vào user id, tạm thời dùng null hoặc 0.
+            // Wait, UpdateAsync doesn't receive userId. We can pass null.
+            await _auditService.LogAsync(null, "UPDATE_TEST", "PlacementTest", test.Id, null, dto.Title);
         }
 
         public async Task PublishAsync(int placementTestId, int userId)
@@ -100,6 +108,8 @@ namespace DuAnTotNghiep.Services
 
             _dbContext.PlacementTests.Update(test);
             await _dbContext.SaveChangesAsync();
+
+            await _auditService.LogAsync(userId, "PUBLISH_TEST", "PlacementTest", test.Id, "DRAFT", "PUBLISHED");
         }
 
         public async Task ArchiveAsync(int placementTestId, int userId)
@@ -111,11 +121,14 @@ namespace DuAnTotNghiep.Services
             var test = await _dbContext.PlacementTests.FindAsync(placementTestId);
             if (test == null) throw new InvalidOperationException("Không tìm thấy bài thi.");
 
+            var oldStatus = test.Status;
             test.Status = "ARCHIVED";
             test.UpdatedAt = DateTime.UtcNow;
 
             _dbContext.PlacementTests.Update(test);
             await _dbContext.SaveChangesAsync();
+
+            await _auditService.LogAsync(userId, "ARCHIVE_TEST", "PlacementTest", test.Id, oldStatus, "ARCHIVED");
         }
 
         public async Task<PlacementTestDetailDto?> GetDetailAsync(int id)

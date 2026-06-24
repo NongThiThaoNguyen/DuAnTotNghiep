@@ -81,10 +81,11 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Take(int attemptId)
+        public async Task<IActionResult> Take(int? id, int? attemptId)
         {
             var userId = GetUserId();
-            var viewModel = await _placementTestService.GetTestTakingViewModelAsync(attemptId, userId);
+            int finalAttemptId = id ?? attemptId ?? 0;
+            var viewModel = await _placementTestService.GetTestTakingViewModelAsync(finalAttemptId, userId);
 
             if (viewModel == null)
             {
@@ -134,16 +135,41 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         public async Task<IActionResult> Submit(int attemptId)
         {
             var studentId = GetUserId();
-            // Just mark it as SUBMITTED to break the infinite loop
-            // The real logic will be implemented in Task 14
-            var attempt = await _placementTestService.GetCurrentAttemptAsync(studentId, 0); // We just need any method to get it, or we can use dbContext directly but we don't have it here.
+            var result = await _placementTestService.SubmitAttemptAsync(attemptId, studentId, new List<AnswerInputDto>());
 
-            // Since we haven't fully implemented Task 14, let's just redirect to Intro.
-            // If they are redirected to Intro, the filter will let them pass.
-            // Wait, we need to mark it as EXPIRED or SUBMITTED.
-            // We already marked it EXPIRED in GetTestTakingViewModelAsync.
-            // So if they POST here, we can just redirect them to Intro.
-            return RedirectToAction("Intro");
+            if (result.IsSuccess)
+            {
+                TempData["SuccessMessage"] = "Nộp bài thành công!";
+                return RedirectToAction("Result", new { attemptId = attemptId });
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra khi nộp bài: " + result.Message;
+                return RedirectToAction("Intro");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Result(int attemptId)
+        {
+            var studentId = GetUserId();
+            try
+            {
+                var viewModel = await _placementTestService.GetResultForStudentAsync(attemptId, studentId);
+                return View(viewModel);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (System.Collections.Generic.KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException)
+            {
+                return RedirectToAction("Take", new { attemptId = attemptId });
+            }
         }
     }
 }

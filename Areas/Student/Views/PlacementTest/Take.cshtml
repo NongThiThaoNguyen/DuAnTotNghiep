@@ -138,25 +138,32 @@
                 return;
             }
 
-            // Using ServerTime directly helps avoid local client time discrepancies
             var serverTimeMs = new Date('@Model.ServerTime.ToString("o")').getTime();
             var endTimeMs = new Date('@Model.EndTime?.ToString("o")').getTime();
             var clientLoadTimeMs = new Date().getTime();
             
             // Calculate how much time is left in milliseconds
             var distance = endTimeMs - serverTimeMs;
+            var isSubmitting = false;
 
             function updateCountdown() {
+                if (isSubmitting) return;
+
                 var currentClientMs = new Date().getTime();
                 var elapsedSinceLoad = currentClientMs - clientLoadTimeMs;
                 var currentDistance = distance - elapsedSinceLoad;
 
                 if (currentDistance <= 0) {
+                    isSubmitting = true;
                     document.getElementById('countdown').innerText = "00:00";
                     document.getElementById('countdown').classList.add('text-red-600');
                     
                     // Timeout actions
-                    clearInterval(timerInterval);
+                    if (typeof timerInterval !== 'undefined') {
+                        clearInterval(timerInterval);
+                    }
+                    
+                    // Replace alert with a non-blocking UI update if possible, or just one alert
                     alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài.");
                     
                     // Auto submit
@@ -180,7 +187,10 @@
             }
 
             updateCountdown();
-            var timerInterval = setInterval(updateCountdown, 1000);
+            var timerInterval;
+            if (!isSubmitting) {
+                timerInterval = setInterval(updateCountdown, 1000);
+            }
 
             // Auto Save Logic
             const form = document.getElementById('testForm');
@@ -229,6 +239,19 @@
                                 console.error('Error auto-saving:', error);
                             });
                         }
+                    }
+                }
+            });
+
+            // Prevent manual submit without confirmation
+            form.addEventListener('submit', function(e) {
+                if (!isSubmitting) {
+                    if (!confirm('Bạn có chắc muốn nộp bài? Sau khi nộp sẽ không thể chỉnh sửa.')) {
+                        e.preventDefault();
+                    } else {
+                        isSubmitting = true;
+                        document.getElementById('btnSubmit').disabled = true;
+                        document.getElementById('btnSubmit').innerHTML = "Đang nộp bài...";
                     }
                 }
             });

@@ -4,5 +4,7 @@ namespace DuAnTotNghiep.DTOs.PlacementTest
     {
         public int? LevelId { get; set; }
         public string? LevelName { get; set; }
+        public decimal Percentage { get; set; }
+        public string? Description { get; set; }
     }
 }

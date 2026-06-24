@@ -18,6 +18,8 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+builder.Services.AddHttpContextAccessor();
+
 // Đăng ký Generic Repository
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
@@ -43,12 +45,18 @@ builder.Services.AddScoped<IPlacementTestService, PlacementTestService>();
 builder.Services.AddScoped<IMasterDataService, MasterDataService>();
 builder.Services.AddScoped<ITestScoringService, TestScoringService>();
 builder.Services.AddScoped<IPlacementTestManagementService, PlacementTestManagementService>();
+builder.Services.AddScoped<IPlacementAttemptService, PlacementAttemptService>();
 builder.Services.AddScoped<IPlacementTestSectionService, PlacementTestSectionService>();
 builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionService>();
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
 
-// Đăng ký Seeder
+// Đăng ký M7 AI Analysis Services
+builder.Services.AddScoped<IPlacementTestAnalysisPayloadBuilder, PlacementTestAnalysisPayloadBuilder>();
+builder.Services.AddScoped<ICompetencyAnalysisService, CompetencyAnalysisService>();
+builder.Services.AddSingleton<DuAnTotNghiep.Services.Background.IAiAnalysisQueue, DuAnTotNghiep.Services.Background.AiAnalysisQueue>();
+builder.Services.AddHostedService<DuAnTotNghiep.Services.Background.AiAnalysisBackgroundService>();
+
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();
 

@@ -19,6 +19,8 @@ namespace DuAnTotNghiep.Services
         private readonly IGenericRepository<TestAnswer> _answerRepository;
         private readonly ITestScoringService _scoringService;
         private readonly DuAnTotNghiep.Data.ApplicationDbContext _dbContext;
+        private readonly DuAnTotNghiep.Services.Background.IAiAnalysisQueue _aiQueue;
+        private readonly IAuditService _auditService;
 
         public PlacementTestService(
             ILearningProfileRepository profileRepository,
@@ -26,7 +28,9 @@ namespace DuAnTotNghiep.Services
             IGenericRepository<TestAttempt> attemptRepository,
             IGenericRepository<TestAnswer> answerRepository,
             ITestScoringService scoringService,
-            DuAnTotNghiep.Data.ApplicationDbContext dbContext)
+            DuAnTotNghiep.Data.ApplicationDbContext dbContext,
+            DuAnTotNghiep.Services.Background.IAiAnalysisQueue aiQueue,
+            IAuditService auditService)
         {
             _profileRepository = profileRepository;
             _testRepository = testRepository;
@@ -34,6 +38,8 @@ namespace DuAnTotNghiep.Services
             _answerRepository = answerRepository;
             _scoringService = scoringService;
             _dbContext = dbContext;
+            _aiQueue = aiQueue;
+            _auditService = auditService;
         }
 
         public async Task<PlacementTestSuggestionViewModel?> BuildPlacementTestSuggestionAsync(int userId)
@@ -202,8 +208,15 @@ namespace DuAnTotNghiep.Services
             if (attemptInfo == null) return null;
 
             var serverTime = DateTime.UtcNow;
-            DateTime? endTime = attemptInfo.TimeLimitMinutes.HasValue 
-                ? attemptInfo.StartedAt.AddMinutes(attemptInfo.TimeLimitMinutes.Value) 
+
+            // Fix Timezone bug: specify UTC kind if Unspecified
+            var startedAtUtc = attemptInfo.StartedAt.Kind == DateTimeKind.Unspecified
+                ? DateTime.SpecifyKind(attemptInfo.StartedAt, DateTimeKind.Utc)
+                : attemptInfo.StartedAt;
+
+            // Fix TimeLimitMinutes == 0 meaning no limit
+            DateTime? endTime = (attemptInfo.TimeLimitMinutes.HasValue && attemptInfo.TimeLimitMinutes.Value > 0) 
+                ? startedAtUtc.AddMinutes(attemptInfo.TimeLimitMinutes.Value) 
                 : null;
 
             int? remainingSeconds = null;
@@ -212,6 +225,9 @@ namespace DuAnTotNghiep.Services
                 remainingSeconds = (int)(endTime.Value - serverTime).TotalSeconds;
                 if (remainingSeconds < 0) remainingSeconds = 0;
             }
+
+            // Debug log
+            System.Console.WriteLine($"[DEBUG PlacementTest] StartedAt: {attemptInfo.StartedAt}, EndTime: {endTime}, ServerTime: {serverTime}, TimeLimitMinutes: {attemptInfo.TimeLimitMinutes}, RemainingSeconds: {remainingSeconds}, AttemptStatus: {attemptInfo.Status}");
 
             // Fix Infinite Loop: If expired, mark as EXPIRED so RequirePlacementTestFilter doesn't keep redirecting
             var currentStatus = attemptInfo.Status;
@@ -224,6 +240,8 @@ namespace DuAnTotNghiep.Services
                     _dbContext.TestAttempts.Update(attemptToUpdate);
                     await _dbContext.SaveChangesAsync();
                     currentStatus = "EXPIRED";
+                    
+                    System.Console.WriteLine($"[DEBUG PlacementTest] Attempt {attemptId} status updated to EXPIRED due to remainingSeconds == 0");
                 }
             }
 
@@ -343,7 +361,7 @@ namespace DuAnTotNghiep.Services
                 if (existingAttempt != null)
                 {
                     var test = await _testRepository.GetByIdAsync(placementTestId);
-                    if (test!.TimeLimitMinutes.HasValue)
+                    if (test!.TimeLimitMinutes.HasValue && test.TimeLimitMinutes.Value > 0)
                     {
                         var expireTime = existingAttempt.StartedAt.AddMinutes(test.TimeLimitMinutes.Value);
                         if (DateTime.UtcNow > expireTime)
@@ -393,6 +411,8 @@ namespace DuAnTotNghiep.Services
                 await _attemptRepository.SaveChangesAsync();
                 await transaction.CommitAsync();
 
+                await _auditService.LogAsync(studentId, "START_ATTEMPT", "TestAttempt", newAttempt.Id);
+
                 return new TestAttemptDto
                 {
                     Id = newAttempt.Id,
@@ -414,10 +434,36 @@ namespace DuAnTotNghiep.Services
             await using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-                var attempt = await _dbContext.TestAttempts.FindAsync(attemptId);
-                if (attempt == null || attempt.StudentId != studentId || attempt.Status != "IN_PROGRESS")
+                var attempt = await _dbContext.TestAttempts
+                    .Include(a => a.PlacementTest)
+                    .FirstOrDefaultAsync(a => a.Id == attemptId);
+                    
+                if (attempt == null || attempt.StudentId != studentId)
                 {
-                    return new SubmitResultDto { IsSuccess = false, Message = "Attempt invalid or already submitted." };
+                    return new SubmitResultDto { IsSuccess = false, Message = "Attempt invalid." };
+                }
+
+                if (attempt.Status == "SUBMITTED" || attempt.Status == "GRADED" || attempt.Status == "EXPIRED")
+                {
+                    return new SubmitResultDto { IsSuccess = false, Message = $"Attempt already {attempt.Status.ToLower()}." };
+                }
+
+                // Server-side Timer validation (Grace period: 2 minutes)
+                if (attempt.PlacementTest.TimeLimitMinutes.HasValue && attempt.PlacementTest.TimeLimitMinutes.Value > 0)
+                {
+                    var startedAtUtc = attempt.StartedAt.Kind == DateTimeKind.Unspecified
+                        ? DateTime.SpecifyKind(attempt.StartedAt, DateTimeKind.Utc)
+                        : attempt.StartedAt;
+                        
+                    var maxEndTime = startedAtUtc.AddMinutes(attempt.PlacementTest.TimeLimitMinutes.Value + 2); // 2 minutes grace
+                    if (DateTime.UtcNow > maxEndTime)
+                    {
+                        attempt.Status = "EXPIRED";
+                        _dbContext.TestAttempts.Update(attempt);
+                        await _dbContext.SaveChangesAsync();
+                        await transaction.CommitAsync();
+                        return new SubmitResultDto { IsSuccess = false, Message = "Thời gian làm bài đã hết. Bài thi của bạn không được công nhận." };
+                    }
                 }
 
                 // Luôn cập nhật trạng thái Submit trước khi chấm
@@ -441,6 +487,9 @@ namespace DuAnTotNghiep.Services
                 
                 await _dbContext.SaveChangesAsync();
 
+                // Log Submit
+                await _auditService.LogAsync(studentId, "SUBMIT_ATTEMPT", "TestAttempt", attemptId);
+
                 // Chấm bài
                 var scoreResult = await _scoringService.GradeAttemptAsync(attemptId);
                 var estimatedLevel = await _scoringService.EstimateLevelAsync(attemptId);
@@ -454,6 +503,12 @@ namespace DuAnTotNghiep.Services
                 await _dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
 
+                // Log Grade
+                await _auditService.LogAsync(studentId, "GRADE_ATTEMPT", "TestAttempt", attemptId, null, $"Score: {scoreResult.TotalScore}");
+
+                // Queue AI Analysis
+                await _aiQueue.QueueAttemptForAnalysisAsync(attemptId, studentId);
+
                 return new SubmitResultDto
                 {
                     IsSuccess = true,
@@ -466,6 +521,80 @@ namespace DuAnTotNghiep.Services
                 await transaction.RollbackAsync();
                 return new SubmitResultDto { IsSuccess = false, Message = "Failed to submit: " + ex.Message };
             }
+        }
+
+        public async Task<TestResultViewModel> GetResultForStudentAsync(int attemptId, int studentId)
+        {
+            var attempt = await _dbContext.TestAttempts
+                .Include(a => a.PlacementTest)
+                .Include(a => a.TestAnswers)
+                .FirstOrDefaultAsync(a => a.Id == attemptId);
+
+            if (attempt == null)
+            {
+                throw new KeyNotFoundException("Attempt not found");
+            }
+
+            if (attempt.StudentId != studentId)
+            {
+                throw new UnauthorizedAccessException("Forbidden: Cannot view another student's attempt");
+            }
+
+            if (attempt.Status == "IN_PROGRESS")
+            {
+                throw new InvalidOperationException("IN_PROGRESS");
+            }
+
+            var estimatedLevel = await _scoringService.EstimateLevelAsync(attemptId);
+            var skillScores = await _scoringService.CalculateSkillScoresAsync(attemptId);
+            var topicScores = await _scoringService.CalculateTopicScoresAsync(attemptId);
+
+            var weakestSkill = skillScores.OrderBy(s => s.Percentage).FirstOrDefault()?.SkillName;
+            var weakestTopic = topicScores.OrderBy(t => t.Percentage).FirstOrDefault()?.TopicName;
+
+            var correctAnswers = attempt.TestAnswers.Count(a => a.IsCorrect == true);
+            var incorrectAnswers = attempt.TestAnswers.Count(a => a.IsCorrect == false);
+            var totalQuestions = attempt.TestAnswers.Count();
+
+            // AI Status
+            var aiAnalysis = await _dbContext.CompetencyAnalyses.FirstOrDefaultAsync(c => c.TestAttemptId == attemptId);
+            bool aiCompleted = aiAnalysis != null;
+            string aiStatus = aiCompleted ? "Completed" : "Analyzing";
+
+            if (!aiCompleted)
+            {
+                var aiLog = await _dbContext.AiUsageLogs
+                    .FirstOrDefaultAsync(l => l.UserId == studentId && l.ModuleCode == $"M6_ATTEMPT_{attemptId}");
+                if (aiLog != null)
+                {
+                    aiStatus = aiLog.RequestStatus switch
+                    {
+                        "PENDING" => "Pending",
+                        "RUNNING" => "Running",
+                        "FAILED" => "Failed",
+                        _ => "Analyzing"
+                    };
+                }
+            }
+
+            return new TestResultViewModel
+            {
+                AttemptId = attempt.Id,
+                TotalScore = attempt.TotalScore ?? 0,
+                MaxScore = attempt.PlacementTest.TotalScore,
+                Percentage = estimatedLevel.Percentage,
+                EstimatedLevel = estimatedLevel.LevelName ?? "Chưa đánh giá",
+                SkillScores = skillScores.OrderByDescending(s => s.Percentage).ToList(),
+                TopicScores = topicScores.OrderByDescending(t => t.Percentage).ToList(),
+                WeakestSkill = weakestSkill,
+                WeakestTopic = weakestTopic,
+                CorrectAnswers = correctAnswers,
+                IncorrectAnswers = incorrectAnswers,
+                TotalQuestions = totalQuestions,
+                AiCompleted = aiCompleted,
+                AiAnalysisStatus = aiStatus,
+                SubmittedAt = attempt.SubmittedAt
+            };
         }
     }
 }

@@ -15,5 +15,6 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task<TestTakingViewModel?> GetTestTakingViewModelAsync(int attemptId, int studentId);
         Task<SaveAnswerResultDto> SaveAnswerAsync(SaveAnswerInputDto input, int studentId);
         Task<SubmitResultDto> SubmitAttemptAsync(int attemptId, int studentId, List<AnswerInputDto> answers);
+        Task<TestResultViewModel> GetResultForStudentAsync(int attemptId, int studentId);
     }
 }

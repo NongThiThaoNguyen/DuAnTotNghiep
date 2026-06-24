@@ -4,24 +4,35 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "ADMIN")]
+    [Authorize(Roles = "ADMIN,TEACHER")]
     public class PlacementTestsController : Controller
     {
         private readonly IPlacementTestManagementService _managementService;
         private readonly IMasterDataService _masterDataService;
         private readonly IPlacementTestValidationService _validationService;
+        private readonly DuAnTotNghiep.Services.Background.IAiAnalysisQueue _aiQueue;
+        private readonly DuAnTotNghiep.Data.ApplicationDbContext _dbContext;
 
-        public PlacementTestsController(IPlacementTestManagementService managementService, IMasterDataService masterDataService, IPlacementTestValidationService validationService)
+        public PlacementTestsController(
+            IPlacementTestManagementService managementService, 
+            IMasterDataService masterDataService, 
+            IPlacementTestValidationService validationService,
+            DuAnTotNghiep.Services.Background.IAiAnalysisQueue aiQueue,
+            DuAnTotNghiep.Data.ApplicationDbContext dbContext)
         {
             _managementService = managementService;
             _masterDataService = masterDataService;
             _validationService = validationService;
+            _aiQueue = aiQueue;
+            _dbContext = dbContext;
         }
 
         public async Task<IActionResult> Index([FromQuery] PlacementTestFilterDto filter)
@@ -48,12 +59,14 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Validate(int id)
         {
             var result = await _validationService.ValidatePlacementTestAsync(id);
             return Json(result);
         }
 
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create()
         {
             var levels = await _masterDataService.GetActiveLevelsAsync();
@@ -63,6 +76,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create(CreatePlacementTestDto dto)
         {
             if (!ModelState.IsValid)
@@ -88,6 +102,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
         }
 
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Edit(int id)
         {
             var test = await _managementService.GetDetailAsync(id);
@@ -111,6 +126,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Edit(int id, UpdatePlacementTestDto dto)
         {
             if (id != dto.Id) return BadRequest();
@@ -143,6 +159,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Publish(int id)
         {
             try
@@ -160,6 +177,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Archive(int id)
         {
             try
@@ -173,6 +191,39 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 TempData["ErrorMessage"] = ex.Message;
             }
             return RedirectToAction(nameof(Details), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RetryAiAnalysis(int attemptId)
+        {
+            try
+            {
+                var attempt = await _dbContext.TestAttempts.FindAsync(attemptId);
+                if (attempt == null) return NotFound("Attempt not found");
+
+                // Reset AI log status to PENDING
+                var aiLog = await _dbContext.AiUsageLogs
+                    .FirstOrDefaultAsync(l => l.UserId == attempt.StudentId && l.ModuleCode == $"M6_ATTEMPT_{attemptId}");
+                
+                if (aiLog != null)
+                {
+                    aiLog.RequestStatus = "PENDING";
+                    aiLog.ErrorMessage = null;
+                    await _dbContext.SaveChangesAsync();
+                }
+
+                await _aiQueue.QueueAttemptForAnalysisAsync(attemptId, attempt.StudentId);
+                TempData["SuccessMessage"] = "Đã đưa vào hàng đợi AI Analysis.";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi Retry AI Analysis: " + ex.Message;
+            }
+            
+            // Redirect back to wherever we came from, e.g. Attempt Details page
+            // Assuming we don't have Attempt Details view, we just redirect to Index
+            return RedirectToAction(nameof(Index));
         }
     }
 }

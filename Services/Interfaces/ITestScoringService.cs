@@ -8,6 +8,7 @@ namespace DuAnTotNghiep.Services.Interfaces
     {
         Task<ScoreResultDto> GradeAttemptAsync(int attemptId);
         Task<List<SkillScoreDto>> CalculateSkillScoresAsync(int attemptId);
+        Task<List<TopicScoreDto>> CalculateTopicScoresAsync(int attemptId);
         Task<EstimatedLevelDto> EstimateLevelAsync(int attemptId);
     }
 }
