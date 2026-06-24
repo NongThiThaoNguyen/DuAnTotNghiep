@@ -8,8 +8,8 @@ namespace DuAnTotNghiep.Services.Interfaces
     {
         Task<int> CreateAsync(CreatePlacementTestDto dto, int createdBy);
         Task UpdateAsync(UpdatePlacementTestDto dto);
-        Task PublishAsync(int placementTestId);
-        Task ArchiveAsync(int placementTestId);
+        Task PublishAsync(int placementTestId, int userId);
+        Task ArchiveAsync(int placementTestId, int userId);
         Task<PlacementTestDetailDto?> GetDetailAsync(int id);
         Task<PagedResult<PlacementTestListItemDto>> GetListAsync(PlacementTestFilterDto filter);
     }

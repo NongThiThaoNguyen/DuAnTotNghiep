@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Chi tiết đề thi: " + Model.Title;
     var sections = await SectionService.GetSectionsAsync(Model.Id);
+    var validationResult = ViewBag.ValidationResult as DuAnTotNghiep.DTOs.PlacementTest.Validation.TestValidationResultDto;
 }
 
 <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -36,8 +37,9 @@
 
         @if (Model.Status == "DRAFT")
         {
+            bool isValid = validationResult != null && validationResult.IsValid;
             <form asp-action="Publish" asp-route-id="@Model.Id" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xuất bản đề thi này? Học sinh sẽ có thể bắt đầu làm bài.')">
-                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                <button type="submit" @(isValid ? "" : "disabled") class="px-4 py-2 text-sm font-medium text-white @(isValid ? "bg-emerald-600 hover:bg-emerald-700" : "bg-emerald-300 cursor-not-allowed") rounded-lg shadow-sm transition-colors flex items-center gap-2" @(!isValid ? "title='Không thể xuất bản do lỗi Validation'" : "")>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
                     Publish
                 </button>
@@ -69,6 +71,124 @@
 {
     <div class="mb-6 p-4 text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg">
         @TempData["SuccessMessage"]
+    </div>
+}
+
+
+@if (validationResult != null)
+{
+    <div class="mb-6 bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                Validation Summary
+                @if (validationResult.IsValid && validationResult.Warnings.Count == 0)
+                {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">VALID</span>
+                }
+                else if (validationResult.IsValid && validationResult.Warnings.Count > 0)
+                {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border border-yellow-200">WARNING</span>
+                }
+                else
+                {
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">INVALID</span>
+                }
+            </h3>
+            <button onclick="window.location.reload()" class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                Re-validate
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Errors (@validationResult.Errors.Count)
+                    </h4>
+                    @if (validationResult.Errors.Any())
+                    {
+                        <ul class="space-y-2 text-sm text-slate-600">
+                            @foreach (var error in validationResult.Errors)
+                            {
+                                <li class="flex items-start gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></span>
+                                    <span><strong>@error.Source:</strong> @error.Message</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-sm text-slate-500 italic">No errors found. Test can be published.</p>
+                    }
+                </div>
+                <div>
+                    <h4 class="font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                        Warnings (@validationResult.Warnings.Count)
+                    </h4>
+                    @if (validationResult.Warnings.Any())
+                    {
+                        <ul class="space-y-2 text-sm text-slate-600">
+                            @foreach (var warning in validationResult.Warnings)
+                            {
+                                <li class="flex items-start gap-2">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-1.5 shrink-0"></span>
+                                    <span><strong>@warning.Source:</strong> @warning.Message</span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-sm text-slate-500 italic">No warnings found.</p>
+                    }
+                </div>
+            </div>
+            
+            <hr class="my-6 border-slate-100" />
+            
+            <div>
+                <h4 class="font-semibold text-slate-700 mb-3">Validation Statistics</h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                    <div class="bg-slate-50 p-3 rounded-lg">
+                        <div class="text-slate-500 mb-1">Total Sections</div>
+                        <div class="font-semibold text-slate-800">@validationResult.Statistics.TotalSections</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg">
+                        <div class="text-slate-500 mb-1">Total Questions</div>
+                        <div class="font-semibold text-slate-800">@validationResult.Statistics.TotalQuestions</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg">
+                        <div class="text-slate-500 mb-1">Skills Covered</div>
+                        <div class="font-semibold text-slate-800">@string.Join(", ", validationResult.Statistics.SkillsCovered)</div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-lg">
+                        <div class="text-slate-500 mb-1">Topics</div>
+                        <div class="font-semibold text-slate-800">@validationResult.Statistics.TopicsCovered.Count topics</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 bg-slate-50 p-4 rounded-lg">
+                    <div class="text-slate-500 text-sm mb-2">Difficulty Distribution</div>
+                    <div class="flex gap-4 items-center">
+                        <div class="flex-1">
+                            <div class="w-full bg-slate-200 rounded-full h-2.5 flex overflow-hidden">
+                                <div class="bg-green-500 h-2.5" style="width: @validationResult.Statistics.DifficultyDistribution.BasicPercentage.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                                <div class="bg-yellow-500 h-2.5" style="width: @validationResult.Statistics.DifficultyDistribution.MediumPercentage.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                                <div class="bg-red-500 h-2.5" style="width: @validationResult.Statistics.DifficultyDistribution.AdvancedPercentage.ToString(System.Globalization.CultureInfo.InvariantCulture)%"></div>
+                            </div>
+                        </div>
+                        <div class="text-xs text-slate-600 flex gap-3 shrink-0">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-500"></span> Basic: @validationResult.Statistics.DifficultyDistribution.BasicPercentage.ToString("0.0")%</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-yellow-500"></span> Medium: @validationResult.Statistics.DifficultyDistribution.MediumPercentage.ToString("0.0")%</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Advanced: @validationResult.Statistics.DifficultyDistribution.AdvancedPercentage.ToString("0.0")%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 }
 

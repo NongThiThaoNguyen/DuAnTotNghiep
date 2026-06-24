@@ -15,11 +15,13 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
     {
         private readonly IPlacementTestManagementService _managementService;
         private readonly IMasterDataService _masterDataService;
+        private readonly IPlacementTestValidationService _validationService;
 
-        public PlacementTestsController(IPlacementTestManagementService managementService, IMasterDataService masterDataService)
+        public PlacementTestsController(IPlacementTestManagementService managementService, IMasterDataService masterDataService, IPlacementTestValidationService validationService)
         {
             _managementService = managementService;
             _masterDataService = masterDataService;
+            _validationService = validationService;
         }
 
         public async Task<IActionResult> Index([FromQuery] PlacementTestFilterDto filter)
@@ -38,7 +40,18 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         {
             var test = await _managementService.GetDetailAsync(id);
             if (test == null) return NotFound();
+
+            var validationResult = await _validationService.ValidatePlacementTestAsync(id);
+            ViewBag.ValidationResult = validationResult;
+
             return View(test);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Validate(int id)
+        {
+            var result = await _validationService.ValidatePlacementTestAsync(id);
+            return Json(result);
         }
 
         public async Task<IActionResult> Create()
@@ -134,7 +147,8 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         {
             try
             {
-                await _managementService.PublishAsync(id);
+                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+                await _managementService.PublishAsync(id, userId);
                 TempData["SuccessMessage"] = "Đã xuất bản (Publish) thành công bài thi.";
             }
             catch (Exception ex)
@@ -150,7 +164,8 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         {
             try
             {
-                await _managementService.ArchiveAsync(id);
+                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "0");
+                await _managementService.ArchiveAsync(id, userId);
                 TempData["SuccessMessage"] = "Đã lưu trữ (Archive) thành công bài thi.";
             }
             catch (Exception ex)

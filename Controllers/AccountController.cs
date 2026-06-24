@@ -81,11 +81,11 @@ namespace DuAnTotNghiep.Controllers
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Name, user.FullName),
-                new Claim(ClaimTypes.Role, user.Role.RoleCode),
+                new Claim(ClaimTypes.Role, user.Role.RoleCode.ToUpper().Trim()),
                 new Claim("SessionToken", sessionToken)
             };
 
-            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
 
             // Cấu hình properties cho Cookie
             var authProperties = new AuthenticationProperties
@@ -116,7 +116,8 @@ namespace DuAnTotNghiep.Controllers
             await _userSessionRepository.SaveChangesAsync();
 
             // Điều hướng theo Role
-            return user.Role.RoleCode switch
+            string roleCode = user.Role.RoleCode.ToUpper().Trim();
+            return roleCode switch
             {
                 "ADMIN" => RedirectToAction("Index", "Home", new { area = "Admin" }),
                 "TEACHER" => RedirectToAction("Index", "Home", new { area = "Teacher" }),

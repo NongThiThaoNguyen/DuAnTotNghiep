@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<DuAnTotNghiep.Filters.RequireOnboardingFilter>();
+    options.Filters.Add<DuAnTotNghiep.Filters.RequirePlacementTestFilter>();
 });
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -44,6 +45,8 @@ builder.Services.AddScoped<ITestScoringService, TestScoringService>();
 builder.Services.AddScoped<IPlacementTestManagementService, PlacementTestManagementService>();
 builder.Services.AddScoped<IPlacementTestSectionService, PlacementTestSectionService>();
 builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionService>();
+builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
+builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
 
 // Đăng ký Seeder
 // Đăng ký Seeder

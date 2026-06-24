@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Services
 {
@@ -107,50 +108,305 @@ namespace DuAnTotNghiep.Services
             };
         }
 
-        public async Task<TestAttemptDto> StartAttemptAsync(int studentId, int placementTestId)
+        public async Task<bool> CanStartAttemptAsync(int studentId, int placementTestId)
         {
             var test = await _testRepository.GetByIdAsync(placementTestId);
             if (test == null || test.Status != "PUBLISHED")
             {
-                throw new Exception("Test is not available.");
+                return false;
             }
 
             var allAttempts = await _attemptRepository.GetAllAsync();
-            var existingAttempt = allAttempts
-                .FirstOrDefault(a => a.StudentId == studentId && a.PlacementTestId == placementTestId && a.Status == "IN_PROGRESS");
+            var existingCompleted = allAttempts
+                .Any(a => a.StudentId == studentId && a.PlacementTestId == placementTestId && 
+                         (a.Status == "SUBMITTED" || a.Status == "GRADED"));
 
-            if (existingAttempt != null)
+            if (existingCompleted)
             {
-                return new TestAttemptDto
-                {
-                    Id = existingAttempt.Id,
-                    PlacementTestId = existingAttempt.PlacementTestId,
-                    StudentId = existingAttempt.StudentId,
-                    StartedAt = existingAttempt.StartedAt,
-                    Status = existingAttempt.Status
-                };
+                return false;
             }
 
-            // Create new
-            var newAttempt = new TestAttempt
-            {
-                StudentId = studentId,
-                PlacementTestId = placementTestId,
-                StartedAt = System.DateTime.UtcNow,
-                Status = "IN_PROGRESS"
-            };
+            return true;
+        }
 
-            await _attemptRepository.AddAsync(newAttempt);
-            await _attemptRepository.SaveChangesAsync();
+        public async Task<TestAttemptDto?> GetCurrentAttemptAsync(int studentId, int placementTestId)
+        {
+            var allAttempts = await _attemptRepository.GetAllAsync();
+            var latestAttempt = allAttempts
+                .Where(a => a.StudentId == studentId && a.PlacementTestId == placementTestId)
+                .OrderByDescending(a => a.StartedAt)
+                .FirstOrDefault();
+
+            if (latestAttempt == null) return null;
 
             return new TestAttemptDto
             {
-                Id = newAttempt.Id,
-                PlacementTestId = newAttempt.PlacementTestId,
-                StudentId = newAttempt.StudentId,
-                StartedAt = newAttempt.StartedAt,
-                Status = newAttempt.Status
+                Id = latestAttempt.Id,
+                PlacementTestId = latestAttempt.PlacementTestId,
+                StudentId = latestAttempt.StudentId,
+                StartedAt = latestAttempt.StartedAt,
+                SubmittedAt = latestAttempt.SubmittedAt,
+                TotalScore = latestAttempt.TotalScore,
+                EstimatedLevelId = latestAttempt.EstimatedLevelId,
+                Status = latestAttempt.Status
             };
+        }
+
+        public async Task<TestTakingViewModel?> GetTestTakingViewModelAsync(int attemptId, int studentId)
+        {
+            var attemptInfo = await _dbContext.TestAttempts
+                .Where(a => a.Id == attemptId && a.StudentId == studentId)
+                .Select(a => new
+                {
+                    a.Id,
+                    a.StartedAt,
+                    a.Status,
+                    TestTitle = a.PlacementTest.Title,
+                    TimeLimitMinutes = a.PlacementTest.TimeLimitMinutes,
+                    Sections = a.PlacementTest.PlacementTestSections
+                        .OrderBy(s => s.OrderIndex)
+                        .Select(s => new TestSectionViewModel
+                        {
+                            SectionId = s.Id,
+                            SectionTitle = s.SectionName,
+                            Instruction = s.Instruction,
+                            OrderIndex = s.OrderIndex,
+                            SkillName = s.Skill.SkillName,
+                            Questions = s.PlacementTestQuestions
+                                .OrderBy(pq => pq.OrderIndex)
+                                .Select(pq => new TestQuestionViewModel
+                                {
+                                    QuestionId = pq.Question.Id,
+                                    QuestionText = pq.Question.QuestionText,
+                                    QuestionType = pq.Question.QuestionType,
+                                    AudioUrl = pq.Question.AudioUrl,
+                                    ImageUrl = pq.Question.ImageUrl,
+                                    Points = pq.Points,
+                                    OrderIndex = pq.OrderIndex,
+                                    ExistingAnswer = a.TestAnswers
+                                        .Where(ta => ta.QuestionId == pq.Question.Id)
+                                        .Select(ta => ta.SelectedOptionId.HasValue ? ta.SelectedOptionId.Value.ToString() : ta.AnswerText)
+                                        .FirstOrDefault(),
+                                    Options = pq.Question.QuestionOptions
+                                        .OrderBy(o => o.OrderIndex)
+                                        .Select(o => new QuestionOptionViewModel
+                                        {
+                                            Id = o.Id,
+                                            Text = o.OptionText
+                                        }).ToList()
+                                }).ToList()
+                        }).ToList()
+                })
+                .FirstOrDefaultAsync();
+
+            if (attemptInfo == null) return null;
+
+            var serverTime = DateTime.UtcNow;
+            DateTime? endTime = attemptInfo.TimeLimitMinutes.HasValue 
+                ? attemptInfo.StartedAt.AddMinutes(attemptInfo.TimeLimitMinutes.Value) 
+                : null;
+
+            int? remainingSeconds = null;
+            if (endTime.HasValue)
+            {
+                remainingSeconds = (int)(endTime.Value - serverTime).TotalSeconds;
+                if (remainingSeconds < 0) remainingSeconds = 0;
+            }
+
+            // Fix Infinite Loop: If expired, mark as EXPIRED so RequirePlacementTestFilter doesn't keep redirecting
+            var currentStatus = attemptInfo.Status;
+            if (remainingSeconds == 0 && currentStatus == "IN_PROGRESS")
+            {
+                var attemptToUpdate = await _dbContext.TestAttempts.FindAsync(attemptId);
+                if (attemptToUpdate != null)
+                {
+                    attemptToUpdate.Status = "EXPIRED";
+                    _dbContext.TestAttempts.Update(attemptToUpdate);
+                    await _dbContext.SaveChangesAsync();
+                    currentStatus = "EXPIRED";
+                }
+            }
+
+            return new TestTakingViewModel
+            {
+                AttemptId = attemptInfo.Id,
+                TestTitle = attemptInfo.TestTitle,
+                ServerTime = serverTime,
+                EndTime = endTime,
+                RemainingSeconds = remainingSeconds,
+                Status = currentStatus,
+                Sections = attemptInfo.Sections
+            };
+        }
+
+        public async Task<SaveAnswerResultDto> SaveAnswerAsync(SaveAnswerInputDto input, int studentId)
+        {
+            var attempt = await _dbContext.TestAttempts
+                .Include(a => a.PlacementTest)
+                .ThenInclude(pt => pt.PlacementTestSections)
+                .ThenInclude(s => s.PlacementTestQuestions)
+                .ThenInclude(pq => pq.Question)
+                .FirstOrDefaultAsync(a => a.Id == input.AttemptId);
+
+            if (attempt == null)
+            {
+                return new SaveAnswerResultDto { Success = false, Message = "Attempt not found", SavedAt = DateTime.UtcNow };
+            }
+
+            if (attempt.StudentId != studentId)
+            {
+                return new SaveAnswerResultDto { Success = false, Message = "Forbidden: Cannot save answer for another student's attempt", SavedAt = DateTime.UtcNow };
+            }
+
+            if (attempt.Status != "IN_PROGRESS")
+            {
+                return new SaveAnswerResultDto { Success = false, Message = $"Cannot save answer because attempt is {attempt.Status}", SavedAt = DateTime.UtcNow };
+            }
+
+            // Verify that the QuestionId belongs to this placement test
+            var questionBelongsToTest = attempt.PlacementTest.PlacementTestSections
+                .SelectMany(s => s.PlacementTestQuestions)
+                .Any(pq => pq.QuestionId == input.QuestionId);
+
+            if (!questionBelongsToTest)
+            {
+                return new SaveAnswerResultDto { Success = false, Message = "Question does not belong to this test", SavedAt = DateTime.UtcNow };
+            }
+
+            var existingAnswer = await _dbContext.TestAnswers
+                .FirstOrDefaultAsync(ta => ta.AttemptId == input.AttemptId && ta.QuestionId == input.QuestionId);
+
+            var questionType = attempt.PlacementTest.PlacementTestSections
+                .SelectMany(s => s.PlacementTestQuestions)
+                .First(pq => pq.QuestionId == input.QuestionId).Question.QuestionType;
+
+            int? selectedOptionId = null;
+            string? answerText = null;
+
+            if (questionType == "SHORT_ANSWER")
+            {
+                answerText = input.AnswerValue;
+            }
+            else
+            {
+                if (int.TryParse(input.AnswerValue, out int optId))
+                {
+                    selectedOptionId = optId;
+                }
+            }
+
+            if (existingAnswer != null)
+            {
+                existingAnswer.SelectedOptionId = selectedOptionId;
+                existingAnswer.AnswerText = answerText;
+                existingAnswer.AnsweredAt = DateTime.UtcNow;
+                _dbContext.TestAnswers.Update(existingAnswer);
+            }
+            else
+            {
+                var newAnswer = new TestAnswer
+                {
+                    AttemptId = input.AttemptId,
+                    QuestionId = input.QuestionId,
+                    SelectedOptionId = selectedOptionId,
+                    AnswerText = answerText,
+                    AnsweredAt = DateTime.UtcNow
+                };
+                _dbContext.TestAnswers.Add(newAnswer);
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            return new SaveAnswerResultDto
+            {
+                Success = true,
+                Message = "Saved successfully",
+                SavedAt = DateTime.UtcNow
+            };
+        }
+
+        public async Task<TestAttemptDto> StartAttemptAsync(int studentId, int placementTestId)
+        {
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var canStart = await CanStartAttemptAsync(studentId, placementTestId);
+                if (!canStart)
+                {
+                    throw new InvalidOperationException("Cannot start attempt. Test may not be published or you have already completed it.");
+                }
+
+                var allAttempts = await _attemptRepository.GetAllAsync();
+                var existingAttempt = allAttempts
+                    .FirstOrDefault(a => a.StudentId == studentId && a.PlacementTestId == placementTestId && a.Status == "IN_PROGRESS");
+
+                if (existingAttempt != null)
+                {
+                    var test = await _testRepository.GetByIdAsync(placementTestId);
+                    if (test!.TimeLimitMinutes.HasValue)
+                    {
+                        var expireTime = existingAttempt.StartedAt.AddMinutes(test.TimeLimitMinutes.Value);
+                        if (DateTime.UtcNow > expireTime)
+                        {
+                            existingAttempt.Status = "EXPIRED";
+                            _dbContext.TestAttempts.Update(existingAttempt);
+                            await _dbContext.SaveChangesAsync();
+                            // Continue to create new attempt below
+                        }
+                        else
+                        {
+                            await transaction.CommitAsync();
+                            return new TestAttemptDto
+                            {
+                                Id = existingAttempt.Id,
+                                PlacementTestId = existingAttempt.PlacementTestId,
+                                StudentId = existingAttempt.StudentId,
+                                StartedAt = existingAttempt.StartedAt,
+                                Status = existingAttempt.Status
+                            };
+                        }
+                    }
+                    else
+                    {
+                        await transaction.CommitAsync();
+                        return new TestAttemptDto
+                        {
+                            Id = existingAttempt.Id,
+                            PlacementTestId = existingAttempt.PlacementTestId,
+                            StudentId = existingAttempt.StudentId,
+                            StartedAt = existingAttempt.StartedAt,
+                            Status = existingAttempt.Status
+                        };
+                    }
+                }
+
+                // Create new
+                var newAttempt = new TestAttempt
+                {
+                    StudentId = studentId,
+                    PlacementTestId = placementTestId,
+                    StartedAt = DateTime.UtcNow,
+                    Status = "IN_PROGRESS"
+                };
+
+                await _attemptRepository.AddAsync(newAttempt);
+                await _attemptRepository.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return new TestAttemptDto
+                {
+                    Id = newAttempt.Id,
+                    PlacementTestId = newAttempt.PlacementTestId,
+                    StudentId = newAttempt.StudentId,
+                    StartedAt = newAttempt.StartedAt,
+                    Status = newAttempt.Status
+                };
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<SubmitResultDto> SubmitAttemptAsync(int attemptId, int studentId, List<AnswerInputDto> answers)

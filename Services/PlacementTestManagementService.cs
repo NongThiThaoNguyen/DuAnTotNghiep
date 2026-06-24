@@ -14,10 +14,12 @@ namespace DuAnTotNghiep.Services
     public class PlacementTestManagementService : IPlacementTestManagementService
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IPlacementTestValidationService _validationService;
 
-        public PlacementTestManagementService(ApplicationDbContext dbContext)
+        public PlacementTestManagementService(ApplicationDbContext dbContext, IPlacementTestValidationService validationService)
         {
             _dbContext = dbContext;
+            _validationService = validationService;
         }
 
         public async Task<int> CreateAsync(CreatePlacementTestDto dto, int createdBy)
@@ -74,25 +76,24 @@ namespace DuAnTotNghiep.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task PublishAsync(int placementTestId)
+        public async Task PublishAsync(int placementTestId, int userId)
         {
+            var user = await _dbContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null || user.Role?.RoleCode != "ADMIN")
+                throw new UnauthorizedAccessException("Bạn không có quyền Publish bài thi này.");
+
             var test = await _dbContext.PlacementTests
-                .Include(t => t.PlacementTestSections)
-                .ThenInclude(s => s.PlacementTestQuestions)
                 .FirstOrDefaultAsync(t => t.Id == placementTestId);
 
             if (test == null) throw new InvalidOperationException("Không tìm thấy bài thi.");
             if (test.Status != "DRAFT") throw new InvalidOperationException("Chỉ có thể Publish bài thi ở trạng thái Draft.");
             
-            if (!test.PlacementTestSections.Any())
-                throw new InvalidOperationException("Không thể Publish bài thi chưa có Section nào.");
-            
-            int questionCount = test.PlacementTestSections.Sum(s => s.PlacementTestQuestions.Count);
-            if (questionCount == 0)
-                throw new InvalidOperationException("Không thể Publish bài thi chưa có Question nào.");
-
-            if (test.TargetLevelId == null)
-                throw new InvalidOperationException("Bài thi chưa có Target Level.");
+            var validationResult = await _validationService.ValidatePlacementTestAsync(placementTestId);
+            if (!validationResult.IsValid)
+            {
+                var errors = string.Join("\n", validationResult.Errors.Select(e => $"- {e.Source}: {e.Message}"));
+                throw new InvalidOperationException($"Không thể Publish bài thi vì có lỗi xác thực:\n{errors}");
+            }
 
             test.Status = "PUBLISHED";
             test.UpdatedAt = DateTime.UtcNow;
@@ -101,8 +102,12 @@ namespace DuAnTotNghiep.Services
             await _dbContext.SaveChangesAsync();
         }
 
-        public async Task ArchiveAsync(int placementTestId)
+        public async Task ArchiveAsync(int placementTestId, int userId)
         {
+            var user = await _dbContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null || user.Role?.RoleCode != "ADMIN")
+                throw new UnauthorizedAccessException("Bạn không có quyền Archive bài thi này.");
+
             var test = await _dbContext.PlacementTests.FindAsync(placementTestId);
             if (test == null) throw new InvalidOperationException("Không tìm thấy bài thi.");
 
@@ -139,7 +144,7 @@ namespace DuAnTotNghiep.Services
                 TotalScore = test.TotalScore,
                 Status = test.Status,
                 CreatedAt = test.CreatedAt,
-                PublishedAt = null,
+                PublishedAt = (test.Status == "PUBLISHED" || test.Status == "ARCHIVED") ? test.UpdatedAt : null,
                 SectionCount = sectionCount,
                 QuestionCount = questionCount,
                 AttemptCount = attemptCount
