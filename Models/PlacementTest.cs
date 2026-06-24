@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DuAnTotNghiep.Models;
 
@@ -7,6 +8,8 @@ public partial class PlacementTest
 {
     public int Id { get; set; }
 
+    [Required]
+    [MaxLength(255)]
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }
@@ -17,6 +20,8 @@ public partial class PlacementTest
 
     public decimal TotalScore { get; set; }
 
+    [Required]
+    [MaxLength(50)]
     public string Status { get; set; } = null!;
 
     public int? CreatedBy { get; set; }

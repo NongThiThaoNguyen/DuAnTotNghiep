@@ -954,7 +954,7 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__placemen__3213E83F955AE2ED");
 
-            entity.ToTable("placement_tests");
+            entity.ToTable("placement_tests", t => t.HasCheckConstraint("CK_PlacementTest_Status", "[status] IN ('DRAFT', 'PUBLISHED', 'ARCHIVED')"));
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
@@ -1010,12 +1010,12 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Question).WithMany(p => p.PlacementTestQuestions)
                 .HasForeignKey(d => d.QuestionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_ptq_question");
 
             entity.HasOne(d => d.Section).WithMany(p => p.PlacementTestQuestions)
                 .HasForeignKey(d => d.SectionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_ptq_section");
         });
 
@@ -1024,6 +1024,8 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__placemen__3213E83FC01FC668");
 
             entity.ToTable("placement_test_sections");
+
+            entity.HasIndex(e => new { e.PlacementTestId, e.SkillId }, "IX_placement_test_sections_test_skill");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Instruction).HasColumnName("instruction");
@@ -1097,7 +1099,10 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__practice__3213E83F9C46F05B");
 
-            entity.ToTable("practice_tasks");
+            entity.ToTable("practice_tasks", t => {
+                t.HasCheckConstraint("CK_PracticeTask_DifficultyLevel", "[difficulty_level] IN ('BASIC', 'MEDIUM', 'ADVANCED')");
+                t.HasCheckConstraint("CK_PracticeTask_TaskType", "[task_type] IN ('MCQ', 'TRUE_FALSE', 'SHORT_ANSWER', 'LISTENING')");
+            });
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
@@ -1143,7 +1148,10 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__question__3213E83F73ECF016");
 
-            entity.ToTable("question_bank");
+            entity.ToTable("question_bank", t => {
+                t.HasCheckConstraint("CK_QuestionBank_DifficultyLevel", "[difficulty_level] IN ('BASIC', 'MEDIUM', 'ADVANCED')");
+                t.HasCheckConstraint("CK_QuestionBank_QuestionType", "[question_type] IN ('MCQ', 'TRUE_FALSE', 'SHORT_ANSWER', 'LISTENING')");
+            });
 
             entity.HasIndex(e => new { e.SkillId, e.TopicId, e.DifficultyLevel }, "IX_questions_skill_topic");
 
@@ -1761,6 +1769,8 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("test_answers");
 
+            entity.HasIndex(e => new { e.AttemptId, e.QuestionId }, "UQ_test_answer_attempt_question").IsUnique();
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AnswerText).HasColumnName("answer_text");
             entity.Property(e => e.AnsweredAt)
@@ -1776,12 +1786,12 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.Attempt).WithMany(p => p.TestAnswers)
                 .HasForeignKey(d => d.AttemptId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_ta_attempt");
 
             entity.HasOne(d => d.Question).WithMany(p => p.TestAnswers)
                 .HasForeignKey(d => d.QuestionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_ta_question");
 
             entity.HasOne(d => d.SelectedOption).WithMany(p => p.TestAnswers)
@@ -1793,9 +1803,9 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__test_att__3213E83FE21DABC0");
 
-            entity.ToTable("test_attempts");
+            entity.ToTable("test_attempts", t => t.HasCheckConstraint("CK_TestAttempt_Status", "[status] IN ('IN_PROGRESS', 'SUBMITTED', 'GRADED', 'EXPIRED')"));
 
-            entity.HasIndex(e => new { e.StudentId, e.Status }, "IX_test_attempt_student");
+            entity.HasIndex(e => new { e.StudentId, e.PlacementTestId, e.Status }, "IX_test_attempt_student");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.EstimatedLevelId).HasColumnName("estimated_level_id");
@@ -1820,12 +1830,12 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.PlacementTest).WithMany(p => p.TestAttempts)
                 .HasForeignKey(d => d.PlacementTestId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_attempt_test");
 
             entity.HasOne(d => d.Student).WithMany(p => p.TestAttempts)
                 .HasForeignKey(d => d.StudentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_attempt_student");
         });
 

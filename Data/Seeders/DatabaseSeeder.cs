@@ -12,6 +12,7 @@ namespace DuAnTotNghiep.Data.Seeders
         private readonly IGenericRepository<EnglishProficiencyLevel> _levelRepository;
         private readonly IGenericRepository<EnglishSkill> _skillRepository;
         private readonly IGenericRepository<StudentLearningProfile> _profileRepository;
+        private readonly ApplicationDbContext _context;
 
         public DatabaseSeeder(
             IRoleRepository roleRepository, 
@@ -19,7 +20,8 @@ namespace DuAnTotNghiep.Data.Seeders
             IGenericRepository<LearningGoal> goalRepository,
             IGenericRepository<EnglishProficiencyLevel> levelRepository,
             IGenericRepository<EnglishSkill> skillRepository,
-            IGenericRepository<StudentLearningProfile> profileRepository)
+            IGenericRepository<StudentLearningProfile> profileRepository,
+            ApplicationDbContext context)
         {
             _roleRepository = roleRepository;
             _userRepository = userRepository;
@@ -27,6 +29,7 @@ namespace DuAnTotNghiep.Data.Seeders
             _levelRepository = levelRepository;
             _skillRepository = skillRepository;
             _profileRepository = profileRepository;
+            _context = context;
         }
 
         public async Task SeedAsync()
@@ -36,6 +39,7 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedGoalsAsync();
             await SeedLevelsAsync();
             await SeedSkillsAsync();
+            await SeedPlacementTestsAsync();
             await SeedDemoProfilesAsync();
         }
 
@@ -128,18 +132,16 @@ namespace DuAnTotNghiep.Data.Seeders
 
             foreach (var goal in goals)
             {
-                var existing = existingGoals.FirstOrDefault(g => g.GoalCode == goal.GoalCode || g.GoalCode == "GENERAL_ENGLISH" && goal.GoalCode == "SCHOOL" || g.GoalCode == "BUSINESS" && goal.GoalCode == "VOCABULARY" || g.GoalCode == "STUDY_ABROAD" && goal.GoalCode == "GRAMMAR");
+                var existing = existingGoals.FirstOrDefault(g => g.GoalCode == goal.GoalCode);
                 
                 if (existing == null)
                 {
-                    // Match by index or just add
-                    existing = existingGoals.FirstOrDefault(g => g.GoalName.Contains("Cáº£i") && goal.GoalCode == "COMMUNICATION" 
-                    || g.GoalName.Contains("Luyá»‡n") && goal.GoalCode == "IELTS"
-                    || g.GoalName.Contains("Há»c") && goal.GoalCode == "SCHOOL"
-                    || g.GoalName.Contains("Má»Ÿ") && goal.GoalCode == "VOCABULARY"
-                    || g.GoalName.Contains("Cá»§ng") && goal.GoalCode == "GRAMMAR");
+                    existing = existingGoals.FirstOrDefault(g => 
+                        (g.GoalCode == "SCHOOL_ENGLISH" && goal.GoalCode == "SCHOOL") ||
+                        (g.GoalCode == "GENERAL_ENGLISH" && goal.GoalCode == "SCHOOL") ||
+                        (g.GoalCode == "BUSINESS" && goal.GoalCode == "VOCABULARY") ||
+                        (g.GoalCode == "STUDY_ABROAD" && goal.GoalCode == "GRAMMAR"));
                 }
-
                 if (existing != null)
                 {
                     // Update to fix corrupted text
@@ -161,6 +163,18 @@ namespace DuAnTotNghiep.Data.Seeders
             {
                 await _goalRepository.SaveChangesAsync();
             }
+
+            // Cleanup orphaned garbled goal
+            var orphanedGoal = existingGoals.FirstOrDefault(g => g.GoalCode == "SCHOOL_ENGLISH" || g.GoalCode == "GENERAL_ENGLISH");
+            if (orphanedGoal != null)
+            {
+                try
+                {
+                    _goalRepository.Delete(orphanedGoal);
+                    await _goalRepository.SaveChangesAsync();
+                }
+                catch { } // Ignore if referenced by foreign keys
+            }
         }
 
         private async Task SeedLevelsAsync()
@@ -181,7 +195,15 @@ namespace DuAnTotNghiep.Data.Seeders
 
             foreach (var level in levels)
             {
-                var existing = existingLevels.FirstOrDefault(l => l.Code == level.Code);
+                var existing = existingLevels.FirstOrDefault(l => 
+                    l.Code == level.Code ||
+                    (l.Code == "A1" && level.Code == "BEGINNER") ||
+                    (l.Code == "A2" && level.Code == "ELEMENTARY") ||
+                    (l.Code == "B1" && level.Code == "PRE_INTERMEDIATE") ||
+                    (l.Code == "B2" && level.Code == "INTERMEDIATE") ||
+                    (l.Code == "C1" && level.Code == "UPPER_INTERMEDIATE") ||
+                    (l.Code == "C2" && level.Code == "ADVANCED"));
+                    
                 if (existing != null)
                 {
                     existing.Name = level.Name;
@@ -207,18 +229,46 @@ namespace DuAnTotNghiep.Data.Seeders
         {
             var skills = new List<EnglishSkill>
             {
-                new EnglishSkill { SkillCode = "LISTENING", SkillName = "Listening", OrderIndex = 1, Description = "Kỹ năng nghe", IsActive = true },
-                new EnglishSkill { SkillCode = "SPEAKING", SkillName = "Speaking", OrderIndex = 2, Description = "Kỹ năng nói", IsActive = true },
-                new EnglishSkill { SkillCode = "READING", SkillName = "Reading", OrderIndex = 3, Description = "Kỹ năng đọc", IsActive = true },
-                new EnglishSkill { SkillCode = "WRITING", SkillName = "Writing", OrderIndex = 4, Description = "Kỹ năng viết", IsActive = true },
-                new EnglishSkill { SkillCode = "GRAMMAR", SkillName = "Grammar", OrderIndex = 5, Description = "Ngữ pháp", IsActive = true },
-                new EnglishSkill { SkillCode = "VOCABULARY", SkillName = "Vocabulary", OrderIndex = 6, Description = "Từ vựng", IsActive = true }
+                new EnglishSkill { SkillCode = "LISTENING", SkillName = "Nghe hiểu", OrderIndex = 1, Description = "Kỹ năng nghe hiểu", IsActive = true },
+                new EnglishSkill { SkillCode = "SPEAKING", SkillName = "Nói", OrderIndex = 2, Description = "Kỹ năng nói", IsActive = true },
+                new EnglishSkill { SkillCode = "READING", SkillName = "Đọc hiểu", OrderIndex = 3, Description = "Kỹ năng đọc hiểu", IsActive = true },
+                new EnglishSkill { SkillCode = "WRITING", SkillName = "Viết", OrderIndex = 4, Description = "Kỹ năng viết", IsActive = true },
+                new EnglishSkill { SkillCode = "GRAMMAR", SkillName = "Ngữ pháp", OrderIndex = 5, Description = "Ngữ pháp", IsActive = true },
+                new EnglishSkill { SkillCode = "VOCABULARY", SkillName = "Từ vựng", OrderIndex = 6, Description = "Từ vựng", IsActive = true },
+                new EnglishSkill { SkillCode = "PRONUNCIATION", SkillName = "Phát âm", OrderIndex = 7, Description = "Phát âm", IsActive = true }
             };
 
             bool changesMade = false;
+            var existingSkills = await _skillRepository.GetAllAsync();
+
             foreach (var skill in skills)
             {
-                if (!await _skillRepository.ExistsAsync(s => s.SkillCode == skill.SkillCode))
+                var existing = existingSkills.FirstOrDefault(s => s.SkillCode == skill.SkillCode);
+                
+                if (existing == null)
+                {
+                    existing = existingSkills.FirstOrDefault(s => 
+                        (s.SkillCode == "LISTENING" && skill.SkillCode == "LISTENING") ||
+                        (s.SkillCode == "SPEAKING" && skill.SkillCode == "SPEAKING") ||
+                        (s.SkillCode == "READING" && skill.SkillCode == "READING") ||
+                        (s.SkillCode == "WRITING" && skill.SkillCode == "WRITING") ||
+                        (s.SkillCode == "GRAMMAR" && skill.SkillCode == "GRAMMAR") ||
+                        (s.SkillCode == "VOCABULARY" && skill.SkillCode == "VOCABULARY") ||
+                        (s.SkillCode == "PRONUNCIATION" && skill.SkillCode == "PRONUNCIATION")
+                    );
+                }
+
+                if (existing != null)
+                {
+                    existing.SkillCode = skill.SkillCode;
+                    existing.SkillName = skill.SkillName;
+                    existing.Description = skill.Description;
+                    existing.OrderIndex = skill.OrderIndex;
+                    existing.IsActive = true;
+                    _skillRepository.Update(existing);
+                    changesMade = true;
+                }
+                else
                 {
                     await _skillRepository.AddAsync(skill);
                     changesMade = true;
@@ -274,6 +324,31 @@ namespace DuAnTotNghiep.Data.Seeders
             }
 
             await _profileRepository.SaveChangesAsync();
+        }
+
+        private async Task SeedPlacementTestsAsync()
+        {
+            if (!_context.PlacementTests.Any())
+            {
+                var adminUser = await _userRepository.GetByEmailAsync("admin@aistudyenglish.com");
+                var beginnerLevel = (await _levelRepository.GetAllAsync()).FirstOrDefault(l => l.Code == "BEGINNER");
+                
+                if (adminUser != null && beginnerLevel != null)
+                {
+                    var test = new PlacementTest
+                    {
+                        Title = "General English Placement Test",
+                        Description = "Bài đánh giá năng lực tiếng Anh tổng quát.",
+                        TimeLimitMinutes = 30,
+                        TargetLevelId = beginnerLevel.Id,
+                        CreatedBy = adminUser.Id,
+                        Status = Enums.PlacementTestStatus.Published,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.PlacementTests.Add(test);
+                    await _context.SaveChangesAsync();
+                }
+            }
         }
     }
 }

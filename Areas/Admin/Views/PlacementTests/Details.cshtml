@@ -1,0 +1,521 @@
+@model DuAnTotNghiep.DTOs.PlacementTest.PlacementTestDetailDto
+@inject DuAnTotNghiep.Services.Interfaces.IPlacementTestSectionService SectionService
+
+@{
+    ViewData["Title"] = "Chi tiết đề thi: " + Model.Title;
+    var sections = await SectionService.GetSectionsAsync(Model.Id);
+}
+
+<div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800 flex items-center gap-3">
+            @Model.Title
+            @if (Model.Status == "DRAFT")
+            {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-800 border border-slate-200">DRAFT</span>
+            }
+            else if (Model.Status == "PUBLISHED")
+            {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">PUBLISHED</span>
+            }
+            else
+            {
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">ARCHIVED</span>
+            }
+        </h1>
+        <p class="text-slate-500 text-sm mt-1">Chi tiết cấu trúc và trạng thái bài thi</p>
+    </div>
+    
+    <div class="flex items-center gap-3">
+        <a asp-action="Index" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors">Quay lại</a>
+        
+        <a asp-action="Edit" asp-route-id="@Model.Id" class="px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-lg transition-colors flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            Sửa
+        </a>
+
+        @if (Model.Status == "DRAFT")
+        {
+            <form asp-action="Publish" asp-route-id="@Model.Id" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xuất bản đề thi này? Học sinh sẽ có thể bắt đầu làm bài.')">
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Publish
+                </button>
+            </form>
+        }
+        else if (Model.Status == "PUBLISHED")
+        {
+            <form asp-action="Archive" asp-route-id="@Model.Id" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn lưu trữ đề thi này? Học sinh sẽ không thể thấy bài thi này nữa.')">
+                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                    Archive
+                </button>
+            </form>
+        }
+    </div>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="mb-6 p-4 border-l-4 border-red-500 bg-red-50 text-red-800 rounded-r-lg flex items-start gap-3">
+        <svg class="w-6 h-6 shrink-0 mt-0.5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+        <div>
+            <h3 class="font-bold">Lỗi xuất bản</h3>
+            <p class="text-sm mt-1">@TempData["ErrorMessage"]</p>
+        </div>
+    </div>
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="mb-6 p-4 text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    
+    <!-- Cột trái: Thông tin -->
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-6">
+            <h3 class="text-lg font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">Thông tin chung</h3>
+            
+            <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Trình độ mục tiêu</dt>
+                    <dd class="mt-1 font-semibold text-slate-900">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                            @Model.TargetLevelName
+                        </span>
+                    </dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Thời gian làm bài</dt>
+                    <dd class="mt-1 font-semibold text-slate-900">@(Model.TimeLimitMinutes?.ToString() ?? "Không giới hạn") phút</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Tổng điểm quy đổi</dt>
+                    <dd class="mt-1 font-semibold text-blue-600 text-lg">@Model.TotalScore</dd>
+                </div>
+                <div>
+                    <dt class="text-sm font-medium text-slate-500">Lượt làm bài (Attempt)</dt>
+                    <dd class="mt-1 font-semibold text-slate-900">@Model.AttemptCount lượt</dd>
+                </div>
+                <div class="sm:col-span-2">
+                    <dt class="text-sm font-medium text-slate-500">Mô tả bài thi</dt>
+                    <dd class="mt-1 text-slate-700 whitespace-pre-line">@(string.IsNullOrEmpty(Model.Description) ? "Không có mô tả." : Model.Description)</dd>
+                </div>
+            </dl>
+        </div>
+
+        <!-- Section quản lý nội dung thi - Task 6, 7 -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+            <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Cấu trúc bài thi (Sections)</h3>
+                    <p class="text-sm text-slate-500 mt-1">Quản lý các phần thi của bài Test</p>
+                </div>
+                <a asp-controller="PlacementTestSections" asp-action="Index" asp-route-placementTestId="@Model.Id" class="px-4 py-2 bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium rounded-lg text-sm transition-colors">
+                    Quản lý Section
+                </a>
+            </div>
+            <div class="p-4 text-center text-slate-500 bg-slate-50 text-sm">
+                @if(Model.SectionCount > 0) {
+                    <p>Bài thi có tổng cộng <strong class="text-slate-800">@Model.SectionCount</strong> Sections.</p>
+                } else {
+                    <p>Chưa có Section nào được tạo. Click "Quản lý Section" để bắt đầu.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Quản lý Câu hỏi (Questions) -->
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden" id="questions-section">
+            <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <h3 class="text-lg font-bold text-slate-800">Ngân hàng Câu hỏi</h3>
+                    <p class="text-sm text-slate-500 mt-1">Thêm/bớt câu hỏi cho từng Section</p>
+                </div>
+                
+                @if(Model.SectionCount > 0 && Model.Status != "ARCHIVED")
+                {
+                    <div class="flex items-center gap-3">
+                        <select id="sectionSelector" class="rounded-lg border-slate-300 text-sm py-2">
+                            <option value="">-- Chọn Section để quản lý --</option>
+                            @foreach (var sec in sections)
+                            {
+                                <option value="@sec.Id">Part @sec.OrderIndex: @sec.SectionName</option>
+                            }
+                        </select>
+                        <button id="btnOpenQuestionModal" class="px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 font-medium rounded-lg text-sm transition-colors hidden">
+                            + Thêm Câu hỏi
+                        </button>
+                    </div>
+                }
+            </div>
+            
+            <div class="p-0">
+                @if(Model.SectionCount == 0)
+                {
+                    <div class="p-8 text-center text-slate-500">
+                        <p>Vui lòng tạo Section trước khi thêm câu hỏi.</p>
+                    </div>
+                }
+                else
+                {
+                    <div id="questionsContainer" class="p-8 text-center text-slate-500">
+                        <p>Vui lòng chọn một Section ở menu phía trên để xem danh sách câu hỏi.</p>
+                    </div>
+                    
+                    <!-- Bảng danh sách câu hỏi -->
+                    <div id="questionsTableWrapper" class="hidden overflow-x-auto">
+                        <div class="p-3 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                            <span class="text-sm font-medium text-slate-700" id="currentSectionTitle"></span>
+                            <button id="btnSaveQuestionOrder" class="hidden px-3 py-1.5 bg-blue-600 text-white rounded text-xs font-medium hover:bg-blue-700">Lưu thứ tự</button>
+                        </div>
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">STT</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Nội dung</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Độ khó</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Điểm</th>
+                                    <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="questionsTbody" class="bg-white divide-y divide-slate-200">
+                                <!-- Data populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Select Question -->
+    <div id="questionModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeQuestionModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl leading-6 font-bold text-slate-900" id="modal-title">Chọn câu hỏi từ Ngân hàng</h3>
+                        <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-500">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-4 flex gap-2 items-end">
+                        <div class="flex-1">
+                            <label class="block text-xs text-slate-500 mb-1">Từ khóa</label>
+                            <input type="text" id="filterKeyword" class="w-full rounded border-slate-300 text-sm" placeholder="Tìm nội dung câu hỏi...">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Loại</label>
+                            <select id="filterType" class="rounded border-slate-300 text-sm">
+                                <option value="">Tất cả</option>
+                                <option value="MULTIPLE_CHOICE">Trắc nghiệm</option>
+                                <option value="FILL_BLANK">Điền từ</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-500 mb-1">Độ khó</label>
+                            <select id="filterDifficulty" class="rounded border-slate-300 text-sm">
+                                <option value="">Tất cả</option>
+                                <option value="BASIC">Cơ bản</option>
+                                <option value="MEDIUM">Trung bình</option>
+                                <option value="ADVANCED">Nâng cao</option>
+                            </select>
+                        </div>
+                        <button id="btnSearchQuestions" onclick="loadAvailableQuestions()" class="px-4 py-2 bg-slate-800 text-white text-sm rounded hover:bg-slate-700">Lọc</button>
+                    </div>
+
+                    <div class="max-h-96 overflow-y-auto border border-slate-200 rounded-lg">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50 sticky top-0 shadow-sm">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500">Câu hỏi</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 w-24">Độ khó</th>
+                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 w-48">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="availableQuestionsTbody" class="bg-white divide-y divide-slate-200">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @section Scripts {
+        <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+        <script>
+            const testId = @Model.Id;
+            const testStatus = '@Model.Status';
+            const hasAttempt = @(Model.AttemptCount > 0 ? "true" : "false");
+            let currentSectionId = 0;
+            let sortableInstance = null;
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const sectionSelector = document.getElementById('sectionSelector');
+                if (sectionSelector) {
+                    sectionSelector.addEventListener('change', function() {
+                        currentSectionId = parseInt(this.value);
+                        if(currentSectionId > 0) {
+                            document.getElementById('questionsContainer').classList.add('hidden');
+                            document.getElementById('questionsTableWrapper').classList.remove('hidden');
+                            document.getElementById('btnOpenQuestionModal').classList.remove('hidden');
+                            document.getElementById('currentSectionTitle').innerText = this.options[this.selectedIndex].text;
+                            loadSectionQuestions();
+                        } else {
+                            document.getElementById('questionsContainer').classList.remove('hidden');
+                            document.getElementById('questionsTableWrapper').classList.add('hidden');
+                            document.getElementById('btnOpenQuestionModal').classList.add('hidden');
+                        }
+                    });
+                }
+
+                document.getElementById('btnOpenQuestionModal')?.addEventListener('click', function() {
+                    document.getElementById('questionModal').classList.remove('hidden');
+                    loadAvailableQuestions();
+                });
+            });
+
+            function closeQuestionModal() {
+                document.getElementById('questionModal').classList.add('hidden');
+            }
+
+            function loadSectionQuestions() {
+                fetch(`/Admin/PlacementTestQuestions/GetBySection/${currentSectionId}`)
+                    .then(r => r.json())
+                    .then(res => {
+                        const tbody = document.getElementById('questionsTbody');
+                        tbody.innerHTML = '';
+                        if (res.success && res.data.length > 0) {
+                            res.data.forEach((q, index) => {
+                                let removeBtn = hasAttempt ? 
+                                    `<button disabled class="text-slate-300 cursor-not-allowed" title="Đã có attempt, không thể gỡ">Gỡ</button>` :
+                                    `<button onclick="removeQuestion(${q.questionId})" class="text-red-500 hover:text-red-700">Gỡ</button>`;
+
+                                let dragHandle = hasAttempt ? '' : `<span class="cursor-move drag-handle text-slate-400 mr-2">☰</span>`;
+
+                                tbody.innerHTML += `
+                                    <tr data-id="${q.questionId}" class="hover:bg-slate-50">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 flex items-center">
+                                            ${dragHandle}
+                                            <span class="order-idx font-medium text-slate-900">${index + 1}</span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-slate-900">
+                                            <div class="line-clamp-2">${q.questionText}</div>
+                                            <span class="text-xs text-slate-500">${q.questionType} | ${q.skillName}</span>
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${q.difficultyLevel}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 text-right font-medium">${q.points}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                            ${removeBtn}
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+
+                            if (!hasAttempt) {
+                                if (sortableInstance) sortableInstance.destroy();
+                                sortableInstance = Sortable.create(tbody, {
+                                    handle: '.drag-handle',
+                                    animation: 150,
+                                    onEnd: function () {
+                                        let isChanged = false;
+                                        tbody.querySelectorAll('tr').forEach((row, i) => {
+                                            let span = row.querySelector('.order-idx');
+                                            if (span.innerText != (i + 1)) {
+                                                isChanged = true;
+                                                span.innerText = i + 1;
+                                            }
+                                        });
+                                        if (isChanged) {
+                                            document.getElementById('btnSaveQuestionOrder').classList.remove('hidden');
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500">Chưa có câu hỏi nào trong Section này.</td></tr>`;
+                        }
+                    });
+            }
+
+            document.getElementById('btnSaveQuestionOrder')?.addEventListener('click', function() {
+                const tbody = document.getElementById('questionsTbody');
+                const orders = Array.from(tbody.querySelectorAll('tr')).map((tr, index) => ({
+                    QuestionId: parseInt(tr.getAttribute('data-id')),
+                    OrderIndex: index + 1
+                }));
+
+                fetch(`/Admin/PlacementTestQuestions/Reorder/${currentSectionId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify(orders)
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        alert("Lưu thứ tự thành công!");
+                        document.getElementById('btnSaveQuestionOrder').classList.add('hidden');
+                        loadSectionQuestions();
+                    } else {
+                        alert(res.message);
+                    }
+                });
+            });
+
+            function loadAvailableQuestions() {
+                const keyword = document.getElementById('filterKeyword').value;
+                const type = document.getElementById('filterType').value;
+                const difficulty = document.getElementById('filterDifficulty').value;
+
+                let url = `/Admin/PlacementTestQuestions/GetAvailable?SectionId=${currentSectionId}&Keyword=${encodeURIComponent(keyword)}&QuestionType=${type}&DifficultyLevel=${difficulty}`;
+
+                fetch(url)
+                    .then(r => r.json())
+                    .then(res => {
+                        const tbody = document.getElementById('availableQuestionsTbody');
+                        tbody.innerHTML = '';
+                        if (res.success && res.data.length > 0) {
+                            res.data.forEach(q => {
+                                tbody.innerHTML += `
+                                    <tr class="hover:bg-slate-50">
+                                        <td class="px-4 py-3 text-sm text-slate-900">
+                                            <div class="line-clamp-2" title="${q.questionText}">${q.questionText}</div>
+                                            <span class="text-xs text-slate-500">${q.questionType} | ${q.skillName}</span>
+                                        </td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-sm text-slate-500">${q.difficultyLevel}</td>
+                                        <td class="px-4 py-3 whitespace-nowrap text-right">
+                                            <div class="flex items-center justify-end gap-2">
+                                                <input type="number" id="pts_${q.id}" class="w-16 text-sm border-slate-300 rounded" value="10" min="0.01" step="0.01" title="Điểm" />
+                                                <button onclick="attachQuestion(${q.id})" class="px-3 py-1 bg-blue-600 text-white rounded text-xs hover:bg-blue-700">Chọn</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+                        } else {
+                            tbody.innerHTML = `<tr><td colspan="3" class="px-4 py-8 text-center text-slate-500">Không tìm thấy câu hỏi phù hợp.</td></tr>`;
+                        }
+                    });
+            }
+
+            function attachQuestion(qId) {
+                const pts = parseFloat(document.getElementById(`pts_${qId}`).value);
+                if (isNaN(pts) || pts <= 0) {
+                    alert('Điểm không hợp lệ'); return;
+                }
+
+                fetch('/Admin/PlacementTestQuestions/Attach', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: JSON.stringify({
+                        SectionId: currentSectionId,
+                        QuestionId: qId,
+                        Points: pts,
+                        OrderIndex: 0
+                    })
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        loadAvailableQuestions();
+                        loadSectionQuestions();
+                    } else {
+                        alert(res.message);
+                    }
+                });
+            }
+
+            function removeQuestion(qId) {
+                if(!confirm("Xác nhận gỡ câu hỏi khỏi bài thi?")) return;
+
+                fetch(`/Admin/PlacementTestQuestions/Remove/${currentSectionId}/${qId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    }
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        loadSectionQuestions();
+                    } else {
+                        alert(res.message);
+                    }
+                });
+            }
+        </script>
+    }
+
+    <!-- Cột phải: Timeline -->
+    <div class="space-y-6">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-6">
+            <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">Thống kê nội dung</h3>
+            <ul class="space-y-4">
+                <li class="flex items-center justify-between">
+                    <span class="text-slate-600 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                        Tổng số Section
+                    </span>
+                    <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">@Model.SectionCount</span>
+                </li>
+                <li class="flex items-center justify-between">
+                    <span class="text-slate-600 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Tổng số Question
+                    </span>
+                    <span class="font-bold text-slate-900 bg-slate-100 px-2 py-0.5 rounded">@Model.QuestionCount</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden p-6">
+            <h3 class="text-base font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">Mốc thời gian</h3>
+            <div class="space-y-4 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-200 before:to-transparent">
+                
+                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 text-slate-500 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    </div>
+                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white shadow-sm">
+                        <div class="flex items-center justify-between space-x-2 mb-1">
+                            <div class="font-bold text-slate-800 text-sm">Khởi tạo (DRAFT)</div>
+                        </div>
+                        <div class="text-slate-500 text-xs">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+                    </div>
+                </div>
+
+                @if (Model.PublishedAt.HasValue)
+                {
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-emerald-100 text-emerald-600 shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        </div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-4 rounded-xl border border-slate-100 bg-white shadow-sm">
+                            <div class="flex items-center justify-between space-x-2 mb-1">
+                                <div class="font-bold text-emerald-700 text-sm">Xuất bản</div>
+                            </div>
+                            <div class="text-slate-500 text-xs">@Model.PublishedAt.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>

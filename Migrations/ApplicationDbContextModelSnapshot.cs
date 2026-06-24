@@ -1542,7 +1542,10 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex("TargetLevelId");
 
-                    b.ToTable("placement_tests", (string)null);
+                    b.ToTable("placement_tests", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_PlacementTest_Status", "[status] IN ('DRAFT', 'PUBLISHED', 'ARCHIVED')");
+                        });
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.PlacementTestQuestion", b =>
@@ -1625,9 +1628,9 @@ namespace DuAnTotNghiep.Migrations
                     b.HasKey("Id")
                         .HasName("PK__placemen__3213E83FC01FC668");
 
-                    b.HasIndex("PlacementTestId");
-
                     b.HasIndex("SkillId");
+
+                    b.HasIndex(new[] { "PlacementTestId", "SkillId" }, "IX_placement_test_sections_test_skill");
 
                     b.ToTable("placement_test_sections", (string)null);
                 });
@@ -1774,7 +1777,12 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex("TopicId");
 
-                    b.ToTable("practice_tasks", (string)null);
+                    b.ToTable("practice_tasks", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_PracticeTask_DifficultyLevel", "[difficulty_level] IN ('BASIC', 'MEDIUM', 'ADVANCED')");
+
+                            t.HasCheckConstraint("CK_PracticeTask_TaskType", "[task_type] IN ('MCQ', 'TRUE_FALSE', 'SHORT_ANSWER', 'LISTENING')");
+                        });
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.QuestionBank", b =>
@@ -1894,7 +1902,12 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex(new[] { "SkillId", "TopicId", "DifficultyLevel" }, "IX_questions_skill_topic");
 
-                    b.ToTable("question_bank", (string)null);
+                    b.ToTable("question_bank", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_QuestionBank_DifficultyLevel", "[difficulty_level] IN ('BASIC', 'MEDIUM', 'ADVANCED')");
+
+                            t.HasCheckConstraint("CK_QuestionBank_QuestionType", "[question_type] IN ('MCQ', 'TRUE_FALSE', 'SHORT_ANSWER', 'LISTENING')");
+                        });
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.QuestionOption", b =>
@@ -2841,11 +2854,12 @@ namespace DuAnTotNghiep.Migrations
                     b.HasKey("Id")
                         .HasName("PK__test_ans__3213E83F49C84548");
 
-                    b.HasIndex("AttemptId");
-
                     b.HasIndex("QuestionId");
 
                     b.HasIndex("SelectedOptionId");
+
+                    b.HasIndex(new[] { "AttemptId", "QuestionId" }, "UQ_test_answer_attempt_question")
+                        .IsUnique();
 
                     b.ToTable("test_answers", (string)null);
                 });
@@ -2901,9 +2915,12 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex("PlacementTestId");
 
-                    b.HasIndex(new[] { "StudentId", "Status" }, "IX_test_attempt_student");
+                    b.HasIndex(new[] { "StudentId", "PlacementTestId", "Status" }, "IX_test_attempt_student");
 
-                    b.ToTable("test_attempts", (string)null);
+                    b.ToTable("test_attempts", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_TestAttempt_Status", "[status] IN ('IN_PROGRESS', 'SUBMITTED', 'GRADED', 'EXPIRED')");
+                        });
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.TopicReference", b =>
@@ -3711,12 +3728,14 @@ namespace DuAnTotNghiep.Migrations
                     b.HasOne("DuAnTotNghiep.Models.QuestionBank", "Question")
                         .WithMany("PlacementTestQuestions")
                         .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ptq_question");
 
                     b.HasOne("DuAnTotNghiep.Models.PlacementTestSection", "Section")
                         .WithMany("PlacementTestQuestions")
                         .HasForeignKey("SectionId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ptq_section");
 
@@ -4115,12 +4134,14 @@ namespace DuAnTotNghiep.Migrations
                     b.HasOne("DuAnTotNghiep.Models.TestAttempt", "Attempt")
                         .WithMany("TestAnswers")
                         .HasForeignKey("AttemptId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ta_attempt");
 
                     b.HasOne("DuAnTotNghiep.Models.QuestionBank", "Question")
                         .WithMany("TestAnswers")
                         .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_ta_question");
 
@@ -4146,12 +4167,14 @@ namespace DuAnTotNghiep.Migrations
                     b.HasOne("DuAnTotNghiep.Models.PlacementTest", "PlacementTest")
                         .WithMany("TestAttempts")
                         .HasForeignKey("PlacementTestId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_attempt_test");
 
                     b.HasOne("DuAnTotNghiep.Models.User", "Student")
                         .WithMany("TestAttempts")
                         .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_attempt_student");
 

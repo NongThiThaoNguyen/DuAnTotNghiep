@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DuAnTotNghiep.Models;
 
@@ -19,6 +20,8 @@ public partial class TestAttempt
 
     public int? EstimatedLevelId { get; set; }
 
+    [Required]
+    [MaxLength(50)]
     public string Status { get; set; } = null!;
 
     public virtual ICollection<CompetencyAnalysis> CompetencyAnalyses { get; set; } = new List<CompetencyAnalysis>();

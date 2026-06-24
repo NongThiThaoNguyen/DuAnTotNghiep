@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DuAnTotNghiep.Models;
 
@@ -11,6 +12,7 @@ public partial class PlacementTestQuestion
 
     public int QuestionId { get; set; }
 
+    [Range(0, 100)]
     public decimal Points { get; set; }
 
     public int OrderIndex { get; set; }

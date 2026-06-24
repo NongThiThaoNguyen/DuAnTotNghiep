@@ -223,43 +223,6 @@ namespace DuAnTotNghiep.Controllers
             return RedirectToAction("Login");
         }
 
-        [Authorize]
-        [HttpGet]
-        public IActionResult ChangePassword()
-        {
-            return View();
-        }
-
-        [Authorize]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userIdString, out int userId))
-            {
-                return RedirectToAction("Login");
-            }
-
-            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
-
-            var result = await _authService.ChangePasswordAsync(userId, model.CurrentPassword, model.NewPassword, ipAddress);
-
-            if (!result.IsSuccess)
-            {
-                ModelState.AddModelError(string.Empty, result.ErrorMessage);
-                return View(model);
-            }
-
-            TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
-            return RedirectToAction("ChangePassword"); // Hoặc redirect về trang cá nhân
-        }
-
         [HttpGet]
         public async Task<IActionResult> Logout()
         {

@@ -39,6 +39,11 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IUserProfileService, DuAnTotNghiep.Services.UserProfileService>();
 builder.Services.AddScoped<ILearningProfileService, LearningProfileService>();
 builder.Services.AddScoped<IPlacementTestService, PlacementTestService>();
+builder.Services.AddScoped<IMasterDataService, MasterDataService>();
+builder.Services.AddScoped<ITestScoringService, TestScoringService>();
+builder.Services.AddScoped<IPlacementTestManagementService, PlacementTestManagementService>();
+builder.Services.AddScoped<IPlacementTestSectionService, PlacementTestSectionService>();
+builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionService>();
 
 // Đăng ký Seeder
 // Đăng ký Seeder
