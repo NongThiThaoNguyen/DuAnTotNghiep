@@ -1,0 +1,35 @@
+@model List<DuAnTotNghiep.DTOs.Topic.TopicTreeDto>
+@{
+    ViewData["Title"] = "Topic Tree";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4">Learning Topic Tree</h2>
+
+    <div class="mb-3">
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-action="Create" class="btn btn-primary">Create New Topic</a>
+        }
+        <a asp-action="Index" class="btn btn-secondary">List View</a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            @if (Model != null && Model.Any())
+            {
+                <ul class="list-group">
+                    @foreach (var topic in Model)
+                    {
+                        @await Html.PartialAsync("_TopicTreeNode", topic)
+                    }
+                </ul>
+            }
+            else
+            {
+                <p>No topics found.</p>
+            }
+        </div>
+    </div>
+</div>

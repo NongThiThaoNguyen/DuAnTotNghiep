@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -40,4 +40,6 @@ public partial class StudentLearningProfile
     public virtual EnglishProficiencyLevel? TargetLevel { get; set; }
 
     public virtual User User { get; set; } = null!;
+
+    public virtual ICollection<StudentAvailableStudySlot> StudentAvailableStudySlots { get; set; } = new List<StudentAvailableStudySlot>();
 }

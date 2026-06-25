@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -38,13 +38,13 @@ namespace DuAnTotNghiep.Migrations
                 name: "IX_test_attempt_student",
                 table: "test_attempts");
 
-            migrationBuilder.DropIndex(
-                name: "IX_test_answers_attempt_id",
-                table: "test_answers");
+            // migrationBuilder.DropIndex(
+            //     name: "IX_test_answers_attempt_id",
+            //     table: "test_answers");
 
-            migrationBuilder.DropIndex(
-                name: "IX_placement_test_sections_placement_test_id",
-                table: "placement_test_sections");
+            // migrationBuilder.DropIndex(
+            //     name: "IX_placement_test_sections_placement_test_id",
+            //     table: "placement_test_sections");
 
             migrationBuilder.CreateIndex(
                 name: "IX_test_attempt_student",

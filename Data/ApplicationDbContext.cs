@@ -54,6 +54,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<LearningTopic> LearningTopics { get; set; }
 
+    public virtual DbSet<TopicPrerequisite> TopicPrerequisites { get; set; }
+
     public virtual DbSet<Notification> Notifications { get; set; }
 
     public virtual DbSet<NotificationRead> NotificationReads { get; set; }
@@ -99,6 +101,8 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<StudentProgressSnapshot> StudentProgressSnapshots { get; set; }
 
     public virtual DbSet<StudentSkillPreference> StudentSkillPreferences { get; set; }
+
+    public virtual DbSet<StudentAvailableStudySlot> StudentAvailableStudySlots { get; set; }
 
     public virtual DbSet<StudyActivityLog> StudyActivityLogs { get; set; }
 
@@ -557,14 +561,33 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Code)
                 .HasMaxLength(20)
                 .IsUnicode(false)
-                .HasColumnName("code");
+                .HasColumnName("level_code");
             entity.Property(e => e.Description)
                 .HasMaxLength(1000)
                 .HasColumnName("description");
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
-                .HasColumnName("name");
+                .HasColumnName("level_name");
             entity.Property(e => e.OrderIndex).HasColumnName("order_index");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany()
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK_levels_created_by");
+
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany()
+                .HasForeignKey(d => d.UpdatedBy)
+                .HasConstraintName("FK_levels_updated_by");
         });
 
         modelBuilder.Entity<EnglishSkill>(entity =>
@@ -590,6 +613,22 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.SkillName)
                 .HasMaxLength(100)
                 .HasColumnName("skill_name");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany()
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK_skills_created_by");
+
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany()
+                .HasForeignKey(d => d.UpdatedBy)
+                .HasConstraintName("FK_skills_updated_by");
         });
 
         modelBuilder.Entity<LearningGoal>(entity =>
@@ -614,13 +653,33 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.OrderIndex).HasColumnName("order_index");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany()
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK_goals_created_by");
+
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany()
+                .HasForeignKey(d => d.UpdatedBy)
+                .HasConstraintName("FK_goals_updated_by");
         });
 
         modelBuilder.Entity<LearningObjective>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__learning__3213E83F6239F152");
 
-            entity.ToTable("learning_objectives");
+            entity.ToTable("learning_objectives", t => 
+            {
+                t.HasCheckConstraint("CK_objective_cognitive_level", "cognitive_level IN ('REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'CREATE')");
+            });
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CognitiveLevel)
@@ -633,11 +692,27 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValue(1)
                 .HasColumnName("order_index");
             entity.Property(e => e.TopicId).HasColumnName("topic_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("updated_at");
+            entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
 
             entity.HasOne(d => d.Topic).WithMany(p => p.LearningObjectives)
                 .HasForeignKey(d => d.TopicId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_objectives_topics");
+
+            entity.HasOne(d => d.CreatedByNavigation).WithMany()
+                .HasForeignKey(d => d.CreatedBy)
+                .HasConstraintName("FK_objectives_created_by");
+
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany()
+                .HasForeignKey(d => d.UpdatedBy)
+                .HasConstraintName("FK_objectives_updated_by");
         });
 
         modelBuilder.Entity<LearningPathNode>(entity =>
@@ -780,22 +855,30 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__learning__3213E83F8C330B01");
 
-            entity.ToTable("learning_topics");
+            entity.ToTable("learning_topics", t =>
+            {
+                t.HasCheckConstraint("CK_topic_status", "status IN ('ACTIVE', 'INACTIVE', 'ARCHIVED')");
+                t.HasCheckConstraint("CK_topic_difficulty_level", "difficulty_level IN ('BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'UPPER_INTERMEDIATE', 'ADVANCED')");
+            });
 
             entity.HasIndex(e => new { e.SkillId, e.LevelId }, "IX_topics_skill_level");
 
             entity.HasIndex(e => e.TopicCode, "UQ__learning__DDA414C51EC96AFC").IsUnique();
+            entity.HasIndex(e => e.Status, "IX_topics_status");
+            entity.HasIndex(e => e.OrderIndex, "IX_topics_order_index");
+            entity.HasIndex(e => e.ParentTopicId, "IX_topics_parent_topic_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.DifficultyLevel)
                 .HasMaxLength(30)
                 .IsUnicode(false)
-                .HasDefaultValue("BASIC")
+                .HasDefaultValue("BEGINNER")
                 .HasColumnName("difficulty_level");
             entity.Property(e => e.EstimatedMinutes).HasColumnName("estimated_minutes");
             entity.Property(e => e.LevelId).HasColumnName("level_id");
@@ -823,6 +906,10 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.LearningTopics)
                 .HasForeignKey(d => d.CreatedBy)
                 .HasConstraintName("FK_topics_users");
+
+            entity.HasOne(d => d.UpdatedByNavigation).WithMany()
+                .HasForeignKey(d => d.UpdatedBy)
+                .HasConstraintName("FK_topics_updated_by");
 
             entity.HasOne(d => d.Level).WithMany(p => p.LearningTopics)
                 .HasForeignKey(d => d.LevelId)
@@ -1837,6 +1924,32 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.StudentId)
                 .OnDelete(DeleteBehavior.Restrict)
                 .HasConstraintName("FK_attempt_student");
+        });
+
+        modelBuilder.Entity<TopicPrerequisite>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PK_topic_prerequisites");
+
+            entity.ToTable("topic_prerequisites");
+
+            entity.HasIndex(e => new { e.TopicId, e.PrerequisiteTopicId }, "UQ_topic_prerequisite").IsUnique();
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.TopicId).HasColumnName("topic_id");
+            entity.Property(e => e.PrerequisiteTopicId).HasColumnName("prerequisite_topic_id");
+            entity.Property(e => e.CreatedAt)
+                .HasDefaultValueSql("(sysutcdatetime())")
+                .HasColumnName("created_at");
+
+            entity.HasOne(d => d.Topic).WithMany(p => p.TopicPrerequisites)
+                .HasForeignKey(d => d.TopicId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_topic_prerequisites_topic");
+
+            entity.HasOne(d => d.PrerequisiteTopic).WithMany(p => p.PrerequisiteForTopics)
+                .HasForeignKey(d => d.PrerequisiteTopicId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_topic_prerequisites_prerequisite");
         });
 
         modelBuilder.Entity<TopicReference>(entity =>

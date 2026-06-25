@@ -4,6 +4,7 @@ using DuAnTotNghiep.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DuAnTotNghiep.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260625023529_AddM4DatabaseStandardization")]
+    partial class AddM4DatabaseStandardization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -867,16 +870,6 @@ namespace DuAnTotNghiep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at")
-                        .HasDefaultValueSql("(sysutcdatetime())");
-
-                    b.Property<int?>("CreatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("created_by");
-
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)")
@@ -901,26 +894,8 @@ namespace DuAnTotNghiep.Migrations
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
 
-                    b.Property<int>("OrderIndex")
-                        .HasColumnType("int")
-                        .HasColumnName("order_index");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at")
-                        .HasDefaultValueSql("(sysutcdatetime())");
-
-                    b.Property<int?>("UpdatedBy")
-                        .HasColumnType("int")
-                        .HasColumnName("updated_by");
-
                     b.HasKey("Id")
                         .HasName("PK__learning__3213E83FD1E17598");
-
-                    b.HasIndex("CreatedBy");
-
-                    b.HasIndex("UpdatedBy");
 
                     b.HasIndex(new[] { "GoalCode" }, "UQ__learning__A2EA35BF031D9129")
                         .IsUnique();
@@ -2561,36 +2536,6 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("search_logs", (string)null);
                 });
 
-            modelBuilder.Entity("DuAnTotNghiep.Models.StudentAvailableStudySlot", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("DayOfWeek")
-                        .HasColumnType("int");
-
-                    b.Property<TimeSpan>("EndTime")
-                        .HasColumnType("time");
-
-                    b.Property<TimeSpan>("StartTime")
-                        .HasColumnType("time");
-
-                    b.Property<int>("StudentProfileId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("StudentProfileId");
-
-                    b.ToTable("StudentAvailableStudySlots");
-                });
-
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentLearningPath", b =>
                 {
                     b.Property<int>("Id")
@@ -3706,23 +3651,6 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("UpdatedByNavigation");
                 });
 
-            modelBuilder.Entity("DuAnTotNghiep.Models.LearningGoal", b =>
-                {
-                    b.HasOne("DuAnTotNghiep.Models.User", "CreatedByNavigation")
-                        .WithMany()
-                        .HasForeignKey("CreatedBy")
-                        .HasConstraintName("FK_goals_created_by");
-
-                    b.HasOne("DuAnTotNghiep.Models.User", "UpdatedByNavigation")
-                        .WithMany()
-                        .HasForeignKey("UpdatedBy")
-                        .HasConstraintName("FK_goals_updated_by");
-
-                    b.Navigation("CreatedByNavigation");
-
-                    b.Navigation("UpdatedByNavigation");
-                });
-
             modelBuilder.Entity("DuAnTotNghiep.Models.LearningObjective", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.User", "CreatedByNavigation")
@@ -4254,17 +4182,6 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("DuAnTotNghiep.Models.StudentAvailableStudySlot", b =>
-                {
-                    b.HasOne("DuAnTotNghiep.Models.StudentLearningProfile", "StudentProfile")
-                        .WithMany("StudentAvailableStudySlots")
-                        .HasForeignKey("StudentProfileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("StudentProfile");
-                });
-
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentLearningPath", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.CompetencyAnalysis", "CompetencyAnalysis")
@@ -4756,8 +4673,6 @@ namespace DuAnTotNghiep.Migrations
 
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentLearningProfile", b =>
                 {
-                    b.Navigation("StudentAvailableStudySlots");
-
                     b.Navigation("StudentSkillPreferences");
                 });
 

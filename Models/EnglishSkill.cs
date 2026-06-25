@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace DuAnTotNghiep.Models;
 
@@ -7,8 +8,12 @@ public partial class EnglishSkill
 {
     public int Id { get; set; }
 
+    [Required]
+    [StringLength(50)]
     public string SkillCode { get; set; } = null!;
 
+    [Required]
+    [StringLength(255)]
     public string SkillName { get; set; } = null!;
 
     public string? Description { get; set; }
@@ -16,6 +21,18 @@ public partial class EnglishSkill
     public int OrderIndex { get; set; }
 
     public bool IsActive { get; set; }
+
+    public int? CreatedBy { get; set; }
+
+    public int? UpdatedBy { get; set; }
+
+    public DateTime CreatedAt { get; set; }
+
+    public DateTime UpdatedAt { get; set; }
+
+    public virtual User? CreatedByNavigation { get; set; }
+
+    public virtual User? UpdatedByNavigation { get; set; }
 
     public virtual ICollection<CompetencySkillScore> CompetencySkillScores { get; set; } = new List<CompetencySkillScore>();
 

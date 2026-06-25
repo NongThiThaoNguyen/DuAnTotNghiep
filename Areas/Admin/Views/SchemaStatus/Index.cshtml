@@ -1,0 +1,171 @@
+@model DuAnTotNghiep.Services.Interfaces.SchemaHealthStatusDto
+@{
+    ViewData["Title"] = "M4 Schema Status";
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">M4 Schema Health Status</h2>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Skills</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    @Model.TotalSkills
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Levels</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    @Model.TotalLevels
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Topics</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    @Model.TotalTopics
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+            <div class="card">
+                <div class="card-body p-3">
+                    <div class="row">
+                        <div class="col-8">
+                            <div class="numbers">
+                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Objectives</p>
+                                <h5 class="font-weight-bolder mb-0">
+                                    @Model.TotalObjectives
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header pb-0">
+                    <h6>Topics Missing Skill</h6>
+                </div>
+                <div class="card-body p-3">
+                    @if (Model.TopicsMissingSkill.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var item in Model.TopicsMissingSkill)
+                            {
+                                <li class="list-group-item text-danger">@item</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-success mb-0">All topics have a valid skill mapped.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header pb-0">
+                    <h6>Topics Missing Level</h6>
+                </div>
+                <div class="card-body p-3">
+                    @if (Model.TopicsMissingLevel.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var item in Model.TopicsMissingLevel)
+                            {
+                                <li class="list-group-item text-danger">@item</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-success mb-0">All topics have a valid level mapped.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header pb-0">
+                    <h6>Topics Missing Objective</h6>
+                </div>
+                <div class="card-body p-3">
+                    @if (Model.TopicsMissingObjective.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var item in Model.TopicsMissingObjective)
+                            {
+                                <li class="list-group-item text-warning">@item</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-success mb-0">All topics have at least one objective.</p>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header pb-0">
+                    <h6>Circular Dependencies Detected</h6>
+                </div>
+                <div class="card-body p-3">
+                    @if (Model.CircularDependencies.Any())
+                    {
+                        <ul class="list-group">
+                            @foreach (var item in Model.CircularDependencies)
+                            {
+                                <li class="list-group-item text-danger">@item</li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-success mb-0">No circular dependencies detected in prerequisites.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

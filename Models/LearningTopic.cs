@@ -1,5 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DuAnTotNghiep.Models;
 
@@ -7,27 +9,39 @@ public partial class LearningTopic
 {
     public int Id { get; set; }
 
+    [ForeignKey("Skill")]
     public int SkillId { get; set; }
 
+    [ForeignKey("ParentTopic")]
     public int? ParentTopicId { get; set; }
 
+    [ForeignKey("Level")]
     public int? LevelId { get; set; }
 
+    [StringLength(50)]
     public string? TopicCode { get; set; }
 
+    [Required]
+    [StringLength(255)]
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }
 
+    [Required]
+    [StringLength(50)]
     public string DifficultyLevel { get; set; } = null!;
 
     public int? EstimatedMinutes { get; set; }
 
     public int OrderIndex { get; set; }
 
+    [Required]
+    [StringLength(50)]
     public string Status { get; set; } = null!;
 
     public int? CreatedBy { get; set; }
+
+    public int? UpdatedBy { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
@@ -38,6 +52,8 @@ public partial class LearningTopic
     public virtual ICollection<AiTutorConversation> AiTutorConversations { get; set; } = new List<AiTutorConversation>();
 
     public virtual User? CreatedByNavigation { get; set; }
+
+    public virtual User? UpdatedByNavigation { get; set; }
 
     public virtual ICollection<LearningTopic> InverseParentTopic { get; set; } = new List<LearningTopic>();
 
@@ -66,4 +82,8 @@ public partial class LearningTopic
     public virtual ICollection<StudyActivityLog> StudyActivityLogs { get; set; } = new List<StudyActivityLog>();
 
     public virtual ICollection<TopicReference> TopicReferences { get; set; } = new List<TopicReference>();
+
+    public virtual ICollection<TopicPrerequisite> TopicPrerequisites { get; set; } = new List<TopicPrerequisite>();
+
+    public virtual ICollection<TopicPrerequisite> PrerequisiteForTopics { get; set; } = new List<TopicPrerequisite>();
 }

@@ -31,6 +31,10 @@ builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
 builder.Services.AddScoped<ILearningProfileRepository, LearningProfileRepository>();
+builder.Services.AddScoped<ILearningTopicRepository, LearningTopicRepository>();
+builder.Services.AddScoped<IEnglishSkillRepository, EnglishSkillRepository>();
+builder.Services.AddScoped<IEnglishProficiencyLevelRepository, EnglishProficiencyLevelRepository>();
+builder.Services.AddScoped<ILearningObjectiveRepository, LearningObjectiveRepository>();
 
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -50,6 +54,11 @@ builder.Services.AddScoped<IPlacementTestSectionService, PlacementTestSectionSer
 builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionService>();
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
+builder.Services.AddScoped<ILearningTopicService, LearningTopicService>();
+builder.Services.AddScoped<ILearningObjectiveService, LearningObjectiveService>();
+builder.Services.AddScoped<IM4ValidationService, M4ValidationService>();
+builder.Services.AddScoped<IEnglishSkillService, EnglishSkillService>();
+builder.Services.AddScoped<IEnglishProficiencyLevelService, EnglishProficiencyLevelService>();
 
 // Đăng ký M7 AI Analysis Services
 builder.Services.AddScoped<IPlacementTestAnalysisPayloadBuilder, PlacementTestAnalysisPayloadBuilder>();
@@ -59,6 +68,9 @@ builder.Services.AddHostedService<DuAnTotNghiep.Services.Background.AiAnalysisBa
 
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();
+builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();
+builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IM4SchemaService, DuAnTotNghiep.Services.M4SchemaService>();
+
 
 // Đăng ký Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -108,6 +120,7 @@ using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
     await seeder.SeedAsync();
+
 }
 
 app.Run();

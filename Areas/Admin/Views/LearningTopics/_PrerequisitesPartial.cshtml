@@ -1,0 +1,12 @@
+@model IEnumerable<DuAnTotNghiep.DTOs.Topic.TopicOptionDto>
+
+<ul>
+    @foreach (var prereq in Model)
+    {
+        <li>@prereq.Name</li>
+    }
+</ul>
+@if (!Model.Any())
+{
+    <p class="text-muted">No prerequisites.</p>
+}
