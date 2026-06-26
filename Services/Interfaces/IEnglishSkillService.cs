@@ -12,5 +12,9 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task CreateAsync(CreateSkillDto dto);
         Task UpdateAsync(UpdateSkillDto dto);
         Task DeactivateAsync(int id);
+        Task<bool> IsSkillUsedAsync(int id);
+        Task DeactivateSkillAsync(int id);
+        Task ArchiveSkillAsync(int id);
+        Task RestoreSkillAsync(int id);
     }
 }

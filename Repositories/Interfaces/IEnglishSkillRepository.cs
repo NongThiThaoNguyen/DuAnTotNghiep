@@ -6,6 +6,7 @@ namespace DuAnTotNghiep.Repositories.Interfaces
 {
     public interface IEnglishSkillRepository : IGenericRepository<EnglishSkill>
     {
+        Task<EnglishSkill?> GetByCodeAsync(string code);
         Task<List<EnglishSkill>> GetActiveSkillsAsync();
         Task<bool> ExistsCodeAsync(string code);
         Task<bool> IsSkillUsedAsync(int skillId);

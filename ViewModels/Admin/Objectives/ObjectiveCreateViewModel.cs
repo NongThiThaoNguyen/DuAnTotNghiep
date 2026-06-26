@@ -18,7 +18,7 @@ namespace DuAnTotNghiep.ViewModels.Admin.Objectives
         [Required]
         [StringLength(50)]
         [Display(Name = "Code (Cognitive Level)")]
-        public string Code { get; set; } = "Remembering";
+        public string Code { get; set; } = "Remember";
 
         public int OrderIndex { get; set; }
         

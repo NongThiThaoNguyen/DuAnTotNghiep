@@ -50,8 +50,10 @@
                 <div class="mb-3">
                     <label asp-for="Difficulty" class="form-label">Difficulty *</label>
                     <select asp-for="Difficulty" class="form-select" required>
-                        <option value="BASIC">BASIC</option>
-                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="BEGINNER">BEGINNER</option>
+                        <option value="ELEMENTARY">ELEMENTARY</option>
+                        <option value="INTERMEDIATE">INTERMEDIATE</option>
+                        <option value="UPPER_INTERMEDIATE">UPPER_INTERMEDIATE</option>
                         <option value="ADVANCED">ADVANCED</option>
                     </select>
                     <span asp-validation-for="Difficulty" class="text-danger"></span>

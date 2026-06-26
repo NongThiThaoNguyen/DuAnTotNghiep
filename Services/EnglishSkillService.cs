@@ -2,6 +2,9 @@ using DuAnTotNghiep.DTOs.Skill;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
+using DuAnTotNghiep.Data;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +16,28 @@ namespace DuAnTotNghiep.Services
     {
         private readonly IEnglishSkillRepository _repository;
         private readonly IM4ValidationService _validationService;
+        private readonly ApplicationDbContext _db;
+        private readonly IAuditService _auditService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public EnglishSkillService(IEnglishSkillRepository repository, IM4ValidationService validationService)
+        public EnglishSkillService(
+            IEnglishSkillRepository repository, 
+            IM4ValidationService validationService,
+            ApplicationDbContext db,
+            IAuditService auditService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _validationService = validationService;
+            _db = db;
+            _auditService = auditService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdStr, out int userId) ? userId : null;
         }
 
         public async Task<List<SkillOptionDto>> GetOptionsAsync()
@@ -74,29 +94,31 @@ namespace DuAnTotNghiep.Services
                 IsActive = dto.IsActive,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
-                // CreatedBy will be set by interceptor or controller logic if available, skipping for now
             };
 
             await _repository.AddAsync(skill);
             await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Create Skill", "EnglishSkill", skill.Id, null, skill.SkillName);
         }
 
         public async Task UpdateAsync(UpdateSkillDto dto)
         {
             var skill = await _repository.GetByIdAsync(dto.Id);
             if (skill == null)
-                throw new InvalidOperationException("Skill không tồn tại."); // Treat as NotFound in controller
+                throw new InvalidOperationException("Skill không tồn tại.");
 
             if (string.IsNullOrWhiteSpace(dto.Name))
                 throw new InvalidOperationException("Name is required.");
 
-            // Optionally check for code duplicate if code changes are allowed
             if (skill.SkillCode.ToLower() != dto.Code.ToLower())
             {
                 if (await _validationService.IsSkillCodeDuplicateAsync(dto.Code, dto.Id))
                     throw new InvalidOperationException("Skill code đã tồn tại.");
                 skill.SkillCode = dto.Code.Trim();
             }
+
+            var oldName = skill.SkillName;
 
             skill.SkillName = dto.Name.Trim();
             skill.Description = dto.Description;
@@ -105,6 +127,8 @@ namespace DuAnTotNghiep.Services
 
             _repository.Update(skill);
             await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Update Skill", "EnglishSkill", skill.Id, oldName, skill.SkillName);
         }
 
         public async Task DeactivateAsync(int id)
@@ -113,11 +137,10 @@ namespace DuAnTotNghiep.Services
             if (skill == null)
                 throw new InvalidOperationException("Skill không tồn tại.");
 
-            if (await _repository.IsSkillUsedAsync(id))
+            var activeTopics = await _db.LearningTopics.AnyAsync(t => t.SkillId == id && (t.Status == "Active" || t.Status == "ACTIVE"));
+            if (activeTopics)
             {
-                // Vẫn cho Deactivate, nhưng có thể throw warning hoặc controller tự cảnh báo. 
-                // Yêu cầu: "Nếu đã dùng: Hiển thị cảnh báo. Vẫn cho: Deactivate. Không cho: Delete".
-                // Deactivate in DB anyway, UI handled the warning before calling.
+                throw new InvalidOperationException("Không thể khóa Skill này vì vẫn còn Topic đang hoạt động (Active). Vui lòng xử lý các Topic liên quan trước.");
             }
 
             skill.IsActive = false;
@@ -125,6 +148,54 @@ namespace DuAnTotNghiep.Services
 
             _repository.Update(skill);
             await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Deactivate Skill", "EnglishSkill", id, "True", "False");
+        }
+
+        public async Task<bool> IsSkillUsedAsync(int id)
+        {
+            return await _repository.IsSkillUsedAsync(id);
+        }
+
+        public async Task DeactivateSkillAsync(int id)
+        {
+            await DeactivateAsync(id);
+        }
+
+        public async Task ArchiveSkillAsync(int id)
+        {
+            var skill = await _repository.GetByIdAsync(id);
+            if (skill == null)
+                throw new InvalidOperationException("Skill không tồn tại.");
+
+            var activeTopics = await _db.LearningTopics.AnyAsync(t => t.SkillId == id && (t.Status == "Active" || t.Status == "ACTIVE"));
+            if (activeTopics)
+            {
+                throw new InvalidOperationException("Không thể lưu trữ (Archive) Skill này vì vẫn còn Topic đang hoạt động (Active). Vui lòng xử lý các Topic liên quan trước.");
+            }
+
+            skill.IsActive = false;
+            skill.UpdatedAt = DateTime.UtcNow;
+
+            _repository.Update(skill);
+            await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Archive Skill", "EnglishSkill", id, "True", "False");
+        }
+
+        public async Task RestoreSkillAsync(int id)
+        {
+            var skill = await _repository.GetByIdAsync(id);
+            if (skill == null)
+                throw new InvalidOperationException("Skill không tồn tại.");
+
+            skill.IsActive = true;
+            skill.UpdatedAt = DateTime.UtcNow;
+
+            _repository.Update(skill);
+            await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Restore Skill", "EnglishSkill", id, "False", "True");
         }
     }
 }

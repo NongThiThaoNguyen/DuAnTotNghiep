@@ -14,6 +14,11 @@ namespace DuAnTotNghiep.Repositories
         {
         }
 
+        public async Task<EnglishProficiencyLevel?> GetByCodeAsync(string code)
+        {
+            return await _dbSet.FirstOrDefaultAsync(l => l.Code.ToLower() == code.ToLower());
+        }
+
         public async Task<List<EnglishProficiencyLevel>> GetActiveLevelsAsync()
         {
             return await _dbSet

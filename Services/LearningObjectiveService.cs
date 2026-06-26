@@ -2,6 +2,7 @@ using DuAnTotNghiep.DTOs.Objective;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +14,25 @@ namespace DuAnTotNghiep.Services
     {
         private readonly ILearningObjectiveRepository _objectiveRepository;
         private readonly ILearningTopicRepository _topicRepository;
+        private readonly IAuditService _auditService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public LearningObjectiveService(
             ILearningObjectiveRepository objectiveRepository,
-            ILearningTopicRepository topicRepository)
+            ILearningTopicRepository topicRepository,
+            IAuditService auditService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _objectiveRepository = objectiveRepository;
             _topicRepository = topicRepository;
+            _auditService = auditService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdStr, out int userId) ? userId : null;
         }
 
         public async Task<int> AddObjectiveAsync(CreateObjectiveDto dto)
@@ -40,6 +53,8 @@ namespace DuAnTotNghiep.Services
             await _objectiveRepository.AddAsync(objective);
             await _objectiveRepository.SaveChangesAsync();
 
+            await _auditService.LogAsync(GetCurrentUserId(), "Create Objective", "LearningObjective", objective.Id, null, objective.ObjectiveText);
+
             return objective.Id;
         }
 
@@ -51,6 +66,8 @@ namespace DuAnTotNghiep.Services
 
             await ValidateObjectiveTextAsync(dto.ObjectiveText);
 
+            var oldText = objective.ObjectiveText;
+
             objective.ObjectiveText = dto.ObjectiveText.Trim();
             objective.CognitiveLevel = dto.CognitiveLevel.ToString().ToUpper();
             objective.OrderIndex = dto.OrderIndex;
@@ -58,6 +75,8 @@ namespace DuAnTotNghiep.Services
 
             _objectiveRepository.Update(objective);
             await _objectiveRepository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Update Objective", "LearningObjective", objective.Id, oldText, objective.ObjectiveText);
         }
 
         public async Task DeleteObjectiveAsync(int objectiveId)
@@ -73,6 +92,8 @@ namespace DuAnTotNghiep.Services
 
             _objectiveRepository.Delete(objective);
             await _objectiveRepository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Delete Objective", "LearningObjective", objective.Id, objective.ObjectiveText, null);
         }
 
         public async Task ReorderObjectivesAsync(int topicId, List<int> orderedIds)
@@ -97,6 +118,7 @@ namespace DuAnTotNghiep.Services
             }
 
             await _objectiveRepository.SaveChangesAsync();
+            await _auditService.LogAsync(GetCurrentUserId(), "Reorder Objectives", "LearningObjective", null, null, $"Reordered: {validObjectivesToUpdate.Count} objectives for topic {topicId}");
         }
 
         public async Task<List<ObjectiveDto>> GetObjectivesByTopicAsync(int topicId)

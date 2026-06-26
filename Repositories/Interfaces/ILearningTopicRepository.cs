@@ -16,5 +16,8 @@ namespace DuAnTotNghiep.Repositories.Interfaces
         Task<List<LearningTopic>> GetByLevelAsync(int levelId);
         Task<bool> ExistsNameAsync(string name, int skillId);
         Task<bool> IsTopicUsedAsync(int topicId);
+        // Bulk operations for import
+        Task AddRangeAsync(IEnumerable<LearningTopic> entities);
+        Task UpdateRangeAsync(IEnumerable<LearningTopic> entities);
     }
 }

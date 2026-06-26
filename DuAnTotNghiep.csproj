@@ -8,18 +8,20 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
-  <Target Name="Tailwind" BeforeTargets="Build">
+  <Target Name="Tailwind" BeforeTargets="Build" Condition="'$(SkipTailwind)' != 'true'">
     <!-- Install npm packages if node_modules doesn't exist -->
     <Exec Command="npm install" Condition="!Exists('node_modules')" />
     <!-- Compile tailwind css -->
-    <Exec Command="npx tailwindcss -i ./Styles/site.css -o ./wwwroot/css/site.css" />
+    <Exec Command="npx tailwindcss -i ./Styles/site.css -o ./wwwroot/css/site.css" ContinueOnError="WarnAndContinue" />
   </Target>
 
 </Project>

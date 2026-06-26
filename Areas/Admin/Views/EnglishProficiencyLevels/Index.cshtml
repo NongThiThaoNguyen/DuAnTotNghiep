@@ -62,12 +62,21 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
-                            @if (item.IsActive)
-                            {
-                                <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn ngừng sử dụng Level này?');">
-                                    <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
-                                </form>
-                            }
+                             @if (item.IsActive)
+                             {
+                                 <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn ngừng hoạt động (Deactivate) Level này?');">
+                                     <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
+                                 </form>
+                                 <form asp-action="Archive" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn lưu trữ (Archive) Level này?');">
+                                     <button type="submit" class="btn btn-sm btn-secondary">Archive</button>
+                                 </form>
+                             }
+                             else
+                             {
+                                 <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn khôi phục (Restore) Level này?');">
+                                     <button type="submit" class="btn btn-sm btn-success">Restore</button>
+                                 </form>
+                             }
                         }
                     </td>
                 </tr>

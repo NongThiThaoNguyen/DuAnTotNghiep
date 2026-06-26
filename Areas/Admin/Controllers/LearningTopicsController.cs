@@ -1,6 +1,9 @@
 using DuAnTotNghiep.DTOs.Topic;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.ViewModels.Admin.Topics;
+using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Helpers;
+using DuAnTotNghiep.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -85,21 +88,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         {
             var detailDto = await _topicService.GetDetailAsync(id);
             if (detailDto == null) return NotFound();
-            var viewModel = new TopicDetailDto
-            {
-                Id = detailDto.Id,
-                TopicCode = detailDto.TopicCode,
-                Name = detailDto.Name,
-                Description = detailDto.Description,
-                SkillName = detailDto.SkillName,
-                LevelName = detailDto.LevelName,
-                ParentTopicName = detailDto.ParentTopicName,
-                Difficulty = detailDto.Difficulty,
-                Status = detailDto.Status,
-                IsActive = detailDto.IsActive,
-                ObjectiveCount = detailDto.ObjectiveCount
-            };
-            return View(viewModel);
+            return View(detailDto);
         }
 
         [Authorize(Roles = "Admin")]
@@ -165,7 +154,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 Difficulty = detailDto.DifficultyLevel,
                 OrderIndex = detailDto.OrderIndex,
                 Status = detailDto.Status,
-                PrerequisiteIds = detailDto.Prerequisites.Select(p => p.Id).ToList()
+                PrerequisiteIds = detailDto.Prerequisites?.Select(p => p.Id).ToList() ?? new List<int>()
             };
 
             await PopulateDropdowns(model, id);
@@ -249,6 +238,23 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> Restore(int id)
+        {
+            try
+            {
+                await _topicService.RestoreTopicAsync(id);
+                TempData["SuccessMessage"] = "Topic restored successfully.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Reorder(List<int> orderedIds)
         {
             try
@@ -284,6 +290,165 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             // Exclude self from parent/prerequisite options
             model.AvailableTopics = topics.Where(t => t.Id != currentTopicId)
                                           .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name });
+        }
+
+        // ==========================================
+        // REFERENCE SOURCES MANAGEMENT (MODULE M5)
+        // ==========================================
+
+        public async Task<IActionResult> ReferenceSources(string? sourceType, string? status, string? keyword)
+        {
+            ReferenceSourceType? typeEnum = null;
+            if (!string.IsNullOrEmpty(sourceType) && Enum.TryParse<ReferenceSourceType>(sourceType, out var parsedType))
+            {
+                typeEnum = parsedType;
+            }
+
+            ReferenceReviewStatus? statusEnum = null;
+            if (!string.IsNullOrEmpty(status) && Enum.TryParse<ReferenceReviewStatus>(status, out var parsedStatus))
+            {
+                statusEnum = parsedStatus;
+            }
+
+            var sources = await _topicService.GetAllReferenceSourcesAsync(typeEnum, statusEnum, keyword);
+
+            ViewBag.Keyword = keyword;
+            ViewBag.SourceType = sourceType;
+            ViewBag.Status = status;
+
+            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(typeEnum);
+            ViewBag.Statuses = ReferenceHelper.GetReviewStatusSelectList(statusEnum);
+
+            return View(sources);
+        }
+
+        public async Task<IActionResult> ReferenceDetails(int id)
+        {
+            var source = await _topicService.GetReferenceSourceByIdAsync(id);
+            if (source == null) return NotFound();
+
+            return View(source);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public IActionResult CreateReference()
+        {
+            var model = new ReferenceSource
+            {
+                Status = ReferenceReviewStatus.PENDING,
+                IsActive = true
+            };
+
+            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList();
+            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList();
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateReference(ReferenceSource model)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _topicService.CreateReferenceSourceAsync(model);
+                    TempData["SuccessMessage"] = "Tạo nguồn tham khảo mới thành công!";
+                    return RedirectToAction(nameof(ReferenceSources));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+
+            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(model.SourceType);
+            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList(model.UsagePolicy);
+
+            return View(model);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditReference(int id)
+        {
+            var source = await _topicService.GetReferenceSourceByIdAsync(id);
+            if (source == null) return NotFound();
+
+            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(source.SourceType);
+            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList(source.UsagePolicy);
+
+            return View(source);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EditReference(int id, ReferenceSource model)
+        {
+            if (id != model.Id) return BadRequest();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _topicService.UpdateReferenceSourceAsync(model);
+                    TempData["SuccessMessage"] = "Cập nhật nguồn tham khảo thành công!";
+                    return RedirectToAction(nameof(ReferenceSources));
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.Message);
+                }
+            }
+
+            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(model.SourceType);
+            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList(model.UsagePolicy);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ReviewReference(int id, string status, string? note)
+        {
+            if (!Enum.TryParse<ReferenceReviewStatus>(status, out var statusEnum))
+            {
+                TempData["ErrorMessage"] = "Trạng thái kiểm duyệt không hợp lệ!";
+                return RedirectToAction(nameof(ReferenceDetails), new { id });
+            }
+
+            try
+            {
+                await _topicService.ReviewReferenceSourceAsync(id, statusEnum, note);
+                TempData["SuccessMessage"] = $"Kiểm duyệt nguồn tham khảo thành công (Trạng thái: {ReferenceHelper.GetReviewStatusLabel(statusEnum)})!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra: " + ex.Message;
+            }
+
+            return RedirectToAction(nameof(ReferenceDetails), new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ArchiveReference(int id)
+        {
+            try
+            {
+                await _topicService.ArchiveReferenceSourceAsync(id);
+                TempData["SuccessMessage"] = "Đã lưu trữ (Archive) nguồn tham khảo thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(ReferenceSources));
         }
     }
 }

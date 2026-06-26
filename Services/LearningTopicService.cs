@@ -3,6 +3,10 @@ using DuAnTotNghiep.DTOs.Topic;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
+using DuAnTotNghiep.Data;
+using DuAnTotNghiep.Enums;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,19 +21,35 @@ namespace DuAnTotNghiep.Services
         private readonly IM4ValidationService _validationService;
         private readonly IEnglishSkillRepository _skillRepository;
         private readonly IEnglishProficiencyLevelRepository _levelRepository;
+        private readonly ApplicationDbContext _db;
+        private readonly IAuditService _auditService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
 
         public LearningTopicService(
             ILearningTopicRepository topicRepository,
             ITopicPrerequisiteRepository prerequisiteRepository,
             IM4ValidationService validationService,
             IEnglishSkillRepository skillRepository,
-            IEnglishProficiencyLevelRepository levelRepository)
+            IEnglishProficiencyLevelRepository levelRepository,
+            ApplicationDbContext db,
+            IAuditService auditService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _topicRepository = topicRepository;
             _prerequisiteRepository = prerequisiteRepository;
             _validationService = validationService;
             _skillRepository = skillRepository;
             _levelRepository = levelRepository;
+            _db = db;
+            _auditService = auditService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdStr, out int userId) ? userId : null;
         }
 
         public async Task<int> CreateTopicAsync(CreateTopicDto dto)
@@ -54,6 +74,14 @@ namespace DuAnTotNghiep.Services
             await _topicRepository.AddAsync(topic);
             await _topicRepository.SaveChangesAsync();
 
+            await _auditService.LogAsync(GetCurrentUserId(), "Create Topic", "LearningTopic", topic.Id, null, topic.Title);
+
+            // Log Audit Link Topic if parent is attached
+            if (topic.ParentTopicId.HasValue)
+            {
+                await _auditService.LogAsync(GetCurrentUserId(), "Link Topic", "LearningTopic", topic.Id, null, $"Parent: {topic.ParentTopicId}");
+            }
+
             return topic.Id;
         }
 
@@ -65,6 +93,9 @@ namespace DuAnTotNghiep.Services
 
             // SkillId can't be changed typically, so we validate existing ones
             await ValidateTopicCoreAsync(dto.TopicCode, dto.Name, topic.SkillId, dto.LevelId, dto.DifficultyLevel, dto.ParentTopicId, dto.Id);
+
+            var oldTitle = topic.Title;
+            var oldParentId = topic.ParentTopicId;
 
             if (topic.TopicCode.ToLower() != dto.TopicCode.ToLower())
             {
@@ -86,6 +117,14 @@ namespace DuAnTotNghiep.Services
 
             _topicRepository.Update(topic);
             await _topicRepository.SaveChangesAsync();
+
+            // Log Audit actions
+            await _auditService.LogAsync(GetCurrentUserId(), "Update Topic", "LearningTopic", topic.Id, oldTitle, topic.Title);
+
+            if (oldParentId != topic.ParentTopicId)
+            {
+                await _auditService.LogAsync(GetCurrentUserId(), "Link Topic", "LearningTopic", topic.Id, oldParentId?.ToString(), topic.ParentTopicId?.ToString());
+            }
         }
 
         public async Task DeactivateTopicAsync(int topicId)
@@ -94,12 +133,21 @@ namespace DuAnTotNghiep.Services
             if (topic == null)
                 throw new InvalidOperationException("Topic không tồn tại.");
 
+            var isPrereqForActiveTopics = await _db.TopicPrerequisites
+                .Include(p => p.Topic)
+                .AnyAsync(p => p.PrerequisiteTopicId == topicId && (p.Topic.Status == "Active" || p.Topic.Status == "ACTIVE"));
+            if (isPrereqForActiveTopics)
+            {
+                throw new InvalidOperationException("Không thể khóa Topic này vì đang là điều kiện tiên quyết (prerequisite) của một Topic khác đang hoạt động.");
+            }
+
             topic.Status = "Inactive";
             topic.UpdatedAt = DateTime.UtcNow;
             
-            // Deactivate implies setting status to Inactive. It does not hard delete.
             _topicRepository.Update(topic);
             await _topicRepository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Deactivate Topic", "LearningTopic", topicId, "Active", "Inactive");
         }
 
         public async Task ArchiveTopicAsync(int topicId)
@@ -108,10 +156,12 @@ namespace DuAnTotNghiep.Services
             if (topic == null)
                 throw new InvalidOperationException("Topic không tồn tại.");
 
-            if (await _topicRepository.IsTopicUsedAsync(topicId))
+            var isPrereqForActiveTopics = await _db.TopicPrerequisites
+                .Include(p => p.Topic)
+                .AnyAsync(p => p.PrerequisiteTopicId == topicId && (p.Topic.Status == "Active" || p.Topic.Status == "ACTIVE"));
+            if (isPrereqForActiveTopics)
             {
-                // We still archive but UI should display warning before this.
-                // It's allowed by spec, just need a warning.
+                throw new InvalidOperationException("Không thể lưu trữ Topic này vì đang là điều kiện tiên quyết (prerequisite) của một Topic khác đang hoạt động.");
             }
 
             topic.Status = "Archived";
@@ -119,6 +169,24 @@ namespace DuAnTotNghiep.Services
 
             _topicRepository.Update(topic);
             await _topicRepository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Archive Topic", "LearningTopic", topicId, "Active", "Archived");
+        }
+
+        public async Task RestoreTopicAsync(int topicId)
+        {
+            var topic = await _topicRepository.GetByIdAsync(topicId);
+            if (topic == null)
+                throw new InvalidOperationException("Topic không tồn tại.");
+
+            string oldStatus = topic.Status;
+            topic.Status = "Active";
+            topic.UpdatedAt = DateTime.UtcNow;
+
+            _topicRepository.Update(topic);
+            await _topicRepository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Restore Topic", "LearningTopic", topicId, oldStatus, "Active");
         }
 
         public async Task ReorderTopicsAsync(List<int> orderedIds)
@@ -139,12 +207,103 @@ namespace DuAnTotNghiep.Services
             }
 
             await _topicRepository.SaveChangesAsync();
+            await _auditService.LogAsync(GetCurrentUserId(), "Reorder Topics", "LearningTopic", null, null, $"Reordered: {validTopics.Count} topics");
         }
 
         public async Task<TopicDetailDto?> GetDetailAsync(int topicId)
         {
             var topic = await _topicRepository.GetTopicWithPrerequisitesAsync(topicId);
             if (topic == null) return null;
+
+            var prerequisites = await _db.TopicPrerequisites
+                .AsNoTracking()
+                .Include(p => p.PrerequisiteTopic)
+                .Where(p => p.TopicId == topicId)
+                .Select(p => new TopicOptionDto
+                {
+                    Id = p.PrerequisiteTopicId,
+                    Name = p.PrerequisiteTopic.Title
+                })
+                .ToListAsync();
+
+            var objectives = await _db.LearningObjectives
+                .AsNoTracking()
+                .Where(o => o.TopicId == topicId)
+                .OrderBy(o => o.OrderIndex)
+                .Select(o => new DuAnTotNghiep.DTOs.Objective.ObjectiveDto
+                {
+                    Id = o.Id,
+                    ObjectiveText = o.ObjectiveText,
+                    CognitiveLevel = o.CognitiveLevel,
+                    OrderIndex = o.OrderIndex
+                })
+                .ToListAsync();
+
+            var lessons = await _db.OriginalLessons
+                .AsNoTracking()
+                .Where(l => l.TopicId == topicId)
+                .Select(l => new LessonDto
+                {
+                    Id = l.Id,
+                    Title = l.Title,
+                    ContentType = l.ContentType,
+                    EstimatedMinutes = l.EstimatedMinutes,
+                    ReviewStatus = l.ReviewStatus,
+                    IsAiGenerated = l.IsAiGenerated
+                })
+                .ToListAsync();
+
+            var quizzes = await _db.Quizzes
+                .AsNoTracking()
+                .Where(q => q.TopicId == topicId)
+                .Select(q => new QuizDto
+                {
+                    Id = q.Id,
+                    Title = q.Title,
+                    Description = q.Description,
+                    QuizType = q.QuizType,
+                    TimeLimitMinutes = q.TimeLimitMinutes,
+                    PassingScore = q.PassingScore,
+                    Status = q.Status
+                })
+                .ToListAsync();
+
+            var learningPaths = await _db.LearningPathNodes
+                .AsNoTracking()
+                .Include(n => n.LearningPath)
+                .ThenInclude(p => p.Student)
+                .Where(n => n.TopicId == topicId)
+                .Select(n => n.LearningPath)
+                .Distinct()
+                .Select(p => new LearningPathDto
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                    Description = p.Description,
+                    Status = p.Status,
+                    StudentName = p.Student != null ? p.Student.FullName : string.Empty
+                })
+                .ToListAsync();
+
+            var questionCount = await _db.QuestionBanks.CountAsync(q => q.TopicId == topicId);
+
+            var placementTestCount = await _db.PlacementTestQuestions
+                .Include(pq => pq.Question)
+                .Include(pq => pq.Section)
+                .Where(pq => pq.Question.TopicId == topicId)
+                .Select(pq => pq.Section.PlacementTestId)
+                .Distinct()
+                .CountAsync();
+
+            var isPrereqForActiveTopics = await _db.TopicPrerequisites
+                .Include(p => p.Topic)
+                .AnyAsync(p => p.PrerequisiteTopicId == topicId && (p.Topic.Status == "Active" || p.Topic.Status == "ACTIVE"));
+
+            bool canArchive = !isPrereqForActiveTopics;
+            bool canDeactivate = !isPrereqForActiveTopics;
+            string? reason = isPrereqForActiveTopics
+                ? "Topic này đang là điều kiện tiên quyết (prerequisite) của một Topic khác đang hoạt động."
+                : null;
 
             return new TopicDetailDto
             {
@@ -156,9 +315,23 @@ namespace DuAnTotNghiep.Services
                 LevelName = topic.Level?.Name ?? string.Empty,
                 ParentTopicName = topic.ParentTopic?.Title,
                 Difficulty = topic.DifficultyLevel,
-                ObjectiveCount = topic.LearningObjectives?.Count ?? 0,
+                DifficultyLevel = topic.DifficultyLevel,
+                ObjectiveCount = objectives.Count,
+                LessonCount = lessons.Count,
+                QuizCount = quizzes.Count,
+                PathCount = learningPaths.Count,
+                QuestionCount = questionCount,
+                PlacementTestCount = placementTestCount,
+                CanArchive = canArchive,
+                CanDeactivate = canDeactivate,
+                Reason = reason,
                 Status = topic.Status,
-                IsActive = topic.Status == "Active"
+                IsActive = topic.Status == "Active",
+                Prerequisites = prerequisites,
+                Objectives = objectives,
+                Lessons = lessons,
+                Quizzes = quizzes,
+                LearningPaths = learningPaths
             };
         }
 
@@ -223,6 +396,41 @@ namespace DuAnTotNghiep.Services
             return await _topicRepository.IsTopicUsedAsync(topicId);
         }
 
+        // ---------- NEW METHODS ----------
+        public async Task<List<TopicOptionDto>> GetActiveTopicsBySkillAsync(int skillId)
+        {
+            var topics = await _topicRepository.GetBySkillAsync(skillId);
+            return topics
+                .Where(t => t.Status == "Active")
+                .Select(t => new TopicOptionDto { Id = t.Id, Name = t.Title })
+                .OrderBy(t => t.Name)
+                .ToList();
+        }
+
+        public async Task<List<TopicOptionDto>> GetTopicsForQuestionAsync(int skillId, int? levelId)
+        {
+            var allTopics = await _topicRepository.GetAllAsync();
+            var query = allTopics.AsQueryable()
+                .Where(t => t.SkillId == skillId && t.Status == "Active");
+            if (levelId.HasValue)
+                query = query.Where(t => t.LevelId == levelId.Value);
+            return query
+                .Select(t => new TopicOptionDto { Id = t.Id, Name = t.Title })
+                .OrderBy(t => t.Name)
+                .ToList();
+        }
+
+        public async Task<bool> IsTopicAvailableAsync(int topicId)
+        {
+            var topic = await _topicRepository.GetByIdAsync(topicId);
+            if (topic == null || topic.Status != "Active")
+                return false;
+
+            var inUse = await _db.QuestionBanks
+                .AnyAsync(q => q.TopicId == topicId && q.ReviewStatus == "APPROVED");
+            return !inUse;
+        }
+
         public async Task<List<int>> GetPrerequisiteChainAsync(int topicId)
         {
             var chain = new List<int>();
@@ -262,7 +470,7 @@ namespace DuAnTotNghiep.Services
             if (string.IsNullOrWhiteSpace(topicCode) || string.IsNullOrWhiteSpace(name))
                 throw new InvalidOperationException("TopicCode và Name không được để trống.");
 
-            var allowedDifficulties = new[] { "BASIC", "MEDIUM", "ADVANCED" };
+            var allowedDifficulties = new[] { "BEGINNER", "ELEMENTARY", "INTERMEDIATE", "UPPER_INTERMEDIATE", "ADVANCED" };
             if (!allowedDifficulties.Contains(difficultyLevel?.ToUpper()))
                 throw new InvalidOperationException("Difficulty Level không hợp lệ.");
 
@@ -360,6 +568,357 @@ namespace DuAnTotNghiep.Services
 
             recursionStack.Remove(current);
             return false;
+        }
+
+        public async Task<List<OriginalLesson>> GetLessonsByTopicAsync(int topicId)
+        {
+            return await _db.OriginalLessons
+                .AsNoTracking()
+                .Where(l => l.TopicId == topicId)
+                .ToListAsync();
+        }
+
+        public async Task<List<Quiz>> GetQuizzesByTopicAsync(int topicId)
+        {
+            return await _db.Quizzes
+                .AsNoTracking()
+                .Where(q => q.TopicId == topicId)
+                .ToListAsync();
+        }
+
+        public async Task<List<StudentLearningPath>> GetLearningPathsByTopicAsync(int topicId)
+        {
+            return await _db.LearningPathNodes
+                .AsNoTracking()
+                .Include(n => n.LearningPath)
+                .Where(n => n.TopicId == topicId)
+                .Select(n => n.LearningPath)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<List<LearningTopic>> GetEligibleTopicsForPathAsync()
+        {
+            return await _db.LearningTopics
+                .AsNoTracking()
+                .Include(t => t.Skill)
+                .Include(t => t.Level)
+                .Where(t => t.Status == "Active" || t.Status == "Published" || t.Status == "ACTIVE" || t.Status == "PUBLISHED")
+                .ToListAsync();
+        }
+
+        public async Task<List<LearningTopic>> GetActiveTopicsAsync()
+        {
+            return await _db.LearningTopics
+                .AsNoTracking()
+                .Include(t => t.Skill)
+                .Include(t => t.Level)
+                .Where(t => t.Status == "Active" || t.Status == "ACTIVE")
+                .ToListAsync();
+        }
+
+        public async Task<AiTopicPayloadDto?> GetAiPayloadForTopicAsync(int topicId)
+        {
+            var topic = await _db.LearningTopics
+                .AsNoTracking()
+                .Include(t => t.Skill)
+                .Include(t => t.Level)
+                .FirstOrDefaultAsync(t => t.Id == topicId);
+
+            if (topic == null) return null;
+
+            if (topic.Status != "Active" && topic.Status != "Published" && topic.Status != "ACTIVE" && topic.Status != "PUBLISHED")
+            {
+                return null;
+            }
+
+            var objectives = await _db.LearningObjectives
+                .AsNoTracking()
+                .Where(o => o.TopicId == topicId)
+                .OrderBy(o => o.OrderIndex)
+                .Select(o => o.ObjectiveText)
+                .ToListAsync();
+
+            var prerequisites = await _db.TopicPrerequisites
+                .AsNoTracking()
+                .Include(p => p.PrerequisiteTopic)
+                .Where(p => p.TopicId == topicId)
+                .Select(p => p.PrerequisiteTopic.Title)
+                .ToListAsync();
+
+            var lessons = await _db.OriginalLessons
+                .AsNoTracking()
+                .Where(l => l.TopicId == topicId)
+                .Select(l => l.Title)
+                .ToListAsync();
+
+            var quizzes = await _db.Quizzes
+                .AsNoTracking()
+                .Where(q => q.TopicId == topicId)
+                .Select(q => q.Title)
+                .ToListAsync();
+
+            return new AiTopicPayloadDto
+            {
+                TopicId = topic.Id,
+                TopicCode = topic.TopicCode ?? string.Empty,
+                Title = topic.Title,
+                Difficulty = topic.DifficultyLevel,
+                SkillName = topic.Skill?.SkillName ?? string.Empty,
+                LevelName = topic.Level?.Name ?? string.Empty,
+                Objectives = objectives,
+                Prerequisites = prerequisites,
+                Lessons = lessons,
+                Quizzes = quizzes
+            };
+        }
+
+        public async Task UpdateLessonTopicAsync(int lessonId, int topicId)
+        {
+            var lesson = await _db.OriginalLessons.FirstOrDefaultAsync(l => l.Id == lessonId);
+            if (lesson == null) throw new InvalidOperationException("Lesson không tồn tại.");
+
+            var oldTopicId = lesson.TopicId;
+            if (oldTopicId != topicId)
+            {
+                lesson.TopicId = topicId;
+                lesson.UpdatedAt = DateTime.UtcNow;
+                _db.OriginalLessons.Update(lesson);
+                await _db.SaveChangesAsync();
+
+                await _auditService.LogAsync(GetCurrentUserId(), "Update Lesson Topic", "OriginalLesson", lessonId, oldTopicId.ToString(), topicId.ToString());
+            }
+        }
+
+        public async Task UpdateQuizTopicAsync(int quizId, int topicId)
+        {
+            var quiz = await _db.Quizzes.FirstOrDefaultAsync(q => q.Id == quizId);
+            if (quiz == null) throw new InvalidOperationException("Quiz không tồn tại.");
+
+            var oldTopicId = quiz.TopicId;
+            if (oldTopicId != topicId)
+            {
+                quiz.TopicId = topicId;
+                _db.Quizzes.Update(quiz);
+                await _db.SaveChangesAsync();
+
+                await _auditService.LogAsync(GetCurrentUserId(), "Update Quiz Topic", "Quiz", quizId, oldTopicId?.ToString(), topicId.ToString());
+            }
+        }
+
+        public async Task UpdateLearningPathNodeTopicAsync(int nodeId, int topicId)
+        {
+            var node = await _db.LearningPathNodes.FirstOrDefaultAsync(n => n.Id == nodeId);
+            if (node == null) throw new InvalidOperationException("Learning Path Node không tồn tại.");
+
+            var oldTopicId = node.TopicId;
+            if (oldTopicId != topicId)
+            {
+                node.TopicId = topicId;
+                _db.LearningPathNodes.Update(node);
+                await _db.SaveChangesAsync();
+
+                await _auditService.LogAsync(GetCurrentUserId(), "Update Learning Path Topic", "LearningPathNode", nodeId, oldTopicId?.ToString(), topicId.ToString());
+            }
+        }
+
+        public async Task LinkTopicPrerequisiteAsync(int topicId, int prerequisiteTopicId)
+        {
+            if (topicId == prerequisiteTopicId)
+                throw new InvalidOperationException("Topic không thể làm prerequisite của chính nó.");
+
+            var exists = await _db.TopicPrerequisites.AnyAsync(p => p.TopicId == topicId && p.PrerequisiteTopicId == prerequisiteTopicId);
+            if (!exists)
+            {
+                var prereq = new TopicPrerequisite
+                {
+                    TopicId = topicId,
+                    PrerequisiteTopicId = prerequisiteTopicId,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _db.TopicPrerequisites.Add(prereq);
+                await _db.SaveChangesAsync();
+
+                await _auditService.LogAsync(GetCurrentUserId(), "Link Topic", "TopicPrerequisite", prereq.Id, null, $"Topic: {topicId}, Prerequisite: {prerequisiteTopicId}");
+            }
+        }
+
+        // Reference Source Methods (Module M5 Task 2)
+        public async Task<ReferenceSource?> GetReferenceSourceByIdAsync(int id)
+        {
+            return await _db.ReferenceSources
+                .Include(r => r.CreatedByNavigation)
+                .Include(r => r.ApprovedByNavigation)
+                .Include(r => r.ContentComplianceReviews)
+                .FirstOrDefaultAsync(r => r.Id == id);
+        }
+
+        public async Task<IEnumerable<ReferenceSource>> GetAllReferenceSourcesAsync(ReferenceSourceType? sourceType, ReferenceReviewStatus? status, string? keyword)
+        {
+            var query = _db.ReferenceSources
+                .Include(r => r.CreatedByNavigation)
+                .Include(r => r.ApprovedByNavigation)
+                .AsQueryable();
+
+            if (sourceType.HasValue)
+            {
+                query = query.Where(r => r.SourceType == sourceType.Value);
+            }
+
+            if (status.HasValue)
+            {
+                query = query.Where(r => r.Status == status.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                var kw = keyword.Trim().ToLower();
+                query = query.Where(r => r.SourceName.ToLower().Contains(kw));
+            }
+
+            return await query.ToListAsync();
+        }
+
+        public async Task<int> CreateReferenceSourceAsync(ReferenceSource referenceSource)
+        {
+            // Validation
+            if (!Enum.IsDefined(typeof(ReferenceSourceType), referenceSource.SourceType))
+                throw new InvalidOperationException("Loại nguồn tham khảo không hợp lệ.");
+
+            if (!Enum.IsDefined(typeof(ReferenceReviewStatus), referenceSource.Status))
+                throw new InvalidOperationException("Trạng thái kiểm duyệt không hợp lệ.");
+
+            if (referenceSource.UsagePolicy.HasValue && !Enum.IsDefined(typeof(ReferenceUsagePolicy), referenceSource.UsagePolicy.Value))
+                throw new InvalidOperationException("Chính sách sử dụng không hợp lệ.");
+
+            referenceSource.CreatedAt = DateTime.UtcNow;
+            referenceSource.UpdatedAt = DateTime.UtcNow;
+            referenceSource.CreatedBy = GetCurrentUserId();
+            referenceSource.IsActive = true;
+
+            await _db.ReferenceSources.AddAsync(referenceSource);
+            await _db.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Create Reference Source", "ReferenceSource", referenceSource.Id, null, referenceSource.SourceName);
+
+            return referenceSource.Id;
+        }
+
+        public async Task UpdateReferenceSourceAsync(ReferenceSource referenceSource)
+        {
+            var existing = await _db.ReferenceSources.FindAsync(referenceSource.Id);
+            if (existing == null)
+                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
+
+            // Validation
+            if (!Enum.IsDefined(typeof(ReferenceSourceType), referenceSource.SourceType))
+                throw new InvalidOperationException("Loại nguồn tham khảo không hợp lệ.");
+
+            if (!Enum.IsDefined(typeof(ReferenceReviewStatus), referenceSource.Status))
+                throw new InvalidOperationException("Trạng thái kiểm duyệt không hợp lệ.");
+
+            if (referenceSource.UsagePolicy.HasValue && !Enum.IsDefined(typeof(ReferenceUsagePolicy), referenceSource.UsagePolicy.Value))
+                throw new InvalidOperationException("Chính sách sử dụng không hợp lệ.");
+
+            // Nghiệp vụ: Chặn chuyển REJECTED -> APPROVED trực tiếp
+            if (existing.Status == ReferenceReviewStatus.REJECTED && referenceSource.Status == ReferenceReviewStatus.APPROVED)
+            {
+                throw new InvalidOperationException("Không thể chuyển trực tiếp từ trạng thái REJECTED sang APPROVED. Vui lòng thực hiện quy trình kiểm duyệt (Review).");
+            }
+
+            var oldName = existing.SourceName;
+
+            existing.SourceName = referenceSource.SourceName.Trim();
+            existing.SourceUrl = referenceSource.SourceUrl?.Trim();
+            existing.SourceType = referenceSource.SourceType;
+            existing.LicenseNote = referenceSource.LicenseNote?.Trim();
+            existing.UsagePolicy = referenceSource.UsagePolicy;
+            existing.Status = referenceSource.Status;
+            existing.IsActive = referenceSource.IsActive;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            _db.ReferenceSources.Update(existing);
+            await _db.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Update Reference Source", "ReferenceSource", referenceSource.Id, oldName, referenceSource.SourceName);
+        }
+
+        public async Task DeleteReferenceSourceAsync(int id)
+        {
+            var existing = await _db.ReferenceSources.FindAsync(id);
+            if (existing == null)
+                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
+
+            // Kiểm tra ràng buộc sử dụng trước khi xóa
+            var hasTopics = await _db.TopicReferences.AnyAsync(tr => tr.ReferenceSourceId == id);
+            if (hasTopics)
+                throw new InvalidOperationException("Không thể xóa nguồn tham khảo này vì đang được Học phần (Topic) sử dụng.");
+
+            _db.ReferenceSources.Remove(existing);
+            await _db.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Delete Reference Source", "ReferenceSource", id, existing.SourceName, null);
+        }
+
+        public async Task ReviewReferenceSourceAsync(int id, ReferenceReviewStatus status, string? note)
+        {
+            if (status != ReferenceReviewStatus.APPROVED && status != ReferenceReviewStatus.REJECTED)
+                throw new InvalidOperationException("Trạng thái kiểm duyệt không hợp lệ (Chỉ chấp nhận APPROVED hoặc REJECTED).");
+
+            var existing = await _db.ReferenceSources.FindAsync(id);
+            if (existing == null)
+                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
+
+            var oldStatus = existing.Status.ToString();
+            var adminId = GetCurrentUserId();
+
+            existing.Status = status;
+            existing.ApprovedBy = adminId;
+            existing.ApprovedAt = DateTime.UtcNow;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            _db.ReferenceSources.Update(existing);
+            await _db.SaveChangesAsync();
+
+            var newStatusWithNote = status.ToString() + (string.IsNullOrEmpty(note) ? "" : $" - Ghi chú: {note}");
+            await _auditService.LogAsync(adminId, "Review Reference Source", "ReferenceSource", id, oldStatus, newStatusWithNote);
+        }
+
+        public async Task ArchiveReferenceSourceAsync(int id)
+        {
+            var existing = await _db.ReferenceSources.FindAsync(id);
+            if (existing == null)
+                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
+
+            // Nghiệp vụ: Kiểm tra sử dụng trước khi Archive
+            // 1. Topic sử dụng
+            var isUsedInTopic = await _db.TopicReferences.AnyAsync(tr => tr.ReferenceSourceId == id);
+
+            // 2. Lesson sử dụng (gián tiếp qua Topic)
+            var isUsedInLesson = await _db.OriginalLessons.AnyAsync(l =>
+                _db.TopicReferences.Any(tr => tr.ReferenceSourceId == id && tr.TopicId == l.TopicId));
+
+            // 3. AI Workflow sử dụng (gián tiếp qua Topic)
+            var isUsedInAiWorkflow = await _db.AiGeneratedContents.AnyAsync(ai =>
+                _db.TopicReferences.Any(tr => tr.ReferenceSourceId == id && tr.TopicId == ai.RelatedTopicId));
+
+            if (isUsedInTopic || isUsedInLesson || isUsedInAiWorkflow)
+            {
+                var msg = "Không thể Lưu trữ (Archive) nguồn tham khảo này vì đang được sử dụng:\n";
+                if (isUsedInTopic) msg += "- Có học phần (Topic) đang liên kết.\n";
+                if (isUsedInLesson) msg += "- Có bài học (Lesson) thuộc học phần liên kết.\n";
+                if (isUsedInAiWorkflow) msg += "- Có nội dung AI (AI Workflow) thuộc học phần liên kết.\n";
+                throw new InvalidOperationException(msg);
+            }
+
+            existing.Status = ReferenceReviewStatus.ARCHIVED;
+            existing.IsActive = false;
+            existing.UpdatedAt = DateTime.UtcNow;
+
+            _db.ReferenceSources.Update(existing);
+            await _db.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Archive Reference Source", "ReferenceSource", id, "Active", "Archived");
         }
     }
 }

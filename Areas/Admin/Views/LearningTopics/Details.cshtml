@@ -12,6 +12,19 @@
             <h4>@Model.Name (@Model.TopicCode)</h4>
         </div>
         <div class="card-body">
+            @if (Model.Status == "Inactive")
+            {
+                <div class="alert alert-warning" role="alert">
+                    <i class="fas fa-exclamation-triangle"></i> <strong>Cảnh báo:</strong> Topic này đang ở trạng thái KHÔNG HOẠT ĐỘNG (Inactive).
+                </div>
+            }
+            @if (!Model.CanArchive && !string.IsNullOrEmpty(Model.Reason))
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-ban"></i> <strong>Không thể khóa/lưu trữ:</strong> @Model.Reason
+                </div>
+            }
+
             <dl class="row">
                 <dt class="col-sm-3">Description</dt>
                 <dd class="col-sm-9">@Model.Description</dd>
@@ -30,6 +43,18 @@
 
                 <dt class="col-sm-3">Status</dt>
                 <dd class="col-sm-9">@Model.Status</dd>
+
+                <dt class="col-sm-3">Số lượng Objective</dt>
+                <dd class="col-sm-9">@Model.ObjectiveCount</dd>
+
+                <dt class="col-sm-3">Số lượng Lesson</dt>
+                <dd class="col-sm-9">@Model.LessonCount</dd>
+
+                <dt class="col-sm-3">Số lượng Quiz</dt>
+                <dd class="col-sm-9">@Model.QuizCount</dd>
+
+                <dt class="col-sm-3">Số lượng Learning Path</dt>
+                <dd class="col-sm-9">@Model.PathCount</dd>
             </dl>
 
             <hr />
@@ -40,11 +65,120 @@
             <h5>Learning Objectives</h5>
             @await Html.PartialAsync("_ObjectivesPartial", Model.Objectives)
 
+            <hr />
+            <h5>Lessons liên quan (@Model.LessonCount)</h5>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tiêu đề</th>
+                        <th>Loại nội dung</th>
+                        <th>Thời lượng (phút)</th>
+                        <th>Trạng thái Review</th>
+                        <th>Tạo bởi AI</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var l in Model.Lessons)
+                    {
+                        <tr>
+                            <td>@l.Title</td>
+                            <td>@l.ContentType</td>
+                            <td>@(l.EstimatedMinutes.HasValue ? l.EstimatedMinutes.Value.ToString() : "-")</td>
+                            <td>@l.ReviewStatus</td>
+                            <td>@(l.IsAiGenerated ? "Có" : "Không")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.Lessons.Any())
+            {
+                <p class="text-muted">Không có Lesson nào liên quan.</p>
+            }
+
+            <hr />
+            <h5>Quizzes liên quan (@Model.QuizCount)</h5>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tiêu đề</th>
+                        <th>Loại</th>
+                        <th>Giới hạn thời gian (phút)</th>
+                        <th>Điểm đạt</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var q in Model.Quizzes)
+                    {
+                        <tr>
+                            <td>@q.Title</td>
+                            <td>@q.QuizType</td>
+                            <td>@(q.TimeLimitMinutes.HasValue ? q.TimeLimitMinutes.Value.ToString() : "-")</td>
+                            <td>@(q.PassingScore.HasValue ? q.PassingScore.Value.ToString() : "-")</td>
+                            <td>@q.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.Quizzes.Any())
+            {
+                <p class="text-muted">Không có Quiz nào liên quan.</p>
+            }
+
+            <hr />
+            <h5>Learning Paths liên quan (@Model.PathCount)</h5>
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tiêu đề</th>
+                        <th>Tên Học viên</th>
+                        <th>Mô tả</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model.LearningPaths)
+                    {
+                        <tr>
+                            <td>@p.Title</td>
+                            <td>@p.StudentName</td>
+                            <td>@p.Description</td>
+                            <td>@p.Status</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            @if (!Model.LearningPaths.Any())
+            {
+                <p class="text-muted">Không có Learning Path nào liên quan.</p>
+            }
+
         </div>
         <div class="card-footer">
             @if (User.IsInRole("Admin"))
             {
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+
+                @if (Model.Status != "Archived")
+                {
+                    <form asp-action="Archive" asp-route-id="@Model.Id" method="post" style="display:inline;" 
+                          onsubmit="return confirm('XÁC NHẬN ARCHIVE TOPIC:\n\nTopic này hiện đang được sử dụng bởi:\n- @Model.LessonCount bài học (Lesson)\n- @Model.QuizCount bài kiểm tra (Quiz)\n- @Model.PathCount lộ trình học (Learning Path)\n- @Model.QuestionCount câu hỏi ngân hàng (Question)\n- @Model.PlacementTestCount bài thi Placement Test\n\nBạn có chắc chắn muốn Archive Topic này không?');">
+                        <button type="submit" class="btn btn-secondary" @(Model.CanArchive ? "" : "disabled")>Archive</button>
+                    </form>
+                }
+                @if (Model.Status == "Active")
+                {
+                    <form asp-action="Deactivate" asp-route-id="@Model.Id" method="post" style="display:inline;" 
+                          onsubmit="return confirm('XÁC NHẬN DEACTIVATE TOPIC:\n\nTopic này hiện đang được sử dụng bởi:\n- @Model.LessonCount bài học (Lesson)\n- @Model.QuizCount bài kiểm tra (Quiz)\n- @Model.PathCount lộ trình học (Learning Path)\n- @Model.QuestionCount câu hỏi ngân hàng (Question)\n- @Model.PlacementTestCount bài thi Placement Test\n\nBạn có chắc chắn muốn Deactivate Topic này không?');">
+                        <button type="submit" class="btn btn-danger" @(Model.CanDeactivate ? "" : "disabled")>Deactivate</button>
+                    </form>
+                }
+                @if (Model.Status == "Archived" || Model.Status == "Inactive")
+                {
+                    <form asp-action="Restore" asp-route-id="@Model.Id" method="post" style="display:inline;">
+                        <button type="submit" class="btn btn-success">Restore (Hoạt động lại)</button>
+                    </form>
+                }
             }
             <a asp-action="Index" class="btn btn-secondary">Back to List</a>
         </div>

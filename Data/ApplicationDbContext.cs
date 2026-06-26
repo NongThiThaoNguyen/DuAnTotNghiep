@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DuAnTotNghiep.Models;
+using DuAnTotNghiep.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Data;
@@ -520,7 +521,15 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__content___3213E83FABD8D38F");
 
-            entity.ToTable("content_compliance_reviews");
+            entity.ToTable("content_compliance_reviews", t =>
+            {
+                t.HasCheckConstraint("CK_content_compliance_reviews_status", "[review_status] IN ('APPROVED', 'REJECTED', 'NEEDS_REVISION')");
+                t.HasCheckConstraint("CK_content_compliance_reviews_risk", "[plagiarism_risk] IS NULL OR [plagiarism_risk] IN ('LOW', 'MEDIUM', 'HIGH')");
+            });
+
+            entity.HasIndex(e => e.ReferenceSourceId);
+            entity.HasIndex(e => e.ReviewerId);
+            entity.HasIndex(e => e.ReviewStatus);
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ContentId).HasColumnName("content_id");
@@ -542,11 +551,17 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("reviewed_at");
             entity.Property(e => e.ReviewerId).HasColumnName("reviewer_id");
+            entity.Property(e => e.ReferenceSourceId).HasColumnName("reference_source_id");
 
             entity.HasOne(d => d.Reviewer).WithMany(p => p.ContentComplianceReviews)
                 .HasForeignKey(d => d.ReviewerId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_content_reviews_reviewer");
+
+            entity.HasOne(d => d.ReferenceSource).WithMany(p => p.ContentComplianceReviews)
+                .HasForeignKey(d => d.ReferenceSourceId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_content_reviews_ref_source");
         });
 
         modelBuilder.Entity<EnglishProficiencyLevel>(entity =>
@@ -1478,7 +1493,17 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__referenc__3213E83F85C4EC5F");
 
-            entity.ToTable("reference_sources");
+            entity.ToTable("reference_sources", t =>
+            {
+                t.HasCheckConstraint("CK_ref_status", "[status] IN ('DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED')");
+                t.HasCheckConstraint("CK_ref_source_type", "[source_type] IN ('OFFICIAL', 'OPEN_LICENSE', 'SELF_CREATED', 'TEACHER_CREATED', 'REFERENCE_ONLY')");
+                t.HasCheckConstraint("CK_ref_usage_policy", "[usage_policy] IS NULL OR [usage_policy] IN ('REFERENCE_ONLY', 'OPEN_USE', 'INTERNAL_ONLY')");
+            });
+
+            entity.HasIndex(e => e.Status);
+            entity.HasIndex(e => e.SourceType);
+            entity.HasIndex(e => e.CreatedBy);
+            entity.HasIndex(e => e.ApprovedBy);
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ApprovedAt).HasColumnName("approved_at");
@@ -1492,6 +1517,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(255)
                 .HasColumnName("source_name");
             entity.Property(e => e.SourceType)
+                .HasConversion<string>()
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("source_type");
@@ -1500,11 +1526,20 @@ public partial class ApplicationDbContext : DbContext
                 .IsUnicode(false)
                 .HasColumnName("source_url");
             entity.Property(e => e.Status)
+                .HasConversion<string>()
                 .HasMaxLength(50)
                 .IsUnicode(false)
-                .HasDefaultValue("PENDING")
+                .HasDefaultValue(ReferenceReviewStatus.PENDING)
                 .HasColumnName("status");
-            entity.Property(e => e.UsagePolicy).HasColumnName("usage_policy");
+            entity.Property(e => e.UsagePolicy)
+                .HasConversion<string>()
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasColumnName("usage_policy");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(e => e.IsActive)
+                .HasDefaultValue(true)
+                .HasColumnName("is_active");
 
             entity.HasOne(d => d.ApprovedByNavigation).WithMany(p => p.ReferenceSourceApprovedByNavigations)
                 .HasForeignKey(d => d.ApprovedBy)
@@ -1959,6 +1994,8 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("topic_references");
 
             entity.HasIndex(e => new { e.TopicId, e.ReferenceSourceId }, "UQ_topic_reference").IsUnique();
+            entity.HasIndex(e => e.TopicId);
+            entity.HasIndex(e => e.ReferenceSourceId);
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreatedAt)

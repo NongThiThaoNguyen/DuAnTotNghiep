@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -23,5 +23,9 @@ public partial class ContentComplianceReview
 
     public DateTime ReviewedAt { get; set; }
 
+    public int? ReferenceSourceId { get; set; }
+
     public virtual User Reviewer { get; set; } = null!;
+
+    public virtual ReferenceSource? ReferenceSource { get; set; }
 }

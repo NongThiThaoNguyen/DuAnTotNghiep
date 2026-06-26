@@ -28,6 +28,11 @@ namespace DuAnTotNghiep.Repositories
             return await _dbSet.AnyAsync(s => s.SkillCode.ToLower() == code.ToLower());
         }
 
+        public async Task<EnglishSkill?> GetByCodeAsync(string code)
+        {
+            return await _dbSet.FirstOrDefaultAsync(s => s.SkillCode.ToLower() == code.ToLower());
+        }
+
         public async Task<bool> IsSkillUsedAsync(int skillId)
         {
             return await _context.LearningTopics.AnyAsync(t => t.SkillId == skillId) ||

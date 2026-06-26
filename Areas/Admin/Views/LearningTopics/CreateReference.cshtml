@@ -1,0 +1,69 @@
+@model DuAnTotNghiep.Models.ReferenceSource
+@{
+    ViewData["Title"] = "Thêm nguồn tham khảo";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4">Thêm nguồn tham khảo hợp pháp mới</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5>Thông tin nguồn tham khảo</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateReference" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="SourceName" class="form-label">Tên nguồn tham khảo <span class="text-danger">*</span></label>
+                            <input asp-for="SourceName" class="form-control" placeholder="Ví dụ: Cambridge Dictionary, Oxford Practice..." required />
+                            <span asp-validation-for="SourceName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SourceUrl" class="form-label">Địa chỉ URL</label>
+                            <input asp-for="SourceUrl" class="form-control" type="url" placeholder="https://example.com" />
+                            <span asp-validation-for="SourceUrl" class="text-danger"></span>
+                            <small class="text-muted">Nhập link trang chủ hoặc link chi tiết nguồn tham khảo.</small>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="SourceType" class="form-label">Loại nguồn tham khảo <span class="text-danger">*</span></label>
+                                <select asp-for="SourceType" class="form-select" asp-items="ViewBag.SourceTypes" required>
+                                    <option value="">-- Chọn loại nguồn --</option>
+                                </select>
+                                <span asp-validation-for="SourceType" class="text-danger"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="UsagePolicy" class="form-label">Chính sách sử dụng</label>
+                                <select asp-for="UsagePolicy" class="form-select" asp-items="ViewBag.UsagePolicies">
+                                    <option value="">-- Chọn chính sách --</option>
+                                </select>
+                                <span asp-validation-for="UsagePolicy" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="LicenseNote" class="form-label">Ghi chú bản quyền / Giấy phép</label>
+                            <textarea asp-for="LicenseNote" class="form-control" rows="4" placeholder="Ví dụ: Sử dụng theo giấy phép CC-BY, hoặc chỉ lưu liên kết ngoài không sao chép..."></textarea>
+                            <span asp-validation-for="LicenseNote" class="text-danger"></span>
+                        </div>
+
+                        <input type="hidden" asp-for="Status" />
+                        <input type="hidden" asp-for="IsActive" />
+
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Thêm mới</button>
+                            <a asp-action="ReferenceSources" class="btn btn-secondary">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

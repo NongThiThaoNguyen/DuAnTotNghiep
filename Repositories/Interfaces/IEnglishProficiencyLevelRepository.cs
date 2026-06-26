@@ -6,6 +6,7 @@ namespace DuAnTotNghiep.Repositories.Interfaces
 {
     public interface IEnglishProficiencyLevelRepository : IGenericRepository<EnglishProficiencyLevel>
     {
+        Task<EnglishProficiencyLevel?> GetByCodeAsync(string code);
         Task<List<EnglishProficiencyLevel>> GetActiveLevelsAsync();
         Task<bool> ExistsCodeAsync(string code);
     }

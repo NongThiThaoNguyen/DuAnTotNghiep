@@ -1,6 +1,8 @@
 using DuAnTotNghiep.Helpers;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Enums;
+using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Data.Seeders
 {
@@ -42,6 +44,8 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedPlacementTestsAsync();
             await SeedPlacementTestDemoAsync();
             await SeedDemoProfilesAsync();
+            await SeedTopicsAndObjectivesAsync();
+            await SeedReferenceSourcesAsync();
         }
 
         private async Task SeedRolesAsync()
@@ -503,6 +507,257 @@ namespace DuAnTotNghiep.Data.Seeders
                 CorrectAnswer = options[correctIndex - 1].OptionText,
                 QuestionOptions = options
             };
+        }
+
+        private async Task SeedTopicsAndObjectivesAsync()
+        {
+            var grammarSkill = _context.EnglishSkills.FirstOrDefault(s => s.SkillCode == "GRAMMAR");
+            var vocabSkill = _context.EnglishSkills.FirstOrDefault(s => s.SkillCode == "VOCABULARY");
+            var beginnerLevel = _context.EnglishProficiencyLevels.FirstOrDefault(l => l.Code == "BEGINNER");
+            var elementaryLevel = _context.EnglishProficiencyLevels.FirstOrDefault(l => l.Code == "ELEMENTARY");
+
+            if (grammarSkill == null || vocabSkill == null || beginnerLevel == null || elementaryLevel == null)
+                return;
+
+            // 1. Seed Topic Grammar -> Tenses
+            var tensesTopic = _context.LearningTopics.FirstOrDefault(t => t.TopicCode == "GRAM_TENSES");
+            if (tensesTopic == null)
+            {
+                tensesTopic = new LearningTopic
+                {
+                    TopicCode = "GRAM_TENSES",
+                    Title = "Tenses",
+                    Description = "Các thì trong tiếng Anh",
+                    SkillId = grammarSkill.Id,
+                    LevelId = beginnerLevel.Id,
+                    DifficultyLevel = "BEGINNER",
+                    Status = "ACTIVE",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.LearningTopics.Add(tensesTopic);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.LearningObjectives.Any(o => o.TopicId == tensesTopic.Id))
+            {
+                _context.LearningObjectives.Add(new LearningObjective
+                {
+                    TopicId = tensesTopic.Id,
+                    ObjectiveText = "Hiểu và phân biệt các thì cơ bản trong tiếng Anh",
+                    CognitiveLevel = "UNDERSTAND",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            // 2. Seed Topic Grammar -> Present Simple (con của Tenses)
+            var presSimpleTopic = _context.LearningTopics.FirstOrDefault(t => t.TopicCode == "GRAM_PRES_SIMP");
+            if (presSimpleTopic == null)
+            {
+                presSimpleTopic = new LearningTopic
+                {
+                    TopicCode = "GRAM_PRES_SIMP",
+                    Title = "Present Simple",
+                    Description = "Thì hiện tại đơn",
+                    SkillId = grammarSkill.Id,
+                    LevelId = beginnerLevel.Id,
+                    ParentTopicId = tensesTopic.Id,
+                    DifficultyLevel = "BEGINNER",
+                    Status = "ACTIVE",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.LearningTopics.Add(presSimpleTopic);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.LearningObjectives.Any(o => o.TopicId == presSimpleTopic.Id))
+            {
+                _context.LearningObjectives.Add(new LearningObjective
+                {
+                    TopicId = presSimpleTopic.Id,
+                    ObjectiveText = "Sử dụng thì hiện tại đơn để nói về thói quen",
+                    CognitiveLevel = "APPLY",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            // 3. Seed Topic Grammar -> Present Continuous (con của Tenses)
+            var presContTopic = _context.LearningTopics.FirstOrDefault(t => t.TopicCode == "GRAM_PRES_CONT");
+            if (presContTopic == null)
+            {
+                presContTopic = new LearningTopic
+                {
+                    TopicCode = "GRAM_PRES_CONT",
+                    Title = "Present Continuous",
+                    Description = "Thì hiện tại tiếp diễn",
+                    SkillId = grammarSkill.Id,
+                    LevelId = beginnerLevel.Id,
+                    ParentTopicId = tensesTopic.Id,
+                    DifficultyLevel = "BEGINNER",
+                    Status = "ACTIVE",
+                    OrderIndex = 2,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.LearningTopics.Add(presContTopic);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.LearningObjectives.Any(o => o.TopicId == presContTopic.Id))
+            {
+                _context.LearningObjectives.Add(new LearningObjective
+                {
+                    TopicId = presContTopic.Id,
+                    ObjectiveText = "Sử dụng thì hiện tại tiếp diễn cho hành động đang xảy ra",
+                    CognitiveLevel = "APPLY",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            // 4. Seed Topic Vocabulary -> Family
+            var familyTopic = _context.LearningTopics.FirstOrDefault(t => t.TopicCode == "VOCAB_FAMILY");
+            if (familyTopic == null)
+            {
+                familyTopic = new LearningTopic
+                {
+                    TopicCode = "VOCAB_FAMILY",
+                    Title = "Family",
+                    Description = "Chủ đề gia đình",
+                    SkillId = vocabSkill.Id,
+                    LevelId = beginnerLevel.Id,
+                    DifficultyLevel = "BEGINNER",
+                    Status = "ACTIVE",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.LearningTopics.Add(familyTopic);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.LearningObjectives.Any(o => o.TopicId == familyTopic.Id))
+            {
+                _context.LearningObjectives.Add(new LearningObjective
+                {
+                    TopicId = familyTopic.Id,
+                    ObjectiveText = "Nhận biết và gọi tên các thành viên trong gia đình",
+                    CognitiveLevel = "REMEMBER",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            // 5. Seed Topic Vocabulary -> School
+            var schoolTopic = _context.LearningTopics.FirstOrDefault(t => t.TopicCode == "VOCAB_SCHOOL");
+            if (schoolTopic == null)
+            {
+                schoolTopic = new LearningTopic
+                {
+                    TopicCode = "VOCAB_SCHOOL",
+                    Title = "School",
+                    Description = "Chủ đề trường học",
+                    SkillId = vocabSkill.Id,
+                    LevelId = beginnerLevel.Id,
+                    DifficultyLevel = "BEGINNER",
+                    Status = "ACTIVE",
+                    OrderIndex = 2,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.LearningTopics.Add(schoolTopic);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.LearningObjectives.Any(o => o.TopicId == schoolTopic.Id))
+            {
+                _context.LearningObjectives.Add(new LearningObjective
+                {
+                    TopicId = schoolTopic.Id,
+                    ObjectiveText = "Từ vựng về các đồ dùng và hoạt động ở trường học",
+                    CognitiveLevel = "REMEMBER",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
+
+            // 6. Seed Topic Vocabulary -> Travel
+            var travelTopic = _context.LearningTopics.FirstOrDefault(t => t.TopicCode == "VOCAB_TRAVEL");
+            if (travelTopic == null)
+            {
+                travelTopic = new LearningTopic
+                {
+                    TopicCode = "VOCAB_TRAVEL",
+                    Title = "Travel",
+                    Description = "Chủ đề du lịch",
+                    SkillId = vocabSkill.Id,
+                    LevelId = elementaryLevel.Id,
+                    DifficultyLevel = "BEGINNER",
+                    Status = "ACTIVE",
+                    OrderIndex = 3,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                _context.LearningTopics.Add(travelTopic);
+                await _context.SaveChangesAsync();
+            }
+
+            if (!_context.LearningObjectives.Any(o => o.TopicId == travelTopic.Id))
+            {
+                _context.LearningObjectives.Add(new LearningObjective
+                {
+                    TopicId = travelTopic.Id,
+                    ObjectiveText = "Từ vựng thông dụng khi đi du lịch và hỏi đường",
+                    CognitiveLevel = "REMEMBER",
+                    OrderIndex = 1,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task SeedReferenceSourcesAsync()
+        {
+            if (!await _context.ReferenceSources.AnyAsync())
+            {
+                var adminUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "admin@aistudyenglish.com");
+                int? adminId = adminUser?.Id;
+
+                var defaultRef = new ReferenceSource
+                {
+                    SourceName = "Default Internal Reference",
+                    SourceUrl = "https://aistudyenglish.local",
+                    SourceType = ReferenceSourceType.REFERENCE_ONLY,
+                    LicenseNote = "Tài liệu tham khảo nội bộ của hệ thống.",
+                    UsagePolicy = ReferenceUsagePolicy.INTERNAL_ONLY,
+                    Status = ReferenceReviewStatus.APPROVED,
+                    CreatedBy = adminId,
+                    ApprovedBy = adminId,
+                    CreatedAt = DateTime.UtcNow,
+                    ApprovedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                _context.ReferenceSources.Add(defaultRef);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

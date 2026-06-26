@@ -33,7 +33,7 @@ namespace DuAnTotNghiep.ViewModels.Admin.Topics
         public int? LevelId { get; set; }
 
         [Required]
-        public string Difficulty { get; set; } = "BASIC";
+        public string Difficulty { get; set; } = "BEGINNER";
 
         public int? ParentTopicId { get; set; }
 
@@ -64,7 +64,7 @@ namespace DuAnTotNghiep.ViewModels.Admin.Topics
         public int? LevelId { get; set; }
 
         [Required]
-        public string Difficulty { get; set; } = "BASIC";
+        public string Difficulty { get; set; } = "BEGINNER";
 
         public int? ParentTopicId { get; set; }
 

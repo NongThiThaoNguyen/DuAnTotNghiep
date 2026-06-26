@@ -3,6 +3,7 @@ using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,15 +16,27 @@ namespace DuAnTotNghiep.Services
         private readonly IEnglishProficiencyLevelRepository _repository;
         private readonly IM4ValidationService _validationService;
         private readonly ILearningTopicRepository _topicRepository;
+        private readonly IAuditService _auditService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public EnglishProficiencyLevelService(
             IEnglishProficiencyLevelRepository repository, 
             IM4ValidationService validationService,
-            ILearningTopicRepository topicRepository)
+            ILearningTopicRepository topicRepository,
+            IAuditService auditService,
+            IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _validationService = validationService;
             _topicRepository = topicRepository;
+            _auditService = auditService;
+            _httpContextAccessor = httpContextAccessor;
+        }
+
+        private int? GetCurrentUserId()
+        {
+            var userIdStr = _httpContextAccessor.HttpContext?.User?.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdStr, out int userId) ? userId : null;
         }
 
         public async Task<List<LevelOptionDto>> GetOptionsAsync()
@@ -90,6 +103,8 @@ namespace DuAnTotNghiep.Services
 
             await _repository.AddAsync(level);
             await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Create Level", "EnglishProficiencyLevel", level.Id, null, level.Name);
         }
 
         public async Task UpdateAsync(UpdateLevelDto dto)
@@ -104,7 +119,6 @@ namespace DuAnTotNghiep.Services
             if (dto.OrderIndex < 0)
                 throw new InvalidOperationException("OrderIndex cannot be negative.");
 
-            // Check if level is used (e.g. Topics)
             var isUsed = await IsLevelUsedAsync(dto.Id);
 
             if (level.Code.ToLower() != dto.Code.ToLower())
@@ -118,6 +132,8 @@ namespace DuAnTotNghiep.Services
                 level.Code = dto.Code.Trim();
             }
 
+            var oldName = level.Name;
+
             level.Name = dto.Name.Trim();
             level.Description = dto.Description;
             level.OrderIndex = dto.OrderIndex;
@@ -126,6 +142,8 @@ namespace DuAnTotNghiep.Services
 
             _repository.Update(level);
             await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Update Level", "EnglishProficiencyLevel", level.Id, oldName, level.Name);
         }
 
         public async Task DeactivateAsync(int id)
@@ -134,9 +152,9 @@ namespace DuAnTotNghiep.Services
             if (level == null)
                 throw new InvalidOperationException("Level không tồn tại.");
 
-            if (await IsLevelUsedAsync(id))
+            if (await HasActiveTopicsAsync(id))
             {
-                throw new InvalidOperationException("Level đang được sử dụng (có Topic hoặc dữ liệu liên quan). Vui lòng xử lý dữ liệu liên quan trước.");
+                throw new InvalidOperationException("Không thể khóa Level này vì vẫn còn Topic đang hoạt động (Active). Vui lòng xử lý các Topic liên quan trước.");
             }
 
             level.IsActive = false;
@@ -144,19 +162,60 @@ namespace DuAnTotNghiep.Services
 
             _repository.Update(level);
             await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Deactivate Level", "EnglishProficiencyLevel", id, "True", "False");
         }
 
-        private async Task<bool> IsLevelUsedAsync(int levelId)
+        public async Task<bool> IsLevelUsedAsync(int levelId)
         {
             var topicsUsingLevel = await _topicRepository.GetByLevelAsync(levelId);
-            if (topicsUsingLevel.Any()) return true;
+            return topicsUsingLevel.Any();
+        }
 
-            // In a real scenario, we might also check LearningProfile (CurrentLevelId, TargetLevelId), etc.
-            // Assuming this repository doesn't have direct access to LearningProfile, we can inject ILearningProfileRepository 
-            // if needed, or handle it here via _topicRepository as a proxy if context is accessible.
-            // Since we don't want to violate dependencies, we'll keep it simple for M4.
-            
-            return false;
+        public async Task DeactivateLevelAsync(int id)
+        {
+            await DeactivateAsync(id);
+        }
+
+        public async Task ArchiveLevelAsync(int id)
+        {
+            var level = await _repository.GetByIdAsync(id);
+            if (level == null)
+                throw new InvalidOperationException("Level không tồn tại.");
+
+            if (await HasActiveTopicsAsync(id))
+            {
+                throw new InvalidOperationException("Không thể lưu trữ (Archive) Level này vì vẫn còn Topic đang hoạt động (Active). Vui lòng xử lý các Topic liên quan trước.");
+            }
+
+            level.IsActive = false;
+            level.UpdatedAt = DateTime.UtcNow;
+
+            _repository.Update(level);
+            await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Archive Level", "EnglishProficiencyLevel", id, "True", "False");
+        }
+
+        public async Task RestoreLevelAsync(int id)
+        {
+            var level = await _repository.GetByIdAsync(id);
+            if (level == null)
+                throw new InvalidOperationException("Level không tồn tại.");
+
+            level.IsActive = true;
+            level.UpdatedAt = DateTime.UtcNow;
+
+            _repository.Update(level);
+            await _repository.SaveChangesAsync();
+
+            await _auditService.LogAsync(GetCurrentUserId(), "Restore Level", "EnglishProficiencyLevel", id, "False", "True");
+        }
+
+        private async Task<bool> HasActiveTopicsAsync(int levelId)
+        {
+            var topics = await _topicRepository.GetByLevelAsync(levelId);
+            return topics.Any(t => t.Status == "Active" || t.Status == "ACTIVE");
         }
     }
 }

@@ -26,6 +26,9 @@ namespace DuAnTotNghiep.Repositories
         {
             return await _dbSet
                 .Include(t => t.TopicPrerequisites)
+                .Include(t => t.Skill)
+                .Include(t => t.Level)
+                .Include(t => t.ParentTopic)
                 .FirstOrDefaultAsync(t => t.Id == id);
         }
 
@@ -120,7 +123,21 @@ namespace DuAnTotNghiep.Repositories
             return await _context.LearningObjectives.AnyAsync(o => o.TopicId == topicId) ||
                    await _context.LearningPathNodes.AnyAsync(n => n.TopicId == topicId) ||
                    await _context.QuestionBanks.AnyAsync(q => q.TopicId == topicId) ||
-                   await _context.PracticeTasks.AnyAsync(p => p.TopicId == topicId);
+                   await _context.PracticeTasks.AnyAsync(p => p.TopicId == topicId) ||
+                   await _context.OriginalLessons.AnyAsync(l => l.TopicId == topicId) ||
+                   await _context.Quizzes.AnyAsync(q => q.TopicId == topicId);
         }
+
+        public async Task AddRangeAsync(IEnumerable<LearningTopic> entities)
+        {
+            await _dbSet.AddRangeAsync(entities);
+        }
+
+        public Task UpdateRangeAsync(IEnumerable<LearningTopic> entities)
+        {
+            _dbSet.UpdateRange(entities);
+            return Task.CompletedTask;
+        }
+
     }
 }

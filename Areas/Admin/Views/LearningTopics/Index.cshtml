@@ -36,8 +36,10 @@
                 <div class="col-md-2">
                     <select name="difficulty" class="form-select">
                         <option value="">-- Difficulty --</option>
-                        <option value="BASIC">BASIC</option>
-                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="BEGINNER">BEGINNER</option>
+                        <option value="ELEMENTARY">ELEMENTARY</option>
+                        <option value="INTERMEDIATE">INTERMEDIATE</option>
+                        <option value="UPPER_INTERMEDIATE">UPPER_INTERMEDIATE</option>
                         <option value="ADVANCED">ADVANCED</option>
                     </select>
                 </div>
@@ -61,6 +63,7 @@
         <div class="mb-3">
             <a asp-action="Create" class="btn btn-primary">Create New Topic</a>
             <a asp-action="Tree" class="btn btn-info">View Tree</a>
+            <a asp-action="ReferenceSources" class="btn btn-dark"><i class="fas fa-gavel"></i> Quản lý nguồn tham khảo</a>
         </div>
     }
 
@@ -97,14 +100,20 @@
                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
                             @if (item.Status != "Archived")
                             {
-                                <form asp-action="Archive" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Archive this topic?');">
+                                <form asp-action="Archive" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn lưu trữ (Archive) Topic này?');">
                                     <button type="submit" class="btn btn-sm btn-secondary">Archive</button>
                                 </form>
                             }
                             @if (item.Status == "Active")
                             {
-                                <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Deactivate this topic?');">
+                                <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn khóa (Deactivate) Topic này?');">
                                     <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
+                                </form>
+                            }
+                            @if (item.Status == "Archived" || item.Status == "Inactive")
+                            {
+                                <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-success">Restore</button>
                                 </form>
                             }
                         }

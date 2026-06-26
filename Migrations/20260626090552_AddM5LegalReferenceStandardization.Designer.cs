@@ -4,6 +4,7 @@ using DuAnTotNghiep.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DuAnTotNghiep.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260626090552_AddM5LegalReferenceStandardization")]
+    partial class AddM5LegalReferenceStandardization
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2373,9 +2376,7 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("updated_at");
 
                     b.Property<string>("UsagePolicy")
-                        .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("nvarchar(max)")
                         .HasColumnName("usage_policy");
 
                     b.HasKey("Id")
@@ -2391,7 +2392,7 @@ namespace DuAnTotNghiep.Migrations
 
                     b.ToTable("reference_sources", null, t =>
                         {
-                            t.HasCheckConstraint("CK_ref_source_type", "[source_type] IN ('OFFICIAL', 'OPEN_LICENSE', 'SELF_CREATED', 'TEACHER_CREATED', 'REFERENCE_ONLY')");
+                            t.HasCheckConstraint("CK_ref_source_type", "[source_type] IN ('OFFICIAL', 'REFERENCE_ONLY', 'OPEN_LICENSE', 'INTERNAL')");
 
                             t.HasCheckConstraint("CK_ref_status", "[status] IN ('DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED')");
 

@@ -12,5 +12,9 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task CreateAsync(CreateLevelDto dto);
         Task UpdateAsync(UpdateLevelDto dto);
         Task DeactivateAsync(int id);
+        Task<bool> IsLevelUsedAsync(int id);
+        Task DeactivateLevelAsync(int id);
+        Task ArchiveLevelAsync(int id);
+        Task RestoreLevelAsync(int id);
     }
 }

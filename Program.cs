@@ -55,6 +55,7 @@ builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionS
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
 builder.Services.AddScoped<ILearningTopicService, LearningTopicService>();
+builder.Services.AddScoped<ITopicImportService, TopicImportService>();
 builder.Services.AddScoped<ILearningObjectiveService, LearningObjectiveService>();
 builder.Services.AddScoped<IM4ValidationService, M4ValidationService>();
 builder.Services.AddScoped<IEnglishSkillService, EnglishSkillService>();
