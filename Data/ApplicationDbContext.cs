@@ -1761,6 +1761,10 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("student_progress_snapshots");
 
+            entity.HasIndex(e => new { e.StudentId, e.SnapshotDate }, "IX_sps_student_date");
+            entity.HasIndex(e => new { e.StudentId, e.SkillId }, "IX_sps_student_skill");
+            entity.HasIndex(e => new { e.StudentId, e.TopicId }, "IX_sps_student_topic");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AverageScore)
                 .HasColumnType("decimal(6, 2)")

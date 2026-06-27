@@ -35,6 +35,8 @@ builder.Services.AddScoped<ILearningTopicRepository, LearningTopicRepository>();
 builder.Services.AddScoped<IEnglishSkillRepository, EnglishSkillRepository>();
 builder.Services.AddScoped<IEnglishProficiencyLevelRepository, EnglishProficiencyLevelRepository>();
 builder.Services.AddScoped<ILearningObjectiveRepository, LearningObjectiveRepository>();
+builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
+builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -60,12 +62,15 @@ builder.Services.AddScoped<ILearningObjectiveService, LearningObjectiveService>(
 builder.Services.AddScoped<IM4ValidationService, M4ValidationService>();
 builder.Services.AddScoped<IEnglishSkillService, EnglishSkillService>();
 builder.Services.AddScoped<IEnglishProficiencyLevelService, EnglishProficiencyLevelService>();
+builder.Services.AddScoped<IStudentProgressService, StudentProgressService>();
+builder.Services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
 
 // Đăng ký M7 AI Analysis Services
 builder.Services.AddScoped<IPlacementTestAnalysisPayloadBuilder, PlacementTestAnalysisPayloadBuilder>();
 builder.Services.AddScoped<ICompetencyAnalysisService, CompetencyAnalysisService>();
 builder.Services.AddSingleton<DuAnTotNghiep.Services.Background.IAiAnalysisQueue, DuAnTotNghiep.Services.Background.AiAnalysisQueue>();
 builder.Services.AddHostedService<DuAnTotNghiep.Services.Background.AiAnalysisBackgroundService>();
+builder.Services.AddHostedService<DuAnTotNghiep.Services.ProgressSnapshotBackgroundService>();
 
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();

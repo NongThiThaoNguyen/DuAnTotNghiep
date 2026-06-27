@@ -1,0 +1,158 @@
+@model DuAnTotNghiep.ViewModels.Progress.TopicProgressViewModel
+@using DuAnTotNghiep.Models
+@using DuAnTotNghiep.Enums
+@{
+    ViewData["Title"] = $"Chi tiết chủ đề {Model.TopicName}";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var nodes = ViewBag.Nodes as List<LearningPathNode> ?? new List<LearningPathNode>();
+}
+
+<div class="space-y-6 animate-fade-in">
+    <!-- Header Block -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+            <span class="text-xs uppercase font-bold text-slate-400 tracking-widest">Kỹ năng: @Model.SkillName</span>
+            <h1 class="text-3xl font-bold tracking-tight text-slate-800">Chủ đề: @Model.TopicName</h1>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            <button onclick="requestReview(@Model.TopicId)" class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-sm font-semibold rounded-xl text-white shadow-2xs transition-colors">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4"></path>
+                </svg>
+                Yêu cầu ôn tập
+            </button>
+            
+            <a asp-action="Index" asp-controller="Progress" asp-area="Student" asp-route-studentId="@ViewBag.TargetStudentId" class="inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 shadow-2xs transition-colors">
+                Quay lại Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Alert for weak topics -->
+    @if (Model.IsWeakArea)
+    {
+        <div class="flex gap-4 bg-rose-50 border border-rose-200 rounded-2xl p-5 text-rose-800 animate-pulse">
+            <svg class="w-6 h-6 text-rose-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+            </svg>
+            <div class="space-y-1">
+                <strong class="font-bold text-sm block">Chủ đề cần cải thiện!</strong>
+                <span class="text-xs">Chủ đề này đang được đánh giá là yếu do điểm trung bình thấp hoặc có bài kiểm tra chưa đạt yêu cầu. Bạn nên xem kỹ lại kiến thức và thực hành nhiều hơn.</span>
+            </div>
+        </div>
+    }
+
+    <!-- Metrics Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-2">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tiến độ chủ đề</span>
+            <h3 class="text-3xl font-extrabold text-indigo-600">@Model.ProgressPercent%</h3>
+            <div class="w-full bg-slate-100 rounded-full h-2 mt-2">
+                <div class="bg-indigo-600 h-2 rounded-full" style="width: @Model.ProgressPercent%"></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-2">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Điểm trung bình (GPA)</span>
+            <h3 class="text-3xl font-extrabold text-slate-800">
+                @(Model.AverageScore.HasValue ? $"{Model.AverageScore.Value}/10" : "Chưa có điểm")
+            </h3>
+            <p class="text-xs text-slate-500">Điểm số trung bình các bài Quiz kiểm tra trong chủ đề này.</p>
+        </div>
+    </div>
+
+    <!-- Collapsible Tasks list -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="font-bold text-slate-800">Danh sách bài học & Bài thi</h3>
+            <p class="text-xs text-slate-500 mt-1">Các bài học con cấu thành nên chủ đề @Model.TopicName</p>
+        </div>
+
+        @if (nodes.Any())
+        {
+            <div class="divide-y divide-slate-100">
+                @foreach (var node in nodes)
+                {
+                    var statusColor = node.Status == ProgressStatus.Completed ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                                      node.Status == ProgressStatus.NeedReview ? "bg-rose-50 text-rose-700 border-rose-200" :
+                                      node.Status == ProgressStatus.Available ? "bg-blue-50 text-blue-700 border-blue-200" :
+                                      "bg-slate-50 text-slate-400 border-slate-200";
+
+                    <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/30 transition-colors">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-bold border @statusColor">
+                                    @node.Status
+                                </span>
+                                <span class="text-xs text-slate-400">Node #@node.OrderIndex</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base">@node.NodeTitle</h4>
+                            <p class="text-xs text-slate-500">
+                                @if (node.LessonId.HasValue)
+                                {
+                                    <span>Loại: <strong>Bài học lý thuyết</strong> (Lesson: @node.Lesson?.Title)</span>
+                                }
+                                @if (node.QuizId.HasValue)
+                                {
+                                    <span class="text-indigo-600">Loại: <strong>Bài thi/Quiz</strong> (Quiz: @node.Quiz?.Title)</span>
+                                }
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            @if (node.Status == ProgressStatus.Completed && node.CompletedAt.HasValue)
+                            {
+                                <span class="text-xs text-slate-400">Hoàn thành: @node.CompletedAt.Value.ToString("dd/MM/yyyy")</span>
+                            }
+                            else if (node.Status == ProgressStatus.Available)
+                            {
+                                <span class="text-xs text-blue-600 font-semibold">Sẵn sàng học ngay</span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-12 text-slate-400 text-sm">
+                Chưa có nội dung chi tiết cho chủ đề này.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function requestReview(topicId) {
+            if (confirm("Bạn có muốn ghi nhận yêu cầu ôn tập cho chủ đề này không?")) {
+                fetch('/Student/Progress/Record', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ActivityType: 'REVIEW',
+                        TopicId: topicId,
+                        DurationMinutes: 15,
+                        Metadata: 'topic_detail_request'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Đăng ký ôn tập chủ đề thành công!");
+                        location.reload();
+                    } else {
+                        alert("Có lỗi xảy ra: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Không thể kết nối đến server.");
+                });
+            }
+        }
+    </script>
+}

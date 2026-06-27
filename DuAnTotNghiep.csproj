@@ -24,4 +24,10 @@
     <Exec Command="npx tailwindcss -i ./Styles/site.css -o ./wwwroot/css/site.css" ContinueOnError="WarnAndContinue" />
   </Target>
 
+  <ItemGroup>
+    <Compile Remove="Tests\**" />
+    <Content Remove="Tests\**" />
+    <None Remove="Tests\**" />
+  </ItemGroup>
+
 </Project>

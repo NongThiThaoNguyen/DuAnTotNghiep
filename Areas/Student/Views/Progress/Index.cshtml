@@ -1,0 +1,355 @@
+@model DuAnTotNghiep.ViewModels.Progress.ProgressDashboardViewModel
+@{
+    ViewData["Title"] = "Tiến độ học tập";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+
+    // Tính tổng số Node để biết tiến độ chung của lộ trình
+    int totalPathNodes = Model.SkillProgresses.Sum(s => s.TotalNodes);
+    int completedPathNodes = Model.SkillProgresses.Sum(s => s.CompletedNodes);
+    double overallPercent = totalPathNodes > 0 ? Math.Round((double)completedPathNodes * 100.0 / totalPathNodes, 1) : 0.0;
+}
+
+<div class="space-y-8 animate-fade-in">
+    <!-- Header & Welcome Banner -->
+    <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl">
+        <!-- Decorative subtle lights -->
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl"></div>
+        <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div class="space-y-3">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/30 text-indigo-200 border border-indigo-500/30 backdrop-blur-xs">
+                    Báo cáo học tập cá nhân
+                </span>
+                <h1 class="text-3xl font-bold tracking-tight">Chào mừng trở lại, @User.Identity?.Name!</h1>
+                <p class="text-slate-300 max-w-xl">Hệ thống ghi nhận bạn đang có tiến trình học tập rất tốt. Hãy duy trì thói quen học hàng ngày để củng cố phản xạ ngôn ngữ nhé!</p>
+            </div>
+            
+            <!-- Overall Progress Widget -->
+            <div class="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 shrink-0 w-full md:w-80 space-y-4">
+                <div class="flex items-center justify-between text-sm">
+                    <span class="font-medium text-slate-200">Tiến độ lộ trình học tập</span>
+                    <span class="font-bold text-white text-base">@overallPercent%</span>
+                </div>
+                <div class="w-full bg-white/20 rounded-full h-2.5">
+                    <div class="bg-gradient-to-r from-blue-400 to-indigo-400 h-2.5 rounded-full shadow-xs transition-all duration-500" style="width: @overallPercent%"></div>
+                </div>
+                <div class="flex items-center justify-between text-xs text-slate-300">
+                    <span>Đã hoàn thành: <strong>@completedPathNodes</strong> node</span>
+                    <span>Tổng số: <strong>@totalPathNodes</strong> node</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-4 gap-6">
+        <!-- Streak Card -->
+        <div class="group relative overflow-hidden bg-white/95 rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
+            <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-orange-50 group-hover:bg-orange-100 flex items-center justify-center transition-colors">
+                <svg class="w-7 h-7 text-orange-500 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Chuỗi ngày học (Streak)</p>
+            <h3 class="text-3xl font-extrabold text-slate-800 mt-2">@Model.StreakDays <span class="text-lg font-medium text-slate-500">ngày</span></h3>
+            <p class="text-xs text-slate-500 mt-2">
+                @if (Model.StreakDays > 0)
+                {
+                    <span class="text-emerald-600 font-medium">🔥 Chuỗi học tích cực đang duy trì tốt!</span>
+                }
+                else
+                {
+                    <span>Hãy học 1 bài hôm nay để tạo chuỗi học liên tục!</span>
+                }
+            </p>
+        </div>
+
+        <!-- Completed Lessons Card -->
+        <div class="group relative overflow-hidden bg-white/95 rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
+            <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-blue-50 group-hover:bg-blue-100 flex items-center justify-center transition-colors">
+                <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+            </div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Bài học hoàn thành</p>
+            <h3 class="text-3xl font-extrabold text-slate-800 mt-2">@Model.CompletedLessonsCount <span class="text-lg font-medium text-slate-500">bài</span></h3>
+            <p class="text-xs text-slate-500 mt-2">Đã tích lũy bài học lý thuyết.</p>
+        </div>
+
+        <!-- Completed Quizzes Card -->
+        <div class="group relative overflow-hidden bg-white/95 rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
+            <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center transition-colors">
+                <svg class="w-7 h-7 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Quiz vượt qua</p>
+            <h3 class="text-3xl font-extrabold text-slate-800 mt-2">@Model.CompletedQuizzesCount <span class="text-lg font-medium text-slate-500">bài</span></h3>
+            <p class="text-xs text-slate-500 mt-2">Tổng số bài kiểm tra đạt yêu cầu.</p>
+        </div>
+
+        <!-- Total Study Time Card -->
+        <div class="group relative overflow-hidden bg-white/95 rounded-2xl border border-slate-200 p-6 shadow-xs hover:shadow-md transition-all duration-300 hover:scale-[1.02]">
+            <div class="absolute right-4 top-4 w-12 h-12 rounded-xl bg-purple-50 group-hover:bg-purple-100 flex items-center justify-center transition-colors">
+                <svg class="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+            </div>
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Thời gian tích lũy</p>
+            <h3 class="text-3xl font-extrabold text-slate-800 mt-2">@Model.TotalStudyMinutes <span class="text-lg font-medium text-slate-500">phút</span></h3>
+            <p class="text-xs text-slate-500 mt-2">
+                Tương đương khoảng <strong class="text-slate-700">@Math.Round((double)Model.TotalStudyMinutes / 60.0, 1) giờ</strong>.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Content Area: Skills & Focus Area -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Progress by Skill (Left & Center columns) -->
+        <div class="lg:col-span-2 space-y-6">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">Hiệu suất theo kỹ năng</h2>
+                <p class="text-xs text-slate-500">Bấm chọn từng kỹ năng để xem chi tiết lộ trình học tập và bài học đã học</p>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                @foreach (var skill in Model.SkillProgresses)
+                {
+                    <a asp-action="SkillDetail" asp-controller="Progress" asp-area="Student" asp-route-skillId="@skill.SkillId" asp-route-studentId="@ViewBag.TargetStudentId" class="block bg-white rounded-2xl border border-slate-200 p-5 shadow-2xs space-y-4 hover:border-indigo-500 hover:shadow-md transition-all hover:scale-[1.01]">
+                        <div class="flex items-center justify-between">
+                            <div class="space-y-1">
+                                <h3 class="font-bold text-slate-800 text-base group-hover:text-indigo-600">@skill.SkillName</h3>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Kỹ năng: @skill.SkillCode</span>
+                            </div>
+                            
+                            <!-- Average score badge -->
+                            <div>
+                                @if (skill.AverageScore.HasValue)
+                                {
+                                    var score = skill.AverageScore.Value;
+                                    var badgeColor = score >= 8.0m ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                                                     score >= 5.0m ? "bg-amber-50 text-amber-700 border-amber-200" :
+                                                     "bg-rose-50 text-rose-700 border-rose-200";
+
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold border @badgeColor">
+                                        GPA: @score/10
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-400 border border-slate-200">
+                                        Chưa có điểm
+                                    </span>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Skill Progress Bar -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs text-slate-500">
+                                <span>Tiến độ hoàn thành</span>
+                                <span class="font-bold text-slate-700">@skill.ProgressPercent%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2">
+                                <div class="bg-blue-600 h-2 rounded-full transition-all duration-500" style="width: @skill.ProgressPercent%"></div>
+                            </div>
+                            <div class="flex justify-between text-[11px] text-slate-400">
+                                <span>Đã học: <strong>@skill.CompletedNodes</strong> bài</span>
+                                <span>Yêu cầu: <strong>@skill.TotalNodes</strong> bài</span>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+
+        <!-- Right Column: Weak Topics & Improved Topics -->
+        <div class="space-y-6">
+            <!-- Weak Topics Section -->
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">Chủ đề cần cải thiện</h2>
+                <p class="text-xs text-slate-500">Danh sách cần học sinh tập trung củng cố lại</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-6">
+                @if (Model.WeakTopics.Any())
+                {
+                    <div class="flex gap-3 bg-amber-50 border border-amber-200 rounded-xl p-4 text-amber-800 text-xs leading-relaxed">
+                        <svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                        <div>
+                            <strong class="font-bold block mb-1">Hãy củng cố kiến thức!</strong>
+                            Bấm chọn tên chủ đề để xem chi tiết hoặc bấm nút ôn tập nhanh bên phải để ôn tập tức thì.
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        @foreach (var topic in Model.WeakTopics)
+                        {
+                            <div class="border-b border-slate-100 pb-3 last:border-0 last:pb-0 flex items-center justify-between">
+                                <div class="space-y-1">
+                                    <span class="inline-block px-2 py-0.5 rounded-sm text-[10px] font-medium bg-slate-100 text-slate-600">@topic.SkillName</span>
+                                    <a asp-action="TopicDetail" asp-controller="Progress" asp-area="Student" asp-route-topicId="@topic.TopicId" asp-route-studentId="@ViewBag.TargetStudentId" class="font-bold text-slate-700 hover:text-indigo-600 text-sm block">@topic.TopicName</a>
+                                </div>
+                                <div class="flex items-center gap-3 text-right">
+                                    <div>
+                                        <span class="text-xs text-rose-500 font-bold block">
+                                            @(topic.AverageScore.HasValue ? $"{topic.AverageScore.Value}/10" : "Cần ôn tập")
+                                        </span>
+                                        <span class="text-[10px] text-slate-400">Tiến độ: @topic.ProgressPercent%</span>
+                                    </div>
+                                    <button onclick="requestReview(@topic.TopicId)" class="inline-flex items-center justify-center p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-600 transition-colors" title="Ôn tập chủ đề này">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89M9 11l3 3L22 4"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-8 space-y-3">
+                        <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center mx-auto">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <h4 class="font-bold text-slate-800">Tuyệt vời!</h4>
+                        <p class="text-xs text-slate-500 px-4">Bạn không có chủ đề yếu nào tại thời điểm này.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Improved Topics Section -->
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">Chủ đề đã cải thiện</h2>
+                <p class="text-xs text-slate-500">Các chủ đề đã có tiến bộ vượt bậc gần đây</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-6">
+                @if (Model.ImprovedTopics.Any())
+                {
+                    <div class="space-y-4">
+                        @foreach (var topic in Model.ImprovedTopics)
+                        {
+                            <div class="border-b border-slate-100 pb-3 last:border-0 last:pb-0 flex items-center justify-between">
+                                <div class="space-y-1">
+                                    <span class="inline-block px-2 py-0.5 rounded-sm text-[10px] font-semibold bg-emerald-50 text-emerald-700">@topic.SkillName</span>
+                                    <a asp-action="TopicDetail" asp-controller="Progress" asp-area="Student" asp-route-topicId="@topic.TopicId" asp-route-studentId="@ViewBag.TargetStudentId" class="font-bold text-slate-700 hover:text-emerald-600 text-sm block">@topic.TopicName</a>
+                                </div>
+                                <div class="text-right">
+                                    <span class="text-xs text-emerald-600 font-bold block">
+                                        GPA: @(topic.AverageScore.HasValue ? $"{topic.AverageScore.Value}/10" : "-")
+                                    </span>
+                                    <span class="text-[10px] text-slate-400">Tiến độ: @topic.ProgressPercent%</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-6 text-slate-400 text-xs">
+                        Chưa ghi nhận sự cải thiện rõ rệt trong 7 ngày qua. Hãy kiên trì học tiếp nhé!
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities Timeline -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800">Lịch sử hoạt động gần đây</h2>
+                <p class="text-xs text-slate-500">Các hoạt động học tập mới nhất được hệ thống ghi nhận</p>
+            </div>
+            
+            <a asp-action="History" asp-controller="Progress" asp-area="Student" asp-route-studentId="@ViewBag.TargetStudentId" class="inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 shadow-2xs transition-colors">
+                Xem toàn bộ lịch sử
+            </a>
+        </div>
+
+        @if (Model.RecentActivities.Any())
+        {
+            <div class="space-y-6 relative before:absolute before:inset-y-1 before:left-3.5 before:w-0.5 before:bg-slate-100">
+                @foreach (var item in Model.RecentActivities)
+                {
+                    var iconColor = item.ActivityType == "LEARN" ? "bg-blue-100 text-blue-600" :
+                                    item.ActivityType == "QUIZ" ? "bg-emerald-100 text-emerald-600" :
+                                    item.ActivityType == "PRACTICE" ? "bg-purple-100 text-purple-600" :
+                                    item.ActivityType == "CHAT" ? "bg-amber-100 text-amber-600" :
+                                    "bg-slate-100 text-slate-600";
+
+                    <div class="flex gap-4 relative z-10 items-start">
+                        <div class="w-8 h-8 rounded-full shrink-0 flex items-center justify-center font-bold text-xs @iconColor shadow-2xs">
+                            @item.ActivityType.Substring(0, 1)
+                        </div>
+                        <div class="flex-1 space-y-1">
+                            <div class="flex items-center justify-between gap-2">
+                                <h4 class="font-bold text-slate-800 text-sm">@item.Title</h4>
+                                <span class="text-xs text-slate-400 shrink-0">@item.ActivityDate.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            <div class="flex items-center gap-4 text-xs text-slate-500">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-sm bg-slate-100 text-[10px] font-bold text-slate-500 uppercase tracking-wider">@item.ActivityType</span>
+                                @if (item.DurationMinutes.HasValue)
+                                {
+                                    <span>Thời gian: <strong>@item.DurationMinutes.Value phút</strong></span>
+                                }
+                                @if (item.Score.HasValue)
+                                {
+                                    <span class="text-indigo-600">Điểm số: <strong>@item.Score.Value/10</strong></span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-12 text-slate-400 text-sm">
+                Không tìm thấy dữ liệu hoạt động gần đây.
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function requestReview(topicId) {
+            if (confirm("Bạn có muốn ghi nhận yêu cầu ôn tập cho chủ đề này không?")) {
+                fetch('/Student/Progress/Record', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ActivityType: 'REVIEW',
+                        TopicId: topicId,
+                        DurationMinutes: 15,
+                        Metadata: 'dashboard_request'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("Đã gửi yêu cầu ôn tập thành công!");
+                        location.reload();
+                    } else {
+                        alert("Có lỗi xảy ra: " + data.message);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert("Không thể kết nối đến server.");
+                });
+            }
+        }
+    </script>
+}
