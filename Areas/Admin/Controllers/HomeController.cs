@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
+using DuAnTotNghiep.Services.Interfaces;
 
 namespace DuAnTotNghiep.Areas.Admin.Controllers
 {
@@ -7,10 +9,17 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
     [Authorize(Roles = "ADMIN")]
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly IDashboardService _dashboardService;
+
+        public HomeController(IDashboardService dashboardService)
         {
-            // Trỏ thẳng về trang Quản lý User vì Admin hiện tại chỉ có chức năng này
-            return RedirectToAction("Index", "User", new { area = "Admin" });
+            _dashboardService = dashboardService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var viewModel = await _dashboardService.GetDashboardDataAsync();
+            return View(viewModel);
         }
     }
 }

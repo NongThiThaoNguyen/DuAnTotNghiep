@@ -8,6 +8,21 @@ public class HomeController : Controller
 {
     public IActionResult Index()
     {
+        if (User.Identity != null && User.Identity.IsAuthenticated)
+        {
+            if (User.IsInRole("STUDENT"))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Student" });
+            }
+            else if (User.IsInRole("ADMIN"))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Admin" });
+            }
+            else if (User.IsInRole("TEACHER"))
+            {
+                return RedirectToAction("Index", "Home", new { area = "Teacher" });
+            }
+        }
         return View();
     }
 

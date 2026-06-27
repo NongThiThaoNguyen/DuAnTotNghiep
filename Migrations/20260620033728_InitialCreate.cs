@@ -11,7 +11,6 @@ namespace DuAnTotNghiep.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            /*
             migrationBuilder.CreateTable(
                 name: "english_proficiency_levels",
                 columns: table => new
@@ -2130,13 +2129,11 @@ namespace DuAnTotNghiep.Migrations
                 table: "users",
                 column: "email",
                 unique: true);
-            */
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            /*
             migrationBuilder.DropTable(
                 name: "ai_feedbacks");
 
@@ -2286,7 +2283,6 @@ namespace DuAnTotNghiep.Migrations
 
             migrationBuilder.DropTable(
                 name: "roles");
-            */
         }
     }
 }

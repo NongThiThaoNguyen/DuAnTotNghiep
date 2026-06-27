@@ -117,7 +117,7 @@ namespace DuAnTotNghiep.Controllers
 
             // Điều hướng theo Role
             string roleCode = user.Role.RoleCode.ToUpper().Trim();
-            return roleCode switch
+             return roleCode switch
             {
                 "ADMIN" => RedirectToAction("Index", "Home", new { area = "Admin" }),
                 "TEACHER" => RedirectToAction("Index", "Home", new { area = "Teacher" }),

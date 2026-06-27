@@ -64,6 +64,7 @@ builder.Services.AddScoped<IEnglishSkillService, EnglishSkillService>();
 builder.Services.AddScoped<IEnglishProficiencyLevelService, EnglishProficiencyLevelService>();
 builder.Services.AddScoped<IStudentProgressService, StudentProgressService>();
 builder.Services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 // Đăng ký M7 AI Analysis Services
 builder.Services.AddScoped<IPlacementTestAnalysisPayloadBuilder, PlacementTestAnalysisPayloadBuilder>();
