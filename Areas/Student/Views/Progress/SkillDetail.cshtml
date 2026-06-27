@@ -1,0 +1,114 @@
+@model DuAnTotNghiep.ViewModels.Progress.SkillProgressViewModel
+@using DuAnTotNghiep.Models
+@using DuAnTotNghiep.Enums
+@{
+    ViewData["Title"] = $"Chi tiết kỹ năng {Model.SkillName}";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var nodes = ViewBag.Nodes as List<LearningPathNode> ?? new List<LearningPathNode>();
+}
+
+<div class="space-y-6 animate-fade-in">
+    <!-- Header Block -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="space-y-1">
+            <span class="text-xs uppercase font-bold text-slate-400 tracking-widest">Chi tiết kỹ năng</span>
+            <h1 class="text-3xl font-bold tracking-tight text-slate-800">@Model.SkillName (@Model.SkillCode)</h1>
+        </div>
+        
+        <a asp-action="Index" asp-controller="Progress" asp-area="Student" asp-route-studentId="@ViewBag.TargetStudentId" class="inline-flex items-center justify-center px-4 py-2 border border-slate-300 text-sm font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 shadow-2xs transition-colors">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Quay lại Dashboard
+        </a>
+    </div>
+
+    <!-- Metrics row -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-2">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tiến độ hoàn thành</span>
+            <h3 class="text-3xl font-extrabold text-indigo-600">@Model.ProgressPercent%</h3>
+            <div class="w-full bg-slate-100 rounded-full h-2 mt-2">
+                <div class="bg-indigo-600 h-2 rounded-full" style="width: @Model.ProgressPercent%"></div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-2">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Điểm trung bình (GPA)</span>
+            <h3 class="text-3xl font-extrabold text-slate-800">
+                @(Model.AverageScore.HasValue ? $"{Model.AverageScore.Value}/10" : "Chưa có")
+            </h3>
+            <p class="text-xs text-slate-500">Tính trên tất cả các bài Quiz kỹ năng.</p>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-2xs space-y-2">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tổng số bài học đã hoàn thành</span>
+            <h3 class="text-3xl font-extrabold text-slate-800">@Model.CompletedNodes / @Model.TotalNodes</h3>
+            <p class="text-xs text-slate-500">Node hoàn thành trong lộ trình hoạt động.</p>
+        </div>
+    </div>
+
+    <!-- Nodes list -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xs overflow-hidden">
+        <div class="p-6 border-b border-slate-100">
+            <h3 class="font-bold text-slate-800">Lộ trình học tập chi tiết của kỹ năng</h3>
+            <p class="text-xs text-slate-500 mt-1">Các bài học và bài kiểm tra thuộc lộ trình đang kích hoạt</p>
+        </div>
+
+        @if (nodes.Any())
+        {
+            <div class="divide-y divide-slate-100">
+                @foreach (var node in nodes)
+                {
+                    var statusColor = node.Status == ProgressStatus.Completed ? "bg-emerald-50 text-emerald-700 border-emerald-200" :
+                                      node.Status == ProgressStatus.NeedReview ? "bg-rose-50 text-rose-700 border-rose-200" :
+                                      node.Status == ProgressStatus.Available ? "bg-blue-50 text-blue-700 border-blue-200" :
+                                      "bg-slate-50 text-slate-400 border-slate-200";
+
+                    <div class="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/30 transition-colors">
+                        <div class="space-y-1">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-bold border @statusColor">
+                                    @node.Status
+                                </span>
+                                <span class="text-xs text-slate-400">Node #@node.OrderIndex</span>
+                            </div>
+                            <h4 class="font-bold text-slate-800 text-base">@node.NodeTitle</h4>
+                            <p class="text-xs text-slate-500">
+                                Chủ đề: <strong>@(node.Topic?.Title ?? "Chung")</strong>
+                                @if (node.LessonId.HasValue)
+                                {
+                                    <span class="ml-2 px-1.5 py-0.5 rounded-xs bg-slate-100 text-[10px] font-medium text-slate-600">Bài học: @node.Lesson?.Title</span>
+                                }
+                                @if (node.QuizId.HasValue)
+                                {
+                                    <span class="ml-2 px-1.5 py-0.5 rounded-xs bg-indigo-50 text-[10px] font-medium text-indigo-600">Bài thi: @node.Quiz?.Title</span>
+                                }
+                            </p>
+                        </div>
+                        
+                        <div class="flex items-center gap-4">
+                            @if (node.Status == ProgressStatus.Completed && node.CompletedAt.HasValue)
+                            {
+                                <span class="text-xs text-slate-400">Hoàn thành: @node.CompletedAt.Value.ToString("dd/MM/yyyy")</span>
+                            }
+                            else if (node.Status == ProgressStatus.Available)
+                            {
+                                <span class="text-xs text-blue-600 font-semibold flex items-center gap-1">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-ping"></span>
+                                    Sẵn sàng học
+                                </span>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-12 text-slate-400 text-sm">
+                Không tìm thấy bài học nào thuộc kỹ năng này trong lộ trình hiện tại.
+            </div>
+        }
+    </div>
+</div>
