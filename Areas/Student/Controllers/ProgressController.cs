@@ -9,6 +9,7 @@ using DuAnTotNghiep.ViewModels.Progress;
 using DuAnTotNghiep.Enums;
 using DuAnTotNghiep.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DuAnTotNghiep.Areas.Student.Controllers
 {
@@ -20,17 +21,30 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         private readonly IProgressTrackingService _progressTrackingService;
         private readonly IProgressRepository _progressRepo;
         private readonly ApplicationDbContext _context;
+        private readonly IPathViewService? _pathViewService;
 
         public ProgressController(
             IStudentProgressService studentProgressService,
             IProgressTrackingService progressTrackingService,
             IProgressRepository progressRepo,
             ApplicationDbContext context)
+            : this(studentProgressService, progressTrackingService, progressRepo, context, null)
+        {
+        }
+
+        [ActivatorUtilitiesConstructor]
+        public ProgressController(
+            IStudentProgressService studentProgressService,
+            IProgressTrackingService progressTrackingService,
+            IProgressRepository progressRepo,
+            ApplicationDbContext context,
+            IPathViewService? pathViewService)
         {
             _studentProgressService = studentProgressService;
             _progressTrackingService = progressTrackingService;
             _progressRepo = progressRepo;
             _context = context;
+            _pathViewService = pathViewService;
         }
 
         private int GetUserId()
@@ -96,8 +110,24 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             {
                 bool handled = false;
 
-                // Tích hợp và gọi các nghiệp vụ đặc thù của ProgressTrackingService
-                if (dto.ActivityType.Equals(ActivityType.Learn, System.StringComparison.OrdinalIgnoreCase) && dto.LearningPathNodeId.HasValue)
+                if (_pathViewService != null && dto.LearningPathNodeId.HasValue && IsPathCompletionActivity(dto))
+                {
+                    handled = await _pathViewService.MarkNodeCompletedAsync(
+                        dto.LearningPathNodeId.Value,
+                        studentId,
+                        dto.ActivityType,
+                        dto.DurationMinutes,
+                        dto.Score,
+                        dto.Metadata);
+
+                    if (!handled)
+                    {
+                        return BadRequest(new { success = false, message = "Không thể cập nhật node lộ trình." });
+                    }
+
+                    await _studentProgressService.UpdateProgressSnapshotsAsync(studentId);
+                }
+                else if (dto.ActivityType.Equals(ActivityType.Learn, System.StringComparison.OrdinalIgnoreCase) && dto.LearningPathNodeId.HasValue)
                 {
                     var node = await _context.LearningPathNodes.FindAsync(dto.LearningPathNodeId.Value);
                     if (node != null && node.LessonId.HasValue)
@@ -143,18 +173,26 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                     handled = true;
                 }
 
-                // Nếu hoạt động không đi kèm Node lộ trình hoặc thuộc dạng chung, ghi nhận qua cơ chế cơ bản
-                if (!handled)
-                {
-                    await _studentProgressService.RecordActivityAsync(dto, studentId);
-                }
-
                 return Ok(new { success = true });
             }
             catch (System.Exception ex)
             {
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
+        }
+
+        private static bool IsPathCompletionActivity(ActivityLogCreateDto dto)
+        {
+            if (dto.ActivityType.Equals(ActivityType.Quiz, System.StringComparison.OrdinalIgnoreCase) &&
+                dto.Score.HasValue &&
+                dto.Score.Value < 5.0m)
+            {
+                return false;
+            }
+
+            return dto.ActivityType.Equals(ActivityType.Learn, System.StringComparison.OrdinalIgnoreCase) ||
+                   dto.ActivityType.Equals(ActivityType.Quiz, System.StringComparison.OrdinalIgnoreCase) ||
+                   dto.ActivityType.Equals(ActivityType.Practice, System.StringComparison.OrdinalIgnoreCase);
         }
 
         [HttpGet]

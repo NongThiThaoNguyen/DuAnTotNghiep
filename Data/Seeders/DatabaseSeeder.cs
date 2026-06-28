@@ -45,6 +45,7 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedPlacementTestDemoAsync();
             await SeedDemoProfilesAsync();
             await SeedTopicsAndObjectivesAsync();
+            await SeedLearningPathDemoAsync();
             await SeedReferenceSourcesAsync();
         }
 
@@ -758,6 +759,141 @@ namespace DuAnTotNghiep.Data.Seeders
                 _context.ReferenceSources.Add(defaultRef);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task SeedLearningPathDemoAsync()
+        {
+            var student = await _userRepository.GetByEmailAsync("student1@aistudyenglish.com");
+            if (student == null)
+            {
+                return;
+            }
+
+            var topics = await _context.LearningTopics
+                .Where(t => t.Status == "ACTIVE")
+                .OrderBy(t => t.OrderIndex)
+                .ThenBy(t => t.Id)
+                .Take(10)
+                .ToListAsync();
+
+            if (topics.Count == 0)
+            {
+                return;
+            }
+
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var now = DateTime.UtcNow;
+
+            var hasCompletedPlacement = await _context.TestAttempts.AnyAsync(a =>
+                a.StudentId == student.Id &&
+                (a.Status == TestAttemptStatus.Submitted || a.Status == TestAttemptStatus.Graded));
+
+            if (!hasCompletedPlacement)
+            {
+                var placementTest = await _context.PlacementTests
+                    .Where(t => t.Status == PlacementTestStatus.Published)
+                    .OrderBy(t => t.Id)
+                    .FirstOrDefaultAsync();
+                var estimatedLevel = await _context.EnglishProficiencyLevels
+                    .Where(l => l.IsActive)
+                    .OrderBy(l => l.OrderIndex)
+                    .ThenBy(l => l.Id)
+                    .FirstOrDefaultAsync();
+
+                if (placementTest != null)
+                {
+                    _context.TestAttempts.Add(new TestAttempt
+                    {
+                        PlacementTestId = placementTest.Id,
+                        StudentId = student.Id,
+                        StartedAt = now.AddDays(-3),
+                        SubmittedAt = now.AddDays(-3).AddMinutes(30),
+                        TotalScore = 72m,
+                        EstimatedLevelId = estimatedLevel?.Id,
+                        Status = TestAttemptStatus.Graded
+                    });
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            var existingPath = await _context.StudentLearningPaths
+                .Include(p => p.LearningPathNodes)
+                .FirstOrDefaultAsync(p => p.StudentId == student.Id && p.Title == "M9 Demo Learning Path");
+            if (existingPath != null)
+            {
+                var availableNode = existingPath.LearningPathNodes
+                    .OrderBy(n => n.OrderIndex)
+                    .FirstOrDefault(n => n.Status == ProgressStatus.Available);
+
+                if (availableNode != null)
+                {
+                    availableNode.TopicId ??= topics[0].Id;
+                    availableNode.LessonId = null;
+                    availableNode.QuizId = null;
+                    availableNode.PracticeTaskId = null;
+                    availableNode.NodeTitle = "Topic: Daily routines";
+                    availableNode.NodeType = NodeType.Topic;
+                    availableNode.PathPhase = "Foundation";
+                    existingPath.UpdatedAt = now;
+                    await _context.SaveChangesAsync();
+                }
+
+                return;
+            }
+
+            var path = new StudentLearningPath
+            {
+                StudentId = student.Id,
+                Title = "M9 Demo Learning Path",
+                Description = "Duolingo-style demo path for the M9 learning path UI.",
+                StartDate = today.AddDays(-2),
+                TargetEndDate = today.AddDays(21),
+                AiPlanSummary = "Start with grammar foundations, check understanding, then rotate review and practice.",
+                Status = "ACTIVE",
+                GeneratedByAi = true,
+                CreatedAt = now,
+                UpdatedAt = now
+            };
+
+            _context.StudentLearningPaths.Add(path);
+            await _context.SaveChangesAsync();
+
+            var nodeSpecs = new[]
+            {
+                ("Grammar warm-up", NodeType.Topic, ProgressStatus.Completed, "Foundation", -2, 12),
+                ("Lesson: Present Simple", NodeType.Lesson, ProgressStatus.Completed, "Foundation", -1, 18),
+                ("Topic: Daily routines", NodeType.Topic, ProgressStatus.Available, "Foundation", 0, 12),
+                ("Practice: Habit sentences", NodeType.Practice, ProgressStatus.InProgress, "Practice", 0, 20),
+                ("Review weak patterns", NodeType.Review, ProgressStatus.NeedReview, "Practice", 1, 15),
+                ("AI Tutor check-in", NodeType.AiTutor, ProgressStatus.Locked, "Guided AI", 2, 10),
+                ("Topic: Family vocabulary", NodeType.Topic, ProgressStatus.Locked, "Vocabulary", 3, 16),
+                ("Lesson: School words", NodeType.Lesson, ProgressStatus.Locked, "Vocabulary", 4, 18),
+                ("Quiz: Travel basics", NodeType.Quiz, ProgressStatus.Locked, "Checkpoint", 5, 12),
+                ("Final review", NodeType.Review, ProgressStatus.Locked, "Checkpoint", 6, 20)
+            };
+
+            var nodes = nodeSpecs.Select((spec, index) =>
+            {
+                var topic = topics[index % topics.Count];
+                return new LearningPathNode
+                {
+                    LearningPathId = path.Id,
+                    TopicId = topic.Id,
+                    NodeTitle = spec.Item1,
+                    NodeDescription = topic.Description,
+                    NodeType = spec.Item2,
+                    PathPhase = spec.Item4,
+                    ScheduledDate = today.AddDays(spec.Item5),
+                    EstimatedMinutes = spec.Item6,
+                    OrderIndex = index + 1,
+                    Status = spec.Item3,
+                    AiReason = $"Recommended because it supports {topic.Title}.",
+                    CompletedAt = spec.Item3 == ProgressStatus.Completed ? now.AddDays(-Math.Max(1, 2 - index)) : null
+                };
+            });
+
+            _context.LearningPathNodes.AddRange(nodes);
+            await _context.SaveChangesAsync();
         }
     }
 }

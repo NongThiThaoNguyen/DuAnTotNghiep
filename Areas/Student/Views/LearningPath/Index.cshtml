@@ -1,0 +1,173 @@
+@model DuAnTotNghiep.ViewModels.LearningPath.LearningPathPageViewModel
+
+@{
+    ViewData["Title"] = "Lộ trình học tập";
+}
+
+<link rel="stylesheet" href="~/css/learning-path.css" asp-append-version="true" />
+
+<div class="lp-page">
+
+    @* --- Alert Banner ------------------------------------------- *@
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="lp-alert" role="alert">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+            </svg>
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (!Model.HasPath)
+    {
+        @* --- Empty State --- *@
+        <div class="lp-empty">
+            <div class="lp-empty__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6-3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7" />
+                </svg>
+            </div>
+            <h1 class="lp-empty__title">Chưa có lộ trình học tập</h1>
+            <p class="lp-empty__text">
+                Hệ thống sẽ tự động tạo lộ trình học tập cá nhân hoá sau khi bạn hoàn thành bài kiểm tra đầu vào và đánh giá năng lực.
+            </p>
+            <a class="lp-btn-primary" asp-area="Student" asp-controller="Home" asp-action="Index">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" />
+                </svg>
+                Về trang chủ
+            </a>
+        </div>
+    }
+    else
+    {
+        @* --- Header --------------------------------------------- *@
+        <header class="lp-header">
+            <div class="lp-header__left">
+                <p class="lp-header__eyebrow">
+                    @(Model.GeneratedByAi ? "✨ AI Study English — Lộ trình AI" : "AI Study English")
+                </p>
+                <h1 class="lp-header__title">@Model.PathTitle</h1>
+                @if (!string.IsNullOrWhiteSpace(Model.PathDescription))
+                {
+                    <p class="lp-header__description">@Model.PathDescription</p>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.AiPlanSummary))
+                {
+                    <p class="lp-header__description" style="margin-top:6px; color:#475569;">@Model.AiPlanSummary</p>
+                }
+            </div>
+            <div class="lp-header__meta">
+                <div class="lp-badge lp-badge--status">
+                    <span class="lp-badge__label">Trạng thái</span>
+                    <span class="lp-badge__value">@Model.PathStatus</span>
+                </div>
+                <div class="lp-badge">
+                    <span class="lp-badge__label">Mục tiêu</span>
+                    <span class="lp-badge__value">@(Model.TargetEndDate?.ToString("dd/MM/yy") ?? "—")</span>
+                </div>
+            </div>
+        </header>
+
+        @* --- Progress -------------------------------------------- *@
+        <section class="lp-section" aria-labelledby="progress-heading">
+            <p class="lp-section__eyebrow">Tiến độ</p>
+            <h2 id="progress-heading" class="lp-section__title">Tiến độ lộ trình hiện tại</h2>
+            @await Html.PartialAsync("_PathProgressBar", Model.Progress)
+        </section>
+
+        @* --- Today Tasks ----------------------------------------- *@
+        <section class="lp-section" aria-labelledby="today-heading">
+            <p class="lp-section__eyebrow">Hôm nay</p>
+            <h2 id="today-heading" class="lp-section__title">Nhiệm vụ hôm nay</h2>
+
+            @if (Model.TodayTasks.Any())
+            {
+                <div class="lp-today">
+                    @foreach (var task in Model.TodayTasks)
+                    {
+                        <a class="lp-task" href="@task.TargetUrl" aria-label="@task.Title">
+                            <span class="lp-task__icon" aria-hidden="true">
+                                @switch (task.NodeType.ToUpperInvariant())
+                                {
+                                    case "TOPIC":
+                                        @:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h10" /></svg>
+                                        break;
+                                    case "LESSON":
+                                        @:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253" /></svg>
+                                        break;
+                                    case "QUIZ":
+                                        @:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z" /></svg>
+                                        break;
+                                    case "PRACTICE":
+                                        @:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" /></svg>
+                                        break;
+                                    default:
+                                        @:<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9" /></svg>
+                                        break;
+                                }
+                            </span>
+                            <span class="lp-task__body">
+                                <span class="lp-task__title">@task.Title</span>
+                                <span class="lp-task__meta">
+                                    <span class="lp-task__chip @(task.IsOverdue ? "lp-task__chip--overdue" : "")">
+                                        @task.NodeType.Replace("_", " ")
+                                    </span>
+                                    @if (task.EstimatedMinutes.HasValue)
+                                    {
+                                        <span class="lp-task__time">@task.EstimatedMinutes.Value min</span>
+                                    }
+                                    @if (task.IsOverdue)
+                                    {
+                                        <span class="lp-task__time" style="color:#EF4444; font-weight:600;">Trễ hạn</span>
+                                    }
+                                </span>
+                                @if (!string.IsNullOrWhiteSpace(task.AiReason))
+                                {
+                                    <p class="lp-task__reason">@task.AiReason</p>
+                                }
+                            </span>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="lp-today-empty">Không có nhiệm vụ nào được lên lịch cho hôm nay. Tiếp tục lộ trình phía dưới nhé! 👇</p>
+            }
+        </section>
+
+        @* --- Node Path Map --------------------------------------- *@
+        <section class="lp-section" aria-labelledby="path-heading">
+            <p class="lp-section__eyebrow">Lộ trình học tập</p>
+            <h2 id="path-heading" class="lp-section__title">Bản đồ lộ trình</h2>
+
+            <div class="lp-path" role="list" aria-label="Danh sách bài học trong lộ trình">
+                @{
+                    var nodeIndex = 0;
+                    var groupedNodes = Model.Nodes
+                        .GroupBy(n => string.IsNullOrWhiteSpace(n.PathPhase)
+                            ? "Giai đoạn " + ((n.OrderIndex - 1) / 5 + 1)
+                            : n.PathPhase)
+                        .ToList();
+                }
+                @foreach (var group in groupedNodes)
+                {
+                    @await Html.PartialAsync("_PathStageHeader", group.Key)
+                    foreach (var node in group.OrderBy(n => n.OrderIndex))
+                    {
+                        var rowClass = nodeIndex % 2 == 0 ? "lp-node-row--left" : "lp-node-row--right";
+                        <div class="lp-node-row @rowClass" role="listitem">
+                            @await Html.PartialAsync("_PathNodeCard", node)
+                        </div>
+                        nodeIndex++;
+                    }
+                }
+            </div>
+        </section>
+    }
+</div>
