@@ -1,0 +1,156 @@
+@model DuAnTotNghiep.ViewModels.LearningPath.PathNodeViewModel
+@using DuAnTotNghiep.Enums
+
+@functions {
+    private static string GetIconSvg(string nodeType)
+    {
+        return nodeType.ToUpperInvariant() switch
+        {
+            NodeType.Topic    => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 6h16M4 12h16M4 18h10\" /></svg>",
+            NodeType.Lesson   => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253\" /></svg>",
+            NodeType.Quiz     => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 12l2 2 4-4M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z\" /></svg>",
+            NodeType.Practice => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z\" /></svg>",
+            NodeType.Review   => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 4v6h6M20 20v-6h-6M5 19A9 9 0 0019 5\" /></svg>",
+            NodeType.AiTutor  => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z\" /></svg>",
+            _                 => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"9\" /></svg>"
+        };
+    }
+
+    private static string GetLockSvg()
+        => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z\" /></svg>";
+
+    private static string GetClockSvg()
+        => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"9\" /><path stroke-linecap=\"round\" d=\"M12 7v5l3 3\" /></svg>";
+
+    private static string GetCalendarSvg()
+        => "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\" /><path stroke-linecap=\"round\" d=\"M16 2v4M8 2v4M3 10h18\" /></svg>";
+
+    private static string Truncate(string? value, int maxLength)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return string.Empty;
+        return value.Length <= maxLength ? value : value[..maxLength] + "…";
+    }
+
+    private static string GetTypeLabel(string nodeType)
+    {
+        return nodeType.ToUpperInvariant() switch
+        {
+            NodeType.Topic    => "Topic",
+            NodeType.Lesson   => "Lesson",
+            NodeType.Quiz     => "Quiz",
+            NodeType.Practice => "Practice",
+            NodeType.Review   => "Review",
+            NodeType.AiTutor  => "AI Tutor",
+            _                 => nodeType.Replace("_", " ")
+        };
+    }
+}
+
+@{
+    var isReadOnly = ViewData["ReadOnly"] is bool readOnly && readOnly;
+    var isClickable = Model.IsClickable && !isReadOnly;
+    var href = Url.Action("OpenNode", "LearningPath", new { area = "Student", nodeId = Model.NodeId });
+    var title = Truncate(Model.Title, 60);
+    var reason = Truncate(Model.AiReason, 90);
+    var isLocked = Model.Status.Equals(ProgressStatus.Locked, StringComparison.OrdinalIgnoreCase);
+    var typeLabel = GetTypeLabel(Model.NodeType);
+}
+
+@{
+    /* Build inner content once — reused in both <a> and <div> */
+    var iconHtml = isLocked ? GetLockSvg() : GetIconSvg(Model.NodeType);
+}
+
+@if (isClickable)
+{
+    <a class="lp-node-card @Model.CssClass"
+       href="@href"
+       aria-label="@title"
+       data-node-id="@Model.NodeId"
+       data-node-status="@Model.Status"
+       title="@Model.Title">
+        <span class="lp-node-card__icon" aria-hidden="true">@Html.Raw(iconHtml)</span>
+        <span class="lp-node-card__body">
+            <span class="lp-node-card__chips">
+                <span class="lp-chip lp-chip--type">@typeLabel</span>
+                <span class="lp-chip lp-chip--status">@Model.StatusLabel</span>
+            </span>
+            <span class="lp-node-card__title">@title</span>
+            @if (!string.IsNullOrWhiteSpace(Model.TopicName))
+            {
+                <span class="lp-node-card__topic">@Model.TopicName</span>
+            }
+            @if (!string.IsNullOrWhiteSpace(reason))
+            {
+                <span class="lp-node-card__reason">@reason</span>
+            }
+            <span class="lp-node-card__footer">
+                @if (Model.EstimatedMinutes.HasValue)
+                {
+                    <span class="lp-node-card__footer-item">
+                        @Html.Raw(GetClockSvg())
+                        @Model.EstimatedMinutes.Value min
+                    </span>
+                }
+                @if (Model.ScheduledDate.HasValue)
+                {
+                    <span class="lp-node-card__footer-item">
+                        @Html.Raw(GetCalendarSvg())
+                        @Model.ScheduledDate.Value.ToString("dd/MM/yyyy")
+                    </span>
+                }
+                @if (Model.CompletedAt.HasValue)
+                {
+                    <span class="lp-node-card__footer-item" style="color:#22C55E; font-weight:600;">
+                        ✓ Done
+                    </span>
+                }
+            </span>
+        </span>
+    </a>
+}
+else
+{
+    <div class="lp-node-card @Model.CssClass"
+         aria-label="@title"
+         data-node-id="@Model.NodeId"
+         data-node-status="@Model.Status"
+         title="@(isLocked ? "Hoàn thành bài trước để mở khóa" : Model.Title)">
+        <span class="lp-node-card__icon" aria-hidden="true">@Html.Raw(iconHtml)</span>
+        <span class="lp-node-card__body">
+            <span class="lp-node-card__chips">
+                <span class="lp-chip lp-chip--type">@typeLabel</span>
+                <span class="lp-chip lp-chip--status">@Model.StatusLabel</span>
+            </span>
+            <span class="lp-node-card__title">@title</span>
+            @if (!string.IsNullOrWhiteSpace(Model.TopicName))
+            {
+                <span class="lp-node-card__topic">@Model.TopicName</span>
+            }
+            @if (isLocked)
+            {
+                <span class="lp-node-card__reason" style="color:#94A3B8; font-style:italic;">Hoàn thành bài trước để mở khóa</span>
+            }
+            else if (!string.IsNullOrWhiteSpace(reason))
+            {
+                <span class="lp-node-card__reason">@reason</span>
+            }
+            <span class="lp-node-card__footer">
+                @if (Model.EstimatedMinutes.HasValue)
+                {
+                    <span class="lp-node-card__footer-item">
+                        @Html.Raw(GetClockSvg())
+                        @Model.EstimatedMinutes.Value min
+                    </span>
+                }
+                @if (Model.ScheduledDate.HasValue)
+                {
+                    <span class="lp-node-card__footer-item">
+                        @Html.Raw(GetCalendarSvg())
+                        @Model.ScheduledDate.Value.ToString("dd/MM/yyyy")
+                    </span>
+                }
+            </span>
+        </span>
+    </div>
+}

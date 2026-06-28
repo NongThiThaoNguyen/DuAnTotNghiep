@@ -414,7 +414,7 @@ namespace DuAnTotNghiep.Services
         {
             try
             {
-                var today = DateOnly.FromDateTime(DateTime.Today);
+                var today = DateOnly.FromDateTime(DateTime.UtcNow);
                 var activities = await _activityLogRepo.GetActivitiesForStreak(studentId);
                 var pathNodes = await _context.LearningPathNodes
                     .Include(n => n.Topic)

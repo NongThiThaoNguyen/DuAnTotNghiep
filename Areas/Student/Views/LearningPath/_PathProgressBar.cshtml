@@ -1,0 +1,33 @@
+@model DuAnTotNghiep.ViewModels.LearningPath.PathProgressSummaryViewModel
+
+<div class="lp-progress">
+    <div class="lp-progress__meta">
+        <span>@Model.CompletedNodes / @Model.TotalNodes bài hoàn thành</span>
+        <span class="lp-progress__pct">@Model.ProgressPercent.ToString("0.##")%</span>
+    </div>
+    <div class="lp-progress__track" role="progressbar"
+         aria-valuenow="@Model.ProgressPercent"
+         aria-valuemin="0"
+         aria-valuemax="100"
+         aria-label="Learning path progress @Model.ProgressPercent.ToString("0.##")%">
+        <div class="lp-progress__fill" style="width: @(Math.Max((double)Model.ProgressPercent, Model.TotalNodes > 0 ? 2 : 0))%"></div>
+    </div>
+    <div class="lp-progress__stats">
+        <div class="lp-stat">
+            <span class="lp-stat__label">Đang học</span>
+            <span class="lp-stat__value">@Model.InProgressNodes</span>
+        </div>
+        <div class="lp-stat">
+            <span class="lp-stat__label">Thời gian</span>
+            <span class="lp-stat__value" style="font-size:15px;">@(Model.TotalStudyMinutes >= 60 ? $"{Model.TotalStudyMinutes / 60}h {Model.TotalStudyMinutes % 60}m" : $"{Model.TotalStudyMinutes}m")</span>
+        </div>
+        <div class="lp-stat">
+            <span class="lp-stat__label">🔥 Streak</span>
+            <span class="lp-stat__value">@Model.CurrentStreak ngày</span>
+        </div>
+        <div class="lp-stat">
+            <span class="lp-stat__label">Còn lại</span>
+            <span class="lp-stat__value">@(Math.Max(Model.TotalNodes - Model.CompletedNodes, 0))</span>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,14 @@
+@model string
+
+@{
+    var label = string.IsNullOrWhiteSpace(Model) ? "Learning stage" : Model;
+}
+
+<div class="lp-stage">
+    <span class="lp-stage__label">
+        <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v18m7-9H5" />
+        </svg>
+        @label
+    </span>
+</div>
