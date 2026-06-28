@@ -32,6 +32,7 @@ builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepo
 builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
 builder.Services.AddScoped<ILearningProfileRepository, LearningProfileRepository>();
 builder.Services.AddScoped<ILearningTopicRepository, LearningTopicRepository>();
+builder.Services.AddScoped<IReferenceSourceRepository, ReferenceSourceRepository>();
 builder.Services.AddScoped<IEnglishSkillRepository, EnglishSkillRepository>();
 builder.Services.AddScoped<IEnglishProficiencyLevelRepository, EnglishProficiencyLevelRepository>();
 builder.Services.AddScoped<ILearningObjectiveRepository, LearningObjectiveRepository>();
@@ -57,6 +58,9 @@ builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionS
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
 builder.Services.AddScoped<ILearningTopicService, LearningTopicService>();
+builder.Services.AddScoped<IReferenceSourceService, ReferenceSourceService>();
+builder.Services.AddScoped<IValidateLicenseService, ValidateLicenseService>();
+builder.Services.AddScoped<IReferenceSourcePolicyService, ReferenceSourcePolicyService>();
 builder.Services.AddScoped<ITopicImportService, TopicImportService>();
 builder.Services.AddScoped<ILearningObjectiveService, LearningObjectiveService>();
 builder.Services.AddScoped<IM4ValidationService, M4ValidationService>();

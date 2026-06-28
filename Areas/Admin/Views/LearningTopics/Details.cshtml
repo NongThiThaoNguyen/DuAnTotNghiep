@@ -1,7 +1,7 @@
 @model DuAnTotNghiep.DTOs.Topic.TopicDetailDto
 @{
     ViewData["Title"] = "Topic Details";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container-fluid">
@@ -153,9 +153,108 @@
                 <p class="text-muted">Không có Learning Path nào liên quan.</p>
             }
 
+            <hr />
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="mb-0">Nguồn tham khảo liên kết (@(Model.References?.Count() ?? 0))</h5>
+                @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+                {
+                    <button type="button" class="btn btn-sm btn-primary px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#linkSourceModal">
+                        <i class="fas fa-plus me-1"></i> Thêm nguồn liên kết
+                    </button>
+                }
+            </div>
+
+            @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+            {
+                var invalidSources = Model.References?.Where(r => !r.IsValid || r.ValidationLevel != "OK").ToList();
+                if (invalidSources != null && invalidSources.Any())
+                {
+                    <div class="alert alert-danger shadow-sm border-start border-4 border-danger mb-3" role="alert">
+                        <h6 class="alert-heading fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo: Có nguồn tham khảo không hợp lệ được liên kết!</h6>
+                        <p class="mb-2 fs-7">Hệ thống phát hiện các nguồn tham khảo sau đây đã bị thay đổi trạng thái kiểm duyệt (từ chối hoặc lưu trữ) sau khi liên kết. AI Context sẽ tự động bỏ qua các nguồn này.</p>
+                        <hr class="my-2">
+                        <ul class="mb-0 fs-7 ps-3">
+                            @foreach (var invalid in invalidSources)
+                            {
+                                <li>
+                                    <strong>@invalid.SourceName</strong>: 
+                                    <span class="text-danger fw-bold">@invalid.ValidationMessage</span> 
+                                    (Trạng thái hiện tại: <span class="badge bg-secondary">@invalid.SourceStatus</span>)
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+            }
+            
+            <table class="table table-sm table-bordered">
+                <thead class="table-light text-secondary fs-7 text-uppercase">
+                    <tr>
+                        <th style="width: 35%">Tên nguồn tham khảo</th>
+                        <th style="width: 15%">Loại nguồn</th>
+                        <th style="width: 20%">Bản quyền</th>
+                        <th style="width: 20%">Ghi chú liên kết</th>
+                        @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+                        {
+                            <th class="text-center" style="width: 10%">Thao tác</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.References != null && Model.References.Any())
+                    {
+                        foreach (var r in Model.References)
+                        {
+                            <tr class="@(!r.IsValid ? "table-danger" : (r.ValidationLevel == "WARNING" ? "table-warning" : ""))">
+                                <td>
+                                    <strong>@r.SourceName</strong>
+                                    @if (!r.IsValid)
+                                    {
+                                        <span class="badge bg-danger text-white ms-1" title="@r.ValidationMessage">
+                                            <i class="fas fa-ban me-1"></i>@r.SourceStatus
+                                        </span>
+                                    }
+                                    else if (r.ValidationLevel == "WARNING")
+                                     {
+                                         <span class="badge bg-warning text-dark ms-1" title="@r.ValidationMessage">
+                                             <i class="fas fa-exclamation-circle me-1"></i>Chờ duyệt
+                                         </span>
+                                     }
+                                    @if (!string.IsNullOrEmpty(r.SourceUrl))
+                                    {
+                                        <br />
+                                        <small><a href="@r.SourceUrl" target="_blank" class="text-decoration-none text-break">@r.SourceUrl</a></small>
+                                    }
+                                </td>
+                                <td><span class="badge bg-light text-dark border">@r.SourceType</span></td>
+                                <td>@r.LicenseNote</td>
+                                <td>@r.Note</td>
+                                @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+                                {
+                                    <td class="text-center">
+                                        <form asp-action="UnlinkSource" asp-controller="LearningTopics" asp-area="Admin" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy liên kết nguồn tham khảo này?');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="topicId" value="@Model.Id" />
+                                            <input type="hidden" name="sourceId" value="@r.ReferenceSourceId" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Hủy liên kết"><i class="fas fa-trash-alt"></i></button>
+                                        </form>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="@(User.IsInRole("ADMIN") || User.IsInRole("TEACHER") ? 5 : 4)" class="text-center text-muted p-3">Chưa có nguồn tham khảo nào liên kết.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
         </div>
         <div class="card-footer">
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole("ADMIN"))
             {
                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
 
@@ -184,3 +283,55 @@
         </div>
     </div>
 </div>
+
+@if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+{
+    <!-- Modal Chọn nguồn phê duyệt -->
+    <div class="modal fade" id="linkSourceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="linkSourceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="linkSourceModalLabel"><i class="fas fa-plus"></i> Chọn nguồn tham khảo liên kết</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form asp-action="LinkSource" asp-controller="LearningTopics" asp-area="Admin" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="topicId" value="@Model.Id" />
+                    
+                    <div class="modal-body text-dark">
+                        @if (ViewBag.AvailableSources != null && ((IEnumerable<DuAnTotNghiep.Models.ReferenceSource>)ViewBag.AvailableSources).Any())
+                        {
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Danh sách nguồn tham khảo (Đã phê duyệt)</label>
+                                <select name="sourceId" class="form-select" required>
+                                    <option value="">-- Chọn nguồn tham khảo --</option>
+                                    @foreach (var s in (IEnumerable<DuAnTotNghiep.Models.ReferenceSource>)ViewBag.AvailableSources)
+                                    {
+                                        <option value="@s.Id">@s.SourceName (@(s.SourceUrl ?? "Không có URL"))</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label fw-semibold">Ghi chú liên kết (Optional)</label>
+                                <textarea name="note" class="form-control" rows="3" placeholder="Ví dụ: Đọc chương 1, bài 2..."></textarea>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-info-circle"></i> Không có nguồn tham khảo nào đã được phê duyệt khả dụng để liên kết. Vui lòng thêm nguồn mới hoặc phê duyệt các nguồn hiện tại trước.
+                            </div>
+                        }
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                        @if (ViewBag.AvailableSources != null && ((IEnumerable<DuAnTotNghiep.Models.ReferenceSource>)ViewBag.AvailableSources).Any())
+                        {
+                            <button type="submit" class="btn btn-primary">Xác nhận liên kết</button>
+                        }
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}

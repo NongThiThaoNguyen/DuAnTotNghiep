@@ -21,7 +21,7 @@ namespace DuAnTotNghiep.Enums
     public enum ReferenceUsagePolicy
     {
         REFERENCE_ONLY,
-        OPEN_USE,
-        INTERNAL_ONLY
+        OPEN_LICENSE,
+        RESTRICTED
     }
 }

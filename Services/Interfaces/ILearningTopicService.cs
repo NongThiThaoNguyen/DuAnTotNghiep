@@ -44,14 +44,5 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task UpdateLearningPathNodeTopicAsync(int nodeId, int topicId);
         Task LinkTopicPrerequisiteAsync(int topicId, int prerequisiteTopicId);
         Task RestoreTopicAsync(int id);
-
-        // Reference Source Methods (Module M5 Task 2)
-        Task<ReferenceSource?> GetReferenceSourceByIdAsync(int id);
-        Task<IEnumerable<ReferenceSource>> GetAllReferenceSourcesAsync(ReferenceSourceType? sourceType, ReferenceReviewStatus? status, string? keyword);
-        Task<int> CreateReferenceSourceAsync(ReferenceSource referenceSource);
-        Task UpdateReferenceSourceAsync(ReferenceSource referenceSource);
-        Task DeleteReferenceSourceAsync(int id);
-        Task ReviewReferenceSourceAsync(int id, ReferenceReviewStatus status, string? note);
-        Task ArchiveReferenceSourceAsync(int id);
     }
 }

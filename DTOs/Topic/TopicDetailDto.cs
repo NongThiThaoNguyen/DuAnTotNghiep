@@ -37,6 +37,22 @@ namespace DuAnTotNghiep.DTOs.Topic
         public IEnumerable<LessonDto> Lessons { get; set; } = new List<LessonDto>();
         public IEnumerable<QuizDto> Quizzes { get; set; } = new List<QuizDto>();
         public IEnumerable<LearningPathDto> LearningPaths { get; set; } = new List<LearningPathDto>();
+        public IEnumerable<TopicReferenceDto> References { get; set; } = new List<TopicReferenceDto>();
+    }
+
+    public class TopicReferenceDto
+    {
+        public int Id { get; set; }
+        public int ReferenceSourceId { get; set; }
+        public string SourceName { get; set; } = string.Empty;
+        public string? SourceUrl { get; set; }
+        public string SourceType { get; set; } = string.Empty;
+        public string? LicenseNote { get; set; }
+        public string? Note { get; set; }
+        public bool IsValid { get; set; } = true;
+        public string ValidationLevel { get; set; } = "OK";
+        public string ValidationMessage { get; set; } = string.Empty;
+        public string SourceStatus { get; set; } = string.Empty;
     }
 
     public class LessonDto

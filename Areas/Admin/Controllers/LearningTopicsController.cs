@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace DuAnTotNghiep.Areas.Admin.Controllers
@@ -21,15 +22,18 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         private readonly ILearningTopicService _topicService;
         private readonly IEnglishSkillService _skillService;
         private readonly IEnglishProficiencyLevelService _levelService;
+        private readonly IReferenceSourceService _referenceService;
 
         public LearningTopicsController(
             ILearningTopicService topicService,
             IEnglishSkillService skillService,
-            IEnglishProficiencyLevelService levelService)
+            IEnglishProficiencyLevelService levelService,
+            IReferenceSourceService referenceService)
         {
             _topicService = topicService;
             _skillService = skillService;
             _levelService = levelService;
+            _referenceService = referenceService;
         }
 
         public async Task<IActionResult> Index(string? keyword, int? skillId, int? levelId, string? difficulty, string? status, int page = 1, int pageSize = 10)
@@ -88,6 +92,13 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         {
             var detailDto = await _topicService.GetDetailAsync(id);
             if (detailDto == null) return NotFound();
+
+            var allApproved = await _referenceService.GetListAsync(null, ReferenceReviewStatus.APPROVED, null);
+            var linkedSourceIds = detailDto.References?.Select(r => r.ReferenceSourceId).ToList() ?? new List<int>();
+            var availableSources = allApproved.Where(s => !linkedSourceIds.Contains(s.Id)).ToList();
+
+            ViewBag.AvailableSources = availableSources;
+
             return View(detailDto);
         }
 
@@ -292,163 +303,46 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                                           .Select(t => new SelectListItem { Value = t.Id.ToString(), Text = t.Name });
         }
 
-        // ==========================================
-        // REFERENCE SOURCES MANAGEMENT (MODULE M5)
-        // ==========================================
-
-        public async Task<IActionResult> ReferenceSources(string? sourceType, string? status, string? keyword)
-        {
-            ReferenceSourceType? typeEnum = null;
-            if (!string.IsNullOrEmpty(sourceType) && Enum.TryParse<ReferenceSourceType>(sourceType, out var parsedType))
-            {
-                typeEnum = parsedType;
-            }
-
-            ReferenceReviewStatus? statusEnum = null;
-            if (!string.IsNullOrEmpty(status) && Enum.TryParse<ReferenceReviewStatus>(status, out var parsedStatus))
-            {
-                statusEnum = parsedStatus;
-            }
-
-            var sources = await _topicService.GetAllReferenceSourcesAsync(typeEnum, statusEnum, keyword);
-
-            ViewBag.Keyword = keyword;
-            ViewBag.SourceType = sourceType;
-            ViewBag.Status = status;
-
-            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(typeEnum);
-            ViewBag.Statuses = ReferenceHelper.GetReviewStatusSelectList(statusEnum);
-
-            return View(sources);
-        }
-
-        public async Task<IActionResult> ReferenceDetails(int id)
-        {
-            var source = await _topicService.GetReferenceSourceByIdAsync(id);
-            if (source == null) return NotFound();
-
-            return View(source);
-        }
-
-        [Authorize(Roles = "Admin")]
-        public IActionResult CreateReference()
-        {
-            var model = new ReferenceSource
-            {
-                Status = ReferenceReviewStatus.PENDING,
-                IsActive = true
-            };
-
-            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList();
-            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList();
-
-            return View(model);
-        }
-
-        [HttpPost]
+        [HttpPost("topics/{topicId}/link-source")]
+        [HttpPost("/Admin/LearningTopics/{topicId}/LinkSource")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateReference(ReferenceSource model)
-        {
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _topicService.CreateReferenceSourceAsync(model);
-                    TempData["SuccessMessage"] = "Tạo nguồn tham khảo mới thành công!";
-                    return RedirectToAction(nameof(ReferenceSources));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError(string.Empty, ex.Message);
-                }
-            }
-
-            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(model.SourceType);
-            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList(model.UsagePolicy);
-
-            return View(model);
-        }
-
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditReference(int id)
-        {
-            var source = await _topicService.GetReferenceSourceByIdAsync(id);
-            if (source == null) return NotFound();
-
-            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(source.SourceType);
-            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList(source.UsagePolicy);
-
-            return View(source);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> EditReference(int id, ReferenceSource model)
-        {
-            if (id != model.Id) return BadRequest();
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    await _topicService.UpdateReferenceSourceAsync(model);
-                    TempData["SuccessMessage"] = "Cập nhật nguồn tham khảo thành công!";
-                    return RedirectToAction(nameof(ReferenceSources));
-                }
-                catch (Exception ex)
-                {
-                    ModelState.AddModelError(string.Empty, ex.Message);
-                }
-            }
-
-            ViewBag.SourceTypes = ReferenceHelper.GetSourceTypeSelectList(model.SourceType);
-            ViewBag.UsagePolicies = ReferenceHelper.GetUsagePolicySelectList(model.UsagePolicy);
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ReviewReference(int id, string status, string? note)
-        {
-            if (!Enum.TryParse<ReferenceReviewStatus>(status, out var statusEnum))
-            {
-                TempData["ErrorMessage"] = "Trạng thái kiểm duyệt không hợp lệ!";
-                return RedirectToAction(nameof(ReferenceDetails), new { id });
-            }
-
-            try
-            {
-                await _topicService.ReviewReferenceSourceAsync(id, statusEnum, note);
-                TempData["SuccessMessage"] = $"Kiểm duyệt nguồn tham khảo thành công (Trạng thái: {ReferenceHelper.GetReviewStatusLabel(statusEnum)})!";
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Có lỗi xảy ra: " + ex.Message;
-            }
-
-            return RedirectToAction(nameof(ReferenceDetails), new { id });
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ArchiveReference(int id)
+        public async Task<IActionResult> LinkSource(int topicId, int sourceId, string? note)
         {
             try
             {
-                await _topicService.ArchiveReferenceSourceAsync(id);
-                TempData["SuccessMessage"] = "Đã lưu trữ (Archive) nguồn tham khảo thành công!";
+                await _referenceService.LinkSourceToTopicAsync(topicId, sourceId, GetCurrentUserId(), note);
+                TempData["SuccessMessage"] = "Liên kết nguồn tham khảo thành công!";
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
             }
 
-            return RedirectToAction(nameof(ReferenceSources));
+            return RedirectToAction(nameof(Details), new { id = topicId });
+        }
+
+        [HttpPost("topics/{topicId}/unlink-source")]
+        [HttpPost("/Admin/LearningTopics/{topicId}/UnlinkSource")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnlinkSource(int topicId, int sourceId)
+        {
+            try
+            {
+                await _referenceService.UnlinkSourceFromTopicAsync(topicId, sourceId, GetCurrentUserId());
+                TempData["SuccessMessage"] = "Hủy liên kết nguồn tham khảo thành công!";
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Details), new { id = topicId });
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return int.TryParse(userIdStr, out var id) ? id : 0;
         }
     }
 }

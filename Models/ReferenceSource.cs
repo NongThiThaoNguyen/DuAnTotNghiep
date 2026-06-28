@@ -15,6 +15,14 @@ public partial class ReferenceSource
     public ReferenceSourceType SourceType { get; set; }
 
     public string? LicenseNote { get; set; }
+    
+    public string? ComplianceEvidenceUrl { get; set; }
+
+    public string? Author { get; set; }
+
+    public string? Organization { get; set; }
+
+    public string? Description { get; set; }
 
     public ReferenceUsagePolicy? UsagePolicy { get; set; }
 
@@ -26,6 +34,12 @@ public partial class ReferenceSource
 
     public DateTime? ApprovedAt { get; set; }
 
+    public int? RejectedBy { get; set; }
+
+    public DateTime? RejectedAt { get; set; }
+
+    public string? RejectionReason { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public DateTime? UpdatedAt { get; set; }
@@ -35,6 +49,8 @@ public partial class ReferenceSource
     public virtual User? ApprovedByNavigation { get; set; }
 
     public virtual User? CreatedByNavigation { get; set; }
+
+    public virtual User? RejectedByNavigation { get; set; }
 
     public virtual ICollection<TopicReference> TopicReferences { get; set; } = new List<TopicReference>();
 

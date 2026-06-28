@@ -745,7 +745,7 @@ namespace DuAnTotNghiep.Data.Seeders
                     SourceUrl = "https://aistudyenglish.local",
                     SourceType = ReferenceSourceType.REFERENCE_ONLY,
                     LicenseNote = "Tài liệu tham khảo nội bộ của hệ thống.",
-                    UsagePolicy = ReferenceUsagePolicy.INTERNAL_ONLY,
+                    UsagePolicy = ReferenceUsagePolicy.RESTRICTED,
                     Status = ReferenceReviewStatus.APPROVED,
                     CreatedBy = adminId,
                     ApprovedBy = adminId,

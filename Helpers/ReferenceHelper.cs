@@ -40,8 +40,8 @@ namespace DuAnTotNghiep.Helpers
             return policy.Value switch
             {
                 ReferenceUsagePolicy.REFERENCE_ONLY => "Chỉ tham khảo (Reference Only)",
-                ReferenceUsagePolicy.OPEN_USE => "Sử dụng tự do (Open Use)",
-                ReferenceUsagePolicy.INTERNAL_ONLY => "Chỉ dùng nội bộ (Internal Only)",
+                ReferenceUsagePolicy.OPEN_LICENSE => "Giấy phép mở (Open License)",
+                ReferenceUsagePolicy.RESTRICTED => "Hạn chế sử dụng (Restricted)",
                 _ => policy.Value.ToString()
             };
         }

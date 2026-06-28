@@ -24,6 +24,7 @@ namespace DuAnTotNghiep.Services
         private readonly ApplicationDbContext _db;
         private readonly IAuditService _auditService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IReferenceSourcePolicyService _policyService;
 
 
         public LearningTopicService(
@@ -34,7 +35,8 @@ namespace DuAnTotNghiep.Services
             IEnglishProficiencyLevelRepository levelRepository,
             ApplicationDbContext db,
             IAuditService auditService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IReferenceSourcePolicyService policyService)
         {
             _topicRepository = topicRepository;
             _prerequisiteRepository = prerequisiteRepository;
@@ -44,6 +46,7 @@ namespace DuAnTotNghiep.Services
             _db = db;
             _auditService = auditService;
             _httpContextAccessor = httpContextAccessor;
+            _policyService = policyService;
         }
 
         private int? GetCurrentUserId()
@@ -305,6 +308,32 @@ namespace DuAnTotNghiep.Services
                 ? "Topic này đang là điều kiện tiên quyết (prerequisite) của một Topic khác đang hoạt động."
                 : null;
 
+            var rawReferences = await _db.TopicReferences
+                .AsNoTracking()
+                .Include(tr => tr.ReferenceSource)
+                .Where(tr => tr.TopicId == topicId)
+                .ToListAsync();
+
+            var references = new List<TopicReferenceDto>();
+            foreach (var tr in rawReferences)
+            {
+                var policyResult = await _policyService.CheckSourceBeforeUseAsync(tr.ReferenceSourceId);
+                references.Add(new TopicReferenceDto
+                {
+                    Id = tr.Id,
+                    ReferenceSourceId = tr.ReferenceSourceId,
+                    SourceName = tr.ReferenceSource != null ? tr.ReferenceSource.SourceName : string.Empty,
+                    SourceUrl = tr.ReferenceSource != null ? tr.ReferenceSource.SourceUrl : string.Empty,
+                    SourceType = tr.ReferenceSource != null ? tr.ReferenceSource.SourceType.ToString() : string.Empty,
+                    LicenseNote = tr.ReferenceSource != null ? tr.ReferenceSource.LicenseNote : string.Empty,
+                    Note = tr.Note,
+                    IsValid = policyResult.IsValid,
+                    ValidationLevel = policyResult.Level,
+                    ValidationMessage = policyResult.Message,
+                    SourceStatus = tr.ReferenceSource != null ? tr.ReferenceSource.Status.ToString() : string.Empty
+                });
+            }
+
             return new TopicDetailDto
             {
                 Id = topic.Id,
@@ -331,7 +360,8 @@ namespace DuAnTotNghiep.Services
                 Objectives = objectives,
                 Lessons = lessons,
                 Quizzes = quizzes,
-                LearningPaths = learningPaths
+                LearningPaths = learningPaths,
+                References = references
             };
         }
 
@@ -741,184 +771,6 @@ namespace DuAnTotNghiep.Services
 
                 await _auditService.LogAsync(GetCurrentUserId(), "Link Topic", "TopicPrerequisite", prereq.Id, null, $"Topic: {topicId}, Prerequisite: {prerequisiteTopicId}");
             }
-        }
-
-        // Reference Source Methods (Module M5 Task 2)
-        public async Task<ReferenceSource?> GetReferenceSourceByIdAsync(int id)
-        {
-            return await _db.ReferenceSources
-                .Include(r => r.CreatedByNavigation)
-                .Include(r => r.ApprovedByNavigation)
-                .Include(r => r.ContentComplianceReviews)
-                .FirstOrDefaultAsync(r => r.Id == id);
-        }
-
-        public async Task<IEnumerable<ReferenceSource>> GetAllReferenceSourcesAsync(ReferenceSourceType? sourceType, ReferenceReviewStatus? status, string? keyword)
-        {
-            var query = _db.ReferenceSources
-                .Include(r => r.CreatedByNavigation)
-                .Include(r => r.ApprovedByNavigation)
-                .AsQueryable();
-
-            if (sourceType.HasValue)
-            {
-                query = query.Where(r => r.SourceType == sourceType.Value);
-            }
-
-            if (status.HasValue)
-            {
-                query = query.Where(r => r.Status == status.Value);
-            }
-
-            if (!string.IsNullOrWhiteSpace(keyword))
-            {
-                var kw = keyword.Trim().ToLower();
-                query = query.Where(r => r.SourceName.ToLower().Contains(kw));
-            }
-
-            return await query.ToListAsync();
-        }
-
-        public async Task<int> CreateReferenceSourceAsync(ReferenceSource referenceSource)
-        {
-            // Validation
-            if (!Enum.IsDefined(typeof(ReferenceSourceType), referenceSource.SourceType))
-                throw new InvalidOperationException("Loại nguồn tham khảo không hợp lệ.");
-
-            if (!Enum.IsDefined(typeof(ReferenceReviewStatus), referenceSource.Status))
-                throw new InvalidOperationException("Trạng thái kiểm duyệt không hợp lệ.");
-
-            if (referenceSource.UsagePolicy.HasValue && !Enum.IsDefined(typeof(ReferenceUsagePolicy), referenceSource.UsagePolicy.Value))
-                throw new InvalidOperationException("Chính sách sử dụng không hợp lệ.");
-
-            referenceSource.CreatedAt = DateTime.UtcNow;
-            referenceSource.UpdatedAt = DateTime.UtcNow;
-            referenceSource.CreatedBy = GetCurrentUserId();
-            referenceSource.IsActive = true;
-
-            await _db.ReferenceSources.AddAsync(referenceSource);
-            await _db.SaveChangesAsync();
-
-            await _auditService.LogAsync(GetCurrentUserId(), "Create Reference Source", "ReferenceSource", referenceSource.Id, null, referenceSource.SourceName);
-
-            return referenceSource.Id;
-        }
-
-        public async Task UpdateReferenceSourceAsync(ReferenceSource referenceSource)
-        {
-            var existing = await _db.ReferenceSources.FindAsync(referenceSource.Id);
-            if (existing == null)
-                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
-
-            // Validation
-            if (!Enum.IsDefined(typeof(ReferenceSourceType), referenceSource.SourceType))
-                throw new InvalidOperationException("Loại nguồn tham khảo không hợp lệ.");
-
-            if (!Enum.IsDefined(typeof(ReferenceReviewStatus), referenceSource.Status))
-                throw new InvalidOperationException("Trạng thái kiểm duyệt không hợp lệ.");
-
-            if (referenceSource.UsagePolicy.HasValue && !Enum.IsDefined(typeof(ReferenceUsagePolicy), referenceSource.UsagePolicy.Value))
-                throw new InvalidOperationException("Chính sách sử dụng không hợp lệ.");
-
-            // Nghiệp vụ: Chặn chuyển REJECTED -> APPROVED trực tiếp
-            if (existing.Status == ReferenceReviewStatus.REJECTED && referenceSource.Status == ReferenceReviewStatus.APPROVED)
-            {
-                throw new InvalidOperationException("Không thể chuyển trực tiếp từ trạng thái REJECTED sang APPROVED. Vui lòng thực hiện quy trình kiểm duyệt (Review).");
-            }
-
-            var oldName = existing.SourceName;
-
-            existing.SourceName = referenceSource.SourceName.Trim();
-            existing.SourceUrl = referenceSource.SourceUrl?.Trim();
-            existing.SourceType = referenceSource.SourceType;
-            existing.LicenseNote = referenceSource.LicenseNote?.Trim();
-            existing.UsagePolicy = referenceSource.UsagePolicy;
-            existing.Status = referenceSource.Status;
-            existing.IsActive = referenceSource.IsActive;
-            existing.UpdatedAt = DateTime.UtcNow;
-
-            _db.ReferenceSources.Update(existing);
-            await _db.SaveChangesAsync();
-
-            await _auditService.LogAsync(GetCurrentUserId(), "Update Reference Source", "ReferenceSource", referenceSource.Id, oldName, referenceSource.SourceName);
-        }
-
-        public async Task DeleteReferenceSourceAsync(int id)
-        {
-            var existing = await _db.ReferenceSources.FindAsync(id);
-            if (existing == null)
-                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
-
-            // Kiểm tra ràng buộc sử dụng trước khi xóa
-            var hasTopics = await _db.TopicReferences.AnyAsync(tr => tr.ReferenceSourceId == id);
-            if (hasTopics)
-                throw new InvalidOperationException("Không thể xóa nguồn tham khảo này vì đang được Học phần (Topic) sử dụng.");
-
-            _db.ReferenceSources.Remove(existing);
-            await _db.SaveChangesAsync();
-
-            await _auditService.LogAsync(GetCurrentUserId(), "Delete Reference Source", "ReferenceSource", id, existing.SourceName, null);
-        }
-
-        public async Task ReviewReferenceSourceAsync(int id, ReferenceReviewStatus status, string? note)
-        {
-            if (status != ReferenceReviewStatus.APPROVED && status != ReferenceReviewStatus.REJECTED)
-                throw new InvalidOperationException("Trạng thái kiểm duyệt không hợp lệ (Chỉ chấp nhận APPROVED hoặc REJECTED).");
-
-            var existing = await _db.ReferenceSources.FindAsync(id);
-            if (existing == null)
-                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
-
-            var oldStatus = existing.Status.ToString();
-            var adminId = GetCurrentUserId();
-
-            existing.Status = status;
-            existing.ApprovedBy = adminId;
-            existing.ApprovedAt = DateTime.UtcNow;
-            existing.UpdatedAt = DateTime.UtcNow;
-
-            _db.ReferenceSources.Update(existing);
-            await _db.SaveChangesAsync();
-
-            var newStatusWithNote = status.ToString() + (string.IsNullOrEmpty(note) ? "" : $" - Ghi chú: {note}");
-            await _auditService.LogAsync(adminId, "Review Reference Source", "ReferenceSource", id, oldStatus, newStatusWithNote);
-        }
-
-        public async Task ArchiveReferenceSourceAsync(int id)
-        {
-            var existing = await _db.ReferenceSources.FindAsync(id);
-            if (existing == null)
-                throw new InvalidOperationException("Nguồn tham khảo không tồn tại.");
-
-            // Nghiệp vụ: Kiểm tra sử dụng trước khi Archive
-            // 1. Topic sử dụng
-            var isUsedInTopic = await _db.TopicReferences.AnyAsync(tr => tr.ReferenceSourceId == id);
-
-            // 2. Lesson sử dụng (gián tiếp qua Topic)
-            var isUsedInLesson = await _db.OriginalLessons.AnyAsync(l =>
-                _db.TopicReferences.Any(tr => tr.ReferenceSourceId == id && tr.TopicId == l.TopicId));
-
-            // 3. AI Workflow sử dụng (gián tiếp qua Topic)
-            var isUsedInAiWorkflow = await _db.AiGeneratedContents.AnyAsync(ai =>
-                _db.TopicReferences.Any(tr => tr.ReferenceSourceId == id && tr.TopicId == ai.RelatedTopicId));
-
-            if (isUsedInTopic || isUsedInLesson || isUsedInAiWorkflow)
-            {
-                var msg = "Không thể Lưu trữ (Archive) nguồn tham khảo này vì đang được sử dụng:\n";
-                if (isUsedInTopic) msg += "- Có học phần (Topic) đang liên kết.\n";
-                if (isUsedInLesson) msg += "- Có bài học (Lesson) thuộc học phần liên kết.\n";
-                if (isUsedInAiWorkflow) msg += "- Có nội dung AI (AI Workflow) thuộc học phần liên kết.\n";
-                throw new InvalidOperationException(msg);
-            }
-
-            existing.Status = ReferenceReviewStatus.ARCHIVED;
-            existing.IsActive = false;
-            existing.UpdatedAt = DateTime.UtcNow;
-
-            _db.ReferenceSources.Update(existing);
-            await _db.SaveChangesAsync();
-
-            await _auditService.LogAsync(GetCurrentUserId(), "Archive Reference Source", "ReferenceSource", id, "Active", "Archived");
         }
     }
 }

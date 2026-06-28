@@ -1497,13 +1497,15 @@ public partial class ApplicationDbContext : DbContext
             {
                 t.HasCheckConstraint("CK_ref_status", "[status] IN ('DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED')");
                 t.HasCheckConstraint("CK_ref_source_type", "[source_type] IN ('OFFICIAL', 'OPEN_LICENSE', 'SELF_CREATED', 'TEACHER_CREATED', 'REFERENCE_ONLY')");
-                t.HasCheckConstraint("CK_ref_usage_policy", "[usage_policy] IS NULL OR [usage_policy] IN ('REFERENCE_ONLY', 'OPEN_USE', 'INTERNAL_ONLY')");
+                t.HasCheckConstraint("CK_ref_usage_policy", "[usage_policy] IS NULL OR [usage_policy] IN ('REFERENCE_ONLY', 'OPEN_LICENSE', 'RESTRICTED')");
             });
 
             entity.HasIndex(e => e.Status);
             entity.HasIndex(e => e.SourceType);
             entity.HasIndex(e => e.CreatedBy);
             entity.HasIndex(e => e.ApprovedBy);
+            entity.HasIndex(e => e.SourceName, "IX_reference_sources_source_name");
+            entity.HasIndex(e => e.SourceUrl, "IX_reference_sources_source_url");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ApprovedAt).HasColumnName("approved_at");
@@ -1513,6 +1515,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.LicenseNote).HasColumnName("license_note");
+            entity.Property(e => e.ComplianceEvidenceUrl)
+                .HasMaxLength(1000)
+                .IsUnicode(false)
+                .HasColumnName("compliance_evidence_url");
             entity.Property(e => e.SourceName)
                 .HasMaxLength(255)
                 .HasColumnName("source_name");
@@ -1536,10 +1542,21 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("usage_policy");
+            entity.Property(e => e.Author)
+                .HasMaxLength(255)
+                .HasColumnName("author");
+            entity.Property(e => e.Organization)
+                .HasMaxLength(255)
+                .HasColumnName("organization");
+            entity.Property(e => e.Description)
+                .HasColumnName("description");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
             entity.Property(e => e.IsActive)
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
+            entity.Property(e => e.RejectedBy).HasColumnName("rejected_by");
+            entity.Property(e => e.RejectedAt).HasColumnName("rejected_at");
+            entity.Property(e => e.RejectionReason).HasColumnName("rejection_reason");
 
             entity.HasOne(d => d.ApprovedByNavigation).WithMany(p => p.ReferenceSourceApprovedByNavigations)
                 .HasForeignKey(d => d.ApprovedBy)
@@ -1548,6 +1565,10 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.CreatedByNavigation).WithMany(p => p.ReferenceSourceCreatedByNavigations)
                 .HasForeignKey(d => d.CreatedBy)
                 .HasConstraintName("FK_ref_created_by");
+
+            entity.HasOne(d => d.RejectedByNavigation).WithMany()
+                .HasForeignKey(d => d.RejectedBy)
+                .HasConstraintName("FK_reference_sources_users_rejected_by");
         });
 
         modelBuilder.Entity<RefreshToken>(entity =>
