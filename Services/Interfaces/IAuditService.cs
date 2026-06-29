@@ -5,5 +5,6 @@ namespace DuAnTotNghiep.Services.Interfaces
     public interface IAuditService
     {
         Task LogAsync(int? userId, string action, string entityName, int? entityId, string? oldValue = null, string? newValue = null);
+        Task LogActionAsync(int? userId, string action, string? entityName, int? entityId, string? oldValue, string? newValue, string? ipAddress);
     }
 }

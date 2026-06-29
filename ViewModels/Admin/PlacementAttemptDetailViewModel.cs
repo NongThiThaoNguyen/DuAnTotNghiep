@@ -22,9 +22,9 @@ namespace DuAnTotNghiep.ViewModels.Admin
 
         public string Status { get; set; } = null!;
 
-        public List<SkillScoreDto> SkillScores { get; set; } = new List<SkillScoreDto>();
+        public List<DuAnTotNghiep.DTOs.PlacementTest.SkillScoreDto> SkillScores { get; set; } = new List<DuAnTotNghiep.DTOs.PlacementTest.SkillScoreDto>();
 
-        public List<TopicScoreDto> TopicScores { get; set; } = new List<TopicScoreDto>();
+        public List<DuAnTotNghiep.DTOs.PlacementTest.TopicScoreDto> TopicScores { get; set; } = new List<DuAnTotNghiep.DTOs.PlacementTest.TopicScoreDto>();
 
         public string AiAnalysisStatus { get; set; } = null!;
     }

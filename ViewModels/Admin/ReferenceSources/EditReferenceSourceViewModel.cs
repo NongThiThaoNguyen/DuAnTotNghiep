@@ -44,5 +44,10 @@ namespace DuAnTotNghiep.ViewModels.Admin.ReferenceSources
 
         [Display(Name = "Cho phép hoạt động")]
         public bool IsActive { get; set; }
+
+        [StringLength(1000, ErrorMessage = "URL bằng chứng tuân thủ không được vượt quá 1000 ký tự.")]
+        [Url(ErrorMessage = "Địa chỉ URL bằng chứng không đúng định dạng HTTP hoặc HTTPS.")]
+        [Display(Name = "URL bằng chứng tuân thủ")]
+        public string? ComplianceEvidenceUrl { get; set; }
     }
 }

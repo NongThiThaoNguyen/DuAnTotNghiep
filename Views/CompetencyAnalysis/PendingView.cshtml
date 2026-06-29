@@ -1,0 +1,90 @@
+@model DuAnTotNghiep.ViewModels.CompetencyResultViewModel
+
+@{
+    ViewData["Title"] = "Đang phân tích năng lực...";
+    var analysisId = Model?.AnalysisId ?? 0;
+    var checkUrl = Url.Action("Status", "CompetencyAnalysis", new { id = analysisId });
+}
+
+<div class="flex flex-col items-center justify-center py-16 px-4 text-center">
+
+    {{!-- Animated spinner + icon --}}
+    <div class="relative mb-6">
+        <div class="h-20 w-20 rounded-full border-4 border-blue-100 border-t-blue-600 animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+            <svg class="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
+            </svg>
+        </div>
+    </div>
+
+    <h1 class="text-xl font-bold text-slate-900 mb-2">AI đang phân tích năng lực của bạn</h1>
+    <p class="text-sm text-slate-500 max-w-md mb-6">
+        Hệ thống đang xử lý kết quả bài kiểm tra và tạo báo cáo cá nhân hoá. Quá trình này thường mất từ 10-30 giây.
+    </p>
+
+    {{!-- Countdown --}}
+    <div class="mb-6 flex flex-col items-center">
+        <p class="text-xs text-slate-400 mb-1">Tự động tải lại sau</p>
+        <span id="countdown"
+              class="text-4xl font-bold text-blue-600 tabular-nums">30</span>
+        <p class="text-xs text-slate-400 mt-1">giây</p>
+    </div>
+
+    {{!-- Skeleton preview --}}
+    <div class="w-full max-w-xl space-y-3 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 text-left">
+        <p class="mb-4 text-xs font-semibold uppercase tracking-widest text-slate-400">Xem trước báo cáo</p>
+        <div class="h-4 w-2/3 animate-pulse rounded bg-slate-200"></div>
+        <div class="h-3 w-full animate-pulse rounded bg-slate-100"></div>
+        <div class="h-3 w-5/6 animate-pulse rounded bg-slate-100"></div>
+        <div class="mt-4 h-4 w-1/2 animate-pulse rounded bg-slate-200"></div>
+        <div class="h-3 w-full animate-pulse rounded bg-slate-100"></div>
+        <div class="h-3 w-4/5 animate-pulse rounded bg-slate-100"></div>
+    </div>
+
+    <button id="manualRefreshBtn"
+            onclick="location.reload()"
+            class="mt-6 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 transition-colors">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Tải lại ngay
+    </button>
+</div>
+
+@section Scripts {
+<script>
+(function () {
+    var seconds = 30;
+    var countdownEl = document.getElementById('countdown');
+    var resultUrl = '@Url.Action("Result", "CompetencyAnalysis", new { id = analysisId })';
+    var checkUrl  = '@checkUrl';
+
+    // Countdown timer
+    var timer = setInterval(function () {
+        seconds--;
+        if (countdownEl) countdownEl.textContent = seconds;
+        if (seconds <= 0) {
+            clearInterval(timer);
+            location.reload();
+        }
+    }, 1000);
+
+    // Poll status every 5 seconds via fetch
+    var poller = setInterval(function () {
+        fetch(checkUrl)
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data && data.status === 'COMPLETED') {
+                    clearInterval(poller);
+                    clearInterval(timer);
+                    window.location.href = resultUrl;
+                }
+            })
+            .catch(function () { /* silently ignore network errors */ });
+    }, 5000);
+})();
+</script>
+}

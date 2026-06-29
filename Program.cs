@@ -78,6 +78,13 @@ builder.Services.AddSingleton<DuAnTotNghiep.Services.Background.IAiAnalysisQueue
 builder.Services.AddHostedService<DuAnTotNghiep.Services.Background.AiAnalysisBackgroundService>();
 builder.Services.AddHostedService<DuAnTotNghiep.Services.ProgressSnapshotBackgroundService>();
 
+builder.Services.AddScoped<ITestResultAggregatorService, TestResultAggregatorService>();
+// M7 - AI Assessment Pipeline
+builder.Services.AddScoped<ICompetencyScoreCalculatorService, CompetencyScoreCalculatorService>();
+builder.Services.AddScoped<ICompetencyFeedbackService, CompetencyFeedbackService>();
+builder.Services.AddScoped<ICompetencyAnalysisOrchestrator, CompetencyAnalysisOrchestrator>();
+builder.Services.AddSingleton<IAiLoggingService, AiLoggingService>(); // Singleton since it uses IServiceScopeFactory internally
+
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();
 builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();

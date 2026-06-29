@@ -12,11 +12,13 @@ namespace DuAnTotNghiep.Services
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ApplicationDbContext _context;
 
-        public AuditService(IServiceScopeFactory scopeFactory, IHttpContextAccessor httpContextAccessor)
+        public AuditService(IServiceScopeFactory scopeFactory, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
         {
             _scopeFactory = scopeFactory;
             _httpContextAccessor = httpContextAccessor;
+            _context = context;
         }
 
         public Task LogAsync(int? userId, string action, string entityName, int? entityId, string? oldValue = null, string? newValue = null)
@@ -55,6 +57,24 @@ namespace DuAnTotNghiep.Services
             });
 
             return Task.CompletedTask;
+        }
+
+        public async Task LogActionAsync(int? userId, string action, string? entityName, int? entityId, string? oldValue, string? newValue, string? ipAddress)
+        {
+            var auditLog = new AuditLog
+            {
+                UserId = userId,
+                Action = action,
+                EntityName = entityName,
+                EntityId = entityId,
+                OldValue = oldValue,
+                NewValue = newValue,
+                IpAddress = ipAddress,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.AuditLogs.Add(auditLog);
+            await _context.SaveChangesAsync();
         }
     }
 }

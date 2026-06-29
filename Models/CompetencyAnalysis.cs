@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -23,9 +23,19 @@ public partial class CompetencyAnalysis
 
     public string? GapAnalysis { get; set; }
 
+    public string? PrioritizedTopicsJson { get; set; }
+
+    public string? KnowledgeGapsJson { get; set; }
+
+    public string? MetadataJson { get; set; }
+
     public string? AiModel { get; set; }
 
     public decimal? ConfidenceScore { get; set; }
+
+    public bool IsLatest { get; set; } = true;
+
+    public string Status { get; set; } = "COMPLETED";
 
     public DateTime CreatedAt { get; set; }
 

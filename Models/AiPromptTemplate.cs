@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -14,6 +14,8 @@ public partial class AiPromptTemplate
     public string ModuleCode { get; set; } = null!;
 
     public string SystemPrompt { get; set; } = null!;
+
+    public string? UserPromptTemplate { get; set; }
 
     public string? OutputSchema { get; set; }
 

@@ -249,6 +249,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValue("ACTIVE")
                 .HasColumnName("status");
             entity.Property(e => e.SystemPrompt).HasColumnName("system_prompt");
+            entity.Property(e => e.UserPromptTemplate).HasColumnName("user_prompt_template");
             entity.Property(e => e.VersionNo)
                 .HasDefaultValue(1)
                 .HasColumnName("version_no");
@@ -372,6 +373,8 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("ai_usage_logs");
 
             entity.HasIndex(e => new { e.ModuleCode, e.CreatedAt }, "IX_ai_usage_module_date");
+            entity.HasIndex(e => e.PromptTemplateId, "IX_ai_usage_logs_prompt_template_id");
+            entity.HasIndex(e => e.UserId, "IX_ai_usage_logs_user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AiModel)
@@ -398,6 +401,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValue("SUCCESS")
                 .HasColumnName("request_status");
             entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.PromptInput).HasColumnName("prompt_input");
+            entity.Property(e => e.ResponseOutput).HasColumnName("response_output");
+            entity.Property(e => e.LatencyMs).HasColumnName("latency_ms");
 
             entity.HasOne(d => d.PromptTemplate).WithMany(p => p.AiUsageLogs)
                 .HasForeignKey(d => d.PromptTemplateId)
@@ -446,6 +452,9 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("competency_analyses");
 
+            entity.HasIndex(e => e.StudentId, "IX_competency_analyses_student_id");
+            entity.HasIndex(e => e.TestAttemptId, "IX_competency_analyses_test_attempt_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AiModel)
                 .HasMaxLength(100)
@@ -465,6 +474,9 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Summary).HasColumnName("summary");
             entity.Property(e => e.TestAttemptId).HasColumnName("test_attempt_id");
             entity.Property(e => e.Weaknesses).HasColumnName("weaknesses");
+            entity.Property(e => e.PrioritizedTopicsJson).HasColumnName("prioritized_topics_json");
+            entity.Property(e => e.KnowledgeGapsJson).HasColumnName("knowledge_gaps_json");
+            entity.Property(e => e.MetadataJson).HasColumnName("metadata_json");
 
             entity.HasOne(d => d.CurrentLevel).WithMany(p => p.CompetencyAnalysisCurrentLevels)
                 .HasForeignKey(d => d.CurrentLevelId)
@@ -490,6 +502,10 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("competency_skill_scores");
 
+            entity.HasIndex(e => e.CompetencyAnalysisId, "IX_competency_skill_scores_competency_analysis_id");
+            entity.HasIndex(e => e.SkillId, "IX_competency_skill_scores_skill_id");
+            entity.HasIndex(e => e.TopicId, "IX_competency_skill_scores_topic_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CompetencyAnalysisId).HasColumnName("competency_analysis_id");
             entity.Property(e => e.LevelId).HasColumnName("level_id");
@@ -501,6 +517,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("score");
             entity.Property(e => e.SkillId).HasColumnName("skill_id");
             entity.Property(e => e.WeaknessNote).HasColumnName("weakness_note");
+            entity.Property(e => e.TopicId).HasColumnName("topic_id");
 
             entity.HasOne(d => d.CompetencyAnalysis).WithMany(p => p.CompetencySkillScores)
                 .HasForeignKey(d => d.CompetencyAnalysisId)
@@ -515,6 +532,11 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.SkillId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_css_skill");
+
+            entity.HasOne(d => d.Topic).WithMany()
+                .HasForeignKey(d => d.TopicId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_css_topic");
         });
 
         modelBuilder.Entity<ContentComplianceReview>(entity =>

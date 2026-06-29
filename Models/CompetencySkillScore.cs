@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -19,9 +19,13 @@ public partial class CompetencySkillScore
 
     public int PriorityLevel { get; set; }
 
+    public int? TopicId { get; set; }
+
     public virtual CompetencyAnalysis CompetencyAnalysis { get; set; } = null!;
 
     public virtual EnglishProficiencyLevel? Level { get; set; }
 
     public virtual EnglishSkill Skill { get; set; } = null!;
+
+    public virtual LearningTopic? Topic { get; set; }
 }

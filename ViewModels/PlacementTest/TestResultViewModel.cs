@@ -16,8 +16,8 @@ namespace DuAnTotNghiep.ViewModels.PlacementTest
         public int IncorrectAnswers { get; set; }
         public int TotalQuestions { get; set; }
 
-        public List<SkillScoreDto> SkillScores { get; set; } = new List<SkillScoreDto>();
-        public List<TopicScoreDto> TopicScores { get; set; } = new List<TopicScoreDto>();
+        public List<DuAnTotNghiep.DTOs.PlacementTest.SkillScoreDto> SkillScores { get; set; } = new List<DuAnTotNghiep.DTOs.PlacementTest.SkillScoreDto>();
+        public List<DuAnTotNghiep.DTOs.PlacementTest.TopicScoreDto> TopicScores { get; set; } = new List<DuAnTotNghiep.DTOs.PlacementTest.TopicScoreDto>();
         
         public string? WeakestSkill { get; set; }
         public string? WeakestTopic { get; set; }

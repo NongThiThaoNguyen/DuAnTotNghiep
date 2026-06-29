@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -24,6 +24,12 @@ public partial class AiUsageLog
     public string RequestStatus { get; set; } = null!;
 
     public string? ErrorMessage { get; set; }
+
+    public string? PromptInput { get; set; }
+
+    public string? ResponseOutput { get; set; }
+
+    public int? LatencyMs { get; set; }
 
     public DateTime CreatedAt { get; set; }
 
