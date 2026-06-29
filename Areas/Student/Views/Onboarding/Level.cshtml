@@ -1,0 +1,146 @@
+@model DuAnTotNghiep.ViewModels.Onboarding.OnboardingStep2ViewModel
+@{
+    ViewData["Title"] = "Đánh giá trình độ";
+    var isScoreBased = ViewBag.GoalCode == "IELTS" || ViewBag.GoalCode == "TOEIC";
+}
+
+<style>
+    .level-radio:checked + .level-card-body {
+        border-color: #3b82f6 !important;
+        background-color: #eff6ff !important;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+    }
+    .level-card-body {
+        transition: all 0.2s ease-in-out;
+        border: 2px solid #e2e8f0;
+    }
+    .level-card-body:hover {
+        border-color: #bfdbfe;
+    }
+    .level-radio:checked + .level-card-body .level-badge {
+        background-color: #3b82f6;
+        color: #ffffff;
+    }
+</style>
+
+<div class="max-w-3xl mx-auto py-12">
+    
+    <partial name="_OnboardingStepper" model="2" />
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">
+        
+        <form method="post" asp-action="Level">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="GoalCode" />
+            
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 text-sm font-medium"></div>
+
+            <!-- SECTION 1: Current Level -->
+            <h3 class="text-2xl font-bold mb-3 text-slate-800">Trình độ hiện tại của bạn?</h3>
+            <p class="text-slate-500 mb-8">Self-assessment giúp AI hiểu rõ vạch xuất phát của bạn. Hãy chọn trình độ bạn cảm thấy phù hợp nhất.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                <label class="cursor-pointer block relative">
+                    <input type="radio" asp-for="CurrentLevelId" value="" class="hidden level-radio" checked="@(Model.CurrentLevelId == null)" />
+                    <div class="level-card-body h-full rounded-2xl p-4 bg-white flex items-center">
+                        <div class="level-badge w-12 h-12 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-lg mr-4 transition-colors">
+                            ?
+                        </div>
+                        <div>
+                            <h6 class="font-bold text-slate-800 mb-1">Không chắc chắn</h6>
+                            <p class="text-slate-500 text-xs">Chưa từng đánh giá</p>
+                        </div>
+                    </div>
+                </label>
+
+                @if (ViewBag.Levels != null)
+                {
+                    foreach (var level in ViewBag.Levels)
+                    {
+                        <label class="cursor-pointer block relative">
+                            <input type="radio" asp-for="CurrentLevelId" value="@level.Id" class="hidden level-radio" />
+                            <div class="level-card-body h-full rounded-2xl p-4 bg-white flex items-center">
+                                <div class="level-badge flex-shrink-0 min-w-[3rem] h-12 px-2 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-[10px] sm:text-xs mr-4 transition-colors text-center overflow-hidden">
+                                    @level.Code
+                                </div>
+                                <div>
+                                    <h6 class="font-bold text-slate-800 mb-1">@level.Name</h6>
+                                    <p class="text-slate-500 text-xs truncate max-w-[180px]">@level.Description</p>
+                                </div>
+                            </div>
+                        </label>
+                    }
+                }
+            </div>
+
+            <hr class="border-slate-200 mb-10" />
+
+            <!-- SECTION 2: Target -->
+            <h3 class="text-2xl font-bold mb-3 text-slate-800">Mục tiêu mong muốn</h3>
+            <p class="text-slate-500 mb-8">Bạn muốn đạt được thành tích nào trong tương lai?</p>
+
+            @if (isScoreBased)
+            {
+                <div class="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                    <label asp-for="TargetScore" class="block font-bold text-slate-700 mb-2">Điểm số @ViewBag.GoalCode mục tiêu</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                        </div>
+                        <input asp-for="TargetScore" class="block w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 transition-colors" type="number" step="0.5" placeholder="Ví dụ: @(ViewBag.GoalCode == "IELTS" ? "6.5" : "800")" />
+                    </div>
+                    <span asp-validation-for="TargetScore" class="text-red-500 text-sm mt-2 block font-medium"></span>
+                    <p class="text-slate-500 text-sm mt-2">Nhập điểm số mục tiêu bạn muốn đạt được để AI thiết kế lộ trình phù hợp.</p>
+                </div>
+            }
+            else
+            {
+                <div class="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-200">
+                    <label asp-for="TargetLevelId" class="block font-bold text-slate-700 mb-2">Trình độ mục tiêu</label>
+                    <select asp-for="TargetLevelId" class="block w-full py-3 px-4 border border-slate-300 rounded-xl focus:ring-blue-500 focus:border-blue-500 bg-white transition-colors">
+                        <option value="">-- Chọn trình độ mong muốn --</option>
+                        @if (ViewBag.Levels != null)
+                        {
+                            foreach (var level in ViewBag.Levels)
+                            {
+                                <option value="@level.Id">@level.Code - @level.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="TargetLevelId" class="text-red-500 text-sm mt-2 block font-medium"></span>
+                </div>
+            }
+
+            @if (!ViewData.ModelState.IsValid && ViewData.ModelState["TargetLevelId"]?.Errors.Count > 0)
+            {
+                <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6 flex items-center gap-3">
+                    <svg class="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                    <span class="font-medium">@ViewData.ModelState["TargetLevelId"]?.Errors[0].ErrorMessage</span>
+                </div>
+            }
+
+            <div class="flex items-center justify-between mt-12 pt-6 border-t border-slate-100">
+                <a asp-action="Goal" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Quay lại</a>
+                <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
+                    Tiếp tục
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.querySelector('form').addEventListener('submit', function (e) {
+            if ($(this).valid()) {
+                var btn = this.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.innerHTML = 'Đang lưu... <svg class="animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                btn.classList.add('opacity-75', 'cursor-not-allowed');
+            }
+        });
+    </script>
+}

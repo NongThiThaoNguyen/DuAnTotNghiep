@@ -1,0 +1,79 @@
+@model DuAnTotNghiep.DTOs.PlacementTestSection.CreateSectionDto
+
+@{
+    ViewData["Title"] = "Thêm phần thi (Section)";
+}
+
+<div class="mb-6 flex items-center justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-800">Thêm Phần Thi (Section)</h1>
+        <p class="text-slate-500 text-sm mt-1">Bài thi: @ViewBag.TestTitle</p>
+    </div>
+    <a asp-action="Index" asp-route-placementTestId="@Model.PlacementTestId" class="text-slate-500 hover:text-slate-800 font-medium text-sm flex items-center gap-1">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+        Quay lại cấu trúc
+    </a>
+</div>
+
+<div class="max-w-3xl bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    <div class="p-6">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 text-sm font-medium"></div>
+            <input type="hidden" asp-for="PlacementTestId" />
+
+            <div class="space-y-6">
+                <!-- Skill -->
+                <div>
+                    <label asp-for="SkillId" class="block text-sm font-medium text-slate-700 mb-1">Kỹ năng đánh giá (Skill) <span class="text-red-500">*</span></label>
+                    <select asp-for="SkillId" asp-items="ViewBag.Skills" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm px-4 py-2 border">
+                        <option value="">-- Chọn kỹ năng --</option>
+                    </select>
+                    <span asp-validation-for="SkillId" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Title -->
+                    <div>
+                        <label asp-for="SectionName" class="block text-sm font-medium text-slate-700 mb-1">Tên phần thi <span class="text-red-500">*</span></label>
+                        <input asp-for="SectionName" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm px-4 py-2 border" placeholder="VD: Part 1 - Reading Comprehension" />
+                        <span asp-validation-for="SectionName" class="text-red-500 text-xs mt-1 block"></span>
+                    </div>
+
+                    <!-- Order -->
+                    <div>
+                        <label asp-for="OrderIndex" class="block text-sm font-medium text-slate-700 mb-1">Thứ tự hiển thị (Order Index) <span class="text-red-500">*</span></label>
+                        <input asp-for="OrderIndex" type="number" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm px-4 py-2 border" />
+                        <span asp-validation-for="OrderIndex" class="text-red-500 text-xs mt-1 block"></span>
+                    </div>
+                </div>
+
+                <!-- MaxScore -->
+                <div>
+                    <label asp-for="MaxScore" class="block text-sm font-medium text-slate-700 mb-1">Điểm tối đa của phần này <span class="text-red-500">*</span></label>
+                    <input asp-for="MaxScore" type="number" step="0.01" class="w-full md:w-1/2 rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm px-4 py-2 border" placeholder="Nhập điểm dự kiến (vd: 25)" />
+                    <p class="text-xs text-slate-500 mt-1">Lưu ý: Sau khi thêm câu hỏi, tổng điểm câu hỏi phải khớp với số điểm này.</p>
+                    <span asp-validation-for="MaxScore" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+
+                <!-- Instruction -->
+                <div>
+                    <label asp-for="Instruction" class="block text-sm font-medium text-slate-700 mb-1">Hướng dẫn làm bài (Instruction)</label>
+                    <textarea asp-for="Instruction" rows="4" class="w-full rounded-lg border-slate-300 focus:border-blue-500 focus:ring-blue-500 shadow-sm px-4 py-2 border" placeholder="Nhập hướng dẫn chi tiết cho học sinh ở phần thi này..."></textarea>
+                    <span asp-validation-for="Instruction" class="text-red-500 text-xs mt-1 block"></span>
+                </div>
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-slate-200 flex justify-end gap-3">
+                <a asp-action="Index" asp-route-placementTestId="@Model.PlacementTestId" class="px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg transition-colors">Hủy</a>
+                <button type="submit" class="px-5 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    Tạo mới
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

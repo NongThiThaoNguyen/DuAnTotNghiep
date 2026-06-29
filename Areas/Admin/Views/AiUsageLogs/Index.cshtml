@@ -1,0 +1,100 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "AI Usage Logs";
+}
+
+<h2>AI Usage Logs</h2>
+
+<form method="get" class="row g-3 mb-4">
+    <div class="col-md-2">
+        <label class="form-label">Module</label>
+        <input name="module" value="@ViewBag.Module" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Model</label>
+        <input name="model" value="@ViewBag.Model" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">From</label>
+        <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">To</label>
+        <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Status</label>
+        <select name="status" class="form-select">
+            <option value="">All</option>
+            <option value="SUCCESS" selected="@(ViewBag.Status == "SUCCESS")">SUCCESS</option>
+            <option value="TIMEOUT" selected="@(ViewBag.Status == "TIMEOUT")">TIMEOUT</option>
+            <option value="SCHEMA_ERROR" selected="@(ViewBag.Status == "SCHEMA_ERROR")">SCHEMA_ERROR</option>
+            <option value="FAILED" selected="@(ViewBag.Status == "FAILED")">FAILED</option>
+        </select>
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100">Filter</button>
+    </div>
+</form>
+
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card border-info">
+            <div class="card-body">
+                <h6 class="card-title">Total Tokens</h6>
+                <h4 class="mb-0">@ViewBag.TotalTokens</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-success">
+            <div class="card-body">
+                <h6 class="card-title">Total Cost</h6>
+                <h4 class="mb-0">@String.Format("{0:C}", ViewBag.TotalCost)</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Module</th>
+            <th>Model</th>
+            <th>Status</th>
+            <th>Input</th>
+            <th>Output</th>
+            <th>Cost</th>
+            <th>Duration</th>
+            <th>Created</th>
+            <th>Error</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!Model.Any())
+        {
+            <tr><td colspan="10" class="text-center">No records found.</td></tr>
+        }
+        else
+        {
+            int i = 0;
+            foreach (var item in Model)
+            {
+                i++;
+                <tr>
+                    <td>@i</td>
+                    <td>@item.ModuleCode</td>
+                    <td>@item.AiModel</td>
+                    <td><span class="badge bg-secondary">@item.RequestStatus</span></td>
+                    <td>@item.InputTokens</td>
+                    <td>@item.OutputTokens</td>
+                    <td>@item.CostEstimate</td>
+                    <td>@item.DurationMs ms</td>
+                    <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    <td>@item.ErrorMessage</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>

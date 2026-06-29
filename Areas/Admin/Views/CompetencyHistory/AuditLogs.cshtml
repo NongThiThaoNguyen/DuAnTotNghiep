@@ -1,0 +1,159 @@
+@model IEnumerable<DuAnTotNghiep.Areas.Admin.ViewModels.AuditLogDisplayViewModel>
+
+@{
+    ViewData["Title"] = "Nhật ký Nghiệp vụ và Kiểm toán (M7)";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Header -->
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <nav aria-label="Breadcrumb">
+            <ol class="flex items-center gap-2 text-sm text-slate-500 mb-1">
+                <li><a href="@Url.Action("Index", "CompetencyHistory")" class="hover:text-blue-600">Admin</a></li>
+                <li><span class="text-slate-400">/</span></li>
+                <li class="font-medium text-slate-900" aria-current="page">Nhật ký kiểm toán</li>
+            </ol>
+        </nav>
+        <h1 class="text-2xl font-bold text-slate-900">Nhật ký Kiểm toán & Nghiệp vụ M7</h1>
+        <p class="text-sm text-slate-500 mt-1">Dữ liệu nhật ký an ninh bảo mật cấp nghiệp vụ (Bất biến & Immutable)</p>
+    </div>
+    <div class="flex gap-2">
+        <a href="@Url.Action("Index", "CompetencyHistory")" class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm ring-1 ring-slate-300 hover:bg-slate-50 transition-all">
+            Quản lý Báo cáo Năng lực
+        </a>
+    </div>
+</div>
+
+<!-- Filter Toolbar -->
+<div class="mb-6 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <!-- Search -->
+        <div class="relative">
+            <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <input type="text" id="logSearch" class="block w-full rounded-lg border-0 py-2 pl-10 pr-3 text-slate-900 ring-1 ring-inset ring-slate-300 placeholder:text-slate-400 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6" placeholder="Tìm kiếm hành động, ID, người thực hiện...">
+        </div>
+        <!-- Action Filter -->
+        <select id="actionFilter" class="block w-full rounded-lg border-0 py-2 pl-3 pr-10 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+            <option value="">Tất cả Hành động</option>
+            <option value="generate">Tạo mới (generate)</option>
+            <option value="regenerate">Tạo lại (regenerate)</option>
+            <option value="view_by_admin">Xem chi tiết (view_by_admin)</option>
+            <option value="ai_failed">AI thất bại (ai_failed)</option>
+            <option value="linked_to_path">Liên kết lộ trình (linked_to_path)</option>
+        </select>
+        <!-- Role Filter -->
+        <select id="roleFilter" class="block w-full rounded-lg border-0 py-2 pl-3 pr-10 text-slate-900 ring-1 ring-inset ring-slate-300 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6">
+            <option value="">Tất cả Vai trò</option>
+            <option value="admin">Quản trị viên (Admin)</option>
+            <option value="teacher">Giáo viên (Teacher)</option>
+            <option value="student">Học sinh (Student)</option>
+            <option value="system">Hệ thống / AI</option>
+        </select>
+    </div>
+</div>
+
+<!-- Data Table -->
+<div class="overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+            <thead class="bg-slate-50 text-slate-700">
+                <tr>
+                    <th scope="col" class="px-6 py-4 font-semibold w-16">Mã Log</th>
+                    <th scope="col" class="px-6 py-4 font-semibold w-40">Thời gian (UTC)</th>
+                    <th scope="col" class="px-6 py-4 font-semibold w-36">Hành động</th>
+                    <th scope="col" class="px-6 py-4 font-semibold w-44">Người thực hiện</th>
+                    <th scope="col" class="px-6 py-4 font-semibold">Nội dung chi tiết nghiệp vụ</th>
+                    <th scope="col" class="px-6 py-4 font-semibold w-36">Địa chỉ IP</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-200 bg-white" id="auditLogTableBody">
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        var actionClass = "bg-slate-100 text-slate-800";
+                        if (item.ActionType.Equals("generate", StringComparison.OrdinalIgnoreCase)) actionClass = "bg-emerald-100 text-emerald-800 ring-emerald-200";
+                        else if (item.ActionType.Equals("regenerate", StringComparison.OrdinalIgnoreCase)) actionClass = "bg-blue-100 text-blue-800 ring-blue-200";
+                        else if (item.ActionType.Equals("view_by_admin", StringComparison.OrdinalIgnoreCase)) actionClass = "bg-amber-100 text-amber-800 ring-amber-200";
+                        else if (item.ActionType.Equals("ai_failed", StringComparison.OrdinalIgnoreCase)) actionClass = "bg-rose-100 text-rose-800 ring-rose-200";
+                        else if (item.ActionType.Equals("linked_to_path", StringComparison.OrdinalIgnoreCase)) actionClass = "bg-purple-100 text-purple-800 ring-purple-200";
+
+                        <tr class="hover:bg-slate-50 transition-colors" data-action="@item.ActionType" data-role="@item.ActorRole">
+                            <td class="whitespace-nowrap px-6 py-4 font-mono text-slate-500 text-xs">
+                                #@item.Id
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4 text-slate-500 text-xs">
+                                @item.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                <span class="inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ring-1 ring-inset @actionClass">
+                                    @item.ActionType
+                                </span>
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4">
+                                <div class="text-sm font-medium text-slate-900">@item.ActorName</div>
+                                <div class="text-xs text-slate-500">@item.ActorRole</div>
+                            </td>
+                            <td class="px-6 py-4 text-slate-700 font-medium">
+                                @item.FriendlyMessage
+                            </td>
+                            <td class="whitespace-nowrap px-6 py-4 font-mono text-slate-500 text-xs">
+                                @(string.IsNullOrEmpty(item.IpAddress) ? "N/A" : item.IpAddress)
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-slate-500">
+                            <svg class="mx-auto h-12 w-12 text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                            <p>Không tìm thấy nhật ký kiểm toán nào.</p>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("logSearch");
+        const actionSelect = document.getElementById("actionFilter");
+        const roleSelect = document.getElementById("roleFilter");
+        const tableRows = document.querySelectorAll("#auditLogTableBody tr");
+
+        function filterLogs() {
+            const query = searchInput.value.toLowerCase().trim();
+            const actionVal = actionSelect.value.toLowerCase();
+            const roleVal = roleSelect.value.toLowerCase();
+
+            tableRows.forEach(row => {
+                // Skip if it's the "No logs found" row
+                if (row.cells.length === 1) return;
+
+                const textContent = row.textContent.toLowerCase();
+                const rowAction = row.getAttribute("data-action")?.toLowerCase() || "";
+                const rowRole = row.getAttribute("data-role")?.toLowerCase() || "";
+
+                const matchesSearch = query === "" || textContent.includes(query);
+                const matchesAction = actionVal === "" || rowAction === actionVal;
+                const matchesRole = roleVal === "" || rowRole === roleVal;
+
+                if (matchesSearch && matchesAction && matchesRole) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        }
+
+        searchInput.addEventListener("input", filterLogs);
+        actionSelect.addEventListener("change", filterLogs);
+        roleSelect.addEventListener("change", filterLogs);
+    });
+</script>

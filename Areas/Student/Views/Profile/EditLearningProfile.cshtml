@@ -1,0 +1,894 @@
+@model DuAnTotNghiep.ViewModels.Onboarding.UpdateLearningProfileViewModel
+@{
+<<<<<<< HEAD
+    ViewData["Title"] = "Cập nhật hồ sơ học tập";
+=======
+    ViewData["Title"] = "Hồ sơ học tập";
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+    var goals = ViewBag.Goals as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.GoalDto>;
+    var levels = ViewBag.Levels as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.LevelDto>;
+    var skills = ViewBag.Skills as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.SkillDto>;
+    var currentGoalId = Model.MainGoalId?.ToString() ?? "";
+<<<<<<< HEAD
+}
+
+<div class="max-w-4xl mx-auto py-8">
+    <div class="mb-8">
+        <h2 class="text-3xl font-bold text-slate-800 mb-2">Hồ sơ học tập</h2>
+        <p class="text-slate-500">Cập nhật mục tiêu, trình độ và kỹ năng ưu tiên để AI điều chỉnh lộ trình học phù hợp nhất.</p>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6 border border-red-100">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div id="goalChangeWarning" class="hidden bg-amber-50 rounded-2xl p-6 border border-amber-200 mb-8 shadow-sm">
+        <div class="flex gap-4">
+            <div class="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <div>
+                <h4 class="font-bold text-amber-800 text-lg mb-1">Lưu ý thay đổi mục tiêu</h4>
+                <p class="text-amber-700">Việc thay đổi mục tiêu học tập có thể khiến lộ trình học hiện tại không còn phù hợp. Bạn có thể cần đánh giá lại năng lực hoặc tạo Learning Path mới.</p>
+            </div>
+        </div>
+    </div>
+
+    <form method="post" asp-action="EditLearningProfile" class="space-y-8">
+        @Html.AntiForgeryToken()
+        
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100">
+                <div asp-validation-summary="ModelOnly" class="font-medium list-none"></div>
+            </div>
+        }
+
+        <!-- Mục tiêu học tập -->
+        <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+            <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>
+                Mục tiêu học tập
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @if (goals != null)
+                {
+                    foreach (var goal in goals)
+                    {
+                        <label class="cursor-pointer block relative">
+                            <input type="radio" asp-for="MainGoalId" value="@goal.Id" class="hidden peer goal-radio" data-initial="@currentGoalId" />
+                            <div class="h-full rounded-xl p-4 border-2 border-slate-100 bg-white hover:border-blue-200 hover:bg-slate-50 transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50">
+                                <h6 class="font-bold text-slate-800 mb-1 peer-checked:text-blue-700">@goal.GoalName</h6>
+                                <p class="text-slate-500 text-sm">@goal.Description</p>
+                            </div>
+                        </label>
+                    }
+                }
+            </div>
+            <span asp-validation-for="MainGoalId" class="text-red-500 text-sm mt-2 block"></span>
+        </div>
+
+        <!-- Trình độ hiện tại & Mục tiêu -->
+        <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+            <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">2</span>
+                Trình độ & Điểm số
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Trình độ hiện tại</label>
+                    <select asp-for="CurrentLevelId" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
+                        <option value="">-- Chọn trình độ hiện tại --</option>
+                        @if (levels != null)
+                        {
+                            foreach (var level in levels)
+                            {
+                                <option value="@level.Id">@level.Code - @level.Name</option>
+                            }
+                        }
+                    </select>
+                    <span asp-validation-for="CurrentLevelId" class="text-red-500 text-sm mt-1 block"></span>
+                </div>
+
+                <div id="targetScoreContainer">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Điểm mục tiêu (Nếu có)</label>
+                    <input type="number" step="0.5" asp-for="TargetScore" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="Ví dụ: 6.5" />
+                    <span asp-validation-for="TargetScore" class="text-red-500 text-sm mt-1 block"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Kỹ năng ưu tiên -->
+        <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+            <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">3</span>
+                Kỹ năng ưu tiên cải thiện
+            </h3>
+            
+            <div class="flex flex-wrap gap-3">
+                @if (skills != null)
+                {
+                    foreach (var skill in skills)
+                    {
+                        bool isChecked = Model.SelectedSkillCodes.Contains(skill.SkillCode);
+                        <label class="cursor-pointer relative inline-block">
+                            <input type="checkbox" name="SelectedSkillCodes" value="@skill.SkillCode" class="hidden peer" @(isChecked ? "checked" : "") />
+                            <div class="px-5 py-2.5 rounded-full border-2 border-slate-200 bg-white text-slate-600 font-medium hover:bg-slate-50 transition-all peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white">
+                                @skill.SkillName
+                            </div>
+                        </label>
+                    }
+                }
+            </div>
+            <span asp-validation-for="SelectedSkillCodes" class="text-red-500 text-sm mt-2 block"></span>
+        </div>
+
+        <!-- Thời gian học -->
+        <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+            <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">4</span>
+                Quỹ thời gian học
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Phút/Ngày</label>
+                    <input type="number" asp-for="DailyStudyMinutes" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="30" />
+                    <span asp-validation-for="DailyStudyMinutes" class="text-red-500 text-sm mt-1 block"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Ngày/Tuần</label>
+                    <input type="number" asp-for="WeeklyStudyDays" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="5" />
+                    <span asp-validation-for="WeeklyStudyDays" class="text-red-500 text-sm mt-1 block"></span>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Khung giờ rảnh</label>
+                    <select asp-for="PreferredStudyTime" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
+                        <option value="">-- Chọn buổi --</option>
+                        <option value="Sáng">Buổi sáng</option>
+                        <option value="Trưa">Buổi trưa</option>
+                        <option value="Chiều">Buổi chiều</option>
+                        <option value="Tối">Buổi tối</option>
+                    </select>
+                    <span asp-validation-for="PreferredStudyTime" class="text-red-500 text-sm mt-1 block"></span>
+                </div>
+            </div>
+            
+            <div class="mt-6">
+                <label class="block text-sm font-bold text-slate-700 mb-2">Ghi chú thêm (Tùy chọn)</label>
+                <textarea asp-for="LearningNote" rows="3" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="Bạn có lưu ý gì thêm về cách học không?"></textarea>
+            </div>
+        </div>
+
+        <div class="flex justify-end gap-4 pt-4 border-t border-slate-200">
+            <a asp-action="Index" asp-controller="Home" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors">
+                Hủy thay đổi
+            </a>
+            <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all">
+                Lưu hồ sơ
+            </button>
+        </div>
+    </form>
+=======
+
+    var user = ViewBag.User as DuAnTotNghiep.Models.User;
+    var profile = ViewBag.UserLearningProfile as DuAnTotNghiep.DTOs.Onboarding.LearningProfileDto;
+    var path = ViewBag.LearningPath as DuAnTotNghiep.Models.StudentLearningPath;
+    var attempt = ViewBag.LatestAttempt as DuAnTotNghiep.Models.TestAttempt;
+    var analysis = ViewBag.LatestAnalysis as DuAnTotNghiep.Models.CompetencyAnalysis;
+    var nextNode = ViewBag.NextNode as DuAnTotNghiep.Models.LearningPathNode;
+    var preferredTopics = ViewBag.PreferredTopicsList as List<string>;
+
+    int totalTopics = ViewBag.TotalTopics ?? 0;
+    int completedTopics = ViewBag.CompletedTopics ?? 0;
+    int inProgressTopics = ViewBag.InProgressTopics ?? 0;
+    int unstartedTopics = ViewBag.UnstartedTopics ?? 0;
+
+    var dashboard = ViewBag.ProgressDashboard as DuAnTotNghiep.ViewModels.Progress.ProgressDashboardViewModel;
+    decimal avgQuizScore = ViewBag.AverageQuizScore ?? 0m;
+    var timeline = ViewBag.Timeline as List<dynamic>;
+
+    // XP & Level calculations
+    int studyMinutes = dashboard?.TotalStudyMinutes ?? 0;
+    int completedLessons = dashboard?.CompletedLessonsCount ?? 0;
+    int completedQuizzes = dashboard?.CompletedQuizzesCount ?? 0;
+    int totalXp = studyMinutes * 10 + completedLessons * 50 + completedQuizzes * 100;
+    int level = (totalXp / 1000) + 1;
+    int xpInLevel = totalXp % 1000;
+
+    // Rank Tier
+    string rankTier = "Bronze";
+    string rankColor = "text-amber-700 bg-amber-50 border-amber-100";
+    if (totalXp >= 3000)
+    {
+        rankTier = "Gold";
+        rankColor = "text-yellow-600 bg-yellow-50 border-yellow-100";
+    }
+    else if (totalXp >= 1000)
+    {
+        rankTier = "Silver";
+        rankColor = "text-slate-500 bg-slate-50 border-slate-100";
+    }
+
+    double percent = totalTopics > 0 ? Math.Round((double)completedTopics / totalTopics * 100) : 0;
+
+    bool hasErrors = !ViewData.ModelState.IsValid;
+    string defaultMode = hasErrors ? "edit" : "dashboard";
+}
+
+<div class="max-w-7xl mx-auto py-8 px-4 font-sans">
+    
+    <!-- Tiêu đề trang & Nút chuyển đổi -->
+    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Hồ sơ học tập</h1>
+            <p class="text-slate-500 text-sm mt-1">Phân tích năng lực tiếng Anh, tiến trình và lộ trình học tập tối ưu hóa bởi AI.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="bg-green-50 text-green-700 border-l-4 border-green-500 p-2.5 rounded-xl text-xs font-semibold shadow-sm flex items-center gap-1.5 mr-2">
+                    <svg class="w-4 h-4 text-green-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            <button id="btn-toggle-edit" type="button" onclick="setMode('edit')" class="px-5 py-2.5 rounded-xl border border-blue-600 text-blue-600 hover:bg-blue-50 font-bold transition-all text-sm flex items-center gap-2 cursor-pointer">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+                Thay đổi thiết lập
+            </button>
+            <button id="btn-toggle-dashboard" type="button" onclick="setMode('dashboard')" class="hidden px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 hover:bg-slate-50 font-bold transition-all text-sm flex items-center gap-2 cursor-pointer">
+                <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Quay lại hồ sơ
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== PHẦN 1: DASHBOARD HỒ SƠ HỌC TẬP (3 CỘT) ==================== -->
+    <div id="mode-dashboard" class="space-y-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- ================= CỘT TRÁI ================= -->
+            <div class="space-y-6">
+                
+                <!-- Card Lớn: Thông tin cá nhân học tập -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between">
+                    <div class="text-center pb-6 border-b border-slate-100">
+                        <div class="relative w-24 h-24 mx-auto mb-4">
+                            <img class="w-24 h-24 rounded-full object-cover ring-4 ring-blue-50 bg-white" 
+                                 src="@(user != null && !string.IsNullOrEmpty(user.AvatarUrl) ? user.AvatarUrl : "/default-images/avatar.png")" 
+                                 alt="Avatar" />
+                            <div class="absolute -bottom-1.5 -right-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider @rankColor border">
+                                @rankTier
+                            </div>
+                        </div>
+                        <h2 class="text-xl font-bold text-slate-900">@(user?.FullName ?? "Học viên")</h2>
+                        <p class="text-slate-400 text-xs mt-0.5">@(user?.Email ?? "")</p>
+                        
+                        <div class="mt-4 flex items-center justify-center gap-2">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-blue-50 text-blue-600">
+                                Hiện tại: @(profile?.CurrentLevel?.Code ?? "N/A")
+                            </span>
+                            @if (profile?.TargetLevel != null)
+                            {
+                                <svg class="w-3.5 h-3.5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-green-50 text-green-700">
+                                    Mục tiêu: @(profile.TargetLevel.Code)
+                                </span>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Streak & XP & Level -->
+                    <div class="py-5 border-b border-slate-100 space-y-4">
+                        <div>
+                            <div class="flex justify-between items-baseline mb-1">
+                                <span class="text-xs text-slate-500 font-bold uppercase">Cấp độ học tập</span>
+                                <span class="text-xs font-bold text-blue-600">Cấp độ @level</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <div class="flex-1 bg-slate-100 rounded-full h-2 overflow-hidden">
+                                    <div class="bg-blue-600 h-full rounded-full transition-all duration-300" style="width: @(xpInLevel / 10.0)%"></div>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-semibold shrink-0">@xpInLevel / 1000 XP</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="block text-[10px] font-bold text-slate-400 uppercase">Học liên tục</span>
+                                <span class="text-base font-extrabold text-orange-500">@(dashboard?.StreakDays ?? 0) ngày 🔥</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] font-bold text-slate-400 uppercase">Tích lũy</span>
+                                <span class="text-base font-extrabold text-blue-600">@totalXp XP 🏆</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Progress Learning Path -->
+                    <div class="pt-5">
+                        <div class="flex justify-between items-baseline mb-1.5">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Tiến độ Lộ trình</span>
+                            <span class="text-sm font-extrabold text-slate-800">@percent%</span>
+                        </div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-emerald-500 h-full rounded-full transition-all duration-500" style="width: @percent%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4 Card nhỏ -->
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Placement Score -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block tracking-wider">Placement</span>
+                        <div class="text-2xl font-extrabold text-blue-600 mt-1">
+                            @(attempt != null ? $"{attempt.TotalScore}đ" : "Chưa thi")
+                        </div>
+                    </div>
+                    <!-- Lessons Completed -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block tracking-wider">Bài học xong</span>
+                        <div class="text-2xl font-extrabold text-slate-850 mt-1">@completedLessons</div>
+                    </div>
+                    <!-- Quiz Completed -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block tracking-wider">Quiz đã làm</span>
+                        <div class="text-2xl font-extrabold text-slate-850 mt-1">@completedQuizzes</div>
+                    </div>
+                    <!-- Average Score -->
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase block tracking-wider">Quiz TB</span>
+                        <div class="text-2xl font-extrabold text-emerald-600 mt-1">
+                            @(avgQuizScore > 0 ? $"{avgQuizScore.ToString("0.0")}đ" : "0.0")
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card: Nguyện vọng học tập -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                    <h3 class="font-extrabold text-slate-900 text-base mb-4 flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        Nguyện vọng học tập (M3)
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Mục tiêu cốt lõi</span>
+                            <span class="text-slate-800 text-sm font-semibold">@(profile?.MainGoal?.GoalName ?? "Chưa thiết lập")</span>
+                        </div>
+                        <div>
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Kỹ năng quan tâm</span>
+                            @if (profile?.PrioritySkills != null && profile.PrioritySkills.Any())
+                            {
+                                <div class="flex flex-wrap gap-1.5 mt-1">
+                                    @foreach (var s in profile.PrioritySkills)
+                                    {
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600 border border-blue-100">@s.SkillName</span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-slate-400 text-xs italic">Chưa chọn kỹ năng</span>
+                            }
+                        </div>
+                        <div>
+                            <span class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Chủ đề yêu thích</span>
+                            @if (preferredTopics != null && preferredTopics.Any())
+                            {
+                                <div class="flex flex-wrap gap-1.5 mt-1">
+                                    @foreach (var t in preferredTopics)
+                                    {
+                                        <span class="text-[10px] font-semibold px-2 py-0.5 rounded bg-slate-55 bg-slate-50 text-slate-600 border border-slate-200">@t</span>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-slate-400 text-xs italic">Chưa chọn chủ đề</span>
+                            }
+                        </div>
+                        <div class="grid grid-cols-2 gap-4 border-t border-slate-50 pt-3">
+                            <div>
+                                <span class="block text-[10px] text-slate-400 font-bold uppercase mb-0.5">Thời gian học</span>
+                                <span class="text-slate-800 text-xs font-semibold">@(profile?.DailyStudyMinutes ?? 30)m/ngày, @(profile?.WeeklyStudyDays ?? 5)d/tuần</span>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] text-slate-400 font-bold uppercase mb-0.5">Buổi học rảnh</span>
+                                <span class="text-slate-800 text-xs font-semibold">Buổi @(profile?.PreferredStudyTime ?? "Tự do")</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (profile != null && profile.OnboardingStatus != "COMPLETED")
+                    {
+                        <div class="mt-5 border-t border-slate-100 pt-4">
+                            <a href="/Student/Onboarding/Goal" class="w-full text-center py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-colors shadow-sm block">
+                                Hoàn thành Onboarding
+                            </a>
+                        </div>
+                    }
+                </div>
+
+            </div>
+
+            <!-- ================= CỘT GIỮA ================= -->
+            <div class="space-y-6">
+                
+                <!-- Card Lớn: Hồ sơ học tập -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 h-full flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100">
+                            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                            </div>
+                            <div>
+                                <h3 class="font-extrabold text-slate-900 text-lg">Chi tiết hồ sơ học tập</h3>
+                                <p class="text-xs text-slate-400 mt-0.5">Đồng bộ dữ liệu M3, M6, M7 và M8</p>
+                            </div>
+                        </div>
+
+                        <dl class="space-y-4">
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Trình độ hiện tại</dt>
+                                <dd class="text-sm font-bold text-slate-800">@(profile?.CurrentLevel?.Name ?? "Chưa xác định")</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Trình độ mục tiêu</dt>
+                                <dd class="text-sm font-bold text-slate-800">@(profile?.TargetLevel?.Name ?? "Chưa xác định")</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Trình độ ước lượng (Placement)</dt>
+                                <dd class="text-sm font-bold text-slate-800">@(attempt?.EstimatedLevel?.Name ?? "Chưa có")</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Điểm kiểm tra đầu vào</dt>
+                                <dd class="text-sm font-bold text-blue-600">@(attempt != null ? $"{attempt.TotalScore} điểm" : "Chưa làm test")</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Lộ trình học tập (M8)</dt>
+                                <dd class="text-sm font-bold text-slate-800 text-right max-w-[200px] truncate">@(path?.Title ?? "Chưa tạo lộ trình")</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Chủ đề hiện tại</dt>
+                                <dd class="text-sm font-bold text-slate-800 text-right max-w-[200px] truncate">@(nextNode?.Topic?.Title ?? "Chưa bắt đầu")</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Bài học tiếp theo</dt>
+                                <dd class="text-sm font-bold text-blue-600 text-right max-w-[200px] truncate">@(nextNode?.NodeTitle ?? "Hoàn thành lộ trình")</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Tiến trình bài học</dt>
+                                <dd class="text-sm font-bold text-slate-800">@percent% (@completedTopics/@totalTopics chủ đề)</dd>
+                            </div>
+                            <div class="flex justify-between items-center py-2 border-b border-slate-50">
+                                <dt class="text-xs text-slate-500 font-semibold">Quỹ thời gian cam kết</dt>
+                                <dd class="text-sm font-bold text-slate-800">@(profile?.DailyStudyMinutes ?? 30) phút/ngày · @(profile?.WeeklyStudyDays ?? 5) ngày/tuần</dd>
+                            </div>
+                            <div class="flex flex-col py-2">
+                                <dt class="text-xs text-slate-500 font-semibold mb-1">Kỹ năng ưu tiên cải thiện</dt>
+                                <dd class="text-xs font-semibold text-slate-700 leading-relaxed">
+                                    @(profile?.PrioritySkills != null && profile.PrioritySkills.Any() ? string.Join(", ", profile.PrioritySkills.Select(s => s.SkillName)) : "Chưa chọn")
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <div class="bg-blue-50/40 p-4 rounded-xl border border-blue-100 flex items-center justify-between text-xs mt-6">
+                        <span class="text-slate-500">Cập nhật lần cuối:</span>
+                        <span class="font-bold text-slate-600">@(ViewBag.DbProfile != null ? ((DateTime)ViewBag.DbProfile.UpdatedAt).ToString("dd/MM/yyyy HH:mm") : "")</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ================= CỘT PHẢI ================= -->
+            <div class="space-y-6">
+                
+                <!-- Card 1: AI Đánh giá năng lực -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                    <h3 class="font-extrabold text-slate-900 text-base mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-blue-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        AI Đánh giá năng lực (M7)
+                    </h3>
+
+                    @if (analysis != null)
+                    {
+                        <div class="space-y-4">
+                            <div>
+                                <span class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Điểm mạnh</span>
+                                <p class="text-sm text-green-700 font-semibold bg-green-50/50 p-2.5 rounded-xl border border-green-100/50 leading-relaxed">@analysis.Strengths</p>
+                            </div>
+                            <div>
+                                <span class="block text-[10px] text-slate-400 font-bold uppercase mb-1">Điểm yếu</span>
+                                <p class="text-sm text-red-700 font-semibold bg-red-50/50 p-2.5 rounded-xl border border-red-100/50 leading-relaxed">@analysis.Weaknesses</p>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-50">
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Kỹ năng mạnh</span>
+                                    <span class="text-xs font-bold text-slate-800">Từ vựng, Đọc hiểu</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Kỹ năng yếu</span>
+                                    <span class="text-xs font-bold text-slate-800">Ngữ pháp nâng cao</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Chủ đề mạnh</span>
+                                    <span class="text-xs font-bold text-slate-800">Travel, Family</span>
+                                </div>
+                                <div>
+                                    <span class="block text-[10px] text-slate-400 font-bold uppercase">Chủ đề yếu</span>
+                                    <span class="text-xs font-bold text-slate-800">Business, Finance</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="flex flex-col items-center justify-center text-center py-8">
+                            <div class="relative w-12 h-12 flex items-center justify-center mb-3">
+                                <div class="absolute inset-0 rounded-full border-4 border-slate-100 border-t-blue-500 animate-spin"></div>
+                                <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1"></path></svg>
+                            </div>
+                            <h4 class="text-slate-800 font-bold text-sm mb-1">Đang phân tích...</h4>
+                            <p class="text-slate-400 text-[10px] max-w-xs leading-normal">AI đang thu thập dữ liệu học tập và kết quả kiểm tra để đánh giá năng lực của bạn.</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Card 2: Thống kê nhanh -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+                    <h3 class="font-extrabold text-slate-900 text-base mb-4 flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2m0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2"></path></svg>
+                        Thống kê nhanh
+                    </h3>
+
+                    <div class="space-y-3.5">
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Tổng bài học</span>
+                            <span class="font-bold text-slate-800">@completedLessons bài</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Tổng Quiz đã làm</span>
+                            <span class="font-bold text-slate-800">@completedQuizzes quiz</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Chủ đề đã hoàn thành</span>
+                            <span class="font-bold text-slate-800">@completedTopics chủ đề</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Kỹ năng hoàn thành</span>
+                            <span class="font-bold text-slate-800">@(dashboard?.SkillProgresses?.Count(s => s.ProgressPercent >= 100) ?? 0) kỹ năng</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Số ngày học tích lũy</span>
+                            <span class="font-bold text-slate-800">@(dashboard?.StreakDays ?? 0) ngày</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Thời gian học tích lũy</span>
+                            <span class="font-bold text-slate-800">@studyMinutes phút</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Điểm trung bình Quiz</span>
+                            <span class="font-bold text-emerald-600">@(avgQuizScore > 0 ? $"{avgQuizScore.ToString("0.0")}đ" : "0.0")</span>
+                        </div>
+                        <div class="flex items-center justify-between text-xs">
+                            <span class="text-slate-500 font-medium">Hạng học lực</span>
+                            <span class="font-bold text-blue-600">Top 8% (@rankTier)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Learning Path -->
+                <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                    <h3 class="font-extrabold text-slate-900 text-base flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                        Lộ trình học tập (M8)
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Đang kích hoạt</span>
+                            <span class="text-sm font-bold text-slate-800 block truncate">@(path?.Title ?? "Chưa khởi tạo")</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Mức độ hoàn thành: @percent%</span>
+                            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                                <div class="bg-blue-600 h-full rounded-full transition-all duration-300" style="width: @percent%"></div>
+                            </div>
+                        </div>
+                        @if (nextNode != null)
+                        {
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold uppercase block mb-0.5">Bài học tiếp theo</span>
+                                <span class="text-xs text-blue-600 font-semibold block truncate">@nextNode.NodeTitle</span>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="pt-2">
+                        <a href="/Student/Home/Index" class="w-full text-center py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md shadow-blue-600/10 block">
+                            Tiếp tục học
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- ================= BÊN DƯỚI TOÀN TRANG: Recent Activities Timeline ================= -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8">
+            <h3 class="font-extrabold text-slate-900 text-lg mb-6 flex items-center gap-2">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Hoạt động gần đây (Recent Activities)
+            </h3>
+
+            @if (timeline != null && timeline.Any())
+            {
+                <div class="relative border-l-2 border-slate-100 ml-3.5 pl-6 space-y-6">
+                    @foreach (var act in timeline)
+                    {
+                        string iconBg = "bg-slate-100 text-slate-500";
+                        string iconSvg = "";
+                        if (act.Type == "LESSON" || act.Type == "LEARN")
+                        {
+                            iconBg = "bg-blue-50 text-blue-600";
+                            iconSvg = "<svg class='w-4.5 h-4.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253'></path></svg>";
+                        }
+                        else if (act.Type == "QUIZ")
+                        {
+                            iconBg = "bg-amber-50 text-amber-600";
+                            iconSvg = "<svg class='w-4.5 h-4.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'></path></svg>";
+                        }
+                        else if (act.Type == "PLACEMENT_TEST")
+                        {
+                            iconBg = "bg-purple-50 text-purple-600";
+                            iconSvg = "<svg class='w-4.5 h-4.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'></path></svg>";
+                        }
+                        else if (act.Type == "AI_RECOMMENDATION")
+                        {
+                            iconBg = "bg-emerald-50 text-emerald-600 animate-pulse";
+                            iconSvg = "<svg class='w-4.5 h-4.5' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 10V3L4 14h7v7l9-11h-7z'></path></svg>";
+                        }
+
+                        <div class="relative">
+                            <!-- Bullet Icon -->
+                            <div class="absolute -left-[37px] top-0 w-8 h-8 rounded-full flex items-center justify-center border-4 border-white shadow-sm @iconBg">
+                                @Html.Raw(iconSvg)
+                            </div>
+                            
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-bold block">@act.Time.ToString("dd/MM/yyyy HH:mm")</span>
+                                <h4 class="text-sm font-bold text-slate-800 mt-0.5">@act.Title</h4>
+                                <p class="text-xs text-slate-500 mt-1">@act.Detail</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="py-12 flex flex-col items-center justify-center text-center">
+                    <div class="w-14 h-14 rounded-full bg-slate-50 flex items-center justify-center mb-3">
+                        <svg class="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h4 class="text-slate-700 font-semibold text-sm">Chưa có hoạt động nào được ghi lại</h4>
+                    <p class="text-slate-400 text-xs mt-1 max-w-xs leading-normal">Hãy bắt đầu bài học, làm bài thi thử hoặc học Quiz để theo dõi lịch sử hoạt động học của bạn.</p>
+                </div>
+            }
+        </div>
+
+    </div>
+
+    <!-- ==================== PHẦN 2: FORM THAY ĐỔI THIẾT LẬP (ẨN) ==================== -->
+    <div id="mode-edit" class="hidden">
+        
+        <div id="goalChangeWarning" class="hidden bg-amber-50 rounded-2xl p-6 border border-amber-200 mb-8 shadow-sm">
+            <div class="flex gap-4">
+                <div class="flex-shrink-0 w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <div>
+                    <h4 class="font-bold text-amber-800 text-lg mb-1">Lưu ý thay đổi mục tiêu</h4>
+                    <p class="text-amber-700">Việc thay đổi mục tiêu học tập có thể khiến lộ trình học hiện tại không còn phù hợp. Bạn có thể cần đánh giá lại năng lực hoặc tạo Learning Path mới.</p>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" asp-action="EditLearningProfile" class="space-y-8">
+            @Html.AntiForgeryToken()
+            
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 shadow-inner">
+                    <div asp-validation-summary="ModelOnly" class="font-medium list-none text-sm"></div>
+                </div>
+            }
+
+            <!-- Mục tiêu học tập -->
+            <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
+                    Mục tiêu học tập
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @if (goals != null)
+                    {
+                        foreach (var goal in goals)
+                        {
+                            <label class="cursor-pointer block relative">
+                                <input type="radio" asp-for="MainGoalId" value="@goal.Id" class="hidden peer goal-radio" data-initial="@currentGoalId" />
+                                <div class="h-full rounded-xl p-4 border-2 border-slate-100 bg-white hover:border-blue-200 hover:bg-slate-50 transition-all peer-checked:border-blue-600 peer-checked:bg-blue-50">
+                                    <h6 class="font-bold text-slate-800 mb-1 peer-checked:text-blue-700">@goal.GoalName</h6>
+                                    <p class="text-slate-500 text-sm">@goal.Description</p>
+                                </div>
+                            </label>
+                        }
+                    }
+                </div>
+                <span asp-validation-for="MainGoalId" class="text-red-500 text-sm mt-2 block"></span>
+            </div>
+
+            <!-- Trình độ hiện tại & Mục tiêu -->
+            <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">2</span>
+                    Trình độ & Điểm số
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Trình độ hiện tại</label>
+                        <select asp-for="CurrentLevelId" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
+                            <option value="">-- Chọn trình độ hiện tại --</option>
+                            @if (levels != null)
+                            {
+                                foreach (var levelItem in levels)
+                                {
+                                    <option value="@levelItem.Id">@levelItem.Code - @levelItem.Name</option>
+                                }
+                            }
+                        </select>
+                        <span asp-validation-for="CurrentLevelId" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+
+                    <div id="targetScoreContainer">
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Điểm mục tiêu (Nếu có)</label>
+                        <input type="number" step="0.5" asp-for="TargetScore" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="Ví dụ: 6.5" />
+                        <span asp-validation-for="TargetScore" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Kỹ năng ưu tiên -->
+            <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">3</span>
+                    Kỹ năng ưu tiên cải thiện
+                </h3>
+                
+                <div class="flex flex-wrap gap-3">
+                    @if (skills != null)
+                    {
+                        foreach (var skill in skills)
+                        {
+                            bool isChecked = Model.SelectedSkillCodes.Contains(skill.SkillCode);
+                            <label class="cursor-pointer relative inline-block">
+                                <input type="checkbox" name="SelectedSkillCodes" value="@skill.SkillCode" class="hidden peer" @(isChecked ? "checked" : "") />
+                                <div class="px-5 py-2.5 rounded-full border border-slate-200 bg-white text-slate-600 font-medium hover:bg-slate-50 transition-all peer-checked:border-blue-600 peer-checked:bg-blue-600 peer-checked:text-white">
+                                    @skill.SkillName
+                                </div>
+                            </label>
+                        }
+                    }
+                </div>
+                <span asp-validation-for="SelectedSkillCodes" class="text-red-500 text-sm mt-2 block"></span>
+            </div>
+
+            <!-- Thời gian học -->
+            <div class="bg-white shadow-sm rounded-2xl p-6 md:p-8 border border-slate-200">
+                <h3 class="text-xl font-bold text-slate-800 mb-6 flex items-center gap-2">
+                    <span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">4</span>
+                    Quỹ thời gian học
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Phút/Ngày</label>
+                        <input type="number" asp-for="DailyStudyMinutes" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="30" />
+                        <span asp-validation-for="DailyStudyMinutes" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Ngày/Tuần</label>
+                        <input type="number" asp-for="WeeklyStudyDays" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="5" />
+                        <span asp-validation-for="WeeklyStudyDays" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-slate-700 mb-2">Khung giờ rảnh</label>
+                        <select asp-for="PreferredStudyTime" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors">
+                            <option value="">-- Chọn buổi --</option>
+                            <option value="Sáng">Buổi sáng</option>
+                            <option value="Trưa">Buổi trưa</option>
+                            <option value="Chiều">Buổi chiều</option>
+                            <option value="Tối">Buổi tối</option>
+                        </select>
+                        <span asp-validation-for="PreferredStudyTime" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <label class="block text-sm font-bold text-slate-700 mb-2">Ghi chú thêm (Tùy chọn)</label>
+                    <textarea asp-for="LearningNote" rows="3" class="w-full rounded-xl border-slate-200 p-3 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-colors" placeholder="Bạn có lưu ý gì thêm về cách học không?"></textarea>
+                </div>
+            </div>
+
+            <!-- Các nút Lưu/Hủy -->
+            <div class="flex justify-end gap-4 pt-4 border-t border-slate-200">
+                <button type="button" onclick="setMode('dashboard')" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-bold hover:bg-slate-50 transition-colors cursor-pointer">
+                    Hủy thay đổi
+                </button>
+                <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all cursor-pointer">
+                    Lưu thiết lập
+                </button>
+            </div>
+        </form>
+    </div>
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+<<<<<<< HEAD
+        document.addEventListener('DOMContentLoaded', function () {
+=======
+        function setMode(mode) {
+            const dashboardSection = document.getElementById('mode-dashboard');
+            const editSection = document.getElementById('mode-edit');
+            const btnEdit = document.getElementById('btn-toggle-edit');
+            const btnDashboard = document.getElementById('btn-toggle-dashboard');
+
+            if (mode === 'dashboard') {
+                dashboardSection.classList.remove('hidden');
+                editSection.classList.add('hidden');
+                btnEdit.classList.remove('hidden');
+                btnDashboard.classList.add('hidden');
+            } else {
+                dashboardSection.classList.add('hidden');
+                editSection.classList.remove('hidden');
+                btnEdit.classList.add('hidden');
+                btnDashboard.classList.remove('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            setMode('@defaultMode');
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+            const initialGoalId = '@currentGoalId';
+            const goalRadios = document.querySelectorAll('.goal-radio');
+            const warningBox = document.getElementById('goalChangeWarning');
+
+            goalRadios.forEach(radio => {
+                radio.addEventListener('change', function () {
+                    if (this.checked && this.value !== initialGoalId) {
+                        warningBox.classList.remove('hidden');
+                    } else {
+                        warningBox.classList.add('hidden');
+                    }
+                });
+            });
+        });
+    </script>
+}

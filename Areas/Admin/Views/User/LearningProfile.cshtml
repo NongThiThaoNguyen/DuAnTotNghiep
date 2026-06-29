@@ -1,0 +1,186 @@
+@model DuAnTotNghiep.DTOs.Onboarding.LearningProfileDto
+@{
+    ViewData["Title"] = "Hồ sơ học tập của học viên";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2 class="h3 mb-2 text-gray-800">
+                <i class="bi bi-mortarboard-fill text-primary me-2"></i> Hồ sơ học tập cá nhân
+            </h2>
+            <p class="mb-4">Thông tin chi tiết về lộ trình và mục tiêu học tập của học viên.</p>
+        </div>
+        <div class="col-auto text-end">
+            <a asp-action="Details" asp-route-id="@ViewBag.StudentId" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Thông tin cơ bản</h6>
+                    <span class="badge bg-info">@Model.OnboardingStatus</span>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <th width="30%">Mục tiêu chính:</th>
+                                <td>@(Model.MainGoal?.GoalName ?? "Chưa thiết lập")</td>
+                            </tr>
+                            <tr>
+                                <th>Trình độ hiện tại:</th>
+                                <td>@(Model.CurrentLevel?.Name ?? "Chưa thiết lập")</td>
+                            </tr>
+                            <tr>
+                                <th>Mục tiêu đầu ra:</th>
+                                <td>
+                                    @if (Model.TargetLevel != null)
+                                    {
+                                        <span>@Model.TargetLevel.Name</span>
+                                    }
+                                    else if (Model.TargetScore.HasValue)
+                                    {
+                                        <span>@Model.TargetScore Điểm</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa thiết lập</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Thời gian học / ngày:</th>
+                                <td>@(Model.DailyStudyMinutes?.ToString() ?? "0") phút</td>
+                            </tr>
+                            <tr>
+                                <th>Số ngày học / tuần:</th>
+                                <td>@(Model.WeeklyStudyDays?.ToString() ?? "0") ngày</td>
+                            </tr>
+                            <tr>
+                                <th>Khung giờ ưu tiên:</th>
+                                <td>@(string.IsNullOrEmpty(Model.PreferredStudyTime) ? "Chưa thiết lập" : Model.PreferredStudyTime)</td>
+                            </tr>
+                            <tr>
+                                <th>Ghi chú:</th>
+                                <td>@(string.IsNullOrEmpty(Model.LearningNote) ? "Không có" : Model.LearningNote)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Kỹ năng ưu tiên cải thiện</h6>
+                </div>
+                <div class="card-body">
+                    @if (Model.PrioritySkills != null && Model.PrioritySkills.Any())
+                    {
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var skill in Model.PrioritySkills)
+                            {
+                                <span class="badge bg-secondary p-2">@skill.SkillName</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-muted mb-0">Chưa thiết lập kỹ năng ưu tiên.</p>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow mb-4 border-left-warning">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-warning">Hành động của Admin</h6>
+                </div>
+                <div class="card-body">
+                    <p class="small text-muted">Nếu học viên gặp khó khăn với bài Placement Test hoặc muốn cấu hình lại lộ trình học từ đầu, bạn có thể thiết lập lại trạng thái Onboarding của học viên.</p>
+                    
+                    <form asp-action="ResetOnboarding" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn reset trạng thái Onboarding của học viên này về Bắt Đầu không? Mọi lịch sử bài test sẽ bị ảnh hưởng.');">
+                        <input type="hidden" name="id" value="@ViewBag.StudentId" />
+                        <button type="submit" class="btn btn-warning w-100">
+                            <i class="bi bi-arrow-counterclockwise"></i> Reset Onboarding
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audit Logs Section -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Lịch sử thay đổi (Audit Logs)</h6>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Hành động</th>
+                                    <th>Giá trị cũ</th>
+                                    <th>Giá trị mới</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (ViewBag.AuditLogs != null && ((IEnumerable<DuAnTotNghiep.Models.AuditLog>)ViewBag.AuditLogs).Any())
+                                {
+                                    foreach (var log in (IEnumerable<DuAnTotNghiep.Models.AuditLog>)ViewBag.AuditLogs)
+                                    {
+                                        <tr>
+                                            <td>@log.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td>
+                                                @if(log.Action == "ONBOARDING_STARTED") { <span class="badge bg-primary">Khởi tạo</span> }
+                                                else if(log.Action == "ONBOARDING_STEP_SAVED") { <span class="badge bg-info">Lưu bước</span> }
+                                                else if(log.Action == "ONBOARDING_COMPLETED") { <span class="badge bg-success">Hoàn thành Onboarding</span> }
+                                                else if(log.Action == "LEARNING_PROFILE_UPDATED") { <span class="badge bg-secondary">Cập nhật Profile</span> }
+                                                else if(log.Action == "ADMIN_RESET_LEARNING_PROFILE") { <span class="badge bg-warning text-dark">Admin Reset</span> }
+                                                else if(log.Action == "ADMIN_VIEW_LEARNING_PROFILE") { <span class="badge bg-light text-dark">Admin View</span> }
+                                                else { <span class="badge bg-dark">@log.Action</span> }
+                                            </td>
+                                            <td>@(string.IsNullOrEmpty(log.OldValue) ? "-" : log.OldValue)</td>
+                                            <td>@(string.IsNullOrEmpty(log.NewValue) ? "-" : log.NewValue)</td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted">Chưa có lịch sử thay đổi nào.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

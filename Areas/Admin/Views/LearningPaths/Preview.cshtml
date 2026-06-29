@@ -1,0 +1,84 @@
+@model DuAnTotNghiep.ViewModels.LearningPath.LearningPathPageViewModel
+
+@{
+    ViewData["Title"] = "Learning Path Preview";
+    ViewData["ReadOnly"] = true;
+}
+
+<link rel="stylesheet" href="~/css/learning-path.css" asp-append-version="true" />
+
+<div class="lp-page">
+    <header class="lp-header">
+        <div>
+            <p class="lp-header__eyebrow">Admin preview</p>
+            <h1 class="lp-header__title">@(Model.HasPath ? Model.PathTitle : "No active path")</h1>
+            @if (!string.IsNullOrWhiteSpace(Model.PathDescription))
+            {
+                <p class="lp-header__description">@Model.PathDescription</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.AiPlanSummary))
+            {
+                <p class="lp-header__description">@Model.AiPlanSummary</p>
+            }
+        </div>
+        <div class="lp-header__meta">
+            <div class="lp-stat">
+                <span class="lp-stat__label">Status</span>
+                <span class="lp-stat__value">@Model.PathStatus</span>
+            </div>
+            <div class="lp-stat">
+                <span class="lp-stat__label">Target</span>
+                <span class="lp-stat__value">@(Model.TargetEndDate?.ToString("dd/MM/yyyy") ?? "Auto")</span>
+            </div>
+        </div>
+    </header>
+
+    @if (!Model.HasPath)
+    {
+        <section class="lp-empty">
+            <h2 class="lp-empty__title">No active learning path</h2>
+            <p class="lp-empty__text">This student does not currently have an ACTIVE learning path.</p>
+        </section>
+    }
+    else
+    {
+        <section class="lp-section">
+            <div class="lp-section__header">
+                <div>
+                    <p class="lp-section__eyebrow">Progress</p>
+                    <h2 class="lp-section__title">Student path summary</h2>
+                </div>
+            </div>
+            @await Html.PartialAsync("~/Areas/Student/Views/LearningPath/_PathProgressBar.cshtml", Model.Progress)
+        </section>
+
+        <section class="lp-section">
+            <div class="lp-section__header">
+                <div>
+                    <p class="lp-section__eyebrow">Read only</p>
+                    <h2 class="lp-section__title">Learning path nodes</h2>
+                </div>
+            </div>
+            <div class="lp-path">
+                @{
+                    var nodeIndex = 0;
+                    var groupedNodes = Model.Nodes
+                        .GroupBy(n => string.IsNullOrWhiteSpace(n.PathPhase) ? "Stage " + ((n.OrderIndex - 1) / 5 + 1) : n.PathPhase)
+                        .ToList();
+                }
+                @foreach (var group in groupedNodes)
+                {
+                    @await Html.PartialAsync("~/Areas/Student/Views/LearningPath/_PathStageHeader.cshtml", group.Key)
+                    foreach (var node in group.OrderBy(n => n.OrderIndex))
+                    {
+                        var rowClass = nodeIndex % 2 == 0 ? "lp-node-row--left" : "lp-node-row--right";
+                        <div class="lp-node-row @rowClass">
+                            @await Html.PartialAsync("~/Areas/Student/Views/LearningPath/_PathNodeCard.cshtml", node)
+                        </div>
+                        nodeIndex++;
+                    }
+                }
+            </div>
+        </section>
+    }
+</div>

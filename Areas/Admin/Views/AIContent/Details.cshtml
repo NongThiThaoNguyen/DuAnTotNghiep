@@ -1,0 +1,169 @@
+@model DuAnTotNghiep.ViewModels.AiContentReviewDetailViewModel
+@{
+    ViewData["Title"] = "Review Content Detail";
+}
+
+<h2>Review Content Detail</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <dl class="row">
+            <dt class="col-sm-3">Content Type</dt>
+            <dd class="col-sm-9">@Model.ContentType</dd>
+
+            <dt class="col-sm-3">Topic</dt>
+            <dd class="col-sm-9">@Model.TopicName</dd>
+
+            <dt class="col-sm-3">Requested By</dt>
+            <dd class="col-sm-9">@Model.RequestedByName</dd>
+
+            <dt class="col-sm-3">Created</dt>
+            <dd class="col-sm-9">@Model.CreatedAt.ToString("yyyy-MM-dd HH:mm")</dd>
+
+            <dt class="col-sm-3">Status</dt>
+            <dd class="col-sm-9"><span class="badge bg-warning">@Model.ReviewStatus</span></dd>
+        </dl>
+
+        <hr />
+
+        <h4>Question Content</h4>
+        <div class="card">
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label">Question Text</label>
+                    <textarea id="questionText" class="form-control" rows="3">@Model.QuestionText</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Options (JSON)</label>
+                    <textarea id="options" class="form-control" rows="3" readonly>@Model.Options</textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Correct Answer Index</label>
+                            <input type="number" class="form-control" value="@Model.CorrectAnswerIndex" readonly />
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label class="form-label">Difficulty</label>
+                            <input type="text" class="form-control" value="@Model.Difficulty" readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Explanation</label>
+                    <textarea id="explanation" class="form-control" rows="3">@Model.Explanation</textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Skill Tags (JSON)</label>
+                    <textarea class="form-control" rows="2" readonly>@Model.SkillTags</textarea>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <h4>Full Generated Content (JSON)</h4>
+        <div class="card">
+            <div class="card-body">
+                <pre>@Model.GeneratedContent</pre>
+            </div>
+        </div>
+
+        <h4>Original Prompt</h4>
+        <div class="card">
+            <div class="card-body">
+                <pre style="max-height: 200px; overflow-y: auto;">@Model.PromptText</pre>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Review Form</div>
+            <div class="card-body">
+                @if (Model.IsApproved)
+                {
+                    <div class="alert alert-success mb-3">
+                        ✓ This content is APPROVED and can be published to Question Bank
+                        @if (Model.PublishedQuestionId.HasValue)
+                        {
+                            <span class="badge bg-info">Published (Q#@Model.PublishedQuestionId)</span>
+                        }
+                    </div>
+
+                    @if (!Model.PublishedQuestionId.HasValue)
+                    {
+                        <form method="post" asp-action="Publish" class="mb-3">
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-primary btn-block">
+                                📤 Publish to Question Bank
+                            </button>
+                        </form>
+                    }
+                }
+
+                <form method="post" asp-action="Approve">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <input type="hidden" name="editedQuestionText" id="hiddenQuestionText" />
+                    <input type="hidden" name="editedExplanation" id="hiddenExplanation" />
+
+                    <div class="mb-3">
+                        <label class="form-check-label">
+                            <input type="checkbox" name="copyrightCheck" class="form-check-input" value="true" />
+                            Copyright Check
+                        </label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Plagiarism Risk</label>
+                        <select name="plagiarismRisk" class="form-control">
+                            <option>LOW</option>
+                            <option>MEDIUM</option>
+                            <option>HIGH</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Review Notes</label>
+                        <textarea name="reviewNote" class="form-control" rows="3" placeholder="Optional notes..."></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-success btn-block">Approve</button>
+                    </div>
+                </form>
+
+                <form method="post" asp-action="RequestRevision">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">Revision Request Note</label>
+                        <textarea name="reviewNote" class="form-control" rows="3" placeholder="Describe what needs revision..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-warning btn-block">Request Revision</button>
+                </form>
+
+                <form method="post" asp-action="Reject">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label class="form-label">Rejection Reason (Required)</label>
+                        <textarea name="reviewNote" class="form-control" rows="3" placeholder="Why is this being rejected?" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-danger btn-block">Reject</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.querySelector('form[asp-action="Approve"]').addEventListener('submit', function() {
+        document.getElementById('hiddenQuestionText').value = document.getElementById('questionText').value;
+        document.getElementById('hiddenExplanation').value = document.getElementById('explanation').value;
+    });
+</script>

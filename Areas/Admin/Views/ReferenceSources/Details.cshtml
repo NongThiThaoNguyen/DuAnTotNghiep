@@ -1,0 +1,328 @@
+@model DuAnTotNghiep.ViewModels.Admin.ReferenceSources.ReferenceSourceDetailsViewModel
+@using DuAnTotNghiep.Helpers
+@using DuAnTotNghiep.Enums
+@{
+    ViewData["Title"] = "Chi tiết nguồn tham khảo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
+        <h2>Chi tiết nguồn tham khảo</h2>
+        <a asp-action="Index" asp-controller="ReferenceSources" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row">
+        <!-- Cột trái: Thông tin chi tiết, bản quyền và các thực thể liên quan -->
+        <div class="col-md-8">
+            <!-- Khối 1: Thông tin nguồn -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0"><i class="fas fa-book"></i> @Model.SourceName</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Địa chỉ URL:</div>
+                        <div class="col-sm-8">
+                            @if (!string.IsNullOrEmpty(Model.SourceUrl))
+                            {
+                                <a href="@Model.SourceUrl" target="_blank" class="text-break"><i class="fas fa-external-link-alt"></i> @Model.SourceUrl</a>
+                                <div class="mt-1 text-muted"><small><i class="fas fa-info-circle text-warning"></i> Nếu liên kết nguồn hiện không khả dụng, vui lòng kiểm tra lại đường dẫn thủ công.</small></div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Không có URL liên kết.</span>
+                            }
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Loại nguồn tham khảo:</div>
+                        <div class="col-sm-8"><strong>@ReferenceHelper.GetSourceTypeLabel(Model.SourceType)</strong></div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Tác giả biên soạn:</div>
+                        <div class="col-sm-8">@(string.IsNullOrEmpty(Model.Author) ? "Không có thông tin" : Model.Author)</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4 text-muted">Tổ chức xuất bản:</div>
+                        <div class="col-sm-8">@(string.IsNullOrEmpty(Model.Organization) ? "Không có thông tin" : Model.Organization)</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-4 text-muted">Mô tả tóm tắt:</div>
+                        <div class="col-sm-8" style="white-space: pre-wrap;">@(string.IsNullOrEmpty(Model.Description) ? "Không có mô tả." : Model.Description)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khối 2: Pháp lý & Bản quyền (Compliance) -->
+            <div class="card shadow-sm mb-4 border-warning">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0 text-warning-emphasis"><i class="fas fa-shield-alt"></i> Pháp lý & Bản quyền (Compliance)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="text-muted">Ghi chú bản quyền / Giấy phép (License Note):</h6>
+                        <div class="bg-light p-3 rounded border text-secondary" style="white-space: pre-wrap; font-family: monospace;">@(string.IsNullOrWhiteSpace(Model.LicenseNote) ? "Không có ghi chú bản quyền." : Model.LicenseNote)</div>
+                    </div>
+                    <div>
+                        <h6 class="text-muted">Chính sách sử dụng học liệu (Usage Policy):</h6>
+                        <span class="badge bg-info text-dark fs-6 py-2 px-3">@ReferenceHelper.GetUsagePolicyLabel(Model.UsagePolicy)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Khối 3: Các Học phần (Topic) đang sử dụng -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-folder-open"></i> Học phần (Topic) đang sử dụng nguồn này (@Model.LinkedTopics.Count)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%">Mã học phần</th>
+                                <th style="width: 45%">Tên học phần</th>
+                                <th style="width: 30%">Ghi chú liên kết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var topic in Model.LinkedTopics)
+                            {
+                                <tr>
+                                    <td><code>@topic.TopicCode</code></td>
+                                    <td><a asp-action="Details" asp-controller="LearningTopics" asp-route-id="@topic.Id" target="_blank">@topic.Title</a></td>
+                                    <td>@topic.ReferenceNote</td>
+                                </tr>
+                            }
+                            @if (!Model.LinkedTopics.Any())
+                            {
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted p-3">Chưa được sử dụng trong Học phần nào.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Khối 4: Các Bài học (Lesson) liên quan -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Bài học (Lesson) liên đới sử dụng nguồn (@Model.LinkedLessons.Count)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-striped table-bordered mb-0">
+                        <thead>
+                            <tr>
+                                <th style="width: 50%">Tên bài học</th>
+                                <th style="width: 50%">Thuộc học phần</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var lesson in Model.LinkedLessons)
+                            {
+                                <tr>
+                                    <td>@lesson.Title</td>
+                                    <td>@lesson.TopicTitle</td>
+                                </tr>
+                            }
+                            @if (!Model.LinkedLessons.Any())
+                            {
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted p-3">Chưa được sử dụng trong Bài học nào.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Khối 5: Lịch sử Audit Log gần nhất -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-history"></i> Lịch sử tác động gần nhất (Audit Logs)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Thời gian</th>
+                                    <th>Hành động</th>
+                                    <th>Người thực hiện</th>
+                                    <th>Ghi chú giá trị thay đổi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var log in Model.RecentAuditLogs)
+                                {
+                                    <tr>
+                                        <td><small>@log.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</small></td>
+                                        <td><span class="badge bg-secondary">@log.Action</span></td>
+                                        <td>@log.ActorName</td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(log.OldValue) || !string.IsNullOrEmpty(log.NewValue))
+                                            {
+                                                <small class="text-muted">
+                                                    @if (!string.IsNullOrEmpty(log.OldValue))
+                                                    {
+                                                        <span>Từ: <code>@log.OldValue</code></span>
+                                                    }
+                                                    @if (!string.IsNullOrEmpty(log.NewValue))
+                                                    {
+                                                        <span> → Sang: <code>@log.NewValue</code></span>
+                                                    }
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">-</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                                @if (!Model.RecentAuditLogs.Any())
+                                {
+                                    <tr>
+                                        <td colspan="4" class="text-center text-muted p-3">Không có nhật ký tác động nào được ghi nhận.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cột phải: Quy trình phê duyệt & Lưu trữ tác vụ -->
+        <div class="col-md-4">
+            <!-- Khối thông tin Quy trình phê duyệt (Workflow Status) -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0"><i class="fas fa-stream"></i> Trạng thái quy trình</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center my-3">
+                        <span class="badge @ReferenceHelper.GetReviewStatusBadgeClass(Model.Status) fs-5 py-2 px-4 w-100">
+                            @ReferenceHelper.GetReviewStatusLabel(Model.Status)
+                        </span>
+                    </div>
+                    <hr />
+                    <dl class="row mb-0">
+                        <dt class="col-sm-5 text-muted">Trạng thái:</dt>
+                        <dd class="col-sm-7">@(Model.IsActive ? "Hoạt động (Active)" : "Ngừng hoạt động (Inactive)")</dd>
+
+                        <dt class="col-sm-5 text-muted">Người tạo:</dt>
+                        <dd class="col-sm-7">@Model.CreatedByUserName</dd>
+
+                        <dt class="col-sm-5 text-muted">Ngày tạo:</dt>
+                        <dd class="col-sm-7"><small>@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small></dd>
+
+                        @if (Model.ApprovedAt.HasValue)
+                        {
+                            <dt class="col-sm-5 text-muted">Người duyệt:</dt>
+                            <dd class="col-sm-7">@Model.ApprovedByUserName</dd>
+
+                            <dt class="col-sm-5 text-muted">Ngày duyệt:</dt>
+                            <dd class="col-sm-7"><small>@Model.ApprovedAt.Value.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small></dd>
+                        }
+                    </dl>
+                </div>
+            </div>
+
+            <!-- Các nút hành động thao tác nhanh -->
+            @if (Model.CanEdit || Model.CanReview || Model.CanArchive || Model.CanSubmit)
+            {
+                <div class="card shadow-sm mb-4 border-info">
+                    <div class="card-header bg-info-subtle">
+                        <h5 class="mb-0"><i class="fas fa-tools"></i> Thao tác quản trị</h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Nút Gửi duyệt -->
+                        @if (Model.CanSubmit)
+                        {
+                            <button type="button" class="btn btn-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#submitReviewModal">
+                                <i class="fas fa-paper-plane"></i> Gửi kiểm duyệt
+                            </button>
+                        }
+
+                        @if (Model.CanEdit)
+                        {
+                            <a asp-action="Edit" asp-controller="ReferenceSources" asp-route-id="@Model.Id" class="btn btn-warning w-100 mb-3"><i class="fas fa-edit"></i> Chỉnh sửa nguồn</a>
+                        }
+
+                        <!-- Form kiểm duyệt dành cho Admin -->
+                        @if (Model.CanReview)
+                        {
+                            <div class="bg-light p-3 rounded border mb-3">
+                                <h6 class="text-primary mb-3"><i class="fas fa-stamp"></i> Ra quyết định kiểm duyệt</h6>
+                                <form asp-action="Review" asp-controller="ReferenceSources" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    
+                                    <div class="mb-3">
+                                        <label class="form-label">Kết quả duyệt</label>
+                                        <select name="status" class="form-select" required>
+                                            <option value="APPROVED">DUYỆT (Approved)</option>
+                                            <option value="REJECTED">TỪ CHỐI (Rejected)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label">Lý do từ chối / Ghi chú</label>
+                                        <textarea name="note" class="form-control" rows="3" placeholder="Nhập lý do từ chối hoặc hướng dẫn chỉnh sửa nếu có..."></textarea>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('Xác nhận lưu quyết định kiểm duyệt nguồn tham khảo này?');">Xác nhận duyệt</button>
+                                </form>
+                            </div>
+                        }
+
+                        <!-- Form Lưu trữ (Archive) dành cho Admin -->
+                        @if (Model.CanArchive)
+                        {
+                            <form asp-action="Archive" asp-controller="ReferenceSources" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn Lưu trữ (Archive) nguồn tham khảo này?\nHành động này cũng sẽ tắt trạng thái hoạt động của học liệu.');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-dark w-100"><i class="fas fa-archive"></i> Lưu trữ (Archive)</button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Modal Xác nhận Gửi duyệt -->
+<div class="modal fade" id="submitReviewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="submitReviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="submitReviewModalLabel"><i class="fas fa-paper-plane"></i> Xác nhận gửi duyệt nguồn</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="SubmitReview" asp-controller="ReferenceSources" asp-area="Admin" asp-route-id="@Model.Id" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <p class="mb-0">Bạn có chắc chắn muốn gửi nguồn tham khảo <strong>@Model.SourceName</strong> này tới Ban kiểm duyệt để đánh giá không?</p>
+                    <div class="alert alert-info mt-3 py-2 mb-0">
+                        <small><i class="fas fa-info-circle"></i> Sau khi gửi, trạng thái sẽ chuyển thành <strong>Chờ duyệt (Pending Review)</strong> và bạn sẽ không thể chỉnh sửa thông tin cho tới khi được Reviewer đánh giá xong.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận gửi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

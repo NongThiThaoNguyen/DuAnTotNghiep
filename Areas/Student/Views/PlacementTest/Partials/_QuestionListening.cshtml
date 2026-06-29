@@ -1,0 +1,32 @@
+@model DuAnTotNghiep.ViewModels.PlacementTest.TestQuestionViewModel
+
+<div class="mb-4 bg-indigo-50 p-5 rounded-xl border border-indigo-100">
+    <p class="font-medium text-slate-800 text-lg mb-3">@Html.Raw(Model.QuestionText)</p>
+    
+    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <img src="@Model.ImageUrl" alt="Question Image" class="max-w-full h-auto mb-4 rounded shadow-sm" />
+    }
+
+    @if (!string.IsNullOrEmpty(Model.AudioUrl))
+    {
+        <div class="mb-4">
+            <audio controls class="w-full">
+                <source src="@Model.AudioUrl" type="audio/mpeg">
+                Trình duyệt của bạn không hỗ trợ thẻ audio.
+            </audio>
+        </div>
+    }
+
+    <div class="space-y-2 mt-2">
+        @foreach (var opt in Model.Options)
+        {
+            var isChecked = (Model.ExistingAnswer == opt.Id.ToString()) ? "checked" : "";
+
+            <label class="flex items-center p-3 border border-slate-200 bg-white rounded-lg cursor-pointer hover:bg-indigo-100 transition-colors">
+                <input type="radio" name="answers[@Model.QuestionId]" value="@opt.Id" class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" @isChecked />
+                <span class="ml-3 text-slate-700">@opt.Text</span>
+            </label>
+        }
+    </div>
+</div>

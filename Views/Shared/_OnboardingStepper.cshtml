@@ -1,0 +1,54 @@
+@model int
+
+@{
+    var currentStep = Model;
+    var steps = new List<string> { "Mục tiêu", "Trình độ", "Kỹ năng", "Thời gian", "Xác nhận" };
+    int totalSteps = steps.Count;
+    int progressPercentage = (currentStep * 100) / totalSteps;
+}
+
+<div class="mb-10 w-full max-w-4xl mx-auto">
+    <!-- Progress Bar -->
+    <div class="text-center mb-6">
+        <p class="text-slate-500 uppercase text-xs font-bold mb-3 tracking-wider">Bước @currentStep / @totalSteps</p>
+        <div class="w-full bg-slate-200 rounded-full h-2">
+            <div class="bg-blue-600 h-2 rounded-full transition-all duration-500 ease-in-out" style="width: @progressPercentage%"></div>
+        </div>
+    </div>
+
+    <!-- Stepper Icons (Desktop mostly, hidden or compressed on mobile) -->
+    <div class="hidden sm:flex justify-between items-center relative px-4">
+        <!-- Connecting Line behind steps -->
+        <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-slate-200 -z-10 px-8">
+            <div class="h-1 bg-blue-600 transition-all duration-500 ease-in-out" style="width: @( ((currentStep - 1) * 100) / (totalSteps - 1) )%"></div>
+        </div>
+
+        @for (int i = 1; i <= totalSteps; i++)
+        {
+            bool isCompleted = i < currentStep;
+            bool isCurrent = i == currentStep;
+            bool isPending = i > currentStep;
+
+            <div class="flex flex-col items-center bg-white px-2 z-10 relative">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm border-2 transition-colors duration-300
+                    @(isCompleted ? "bg-blue-600 border-blue-600 text-white" : 
+                      isCurrent ? "bg-white border-blue-600 text-blue-600 shadow-lg shadow-blue-200" : 
+                      "bg-white border-slate-300 text-slate-400")">
+                    @if (isCompleted)
+                    {
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    }
+                    else
+                    {
+                        <span>@i</span>
+                    }
+                </div>
+                <span class="mt-2 text-xs font-semibold @(isCurrent || isCompleted ? "text-slate-800" : "text-slate-400")">
+                    @steps[i - 1]
+                </span>
+            </div>
+        }
+    </div>
+</div>

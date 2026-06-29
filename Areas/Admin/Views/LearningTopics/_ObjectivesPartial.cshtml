@@ -1,0 +1,25 @@
+@model IEnumerable<DuAnTotNghiep.DTOs.Objective.ObjectiveDto>
+
+<table class="table table-sm table-bordered">
+    <thead>
+        <tr>
+            <th>Order</th>
+            <th>Cognitive Level</th>
+            <th>Objective Text</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var obj in Model)
+        {
+            <tr>
+                <td>@obj.OrderIndex</td>
+                <td>@obj.CognitiveLevel</td>
+                <td>@obj.ObjectiveText</td>
+            </tr>
+        }
+    </tbody>
+</table>
+@if (!Model.Any())
+{
+    <p class="text-muted">No objectives.</p>
+}

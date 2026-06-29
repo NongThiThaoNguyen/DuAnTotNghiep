@@ -1,0 +1,265 @@
+@model DuAnTotNghiep.ViewModels.Admin.ReferenceSources.ReferenceSourcePagedViewModel
+@using DuAnTotNghiep.Helpers
+@using DuAnTotNghiep.Enums
+@{
+    ViewData["Title"] = "Quản lý nguồn tham khảo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var currentUserIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    int.TryParse(currentUserIdStr, out var currentUserId);
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4">Nguồn tham khảo hợp pháp</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success mt-2">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger mt-2" style="white-space: pre-line;">@TempData["ErrorMessage"]</div>
+    }
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger mt-2">
+            <div asp-validation-summary="All" class="text-danger"></div>
+        </div>
+    }
+
+    <!-- Thanh Badge tổng quan đếm trạng thái từ CountByStatusAsync -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-3 my-3">
+        <div class="col">
+            <div class="card text-center bg-white border-secondary h-100 shadow-sm">
+                <div class="card-body py-3">
+                    <h6 class="card-title text-muted mb-1"><i class="fas fa-edit"></i> Bản nháp (Draft)</h6>
+                    <span class="badge bg-secondary fs-5 mt-1">@(Model.StatusSummary.ContainsKey(ReferenceReviewStatus.DRAFT) ? Model.StatusSummary[ReferenceReviewStatus.DRAFT] : 0)</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center bg-white border-warning h-100 shadow-sm">
+                <div class="card-body py-3">
+                    <h6 class="card-title text-warning mb-1"><i class="fas fa-hourglass-start"></i> Chờ duyệt (Pending)</h6>
+                    <span class="badge bg-warning fs-5 mt-1">@(Model.StatusSummary.ContainsKey(ReferenceReviewStatus.PENDING) ? Model.StatusSummary[ReferenceReviewStatus.PENDING] : 0)</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center bg-white border-success h-100 shadow-sm">
+                <div class="card-body py-3">
+                    <h6 class="card-title text-success mb-1"><i class="fas fa-check-circle"></i> Đã duyệt (Approved)</h6>
+                    <span class="badge bg-success fs-5 mt-1">@(Model.StatusSummary.ContainsKey(ReferenceReviewStatus.APPROVED) ? Model.StatusSummary[ReferenceReviewStatus.APPROVED] : 0)</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center bg-white border-danger h-100 shadow-sm">
+                <div class="card-body py-3">
+                    <h6 class="card-title text-danger mb-1"><i class="fas fa-times-circle"></i> Bị từ chối (Rejected)</h6>
+                    <span class="badge bg-danger fs-5 mt-1">@(Model.StatusSummary.ContainsKey(ReferenceReviewStatus.REJECTED) ? Model.StatusSummary[ReferenceReviewStatus.REJECTED] : 0)</span>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card text-center bg-white border-dark h-100 shadow-sm">
+                <div class="card-body py-3">
+                    <h6 class="card-title text-dark mb-1"><i class="fas fa-archive"></i> Lưu trữ (Archived)</h6>
+                    <span class="badge bg-dark fs-5 mt-1">@(Model.StatusSummary.ContainsKey(ReferenceReviewStatus.ARCHIVED) ? Model.StatusSummary[ReferenceReviewStatus.ARCHIVED] : 0)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Form -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" asp-action="Index" asp-controller="ReferenceSources" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="keyword" class="form-control" placeholder="Tìm theo tên hoặc URL..." value="@Model.Keyword" />
+                </div>
+                <div class="col-md-3">
+                    <select name="sourceType" class="form-select" asp-items="ViewBag.SourceTypes">
+                        <option value="">-- Tất cả loại nguồn --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <select name="status" class="form-select" asp-items="ViewBag.Statuses">
+                        <option value="">-- Tất cả trạng thái --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-secondary w-100"><i class="fas fa-filter"></i> Lọc danh sách</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="mb-3 d-flex justify-content-between align-items-center">
+        <div>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Create" asp-controller="ReferenceSources" class="btn btn-primary"><i class="fas fa-plus"></i> Thêm nguồn mới</a>
+            }
+            <a asp-action="Index" asp-controller="LearningTopics" class="btn btn-outline-secondary">Quay lại Topics</a>
+        </div>
+        <div class="text-muted">
+            Hiển thị tối đa <strong>@Model.PageSize</strong> dòng trên mỗi trang (Tổng số: <strong>@Model.TotalItems</strong> nguồn)
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body p-0">
+            <table class="table table-bordered table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Tên nguồn tham khảo</th>
+                        <th>Loại nguồn</th>
+                        <th>Trạng thái</th>
+                        <th>Hoạt động</th>
+                        <th>Người tạo</th>
+                        <th>Ngày tạo</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td>
+                                <strong>@item.SourceName</strong>
+                                @if (!string.IsNullOrEmpty(item.SourceUrl))
+                                {
+                                    <br />
+                                    <small><a href="@item.SourceUrl" target="_blank" class="text-truncate d-inline-block" style="max-width: 300px;">@item.SourceUrl</a></small>
+                                }
+                            </td>
+                            <td>@ReferenceHelper.GetSourceTypeLabel(item.SourceType)</td>
+                            <td>
+                                <span class="badge @ReferenceHelper.GetReviewStatusBadgeClass(item.Status)">
+                                    @ReferenceHelper.GetReviewStatusLabel(item.Status)
+                                </span>
+                            </td>
+                            <td>
+                                @if (item.IsActive)
+                                {
+                                    <span class="text-success"><i class="fas fa-check-circle"></i> Active</span>
+                                }
+                                else
+                                {
+                                    <span class="text-danger"><i class="fas fa-times-circle"></i> Inactive</span>
+                                }
+                            </td>
+                            <td>@item.CreatedByUserName</td>
+                            <td>@item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-controller="ReferenceSources" asp-route-id="@item.Id" class="btn btn-sm btn-info" title="Chi tiết"><i class="fas fa-info-circle"></i></a>
+                                    
+                                    @if ((User.IsInRole("ADMIN") || (User.IsInRole("TEACHER") && item.CreatedById == currentUserId)) 
+                                        && (item.Status == ReferenceReviewStatus.DRAFT || item.Status == ReferenceReviewStatus.REJECTED))
+                                    {
+                                        <button type="button" class="btn btn-sm btn-primary" title="Gửi duyệt" data-bs-toggle="modal" data-bs-target="#submitModal-@item.Id">
+                                            <i class="fas fa-paper-plane"></i>
+                                        </button>
+                                    }
+
+                                    @if (User.IsInRole("ADMIN"))
+                                    {
+                                        <a asp-action="Edit" asp-controller="ReferenceSources" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>
+                                        @if (item.Status != ReferenceReviewStatus.ARCHIVED)
+                                        {
+                                            <form asp-action="Archive" asp-controller="ReferenceSources" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn Lưu trữ (Archive) nguồn tham khảo này?\nHành động này cũng sẽ tắt trạng thái hoạt động.');">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="btn btn-sm btn-dark" title="Lưu trữ"><i class="fas fa-archive"></i></button>
+                                            </form>
+                                        }
+                                    }
+                                    else if (User.IsInRole("TEACHER"))
+                                    {
+                                        <!-- Giáo viên chỉ được xem và sửa nếu là của mình -->
+                                        @if (item.CreatedById == currentUserId)
+                                        {
+                                            <a asp-action="Edit" asp-controller="ReferenceSources" asp-route-id="@item.Id" class="btn btn-sm btn-warning" title="Chỉnh sửa"><i class="fas fa-edit"></i></a>
+                                        }
+                                    }
+                                </div>
+
+                                @if ((User.IsInRole("ADMIN") || (User.IsInRole("TEACHER") && item.CreatedById == currentUserId)) 
+                                    && (item.Status == ReferenceReviewStatus.DRAFT || item.Status == ReferenceReviewStatus.REJECTED))
+                                {
+                                    <!-- Modal Xác nhận Gửi duyệt cho từng dòng -->
+                                    <div class="modal fade text-start" id="submitModal-@item.Id" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content text-dark">
+                                                <div class="modal-header bg-primary text-white">
+                                                    <h5 class="modal-title"><i class="fas fa-paper-plane"></i> Xác nhận gửi duyệt nguồn</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <form asp-action="SubmitReview" asp-controller="ReferenceSources" asp-area="Admin" asp-route-id="@item.Id" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <div class="modal-body text-wrap">
+                                                        <p class="mb-0">Bạn có chắc chắn muốn gửi nguồn tham khảo <strong>@item.SourceName</strong> này tới Ban kiểm duyệt để đánh giá không?</p>
+                                                        <div class="alert alert-info mt-3 py-2 mb-0">
+                                                            <small><i class="fas fa-info-circle"></i> Trạng thái sẽ chuyển thành <strong>Chờ duyệt (Pending Review)</strong> và bạn không thể chỉnh sửa thông tin cho tới khi được Reviewer đánh giá xong.</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+                                                        <button type="submit" class="btn btn-primary btn-sm">Xác nhận</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center text-muted p-4">Không tìm thấy nguồn tham khảo nào phù hợp.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Phân trang Bootstrap 5 -->
+    @if (Model.TotalPages > 1)
+    {
+        <div class="d-flex justify-content-center mt-4">
+            <nav aria-label="Page navigation">
+                <ul class="pagination mb-0">
+                    <li class="page-item @(Model.CurrentPage == 1 ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { keyword = Model.Keyword, sourceType = Model.SourceType, status = Model.Status, page = Model.CurrentPage - 1 })" aria-label="Previous">
+                            <span aria-hidden="true">&laquo; Trước</span>
+                        </a>
+                    </li>
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(Model.CurrentPage == i ? "active" : "")">
+                            <a class="page-link" href="@Url.Action("Index", new { keyword = Model.Keyword, sourceType = Model.SourceType, status = Model.Status, page = i })">@i</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.CurrentPage == Model.TotalPages ? "disabled" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { keyword = Model.Keyword, sourceType = Model.SourceType, status = Model.Status, page = Model.CurrentPage + 1 })" aria-label="Next">
+                            <span aria-hidden="true">Sau &raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    }
+</div>
+
+<!-- Custom CSS for the grid column sizes of status cards -->
+<style>
+@@media (min-width: 768px) {
+    .col-md-2-4 {
+        flex: 0 0 20%;
+        max-width: 20%;
+    }
+}
+</style>

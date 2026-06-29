@@ -1,0 +1,28 @@
+@model DuAnTotNghiep.DTOs.Topic.TopicTreeDto
+
+<li class="list-group-item">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <strong>@Model.Name</strong>
+            <span class="badge bg-secondary ms-2">@Model.DifficultyLevel</span>
+            <span class="badge bg-info ms-2">Code: @Model.TopicCode</span>
+        </div>
+        <div>
+            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-sm btn-info">Details</a>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-warning">Edit</a>
+            }
+        </div>
+    </div>
+    
+    @if (Model.Children != null && Model.Children.Any())
+    {
+        <ul class="list-group mt-2">
+            @foreach (var child in Model.Children)
+            {
+                @await Html.PartialAsync("_TopicTreeNode", child)
+            }
+        </ul>
+    }
+</li>

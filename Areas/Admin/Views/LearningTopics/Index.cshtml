@@ -1,0 +1,127 @@
+@model IEnumerable<DuAnTotNghiep.ViewModels.Admin.Topics.TopicListViewModel>
+@{
+    ViewData["Title"] = "Learning Topics";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid">
+    <h2 class="mt-4">Learning Topics</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <!-- Filter Form -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="keyword" class="form-control" placeholder="Search by Code/Name" value="@ViewBag.Keyword" />
+                </div>
+                <div class="col-md-2">
+                    <select name="skillId" class="form-select" asp-items="ViewBag.Skills">
+                        <option value="">-- All Skills --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="levelId" class="form-select" asp-items="ViewBag.Levels">
+                        <option value="">-- All Levels --</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="difficulty" class="form-select">
+                        <option value="">-- Difficulty --</option>
+                        <option value="BEGINNER">BEGINNER</option>
+                        <option value="ELEMENTARY">ELEMENTARY</option>
+                        <option value="INTERMEDIATE">INTERMEDIATE</option>
+                        <option value="UPPER_INTERMEDIATE">UPPER_INTERMEDIATE</option>
+                        <option value="ADVANCED">ADVANCED</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="status" class="form-select">
+                        <option value="">-- Status --</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Archived">Archived</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="submit" class="btn btn-secondary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @if (User.IsInRole("Admin"))
+    {
+        <div class="mb-3">
+            <a asp-action="Create" class="btn btn-primary">Create New Topic</a>
+            <a asp-action="Tree" class="btn btn-info">View Tree</a>
+            <a asp-action="Index" asp-controller="ReferenceSources" class="btn btn-dark"><i class="fas fa-gavel"></i> Quản lý nguồn tham khảo</a>
+        </div>
+    }
+
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Code</th>
+                <th>Name</th>
+                <th>Skill</th>
+                <th>Level</th>
+                <th>Parent</th>
+                <th>Difficulty</th>
+                <th>Status</th>
+                <th>Objectives</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.TopicCode</td>
+                    <td>@item.Name</td>
+                    <td>@item.SkillName</td>
+                    <td>@item.LevelName</td>
+                    <td>@item.ParentTopicName</td>
+                    <td>@item.Difficulty</td>
+                    <td>@item.Status</td>
+                    <td>@item.ObjectiveCount</td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                            @if (item.Status != "Archived")
+                            {
+                                <form asp-action="Archive" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn lưu trữ (Archive) Topic này?');">
+                                    <button type="submit" class="btn btn-sm btn-secondary">Archive</button>
+                                </form>
+                            }
+                            @if (item.Status == "Active")
+                            {
+                                <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn khóa (Deactivate) Topic này?');">
+                                    <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
+                                </form>
+                            }
+                            @if (item.Status == "Archived" || item.Status == "Inactive")
+                            {
+                                <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-success">Restore</button>
+                                </form>
+                            }
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    
+    <!-- Paging omitted for brevity or implement standard bootstrap paging using ViewBag.CurrentPage / ViewBag.TotalPages -->
+</div>

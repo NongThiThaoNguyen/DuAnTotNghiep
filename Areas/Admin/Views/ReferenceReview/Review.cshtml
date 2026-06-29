@@ -1,0 +1,204 @@
+@model DuAnTotNghiep.ViewModels.Admin.ReferenceSources.ReferenceSourceDetailsViewModel
+@{
+    ViewData["Title"] = "Đánh giá nguồn tham khảo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-clipboard-check text-primary me-2"></i>Đánh giá nguồn tham khảo</h1>
+        <a href="/review/pending" class="btn btn-outline-secondary rounded-pill">
+            <i class="fas fa-arrow-left me-1"></i> Quay lại danh sách
+        </a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-1"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Thông tin nguồn tham khảo -->
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light border-0 py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-dark">Thông tin chi tiết nguồn</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Tên nguồn tham khảo</label>
+                            <span class="fs-5 fw-semibold text-dark d-block">@Model.SourceName</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Trạng thái hiện tại</label>
+                            <span class="badge bg-warning text-dark px-3 py-2 rounded-pill fs-7">
+                                <i class="fas fa-clock me-1"></i>@Model.Status
+                            </span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Địa chỉ URL</label>
+                            @if (!string.IsNullOrEmpty(Model.SourceUrl))
+                            {
+                                <a href="@Model.SourceUrl" target="_blank" class="text-decoration-none fs-6 fw-semibold text-primary text-break">
+                                    @Model.SourceUrl <i class="fas fa-external-link-alt ms-1 fs-8"></i>
+                                </a>
+                            }
+                            else
+                            {
+                                <span class="text-muted d-block italic">Không có địa chỉ liên kết URL</span>
+                            }
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Loại nguồn tham khảo</label>
+                            <span class="fw-semibold text-dark d-block">@Model.SourceType</span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Chính sách sử dụng</label>
+                            <span class="fw-semibold text-dark d-block">@(Model.UsagePolicy?.ToString() ?? "Chưa thiết lập")</span>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Bản quyền học liệu</label>
+                            <span class="text-dark fw-semibold d-block">@(string.IsNullOrEmpty(Model.LicenseNote) ? "Chưa có ghi chú" : Model.LicenseNote)</span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Tác giả</label>
+                            <span class="text-dark d-block">@(string.IsNullOrEmpty(Model.Author) ? "-" : Model.Author)</span>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Tổ chức / Nhà xuất bản</label>
+                            <span class="text-dark d-block">@(string.IsNullOrEmpty(Model.Organization) ? "-" : Model.Organization)</span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Mô tả chi tiết</label>
+                            <div class="bg-light p-3 rounded text-dark" style="min-height: 80px; white-space: pre-line;">
+                                @(string.IsNullOrEmpty(Model.Description) ? "Không có mô tả chi tiết." : Model.Description)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white border-0 py-3 d-flex justify-content-end gap-3">
+                    <button type="button" class="btn btn-danger px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                        <i class="fas fa-times-circle me-1"></i>Từ chối duyệt
+                    </button>
+                    <button type="button" class="btn btn-success px-4 rounded-pill" data-bs-toggle="modal" data-bs-target="#approveModal">
+                        <i class="fas fa-check-circle me-1"></i>Phê duyệt nguồn
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metadata sidebar -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-header bg-light border-0 py-3">
+                    <h5 class="card-title mb-0 fw-semibold text-dark">Thông tin người tạo</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Người đăng ký</label>
+                        <span class="fw-semibold text-dark">@Model.CreatedByUserName</span>
+                    </div>
+                    <div>
+                        <label class="text-secondary fs-7 text-uppercase fw-medium d-block mb-1">Thời gian gửi</label>
+                        <span class="text-dark">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Approve Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="approveModalLabel"><i class="fas fa-check-circle me-1"></i> Phê duyệt nguồn tham khảo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/review/approve" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="modal-body">
+                    <p class="mb-3 text-dark">Bạn có chắc chắn muốn **PHÊ DUYỆT** nguồn tham khảo này không? Nguồn sau khi duyệt có thể liên kết trực tiếp vào các Topic/Lesson giảng dạy.</p>
+                    <div class="mb-3">
+                        <label for="approveNote" class="form-label text-dark fw-semibold">Ghi chú kiểm duyệt (Optional)</label>
+                        <textarea class="form-control" id="approveNote" name="note" rows="3" placeholder="Nhập nhận xét hoặc lưu ý bản quyền nếu cần..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-success px-3">Xác nhận Phê duyệt</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Reject Modal -->
+<div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="rejectModalLabel"><i class="fas fa-times-circle me-1"></i> Từ chối nguồn tham khảo</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="/review/reject" method="post" id="rejectForm">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="modal-body">
+                    <p class="mb-3 text-dark">Vui lòng nhập lý do từ chối cụ thể. Lý do này sẽ gửi tới người tạo nguồn để thực hiện chỉnh sửa lại học liệu.</p>
+                    <div class="mb-3">
+                        <label for="rejectReason" class="form-label text-danger fw-semibold">Lý do từ chối (Bắt buộc)</label>
+                        <textarea class="form-control border-danger" id="rejectReason" name="reason" rows="3" placeholder="Ví dụ: Thiếu giấy phép bản quyền hợp lệ, URL hỏng..." required></textarea>
+                        <div class="invalid-feedback d-none text-danger fs-7 mt-1" id="reasonWarning">
+                            <i class="fas fa-exclamation-triangle"></i> Lý do từ chối không được để trống!
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
+                    <button type="submit" class="btn btn-danger px-3">Xác nhận Từ chối</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const rejectForm = document.getElementById("rejectForm");
+        const rejectReason = document.getElementById("rejectReason");
+        const reasonWarning = document.getElementById("reasonWarning");
+
+        if (rejectForm) {
+            rejectForm.addEventListener("submit", function (e) {
+                if (!rejectReason.value.trim()) {
+                    e.preventDefault();
+                    reasonWarning.classList.remove("d-none");
+                    rejectReason.classList.add("is-invalid");
+                } else {
+                    reasonWarning.classList.add("d-none");
+                    rejectReason.classList.remove("is-invalid");
+                }
+            });
+        }
+
+        if (rejectReason) {
+            rejectReason.addEventListener("input", function() {
+                if (rejectReason.value.trim()) {
+                    reasonWarning.classList.add("d-none");
+                    rejectReason.classList.remove("is-invalid");
+                }
+            });
+        }
+    });
+</script>

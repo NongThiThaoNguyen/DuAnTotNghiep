@@ -1,0 +1,49 @@
+@model DuAnTotNghiep.ViewModels.VerifyOtpViewModel
+@{
+    Layout = "_AuthLayout";
+    ViewData["Title"] = "Xác nhận OTP";
+    ViewData["Subtitle"] = "Vui lòng nhập mã xác nhận 6 số vừa được gửi đến email của bạn.";
+}
+
+<div class="bg-white py-8 px-6 shadow-sm border border-slate-200 rounded-2xl sm:px-10">
+    <div class="mb-6 flex justify-center">
+        <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+        </div>
+    </div>
+
+    <div class="text-center mb-6">
+        <p class="text-sm text-slate-600">
+            Mã OTP đã được gửi đến: <br/>
+            <span class="font-semibold text-slate-800">@Model?.Email</span>
+        </p>
+    </div>
+
+    <form asp-controller="Account" asp-action="VerifyOtp" method="post" class="space-y-6">
+        <div asp-validation-summary="ModelOnly" class="text-sm font-medium text-red-600 bg-red-50 border border-red-200 rounded-lg p-3"></div>
+        <input type="hidden" asp-for="Email" />
+
+        <div>
+            <label asp-for="Otp" class="block text-sm font-medium text-slate-700 text-center mb-2">Nhập mã OTP</label>
+            <input asp-for="Otp" class="block w-full px-4 py-3 text-center text-2xl tracking-[0.5em] font-bold border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="------" maxlength="6" />
+            <span asp-validation-for="Otp" class="mt-2 text-xs text-red-600 block text-center"></span>
+        </div>
+
+        <div class="pt-2">
+            <button type="submit" class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-xs text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-colors">
+                Xác thực
+            </button>
+        </div>
+    </form>
+</div>
+
+<div class="mt-6 text-center">
+    <p class="text-sm text-slate-600">
+        Chưa nhận được mã? 
+        <a asp-action="ForgotPassword" class="font-medium text-blue-600 hover:text-blue-500 transition-colors">
+            Gửi lại OTP
+        </a>
+    </p>
+</div>
