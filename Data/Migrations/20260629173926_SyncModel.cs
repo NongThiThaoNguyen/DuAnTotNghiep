@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DuAnTotNghiep.Migrations
+namespace DuAnTotNghiep.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdatePendingModelChanges : Migration
+    public partial class SyncModel : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

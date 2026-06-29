@@ -11,6 +11,7 @@ using DuAnTotNghiep.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
+Console.WriteLine("CONNECTION STRING IS: " + builder.Configuration.GetConnectionString("DefaultConnection"));
 
 // Load .env file
 DotNetEnv.Env.Load();

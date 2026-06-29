@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DuAnTotNghiep.Migrations
+namespace DuAnTotNghiep.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260629142342_UpdatePendingModelChanges")]
-    partial class UpdatePendingModelChanges
+    [Migration("20260629173926_SyncModel")]
+    partial class SyncModel
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
