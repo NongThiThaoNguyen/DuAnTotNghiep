@@ -11,13 +11,13 @@ using Microsoft.AspNetCore.Http;
 using DuAnTotNghiep.Areas.Student.Controllers;
 using DuAnTotNghiep.Services;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.Repositories;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.DTOs.Progress;
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.ViewModels.Progress;
+using DuAnTotNghiep.Models.DTOs.Progress;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.ViewModels.Progress;
 
 namespace DuAnTotNghiep.Tests
 {

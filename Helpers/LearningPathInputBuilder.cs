@@ -1,10 +1,10 @@
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs.LearningPath;
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.DTOs.LearningPath;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
-using DuAnTotNghiep.ViewModels.LearningPath.M8;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
+using DuAnTotNghiep.Models.ViewModels.LearningPath.M8;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Helpers;

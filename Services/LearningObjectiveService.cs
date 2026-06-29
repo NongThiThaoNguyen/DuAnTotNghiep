@@ -1,6 +1,6 @@
-using DuAnTotNghiep.DTOs.Objective;
+using DuAnTotNghiep.Models.DTOs.Objective;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using System;

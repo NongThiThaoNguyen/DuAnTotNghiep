@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Areas.Admin.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

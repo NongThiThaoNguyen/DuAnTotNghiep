@@ -1,6 +1,6 @@
-using DuAnTotNghiep.DTOs.Skill;
+using DuAnTotNghiep.Models.DTOs.Skill;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Admin.Skills;
+using DuAnTotNghiep.Models.ViewModels.Admin.Skills;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

@@ -1,7 +1,7 @@
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System;

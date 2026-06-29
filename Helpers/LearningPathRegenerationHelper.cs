@@ -1,5 +1,5 @@
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Models;
 using Microsoft.EntityFrameworkCore;
 

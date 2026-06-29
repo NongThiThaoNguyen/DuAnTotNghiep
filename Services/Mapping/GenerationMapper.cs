@@ -1,5 +1,5 @@
-using DuAnTotNghiep.DTOs;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.DTOs;
+using DuAnTotNghiep.Models.ViewModels;
 
 namespace DuAnTotNghiep.Services.Mapping
 {

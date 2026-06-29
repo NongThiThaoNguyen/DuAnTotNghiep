@@ -1,6 +1,6 @@
-using DuAnTotNghiep.DTOs.Level;
+using DuAnTotNghiep.Models.DTOs.Level;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;

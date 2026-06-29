@@ -1,4 +1,4 @@
-using DuAnTotNghiep.DTOs.LearningPath;
+using DuAnTotNghiep.Models.DTOs.LearningPath;
 
 namespace DuAnTotNghiep.Services.Interfaces
 {

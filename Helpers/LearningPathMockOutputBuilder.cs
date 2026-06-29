@@ -1,6 +1,6 @@
-using DuAnTotNghiep.DTOs.LearningPath;
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.DTOs.LearningPath;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.Exceptions;
 
 namespace DuAnTotNghiep.Helpers;
 

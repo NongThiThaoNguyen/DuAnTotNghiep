@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs;
+using DuAnTotNghiep.Models.DTOs;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Validators;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 
 namespace DuAnTotNghiep.Services.AI
 {
@@ -41,7 +41,7 @@ namespace DuAnTotNghiep.Services.AI
                 {
                     aiResponse = await _aiProvider.GenerateAsync(systemPrompt, userPrompt, "M14", prompt.Id, dto.RequestedBy != null ? int.Parse(dto.RequestedBy) : null, "gpt-4o-mini");
                 }
-                catch (TaskCanceledException ex)
+                catch (TaskCanceledException)
                 {
                     return new AIGenerationResult { IsSuccess = false, ErrorMessage = "We could not complete your request because the AI service timed out. Please try again." };
                 }
@@ -92,14 +92,14 @@ namespace DuAnTotNghiep.Services.AI
                         return new AIGenerationResult { IsSuccess = false, ErrorMessage = "The AI response did not contain a valid JSON payload." };
                     }
                 }
-                catch (JsonException ex)
+                catch (JsonException)
                 {
                     return new AIGenerationResult { IsSuccess = false, ErrorMessage = "The AI response could not be parsed. Please review the generated content." };
                 }
 
                 return new AIGenerationResult { IsSuccess = items.Count > 0, Items = items, ItemErrors = itemErrors };
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return new AIGenerationResult { IsSuccess = false, ErrorMessage = "We could not generate the questions right now. Please try again shortly." };
             }

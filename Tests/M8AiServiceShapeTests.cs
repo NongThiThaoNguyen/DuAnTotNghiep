@@ -1,5 +1,5 @@
-using DuAnTotNghiep.DTOs.LearningPath;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.DTOs.LearningPath;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Services;
 using DuAnTotNghiep.Services.Interfaces;
 using Xunit;

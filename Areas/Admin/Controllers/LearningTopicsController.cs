@@ -1,7 +1,7 @@
-using DuAnTotNghiep.DTOs.Topic;
+using DuAnTotNghiep.Models.DTOs.Topic;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Admin.Topics;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.ViewModels.Admin.Topics;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Helpers;
 using DuAnTotNghiep.Models;
 using Microsoft.AspNetCore.Authorization;

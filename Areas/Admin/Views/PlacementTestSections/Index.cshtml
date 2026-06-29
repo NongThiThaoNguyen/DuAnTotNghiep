@@ -1,7 +1,7 @@
-@model List<DuAnTotNghiep.DTOs.PlacementTestSection.PlacementTestSectionDto>
+@model List<DuAnTotNghiep.Models.DTOs.PlacementTestSection.PlacementTestSectionDto>
 
 @{
-    var test = ViewBag.Test as DuAnTotNghiep.DTOs.PlacementTest.PlacementTestDetailDto;
+    var test = ViewBag.Test as DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementTestDetailDto;
     ViewData["Title"] = $"Quản lý cấu trúc bài thi: {test?.Title}";
     bool canEdit = test?.Status != "ARCHIVED";
 }

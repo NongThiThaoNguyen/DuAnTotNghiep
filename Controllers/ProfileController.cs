@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.Exceptions;
-using DuAnTotNghiep.ViewModels.Profile;
+using DuAnTotNghiep.Models.Exceptions;
+using DuAnTotNghiep.Models.ViewModels.Profile;
 
 namespace DuAnTotNghiep.Controllers;
 

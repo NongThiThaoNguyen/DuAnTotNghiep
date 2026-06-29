@@ -1,6 +1,6 @@
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.ViewModels.Admin.ReferenceSources;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.ViewModels.Admin.ReferenceSources;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

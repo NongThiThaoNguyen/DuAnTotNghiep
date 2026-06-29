@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 
 namespace DuAnTotNghiep.Services
 {

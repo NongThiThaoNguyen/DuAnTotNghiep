@@ -4,13 +4,13 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs;
+using DuAnTotNghiep.Models.DTOs;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.AI;
 using DuAnTotNghiep.Services;
 using DuAnTotNghiep.Services.Mapping;
 using DuAnTotNghiep.Services.Validators;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

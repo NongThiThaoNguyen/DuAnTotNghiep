@@ -1,13 +1,13 @@
-@model DuAnTotNghiep.ViewModels.Onboarding.UpdateLearningProfileViewModel
+@model DuAnTotNghiep.Models.ViewModels.Onboarding.UpdateLearningProfileViewModel
 @{
     ViewData["Title"] = "Hồ sơ học tập";
-    var goals = ViewBag.Goals as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.GoalDto>;
-    var levels = ViewBag.Levels as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.LevelDto>;
-    var skills = ViewBag.Skills as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.SkillDto>;
+    var goals = ViewBag.Goals as IEnumerable<DuAnTotNghiep.Models.DTOs.Onboarding.GoalDto>;
+    var levels = ViewBag.Levels as IEnumerable<DuAnTotNghiep.Models.DTOs.Onboarding.LevelDto>;
+    var skills = ViewBag.Skills as IEnumerable<DuAnTotNghiep.Models.DTOs.Onboarding.SkillDto>;
     var currentGoalId = Model.MainGoalId?.ToString() ?? "";
 
     var user = ViewBag.User as DuAnTotNghiep.Models.User;
-    var profile = ViewBag.UserLearningProfile as DuAnTotNghiep.DTOs.Onboarding.LearningProfileDto;
+    var profile = ViewBag.UserLearningProfile as DuAnTotNghiep.Models.DTOs.Onboarding.LearningProfileDto;
     var path = ViewBag.LearningPath as DuAnTotNghiep.Models.StudentLearningPath;
     var attempt = ViewBag.LatestAttempt as DuAnTotNghiep.Models.TestAttempt;
     var analysis = ViewBag.LatestAnalysis as DuAnTotNghiep.Models.CompetencyAnalysis;
@@ -19,7 +19,7 @@
     int inProgressTopics = ViewBag.InProgressTopics ?? 0;
     int unstartedTopics = ViewBag.UnstartedTopics ?? 0;
 
-    var dashboard = ViewBag.ProgressDashboard as DuAnTotNghiep.ViewModels.Progress.ProgressDashboardViewModel;
+    var dashboard = ViewBag.ProgressDashboard as DuAnTotNghiep.Models.ViewModels.Progress.ProgressDashboardViewModel;
     decimal avgQuizScore = ViewBag.AverageQuizScore ?? 0m;
     var timeline = ViewBag.Timeline as List<dynamic>;
 

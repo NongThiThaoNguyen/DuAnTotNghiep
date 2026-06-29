@@ -8,7 +8,7 @@ public class M8EnumTests
     public void LearningPathStatus_DefinesExpectedStringConstants()
     {
         var assembly = typeof(StudentLearningPath).Assembly;
-        var type = assembly.GetType("DuAnTotNghiep.Enums.LearningPathStatus");
+        var type = assembly.GetType("DuAnTotNghiep.Models.Enums.LearningPathStatus");
         Assert.NotNull(type);
 
         AssertConstant(type!, "Active", "ACTIVE");

@@ -4,9 +4,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.Exceptions;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -502,7 +502,7 @@ namespace DuAnTotNghiep.Services
                 Weaknesses = feedbackDto.Weaknesses,
                 RecommendedActions = feedbackDto.RecommendedActions,
                 // PriorityTopics would be mapped here if available in feedbackDto or via another service
-                PriorityTopics = new System.Collections.Generic.List<DuAnTotNghiep.ViewModels.PriorityTopicItem>(),
+                PriorityTopics = new System.Collections.Generic.List<DuAnTotNghiep.Models.ViewModels.PriorityTopicItem>(),
                 Status = "COMPLETED", // Hardcoded for now, normally mapped from DB
                 IsAiFallback = false // Would check if Metadata indicates an AI failure
             };

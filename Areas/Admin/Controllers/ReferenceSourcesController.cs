@@ -1,8 +1,8 @@
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Helpers;
-using DuAnTotNghiep.ViewModels.Admin.ReferenceSources;
+using DuAnTotNghiep.Models.ViewModels.Admin.ReferenceSources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;

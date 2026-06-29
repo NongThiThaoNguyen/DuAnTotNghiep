@@ -1,8 +1,8 @@
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.PlacementTest;
-using DuAnTotNghiep.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.ViewModels.PlacementTest;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -3,10 +3,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs;
-using DuAnTotNghiep.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.DTOs;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Admin;
+using DuAnTotNghiep.Models.ViewModels.Admin;
 
 namespace DuAnTotNghiep.Services
 {

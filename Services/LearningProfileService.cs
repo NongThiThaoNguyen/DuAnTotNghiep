@@ -1,8 +1,8 @@
-using DuAnTotNghiep.DTOs.Onboarding;
+using DuAnTotNghiep.Models.DTOs.Onboarding;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Onboarding;
+using DuAnTotNghiep.Models.ViewModels.Onboarding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -213,6 +213,7 @@ namespace DuAnTotNghiep.Services
             if (model.CurrentLevelId.HasValue && !await _levelRepository.ExistsAsync(l => l.Id == model.CurrentLevelId)) return false;
             if (model.TargetLevelId.HasValue && !await _levelRepository.ExistsAsync(l => l.Id == model.TargetLevelId)) return false;
 
+            if (!model.MainGoalId.HasValue) return false;
             var goal = await _goalRepository.GetByIdAsync(model.MainGoalId.Value);
             if (goal != null)
             {
@@ -265,6 +266,7 @@ namespace DuAnTotNghiep.Services
             if (model.CurrentLevelId.HasValue && !await _levelRepository.ExistsAsync(l => l.Id == model.CurrentLevelId)) return false;
             if (model.TargetLevelId.HasValue && !await _levelRepository.ExistsAsync(l => l.Id == model.TargetLevelId)) return false;
 
+            if (!model.MainGoalId.HasValue) return false;
             var goal = await _goalRepository.GetByIdAsync(model.MainGoalId.Value);
             if (goal != null)
             {

@@ -12,7 +12,7 @@ public class M8StudentLearningPathViewTests
         Assert.True(File.Exists(viewPath), $"Missing view: {viewPath}");
         var content = File.ReadAllText(viewPath);
 
-        Assert.Contains("@model DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathGenerateViewModel", content);
+        Assert.Contains("@model DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathGenerateViewModel", content);
         Assert.Contains("Layout = \"~/Views/Shared/_StudentLayout.cshtml\"", content);
         Assert.Contains("m8-generate-form", content);
         Assert.Contains("m8-missing-step", content);
@@ -26,7 +26,7 @@ public class M8StudentLearningPathViewTests
         Assert.True(File.Exists(viewPath), $"Missing view: {viewPath}");
         var content = File.ReadAllText(viewPath);
 
-        Assert.Contains("@model DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathSummaryViewModel", content);
+        Assert.Contains("@model DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathSummaryViewModel", content);
         Assert.Contains("Layout = \"~/Views/Shared/_StudentLayout.cshtml\"", content);
         Assert.Contains("m8-path-summary", content);
         Assert.Contains("asp-action=\"Detail\"", content);
@@ -41,7 +41,7 @@ public class M8StudentLearningPathViewTests
         Assert.True(File.Exists(viewPath), $"Missing view: {viewPath}");
         var content = File.ReadAllText(viewPath);
 
-        Assert.Contains("@model DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathDetailViewModel", content);
+        Assert.Contains("@model DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathDetailViewModel", content);
         Assert.Contains("Layout = \"~/Views/Shared/_StudentLayout.cshtml\"", content);
         Assert.Contains("m8-node-card", content);
         Assert.Contains("m8-node-status--locked", content);

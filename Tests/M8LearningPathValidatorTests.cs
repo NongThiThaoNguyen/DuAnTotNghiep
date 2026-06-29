@@ -1,4 +1,4 @@
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Helpers;
 using DuAnTotNghiep.Models;
 using Xunit;

@@ -1,6 +1,6 @@
 using DuAnTotNghiep.Areas.Admin.Controllers;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

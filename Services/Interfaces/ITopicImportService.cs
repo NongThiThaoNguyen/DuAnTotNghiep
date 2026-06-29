@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using DuAnTotNghiep.DTOs.TopicImport;
+using DuAnTotNghiep.Models.DTOs.TopicImport;
 
 namespace DuAnTotNghiep.Services.Interfaces
 {

@@ -1,4 +1,4 @@
-using DuAnTotNghiep.DTOs.PlacementTest.Validation;
+using DuAnTotNghiep.Models.DTOs.PlacementTest.Validation;
 using System.Threading.Tasks;
 
 namespace DuAnTotNghiep.Services.Interfaces

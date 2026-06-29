@@ -1,6 +1,6 @@
 using System.Security.Claims;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

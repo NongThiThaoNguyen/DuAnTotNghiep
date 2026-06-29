@@ -1,7 +1,7 @@
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Tests;
@@ -12,7 +12,7 @@ public class M8RepositoryShapeTests
     public void LearningPathRepositoryInterface_DefinesRequiredMethods()
     {
         var assembly = typeof(StudentLearningPath).Assembly;
-        var type = assembly.GetType("DuAnTotNghiep.Repositories.Interfaces.ILearningPathRepository");
+        var type = assembly.GetType("DuAnTotNghiep.Models.Repositories.Interfaces.ILearningPathRepository");
         Assert.NotNull(type);
 
         AssertMethod(type!, "GetActivePathByStudentIdAsync", typeof(Task<StudentLearningPath>), typeof(int));
@@ -113,7 +113,7 @@ public class M8RepositoryShapeTests
 
     private static ILearningPathRepository CreateRepository(ApplicationDbContext context)
     {
-        var type = typeof(StudentLearningPath).Assembly.GetType("DuAnTotNghiep.Repositories.LearningPathRepository");
+        var type = typeof(StudentLearningPath).Assembly.GetType("DuAnTotNghiep.Models.Repositories.LearningPathRepository");
         Assert.NotNull(type);
 
         return (ILearningPathRepository)Activator.CreateInstance(type!, context)!;

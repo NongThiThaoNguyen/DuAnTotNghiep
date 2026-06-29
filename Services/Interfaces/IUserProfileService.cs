@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using DuAnTotNghiep.ViewModels.Profile;
+using DuAnTotNghiep.Models.ViewModels.Profile;
 using DuAnTotNghiep.Areas.Admin.ViewModels;
 
 namespace DuAnTotNghiep.Services.Interfaces;

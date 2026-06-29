@@ -2,7 +2,7 @@ using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Services;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,7 +1,7 @@
 using DuAnTotNghiep.Helpers;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Data.Seeders
@@ -369,7 +369,7 @@ namespace DuAnTotNghiep.Data.Seeders
                         TimeLimitMinutes = 30,
                         TargetLevelId = beginnerLevel.Id,
                         CreatedBy = adminUser.Id,
-                        Status = Enums.PlacementTestStatus.Published,
+                        Status = PlacementTestStatus.Published,
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.PlacementTests.Add(test);

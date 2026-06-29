@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 
 namespace DuAnTotNghiep.Services
 {

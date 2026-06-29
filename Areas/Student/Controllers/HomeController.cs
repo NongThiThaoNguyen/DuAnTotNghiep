@@ -7,7 +7,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
 

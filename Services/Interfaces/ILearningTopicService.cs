@@ -1,7 +1,7 @@
-using DuAnTotNghiep.DTOs.Common;
-using DuAnTotNghiep.DTOs.Topic;
+using DuAnTotNghiep.Models.DTOs.Common;
+using DuAnTotNghiep.Models.DTOs.Topic;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

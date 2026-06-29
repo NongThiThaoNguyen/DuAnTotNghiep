@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Repositories.Interfaces;
-using DuAnTotNghiep.Repositories;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Services;
 using DuAnTotNghiep.Services.AI;
@@ -52,7 +52,7 @@ builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddScoped<ILearningPathRepository, LearningPathRepository>();
 builder.Services.AddScoped<ICompetencyAnalysisRepository, CompetencyAnalysisRepository>();
-builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();
+builder.Services.AddScoped<DuAnTotNghiep.Models.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Models.Repositories.TopicPrerequisiteRepository>();
 
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();

@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 
 namespace DuAnTotNghiep.Services.AI
 {

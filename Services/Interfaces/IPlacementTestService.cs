@@ -1,5 +1,5 @@
-using DuAnTotNghiep.DTOs.PlacementTest;
-using DuAnTotNghiep.ViewModels.PlacementTest;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.ViewModels.PlacementTest;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

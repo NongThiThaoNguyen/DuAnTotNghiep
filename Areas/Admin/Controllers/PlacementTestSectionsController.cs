@@ -1,4 +1,4 @@
-using DuAnTotNghiep.DTOs.PlacementTestSection;
+using DuAnTotNghiep.Models.DTOs.PlacementTestSection;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

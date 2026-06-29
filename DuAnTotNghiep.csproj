@@ -4,6 +4,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <NoWarn>$(NoWarn);8618;8600;8601;8602;8604;8619;8625;8629</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -16,13 +17,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
-
-  <Target Name="Tailwind" BeforeTargets="Build" Condition="'$(SkipTailwind)' != 'true'">
-    <!-- Install npm packages if node_modules doesn't exist -->
-    <Exec Command="npm install" Condition="!Exists('node_modules')" />
-    <!-- Compile tailwind css -->
-    <Exec Command="npx tailwindcss -i ./Styles/site.css -o ./wwwroot/css/site.css" ContinueOnError="WarnAndContinue" />
-  </Target>
 
   <ItemGroup>
     <Compile Remove="Tests\**" />

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Data;

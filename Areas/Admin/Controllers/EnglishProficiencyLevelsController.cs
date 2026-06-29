@@ -1,6 +1,6 @@
-using DuAnTotNghiep.DTOs.Level;
+using DuAnTotNghiep.Models.DTOs.Level;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Admin.Levels;
+using DuAnTotNghiep.Models.ViewModels.Admin.Levels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;

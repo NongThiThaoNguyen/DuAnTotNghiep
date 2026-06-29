@@ -1,5 +1,5 @@
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -35,11 +35,11 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             var userId = GetUserId();
             var flowStatus = await _requirementService.GetStudentFlowStatusAsync(userId);
             
-            if (flowStatus.Status == DuAnTotNghiep.DTOs.PlacementTest.PlacementFlowStatus.Completed)
+            if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.Completed)
             {
                 return RedirectToAction("Index", "Home");
             }
-            if (flowStatus.Status == DuAnTotNghiep.DTOs.PlacementTest.PlacementFlowStatus.PlacementInProgress)
+            if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.PlacementInProgress)
             {
                 return Redirect(flowStatus.RedirectUrl!);
             }

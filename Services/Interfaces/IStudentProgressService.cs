@@ -1,5 +1,5 @@
-using DuAnTotNghiep.DTOs.Progress;
-using DuAnTotNghiep.ViewModels.Progress;
+using DuAnTotNghiep.Models.DTOs.Progress;
+using DuAnTotNghiep.Models.ViewModels.Progress;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

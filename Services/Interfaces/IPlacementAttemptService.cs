@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
-using DuAnTotNghiep.DTOs;
-using DuAnTotNghiep.DTOs.PlacementTest;
-using DuAnTotNghiep.ViewModels.Admin;
+using DuAnTotNghiep.Models.DTOs;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.ViewModels.Admin;
 
 namespace DuAnTotNghiep.Services.Interfaces
 {

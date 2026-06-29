@@ -1,7 +1,7 @@
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.ViewModels.LearningPath;
-using DuAnTotNghiep.ViewModels.LearningPath.M8;
+using DuAnTotNghiep.Models.ViewModels.LearningPath;
+using DuAnTotNghiep.Models.ViewModels.LearningPath.M8;
 
 namespace DuAnTotNghiep.Helpers;
 

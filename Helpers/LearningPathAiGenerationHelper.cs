@@ -1,6 +1,6 @@
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs.LearningPath;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.DTOs.LearningPath;
+using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;

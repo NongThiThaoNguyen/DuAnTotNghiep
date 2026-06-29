@@ -1,10 +1,10 @@
-@model DuAnTotNghiep.DTOs.PlacementTest.PlacementTestDetailDto
+@model DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementTestDetailDto
 @inject DuAnTotNghiep.Services.Interfaces.IPlacementTestSectionService SectionService
 
 @{
     ViewData["Title"] = "Chi tiết đề thi: " + Model.Title;
     var sections = await SectionService.GetSectionsAsync(Model.Id);
-    var validationResult = ViewBag.ValidationResult as DuAnTotNghiep.DTOs.PlacementTest.Validation.TestValidationResultDto;
+    var validationResult = ViewBag.ValidationResult as DuAnTotNghiep.Models.DTOs.PlacementTest.Validation.TestValidationResultDto;
 }
 
 <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">

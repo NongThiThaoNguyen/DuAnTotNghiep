@@ -1,5 +1,5 @@
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs.PlacementTestSection;
+using DuAnTotNghiep.Models.DTOs.PlacementTestSection;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;

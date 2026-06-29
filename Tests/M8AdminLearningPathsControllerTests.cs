@@ -1,9 +1,9 @@
 using DuAnTotNghiep.Areas.Admin.Controllers;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Admin.LearningPaths;
+using DuAnTotNghiep.Models.ViewModels.Admin.LearningPaths;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;

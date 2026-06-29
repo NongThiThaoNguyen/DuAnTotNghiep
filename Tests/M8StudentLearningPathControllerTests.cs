@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using DuAnTotNghiep.Areas.Student.Controllers;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.LearningPath.M8;
+using DuAnTotNghiep.Models.ViewModels.LearningPath.M8;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

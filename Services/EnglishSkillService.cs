@@ -1,6 +1,6 @@
-using DuAnTotNghiep.DTOs.Skill;
+using DuAnTotNghiep.Models.DTOs.Skill;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Data;
 using Microsoft.EntityFrameworkCore;

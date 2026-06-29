@@ -1,5 +1,5 @@
-using DuAnTotNghiep.ViewModels.Admin.LearningPaths;
-using DuAnTotNghiep.ViewModels.Admin.PathTemplates;
+using DuAnTotNghiep.Models.ViewModels.Admin.LearningPaths;
+using DuAnTotNghiep.Models.ViewModels.Admin.PathTemplates;
 using Xunit;
 
 namespace DuAnTotNghiep.Tests;

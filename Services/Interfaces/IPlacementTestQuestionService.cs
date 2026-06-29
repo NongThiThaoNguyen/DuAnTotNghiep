@@ -1,4 +1,4 @@
-using DuAnTotNghiep.DTOs.PlacementTestQuestion;
+using DuAnTotNghiep.Models.DTOs.PlacementTestQuestion;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

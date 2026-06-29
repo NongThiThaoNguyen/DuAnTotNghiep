@@ -1,5 +1,5 @@
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.ViewModels.LearningPath;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.ViewModels.LearningPath;
 
 namespace DuAnTotNghiep.Tests;
 

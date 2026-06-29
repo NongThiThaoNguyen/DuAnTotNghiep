@@ -1,4 +1,4 @@
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 
 namespace DuAnTotNghiep.Services.Interfaces
 {

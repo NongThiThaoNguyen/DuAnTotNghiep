@@ -1,8 +1,8 @@
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.LearningPath;
+using DuAnTotNghiep.Models.ViewModels.LearningPath;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Services

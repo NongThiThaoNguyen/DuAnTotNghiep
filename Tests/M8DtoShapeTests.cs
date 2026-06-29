@@ -8,8 +8,8 @@ public class M8DtoShapeTests
     public void LearningPathInputDto_ExposesRequiredInputProperties()
     {
         var assembly = typeof(StudentLearningPath).Assembly;
-        var inputType = GetRequiredType(assembly, "DuAnTotNghiep.DTOs.LearningPath.LearningPathInputDto");
-        var resourceType = GetRequiredType(assembly, "DuAnTotNghiep.DTOs.LearningPath.LearningPathResourceDto");
+        var inputType = GetRequiredType(assembly, "DuAnTotNghiep.Models.DTOs.LearningPath.LearningPathInputDto");
+        var resourceType = GetRequiredType(assembly, "DuAnTotNghiep.Models.DTOs.LearningPath.LearningPathResourceDto");
 
         AssertProperty(inputType, "StudentId", typeof(int));
         AssertProperty(inputType, "GoalName", typeof(string));
@@ -29,9 +29,9 @@ public class M8DtoShapeTests
     public void LearningPathOutputDto_ExposesRequiredAiOutputSchema()
     {
         var assembly = typeof(StudentLearningPath).Assembly;
-        var outputType = GetRequiredType(assembly, "DuAnTotNghiep.DTOs.LearningPath.LearningPathOutputDto");
-        var phaseType = GetRequiredType(assembly, "DuAnTotNghiep.DTOs.LearningPath.LearningPathOutputPhaseDto");
-        var nodeType = GetRequiredType(assembly, "DuAnTotNghiep.DTOs.LearningPath.LearningPathOutputNodeDto");
+        var outputType = GetRequiredType(assembly, "DuAnTotNghiep.Models.DTOs.LearningPath.LearningPathOutputDto");
+        var phaseType = GetRequiredType(assembly, "DuAnTotNghiep.Models.DTOs.LearningPath.LearningPathOutputPhaseDto");
+        var nodeType = GetRequiredType(assembly, "DuAnTotNghiep.Models.DTOs.LearningPath.LearningPathOutputNodeDto");
 
         AssertProperty(outputType, "PathTitle", typeof(string));
         AssertProperty(outputType, "Summary", typeof(string));

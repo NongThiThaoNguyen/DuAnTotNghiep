@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 using Microsoft.Extensions.Logging;
 
 namespace DuAnTotNghiep.Services
@@ -126,7 +126,7 @@ namespace DuAnTotNghiep.Services
                 TopicScores = sortedTopicScores,
                 DifficultyBreakdowns = difficultyBreakdowns,
                 KnowledgeGapPattern = knowledgeGapPattern,
-                PriorityTopics = priorityTopics,
+                PriorityTopics = System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.List<DuAnTotNghiep.Models.ViewModels.PriorityTopicItem>>(System.Text.Json.JsonSerializer.Serialize(priorityTopics)) ?? new System.Collections.Generic.List<DuAnTotNghiep.Models.ViewModels.PriorityTopicItem>(),
                 // Pass-through danh sách câu sai từ Task 2 để Prompt AI (Task 4) phân tích lỗi cụ thể.
                 WrongAnswers = inputData.WrongAnswers ?? new List<WrongAnswerDto>(),
                 CalculationWarnings = warnings
@@ -642,6 +642,7 @@ namespace DuAnTotNghiep.Services
             var validGapTopics = expandedGapTopicIds
                 .Select(id => catalogMap.TryGetValue(id, out var t) ? t : null)
                 .Where(t => t != null && string.Equals(t.Status, "ACTIVE", StringComparison.OrdinalIgnoreCase))
+                .Select(t => t!)
                 .ToList();
 
             var childrenMap = new Dictionary<int, List<int>>();

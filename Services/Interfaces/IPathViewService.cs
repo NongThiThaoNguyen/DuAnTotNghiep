@@ -1,5 +1,5 @@
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.ViewModels.LearningPath;
+using DuAnTotNghiep.Models.ViewModels.LearningPath;
 
 namespace DuAnTotNghiep.Services.Interfaces
 {

@@ -1,10 +1,10 @@
 using System.Security.Claims;
 using DuAnTotNghiep.Areas.Student.Controllers;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs.Progress;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.DTOs.Progress;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

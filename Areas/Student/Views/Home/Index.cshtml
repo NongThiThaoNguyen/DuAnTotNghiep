@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Tổng quan";
     var user = ViewBag.User as DuAnTotNghiep.Models.User;
-    var profile = ViewBag.UserLearningProfile as DuAnTotNghiep.DTOs.Onboarding.LearningProfileDto;
+    var profile = ViewBag.UserLearningProfile as DuAnTotNghiep.Models.DTOs.Onboarding.LearningProfileDto;
     var path = ViewBag.LearningPath as DuAnTotNghiep.Models.StudentLearningPath;
     var attempt = ViewBag.LatestAttempt as DuAnTotNghiep.Models.TestAttempt;
     var analysis = ViewBag.LatestAnalysis as DuAnTotNghiep.Models.CompetencyAnalysis;
@@ -14,7 +14,7 @@
     int inProgressTopics = ViewBag.InProgressTopics ?? 0;
     int unstartedTopics = ViewBag.UnstartedTopics ?? 0;
 
-    var dashboard = ViewBag.ProgressDashboard as DuAnTotNghiep.ViewModels.Progress.ProgressDashboardViewModel;
+    var dashboard = ViewBag.ProgressDashboard as DuAnTotNghiep.Models.ViewModels.Progress.ProgressDashboardViewModel;
     decimal avgQuizScore = ViewBag.AverageQuizScore ?? 0m;
     var timeline = ViewBag.Timeline as List<dynamic>;
     var notifications = ViewBag.NotificationsList as List<DuAnTotNghiep.Models.Notification>;

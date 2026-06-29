@@ -1,7 +1,7 @@
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Admin.LearningPaths;
+using DuAnTotNghiep.Models.ViewModels.Admin.LearningPaths;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

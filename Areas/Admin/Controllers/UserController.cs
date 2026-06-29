@@ -13,13 +13,13 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         private readonly IUserService _userService;
         private readonly IUserProfileService _profileService;
         private readonly ILearningProfileService _learningProfileService;
-        private readonly DuAnTotNghiep.Repositories.Interfaces.IAuditLogRepository _auditRepository;
+        private readonly DuAnTotNghiep.Models.Repositories.Interfaces.IAuditLogRepository _auditRepository;
 
         public UserController(
             IUserService userService, 
             IUserProfileService profileService,
             ILearningProfileService learningProfileService,
-            DuAnTotNghiep.Repositories.Interfaces.IAuditLogRepository auditRepository)
+            DuAnTotNghiep.Models.Repositories.Interfaces.IAuditLogRepository auditRepository)
         {
             _userService = userService;
             _profileService = profileService;
@@ -40,7 +40,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 var userDetails = await _profileService.GetAdminUserProfileAsync(id);
                 return View(userDetails);
             }
-            catch (DuAnTotNghiep.Exceptions.NotFoundException)
+            catch (DuAnTotNghiep.Models.Exceptions.NotFoundException)
             {
                 return NotFound();
             }
@@ -146,7 +146,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 ViewBag.StudentId = id;
                 return View(profile);
             }
-            catch (DuAnTotNghiep.Exceptions.NotFoundException)
+            catch (DuAnTotNghiep.Models.Exceptions.NotFoundException)
             {
                 return NotFound();
             }

@@ -1,5 +1,5 @@
-using DuAnTotNghiep.DTOs.Onboarding;
-using DuAnTotNghiep.ViewModels.Onboarding;
+using DuAnTotNghiep.Models.DTOs.Onboarding;
+using DuAnTotNghiep.Models.ViewModels.Onboarding;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

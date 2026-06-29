@@ -5,9 +5,9 @@ namespace DuAnTotNghiep.Tests;
 public class M8AdminLearningPathViewTests
 {
     [Theory]
-    [InlineData("PathHistory.cshtml", "@model DuAnTotNghiep.ViewModels.Admin.LearningPaths.PathHistoryViewModel", "Path History")]
-    [InlineData("PathDetail.cshtml", "@model DuAnTotNghiep.ViewModels.Admin.LearningPaths.PathDetailAdminViewModel", "Path Detail")]
-    [InlineData("GenerationLogs.cshtml", "@model DuAnTotNghiep.ViewModels.Admin.LearningPaths.GenerationLogViewModel", "Generation Logs")]
+    [InlineData("PathHistory.cshtml", "@model DuAnTotNghiep.Models.ViewModels.Admin.LearningPaths.PathHistoryViewModel", "Path History")]
+    [InlineData("PathDetail.cshtml", "@model DuAnTotNghiep.Models.ViewModels.Admin.LearningPaths.PathDetailAdminViewModel", "Path Detail")]
+    [InlineData("GenerationLogs.cshtml", "@model DuAnTotNghiep.Models.ViewModels.Admin.LearningPaths.GenerationLogViewModel", "Generation Logs")]
     public void LearningPathAdminViews_ShouldUseAdminLayoutAndExpectedModels(
         string fileName,
         string modelDirective,

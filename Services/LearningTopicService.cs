@@ -1,10 +1,10 @@
-using DuAnTotNghiep.DTOs.Common;
-using DuAnTotNghiep.DTOs.Topic;
+using DuAnTotNghiep.Models.DTOs.Common;
+using DuAnTotNghiep.Models.DTOs.Topic;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -233,7 +233,7 @@ namespace DuAnTotNghiep.Services
                 .AsNoTracking()
                 .Where(o => o.TopicId == topicId)
                 .OrderBy(o => o.OrderIndex)
-                .Select(o => new DuAnTotNghiep.DTOs.Objective.ObjectiveDto
+                .Select(o => new DuAnTotNghiep.Models.DTOs.Objective.ObjectiveDto
                 {
                     Id = o.Id,
                     ObjectiveText = o.ObjectiveText,

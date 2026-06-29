@@ -1,4 +1,4 @@
-using DuAnTotNghiep.DTOs.Skill;
+using DuAnTotNghiep.Models.DTOs.Skill;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

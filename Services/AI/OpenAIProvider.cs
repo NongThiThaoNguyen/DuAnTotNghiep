@@ -7,7 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs;
+using DuAnTotNghiep.Models.DTOs;
 using DuAnTotNghiep.Services;
 using Microsoft.Extensions.Configuration;
 
@@ -109,14 +109,14 @@ namespace DuAnTotNghiep.Services.AI
                 await LogUsageAsync(new AiUsageLogDto { UserId = userId, ModuleCode = moduleCode, PromptTemplateId = promptTemplateId, AiModel = model, InputTokens = inputTokens, OutputTokens = outputTokens, CostEstimate = CalculateCost(inputTokens, outputTokens), RequestStatus = requestStatus, ErrorMessage = errorMessage, DurationMs = (int)stopwatch.ElapsedMilliseconds });
                 throw;
             }
-            catch (JsonException ex)
+            catch (JsonException)
             {
                 requestStatus = "SCHEMA_ERROR";
                 errorMessage = "The AI response format was invalid.";
                 await LogUsageAsync(new AiUsageLogDto { UserId = userId, ModuleCode = moduleCode, PromptTemplateId = promptTemplateId, AiModel = model, InputTokens = inputTokens, OutputTokens = outputTokens, CostEstimate = CalculateCost(inputTokens, outputTokens), RequestStatus = requestStatus, ErrorMessage = errorMessage, DurationMs = (int)stopwatch.ElapsedMilliseconds });
                 throw;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 requestStatus = "FAILED";
                 errorMessage = "We could not complete the AI request right now. Please try again shortly.";

@@ -1,9 +1,9 @@
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Admin.ReferenceSources;
+using DuAnTotNghiep.Models.ViewModels.Admin.ReferenceSources;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

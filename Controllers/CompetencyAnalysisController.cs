@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -141,7 +141,7 @@ namespace DuAnTotNghiep.Controllers
 
                 return Json(integrationDto);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
                 // Obfuscation: Return NotFound to hide resource presence for unauthorized students
                 if (role == "Student")

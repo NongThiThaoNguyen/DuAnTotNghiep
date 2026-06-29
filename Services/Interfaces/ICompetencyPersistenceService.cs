@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 
 namespace DuAnTotNghiep.Services.Interfaces
 {

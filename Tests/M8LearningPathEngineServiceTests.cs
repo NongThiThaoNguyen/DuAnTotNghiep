@@ -1,9 +1,9 @@
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs.LearningPath;
-using DuAnTotNghiep.Enums;
-using DuAnTotNghiep.Exceptions;
+using DuAnTotNghiep.Models.DTOs.LearningPath;
+using DuAnTotNghiep.Models.Enums;
+using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories;
+using DuAnTotNghiep.Models.Repositories;
 using DuAnTotNghiep.Services;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;

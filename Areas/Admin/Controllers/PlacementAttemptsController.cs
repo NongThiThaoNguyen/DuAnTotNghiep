@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using DuAnTotNghiep.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
 using DuAnTotNghiep.Services.Interfaces;
 
 namespace DuAnTotNghiep.Areas.Admin.Controllers

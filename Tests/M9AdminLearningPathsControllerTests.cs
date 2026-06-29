@@ -1,6 +1,6 @@
 using DuAnTotNghiep.Areas.Admin.Controllers;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.LearningPath;
+using DuAnTotNghiep.Models.ViewModels.LearningPath;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Moq;

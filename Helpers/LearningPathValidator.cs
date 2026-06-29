@@ -1,4 +1,4 @@
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
 
 namespace DuAnTotNghiep.Helpers;

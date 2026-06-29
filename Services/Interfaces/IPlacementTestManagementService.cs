@@ -1,5 +1,5 @@
-using DuAnTotNghiep.DTOs;
-using DuAnTotNghiep.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.DTOs;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
 using System.Threading.Tasks;
 
 namespace DuAnTotNghiep.Services.Interfaces

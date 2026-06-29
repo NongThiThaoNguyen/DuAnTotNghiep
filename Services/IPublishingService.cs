@@ -1,4 +1,4 @@
-using DuAnTotNghiep.DTOs;
+using DuAnTotNghiep.Models.DTOs;
 using System.Threading;
 using System.Threading.Tasks;
 

@@ -1,0 +1,13 @@
+using DuAnTotNghiep.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace DuAnTotNghiep.Models.Repositories.Interfaces
+{
+    public interface IEnglishProficiencyLevelRepository : IGenericRepository<EnglishProficiencyLevel>
+    {
+        Task<EnglishProficiencyLevel?> GetByCodeAsync(string code);
+        Task<List<EnglishProficiencyLevel>> GetActiveLevelsAsync();
+        Task<bool> ExistsCodeAsync(string code);
+    }
+}

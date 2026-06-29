@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DuAnTotNghiep.DTOs;
+using DuAnTotNghiep.Models.DTOs;
 
 namespace DuAnTotNghiep.Services
 {

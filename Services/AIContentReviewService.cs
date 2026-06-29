@@ -5,9 +5,9 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs;
+using DuAnTotNghiep.Models.DTOs;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Services

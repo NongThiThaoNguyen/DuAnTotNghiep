@@ -1,5 +1,5 @@
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels;
+using DuAnTotNghiep.Models.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +11,9 @@ namespace DuAnTotNghiep.Controllers
     public class AccountController : Controller
     {
         private readonly IAuthService _authService;
-        private readonly DuAnTotNghiep.Repositories.Interfaces.IUserSessionRepository _userSessionRepository;
+        private readonly DuAnTotNghiep.Models.Repositories.Interfaces.IUserSessionRepository _userSessionRepository;
 
-        public AccountController(IAuthService authService, DuAnTotNghiep.Repositories.Interfaces.IUserSessionRepository userSessionRepository)
+        public AccountController(IAuthService authService, DuAnTotNghiep.Models.Repositories.Interfaces.IUserSessionRepository userSessionRepository)
         {
             _authService = authService;
             _userSessionRepository = userSessionRepository;

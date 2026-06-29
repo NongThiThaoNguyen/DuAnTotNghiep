@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 
 namespace DuAnTotNghiep.Models;
 

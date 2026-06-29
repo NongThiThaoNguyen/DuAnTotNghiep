@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using DuAnTotNghiep.DTOs.PlacementTest;
+using DuAnTotNghiep.Models.DTOs.PlacementTest;
 
 namespace DuAnTotNghiep.Services.Interfaces
 {

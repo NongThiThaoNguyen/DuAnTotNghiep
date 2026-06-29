@@ -1,7 +1,7 @@
-using DuAnTotNghiep.DTOs;
-using DuAnTotNghiep.DTOs.Onboarding;
+using DuAnTotNghiep.Models.DTOs;
+using DuAnTotNghiep.Models.DTOs.Onboarding;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Onboarding;
+using DuAnTotNghiep.Models.ViewModels.Onboarding;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;

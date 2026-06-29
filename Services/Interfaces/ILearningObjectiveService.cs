@@ -1,4 +1,4 @@
-using DuAnTotNghiep.DTOs.Objective;
+using DuAnTotNghiep.Models.DTOs.Objective;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

@@ -8,12 +8,12 @@ public class M8ViewModelShapeTests
     public void M8LearningPathViewModels_ExposeRequiredProperties()
     {
         var assembly = typeof(StudentLearningPath).Assembly;
-        var summaryType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathSummaryViewModel");
-        var detailType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathDetailViewModel");
-        var generateType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathGenerateViewModel");
-        var historyType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.M8.AdminPathHistoryViewModel");
-        var historyItemType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.M8.AdminPathHistoryItemViewModel");
-        var pathNodeType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.PathNodeViewModel");
+        var summaryType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathSummaryViewModel");
+        var detailType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathDetailViewModel");
+        var generateType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathGenerateViewModel");
+        var historyType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.M8.AdminPathHistoryViewModel");
+        var historyItemType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.M8.AdminPathHistoryItemViewModel");
+        var pathNodeType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.PathNodeViewModel");
 
         Assert.True(summaryType.IsAssignableFrom(detailType));
         AssertSummaryProperties(summaryType);
@@ -27,8 +27,8 @@ public class M8ViewModelShapeTests
     public void StudentLearningPathViewModels_DoNotExposeRawPromptOrTechnicalLogs()
     {
         var assembly = typeof(StudentLearningPath).Assembly;
-        var summaryType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathSummaryViewModel");
-        var detailType = GetRequiredType(assembly, "DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathDetailViewModel");
+        var summaryType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathSummaryViewModel");
+        var detailType = GetRequiredType(assembly, "DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathDetailViewModel");
         var sensitiveFragments = new[] { "Prompt", "ApiKey", "Token", "ErrorMessage", "TechnicalLog" };
 
         AssertNoSensitiveProperties(summaryType, sensitiveFragments);

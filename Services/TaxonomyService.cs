@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.DTOs;
+using DuAnTotNghiep.Models.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace DuAnTotNghiep.Services

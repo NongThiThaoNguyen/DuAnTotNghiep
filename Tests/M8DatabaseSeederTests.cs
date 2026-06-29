@@ -1,8 +1,8 @@
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Data.Seeders;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Repositories.Interfaces;
+using DuAnTotNghiep.Models.Repositories.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 

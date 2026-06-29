@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using DuAnTotNghiep.Services.Interfaces;
-using DuAnTotNghiep.ViewModels.Onboarding;
+using DuAnTotNghiep.Models.ViewModels.Onboarding;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models;
 
 namespace DuAnTotNghiep.Areas.Student.Controllers

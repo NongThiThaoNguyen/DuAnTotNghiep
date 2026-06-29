@@ -1,4 +1,4 @@
-using DuAnTotNghiep.Enums;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
 using Microsoft.EntityFrameworkCore;

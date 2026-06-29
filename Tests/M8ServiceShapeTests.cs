@@ -1,6 +1,6 @@
-using DuAnTotNghiep.DTOs.LearningPath;
+using DuAnTotNghiep.Models.DTOs.LearningPath;
 using DuAnTotNghiep.Models;
-using DuAnTotNghiep.ViewModels.LearningPath.M8;
+using DuAnTotNghiep.Models.ViewModels.LearningPath.M8;
 
 namespace DuAnTotNghiep.Tests;
 
