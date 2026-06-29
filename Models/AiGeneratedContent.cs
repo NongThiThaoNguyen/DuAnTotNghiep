@@ -9,14 +9,6 @@ public partial class AiGeneratedContent
 
     public int? RequestedBy { get; set; }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-        public string? BatchId { get; set; }
-
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public string ContentType { get; set; } = null!;
 
     public int? RelatedTopicId { get; set; }
@@ -35,14 +27,10 @@ public partial class AiGeneratedContent
 
     public DateTime? ReviewedAt { get; set; }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
+    public string? BatchId { get; set; }
+
     public int? PublishedQuestionId { get; set; }
 
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public DateTime CreatedAt { get; set; }
 
     public virtual LearningTopic? RelatedTopic { get; set; }
@@ -50,12 +38,4 @@ public partial class AiGeneratedContent
     public virtual User? RequestedByNavigation { get; set; }
 
     public virtual User? ReviewedByNavigation { get; set; }
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-    public virtual QuestionBank? PublishedQuestion { get; set; }
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 }

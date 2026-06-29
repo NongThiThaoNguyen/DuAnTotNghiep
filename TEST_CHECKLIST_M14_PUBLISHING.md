@@ -18,7 +18,7 @@
 - [ ] Verify form redirects to `/QuizGeneration/Preview`
 - [ ] View batch ID and PENDING items in preview table
 - [ ] Check AiUsageLog entry created with status="SUCCESS"
-- [ ] Check ai_generated_contents table: 
+- [ ] Check ai_generated_contents table:
   - [ ] review_status = 'PENDING'
   - [ ] batch_id = guid
   - [ ] generated_content = valid JSON with question_text, options, correct_answer_index

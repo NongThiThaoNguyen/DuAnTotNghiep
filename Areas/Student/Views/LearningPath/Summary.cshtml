@@ -1,0 +1,111 @@
+@model DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathSummaryViewModel
+
+@{
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    ViewData["Title"] = "Tóm tắt lộ trình AI";
+
+    var progressPercent = Model.TotalNodes == 0
+        ? 0
+        : (int)Math.Round((double)Model.CompletedNodes * 100 / Model.TotalNodes);
+}
+
+<link rel="stylesheet" href="~/css/learning-path-m8.css" asp-append-version="true" />
+
+<div class="m8-path-summary">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="m8-alert" role="alert">
+            <span class="m8-alert__icon" aria-hidden="true">!</span>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    <header class="m8-page-header">
+        <p class="m8-page-header__eyebrow">AI Learning Path</p>
+        <h1 class="m8-page-header__title">@Model.Title</h1>
+        <p class="m8-page-header__description">@Model.AiPlanSummary</p>
+    </header>
+
+    <section class="m8-summary-grid" aria-label="Tổng quan lộ trình">
+        <article class="m8-stat-card">
+            <span class="m8-stat-card__label">Tiến độ</span>
+            <strong class="m8-stat-card__value">@Model.CompletedNodes/@Model.TotalNodes</strong>
+            <div class="m8-progress" aria-label="Tiến độ @progressPercent%">
+                <span class="m8-progress__bar" style="width:@progressPercent%"></span>
+            </div>
+        </article>
+
+        <article class="m8-stat-card">
+            <span class="m8-stat-card__label">Node hiện tại</span>
+            <strong class="m8-stat-card__value m8-stat-card__value--text">
+                @(string.IsNullOrWhiteSpace(Model.CurrentNodeTitle) ? "Chưa có" : Model.CurrentNodeTitle)
+            </strong>
+        </article>
+
+        <article class="m8-stat-card">
+            <span class="m8-stat-card__label">Node tiếp theo</span>
+            <strong class="m8-stat-card__value m8-stat-card__value--text">
+                @(string.IsNullOrWhiteSpace(Model.NextNodeTitle) ? "Chưa có" : Model.NextNodeTitle)
+            </strong>
+        </article>
+    </section>
+
+    <section class="m8-ai-reason" aria-labelledby="ai-reason-heading">
+        <div>
+            <p class="m8-ai-reason__eyebrow">Lý do AI đề xuất</p>
+            <h2 id="ai-reason-heading" class="m8-ai-reason__title">Lộ trình này tập trung vào điểm cần cải thiện</h2>
+            <p class="m8-ai-reason__text">@Model.AiPlanSummary</p>
+        </div>
+
+        <dl class="m8-meta-list">
+            <div>
+                <dt>Phiên bản</dt>
+                <dd>v@Model.PathVersion</dd>
+            </div>
+            <div>
+                <dt>Trạng thái</dt>
+                <dd>@Model.Status</dd>
+            </div>
+            <div>
+                <dt>Ngày bắt đầu</dt>
+                <dd>@(Model.StartDate?.ToString("dd/MM/yyyy") ?? "Chưa đặt")</dd>
+            </div>
+            <div>
+                <dt>Mục tiêu</dt>
+                <dd>@(Model.TargetEndDate?.ToString("dd/MM/yyyy") ?? "Chưa đặt")</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="m8-priority-topics" aria-labelledby="priority-topics-heading">
+        <h2 id="priority-topics-heading" class="m8-section-title">Chủ đề ưu tiên</h2>
+        @if (Model.PriorityTopics.Any())
+        {
+            <div class="m8-chip-list">
+                @foreach (var topic in Model.PriorityTopics)
+                {
+                    <span class="m8-chip">@topic</span>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="m8-muted-text">AI sẽ cập nhật chủ đề ưu tiên khi có thêm dữ liệu học tập.</p>
+        }
+    </section>
+
+    <section class="m8-action-panel" aria-label="Thao tác lộ trình">
+        <a class="m8-btn m8-btn--primary" asp-area="Student" asp-controller="LearningPath" asp-action="Detail" asp-route-id="@Model.PathId">
+            Xem chi tiết
+        </a>
+
+        @if (Model.GeneratedByAi)
+        {
+            <form class="m8-regenerate-form" asp-area="Student" asp-controller="LearningPath" asp-action="Regenerate" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="reason" value="Student requested a refreshed AI learning path." />
+                <button type="submit" class="m8-btn m8-btn--secondary">Tạo lại lộ trình</button>
+            </form>
+        }
+    </section>
+</div>

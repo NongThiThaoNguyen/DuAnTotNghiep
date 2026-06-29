@@ -226,15 +226,15 @@ namespace DuAnTotNghiep.Services
                 // 7. Calculate Accuracy Percentages
                 foreach (var sDto in skillMap.Values)
                 {
-                    sDto.AccuracyPercentage = sDto.MaxScore > 0 
-                        ? Math.Round((sDto.EarnedScore / sDto.MaxScore) * 100, 2) 
+                    sDto.AccuracyPercentage = sDto.MaxScore > 0
+                        ? Math.Round((sDto.EarnedScore / sDto.MaxScore) * 100, 2)
                         : 0;
                 }
 
                 foreach (var tDto in topicMap.Values)
                 {
-                    tDto.AccuracyPercentage = tDto.MaxScore > 0 
-                        ? Math.Round((tDto.EarnedScore / tDto.MaxScore) * 100, 2) 
+                    tDto.AccuracyPercentage = tDto.MaxScore > 0
+                        ? Math.Round((tDto.EarnedScore / tDto.MaxScore) * 100, 2)
                         : 0;
                 }
 
@@ -247,8 +247,8 @@ namespace DuAnTotNghiep.Services
                         continue;
                     }
 
-                    dDto.AccuracyPercentage = dDto.MaxScore > 0 
-                        ? Math.Round((dDto.EarnedScore / dDto.MaxScore) * 100, 2) 
+                    dDto.AccuracyPercentage = dDto.MaxScore > 0
+                        ? Math.Round((dDto.EarnedScore / dDto.MaxScore) * 100, 2)
                         : 0;
                 }
 
@@ -270,7 +270,7 @@ namespace DuAnTotNghiep.Services
                     ValidationWarnings = warnings
                 };
 
-                _logger.LogInformation("Successfully completed test result aggregation for Attempt ID: {AttemptId}. Warnings count: {WarningCount}, Wrong answers count: {WrongCount}", 
+                _logger.LogInformation("Successfully completed test result aggregation for Attempt ID: {AttemptId}. Warnings count: {WarningCount}, Wrong answers count: {WrongCount}",
                     attemptId, result.ValidationWarnings.Count, result.WrongAnswers.Count);
 
                 return result;

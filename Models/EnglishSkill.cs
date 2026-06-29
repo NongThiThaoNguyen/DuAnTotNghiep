@@ -1,17 +1,6 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-﻿using System;
-using System.Collections.Generic;
-=======
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Models;
 
@@ -19,23 +8,12 @@ public partial class EnglishSkill
 {
     public int Id { get; set; }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public string SkillCode { get; set; } = null!;
-
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     [Required]
     [StringLength(50)]
     public string SkillCode { get; set; } = null!;
 
     [Required]
     [StringLength(255)]
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public string SkillName { get; set; } = null!;
 
     public string? Description { get; set; }
@@ -44,11 +22,6 @@ public partial class EnglishSkill
 
     public bool IsActive { get; set; }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public int? CreatedBy { get; set; }
 
     public int? UpdatedBy { get; set; }
@@ -61,10 +34,6 @@ public partial class EnglishSkill
 
     public virtual User? UpdatedByNavigation { get; set; }
 
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public virtual ICollection<CompetencySkillScore> CompetencySkillScores { get; set; } = new List<CompetencySkillScore>();
 
     public virtual ICollection<LearningPathTemplateNode> LearningPathTemplateNodes { get; set; } = new List<LearningPathTemplateNode>();

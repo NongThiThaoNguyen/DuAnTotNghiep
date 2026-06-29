@@ -66,7 +66,7 @@ END
 -- Add Foreign Key constraint for [topic_id]
 IF NOT EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[FK_css_topic]') AND parent_object_id = OBJECT_ID(N'[dbo].[competency_skill_scores]'))
 BEGIN
-    ALTER TABLE [dbo].[competency_skill_scores] 
+    ALTER TABLE [dbo].[competency_skill_scores]
     ADD CONSTRAINT [FK_css_topic] FOREIGN KEY ([topic_id]) REFERENCES [dbo].[learning_topics]([id]) ON DELETE NO ACTION;
     PRINT 'Added foreign key constraint [FK_css_topic] to [competency_skill_scores].';
 END

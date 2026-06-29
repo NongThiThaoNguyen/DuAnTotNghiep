@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 ﻿using System;
-=======
-using System;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-using System;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -31,38 +23,20 @@ public partial class CompetencyAnalysis
 
     public string? GapAnalysis { get; set; }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+    public string? AiModel { get; set; }
+
+    public decimal? ConfidenceScore { get; set; }
+
+    public string Status { get; set; } = "COMPLETED";
+
+    public bool IsLatest { get; set; } = true;
+
     public string? PrioritizedTopicsJson { get; set; }
 
     public string? KnowledgeGapsJson { get; set; }
 
     public string? MetadataJson { get; set; }
 
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-    public string? AiModel { get; set; }
-
-    public decimal? ConfidenceScore { get; set; }
-
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-    public bool IsLatest { get; set; } = true;
-
-    public string Status { get; set; } = "COMPLETED";
-
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<CompetencySkillScore> CompetencySkillScores { get; set; } = new List<CompetencySkillScore>();

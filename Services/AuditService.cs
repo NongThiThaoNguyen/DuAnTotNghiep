@@ -1,9 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-using DuAnTotNghiep.Services.Interfaces;
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -11,29 +5,18 @@ using Microsoft.Extensions.DependencyInjection;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Data;
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Services
 {
     public class AuditService : IAuditService
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ApplicationDbContext _context;
 
-        public AuditService(IServiceScopeFactory scopeFactory, IHttpContextAccessor httpContextAccessor, ApplicationDbContext context)
+        public AuditService(IServiceScopeFactory scopeFactory, IHttpContextAccessor httpContextAccessor)
         {
             _scopeFactory = scopeFactory;
             _httpContextAccessor = httpContextAccessor;
-            _context = context;
         }
 
         public Task LogAsync(int? userId, string action, string entityName, int? entityId, string? oldValue = null, string? newValue = null)
@@ -64,36 +47,25 @@ namespace DuAnTotNghiep.Services
                     dbContext.AuditLogs.Add(log);
                     await dbContext.SaveChangesAsync();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    // Do not bubble up exception to break the main flow.
-                    Console.WriteLine($"[AuditLog Error] {ex.Message}");
+                    // Audit persistence should not interrupt the main flow.
                 }
             });
 
             return Task.CompletedTask;
         }
 
-        public async Task LogActionAsync(int? userId, string action, string? entityName, int? entityId, string? oldValue, string? newValue, string? ipAddress)
+        public Task LogActionAsync(
+            int? userId,
+            string action,
+            string entityName,
+            int? entityId,
+            string? oldValue = null,
+            string? newValue = null,
+            string? ipAddress = null)
         {
-            var auditLog = new AuditLog
-            {
-                UserId = userId,
-                Action = action,
-                EntityName = entityName,
-                EntityId = entityId,
-                OldValue = oldValue,
-                NewValue = newValue,
-                IpAddress = ipAddress,
-                CreatedAt = DateTime.UtcNow
-            };
-
-            _context.AuditLogs.Add(auditLog);
-            await _context.SaveChangesAsync();
+            return LogAsync(userId, action, entityName, entityId, oldValue, newValue);
         }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

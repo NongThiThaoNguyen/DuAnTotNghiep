@@ -1,9 +1,4 @@
 @using System.Security.Claims
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 @functions {
     public class MenuItem
     {
@@ -241,24 +236,12 @@
         }
     };
 }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 <!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-    <title>@ViewData["Title"] - DuAnTotNghiep (Student)</title>
-=======
     <title>@ViewData["Title"] - AI Study English (Student)</title>
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-    <title>@ViewData["Title"] - AI Study English (Student)</title>
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -266,11 +249,6 @@
     
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DuAnTotNghiep.styles.css" asp-append-version="true" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     
     <style>
         /* Smooth transitions for sidebar */
@@ -318,10 +296,6 @@
             }
         }
     </style>
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 </head>
 <body class="h-full flex flex-col font-sans text-slate-900 bg-slate-50">
 
@@ -329,63 +303,6 @@
 
     <div class="flex flex-1 relative overflow-hidden">
         
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 lg:hidden"></div>
-
-        <aside id="mobileSidebar" class="fixed inset-y-0 left-0 z-50 w-70 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:h-[calc(100vh-4rem)] flex flex-col justify-between shrink-0 overflow-y-auto">
-            <div class="p-6">
-                <div class="lg:hidden flex items-center gap-2 mb-6">
-                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">D</div>
-                    <span class="font-bold text-lg text-slate-800">DuAn<span class="text-blue-600">TotNghiep</span></span>
-                </div>
-                
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-4">Học Viên</span>
-                <ul class="space-y-1 mb-8">
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Student" asp-controller="Home" asp-action="Index">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                            </svg>
-                            Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
-                            Khóa học của tôi
-                        </a>
-                    </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
-                            Tìm khóa học
-                        </a>
-                    </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                            Tiến độ học tập
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            
-            <div class="p-6 border-t border-slate-200">
-                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Logout">
-                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                    Đăng xuất
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         <!-- Mobile Sidebar Backdrop Overlay -->
         <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 lg:hidden"></div>
 
@@ -470,10 +387,6 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                     </svg>
                     <span class="menu-text">Đăng xuất</span>
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 </a>
             </div>
         </aside>
@@ -481,11 +394,6 @@
         <!-- Content Area -->
         <main role="main" class="flex-1 overflow-y-auto min-h-0 flex flex-col bg-slate-50">
             <div class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 
                 <!-- Dynamic Breadcrumb Trail -->
                 <nav class="flex mb-6" aria-label="Breadcrumb">
@@ -517,24 +425,12 @@
                     </ol>
                 </nav>
 
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 @RenderBody()
             </div>
             
             <footer class="bg-white border-t border-slate-200 py-6 px-8 text-center text-sm text-slate-500">
                 <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    <span>&copy; 2026 - DuAnTotNghiep - Thiết kế bởi Nông Thị Thảo Nguyên</span>
-=======
                     <span>&copy; 2026 - AI Study English - Thiết kế bởi Nông Thị Thảo Nguyên</span>
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-                    <span>&copy; 2026 - AI Study English - Thiết kế bởi Nông Thị Thảo Nguyên</span>
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 </div>
             </footer>
         </main>
@@ -548,12 +444,6 @@
             const sidebarToggle = document.getElementById('sidebarToggle');
             const mobileSidebar = document.getElementById('mobileSidebar');
             const sidebarOverlay = document.getElementById('sidebarOverlay');
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             const desktopSidebarCollapseBtn = document.getElementById('desktopSidebarCollapseBtn');
             const collapseIcon = document.getElementById('collapseIcon');
 
@@ -563,10 +453,6 @@
             }
 
             // Mobile Hamburger Sidebar Toggle
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             if (sidebarToggle && mobileSidebar && sidebarOverlay) {
                 function toggleSidebar() {
                     mobileSidebar.classList.toggle('-translate-x-full');
@@ -577,11 +463,6 @@
                 sidebarOverlay.addEventListener('click', toggleSidebar);
             }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             // Desktop Sidebar Collapse Toggle
             if (desktopSidebarCollapseBtn && mobileSidebar) {
                 desktopSidebarCollapseBtn.addEventListener('click', function(e) {
@@ -592,10 +473,6 @@
             }
 
             // User Profile Dropdown Toggle
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             const userMenuBtn = document.getElementById('userMenuBtn');
             const userDropdown = document.getElementById('userDropdown');
 
@@ -610,11 +487,6 @@
                     }
                 });
             }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             // Accordion dropdown toggle
             const toggleButtons = document.querySelectorAll('.category-toggle-btn');
@@ -644,10 +516,6 @@
                     }
                 });
             });
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
     </script>
     

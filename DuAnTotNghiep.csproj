@@ -8,33 +8,12 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     <PackageReference Include="ClosedXML" Version="0.105.0" />
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-    <PackageReference Include="ClosedXML" Version="0.105.0" />
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.9">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
-<<<<<<< HEAD
-<<<<<<< HEAD
-  </ItemGroup>
-
-  <Target Name="Tailwind" BeforeTargets="Build">
-    <!-- Install npm packages if node_modules doesn't exist -->
-    <Exec Command="npm install" Condition="!Exists('node_modules')" />
-    <!-- Compile tailwind css -->
-    <Exec Command="npx tailwindcss -i ./Styles/site.css -o ./wwwroot/css/site.css" />
-  </Target>
-
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
@@ -51,8 +30,4 @@
     <None Remove="Tests\**" />
   </ItemGroup>
 
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 </Project>

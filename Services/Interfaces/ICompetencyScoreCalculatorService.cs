@@ -5,7 +5,7 @@ namespace DuAnTotNghiep.Services.Interfaces
     /// <summary>
     /// Định nghĩa contract cho Service tính toán năng lực học sinh
     /// theo phương pháp Rule-based (thuần logic nghiệp vụ, không gọi AI).
-    /// 
+    ///
     /// Đây là tầng M7.Task3 trong pipeline:
     ///   Task2 (AggregateTestData) → [AssessmentInputDto]
     ///   → Task3 (CalculateScores) → [CalculatedCompetencyResult]

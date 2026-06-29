@@ -4,46 +4,20 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
-<<<<<<< HEAD
-<<<<<<< HEAD
-using System.Security.Claims;
-using System.Threading.Tasks;
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Areas.Admin.Controllers
 {
     [Area("Admin")]
-<<<<<<< HEAD
-<<<<<<< HEAD
-    [Authorize(Roles = "ADMIN")]
-=======
     [Authorize(Roles = "ADMIN,TEACHER")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-    [Authorize(Roles = "ADMIN,TEACHER")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public class PlacementTestsController : Controller
     {
         private readonly IPlacementTestManagementService _managementService;
         private readonly IMasterDataService _masterDataService;
         private readonly IPlacementTestValidationService _validationService;
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-        public PlacementTestsController(IPlacementTestManagementService managementService, IMasterDataService masterDataService, IPlacementTestValidationService validationService)
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private readonly DuAnTotNghiep.Services.Background.IAiAnalysisQueue _aiQueue;
         private readonly DuAnTotNghiep.Data.ApplicationDbContext _dbContext;
 
@@ -53,24 +27,12 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             IPlacementTestValidationService validationService,
             DuAnTotNghiep.Services.Background.IAiAnalysisQueue aiQueue,
             DuAnTotNghiep.Data.ApplicationDbContext dbContext)
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         {
             _managementService = managementService;
             _masterDataService = masterDataService;
             _validationService = validationService;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
             _aiQueue = aiQueue;
             _dbContext = dbContext;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-            _aiQueue = aiQueue;
-            _dbContext = dbContext;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         public async Task<IActionResult> Index([FromQuery] PlacementTestFilterDto filter)
@@ -97,28 +59,14 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         }
 
         [HttpGet]
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-        [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Validate(int id)
         {
             var result = await _validationService.ValidatePlacementTestAsync(id);
             return Json(result);
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-        [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Create()
         {
             var levels = await _masterDataService.GetActiveLevelsAsync();
@@ -128,14 +76,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-        [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Create(CreatePlacementTestDto dto)
         {
             if (!ModelState.IsValid)
@@ -161,14 +102,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
         }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-        [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Edit(int id)
         {
             var test = await _managementService.GetDetailAsync(id);
@@ -192,14 +126,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-        [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Edit(int id, UpdatePlacementTestDto dto)
         {
             if (id != dto.Id) return BadRequest();
@@ -232,14 +159,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-        [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Publish(int id)
         {
             try
@@ -257,14 +177,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-        [Authorize(Roles = "ADMIN")]
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Archive(int id)
         {
             try
@@ -279,11 +192,6 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
             return RedirectToAction(nameof(Details), new { id });
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -317,9 +225,5 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             // Assuming we don't have Attempt Details view, we just redirect to Index
             return RedirectToAction(nameof(Index));
         }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

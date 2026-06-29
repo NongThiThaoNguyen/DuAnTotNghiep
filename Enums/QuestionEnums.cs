@@ -14,15 +14,7 @@ namespace DuAnTotNghiep.Enums
         }
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     public static class QuestionTypeConstants
-=======
-    public static class QuestionType
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-    public static class QuestionType
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     {
         public const string MCQ = "MCQ";
         public const string TrueFalse = "TRUE_FALSE";

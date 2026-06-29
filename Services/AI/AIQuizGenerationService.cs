@@ -47,7 +47,7 @@ namespace DuAnTotNghiep.Services.AI
                 }
                 catch (Exception ex)
                 {
-                    return new AIGenerationResult { IsSuccess = false, ErrorMessage = ex.Message }; 
+                    return new AIGenerationResult { IsSuccess = false, ErrorMessage = ex.Message };
                 }
 
                 // Response might be a JSON string or wrapped; try to parse the first JSON object/array

@@ -138,34 +138,14 @@ namespace DuAnTotNghiep.Services
                 
                 var answersInSkill = attempt.TestAnswers.Where(a => qIdsInSkill.Contains(a.QuestionId)).ToList();
                 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                int totalQs = qIdsInSkill.Count;
-                int correctQs = answersInSkill.Count(a => a.IsCorrect == true);
-                decimal score = answersInSkill.Sum(a => a.Score ?? 0);
-=======
                 decimal maxScore = group.Sum(pq => pq.Points);
                 decimal earnedScore = answersInSkill.Sum(a => a.Score ?? 0);
                 decimal percentage = maxScore > 0 ? (earnedScore / maxScore) * 100 : 0;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-                decimal maxScore = group.Sum(pq => pq.Points);
-                decimal earnedScore = answersInSkill.Sum(a => a.Score ?? 0);
-                decimal percentage = maxScore > 0 ? (earnedScore / maxScore) * 100 : 0;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
                 result.Add(new SkillScoreDto
                 {
                     SkillId = skill.Id,
                     SkillName = skill.SkillName,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                    TotalQuestions = totalQs,
-                    CorrectQuestions = correctQs,
-                    Score = score
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     EarnedScore = earnedScore,
                     MaxScore = maxScore,
                     Percentage = percentage
@@ -216,10 +196,6 @@ namespace DuAnTotNghiep.Services
                     EarnedScore = earnedScore,
                     MaxScore = maxScore,
                     Percentage = percentage
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 });
             }
 
@@ -243,14 +219,6 @@ namespace DuAnTotNghiep.Services
 
             // Simple rule: <40% A1, <60% A2, <80% B1, >=80% B2
             string levelCode = "A1";
-<<<<<<< HEAD
-<<<<<<< HEAD
-            if (percentage >= 80) levelCode = "B2";
-            else if (percentage >= 60) levelCode = "B1";
-            else if (percentage >= 40) levelCode = "A2";
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             string description = "Người dùng ở trình độ cơ bản (Beginner).";
             if (percentage >= 80)
             {
@@ -267,10 +235,6 @@ namespace DuAnTotNghiep.Services
                 levelCode = "A2";
                 description = "Người dùng ở trình độ sơ cấp (Pre-Intermediate).";
             }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             var level = await _dbContext.EnglishProficiencyLevels
                 .FirstOrDefaultAsync(l => l.Code == levelCode);
@@ -278,19 +242,9 @@ namespace DuAnTotNghiep.Services
             return new EstimatedLevelDto
             {
                 LevelId = level?.Id,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                LevelName = level?.Name
-=======
                 LevelName = level?.Name,
                 Percentage = percentage,
                 Description = description
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-                LevelName = level?.Name,
-                Percentage = percentage,
-                Description = description
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             };
         }
     }

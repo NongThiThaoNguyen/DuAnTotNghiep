@@ -1,0 +1,66 @@
+@model IEnumerable<DuAnTotNghiep.Models.LearningPathTemplate>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Path Templates";
+}
+
+<div class="space-y-6">
+    <header class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+        <p class="text-xs font-bold uppercase text-blue-600 mb-2">AI Learning Path</p>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-slate-900">Path Templates</h1>
+                <p class="text-sm text-slate-500 mt-2">Quản lý template lộ trình học dùng làm fallback hoặc mẫu triển khai.</p>
+            </div>
+            <a class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700" asp-action="Create">Tạo template</a>
+        </div>
+    </header>
+
+    <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-xs font-bold uppercase text-slate-500">
+                    <tr>
+                        <th class="px-4 py-3">Template</th>
+                        <th class="px-4 py-3">Duration</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Created</th>
+                        <th class="px-4 py-3">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 font-semibold text-slate-900">@item.TemplateName</td>
+                            <td class="px-4 py-3 text-slate-600">@(item.DurationWeeks?.ToString() ?? "N/A") tuần</td>
+                            <td class="px-4 py-3"><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">@item.Status</span></td>
+                            <td class="px-4 py-3 text-slate-600">@item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-4 py-3">
+                                <div class="flex flex-wrap gap-2">
+                                    <a class="font-bold text-blue-600 hover:text-blue-700" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a>
+                                    <a class="font-bold text-amber-600 hover:text-amber-700" asp-action="Edit" asp-route-id="@item.Id">Sửa</a>
+                                    <form asp-action="Publish" asp-route-id="@item.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button class="font-bold text-green-600 hover:text-green-700" type="submit">Publish</button>
+                                    </form>
+                                    <form asp-action="Archive" asp-route-id="@item.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button class="font-bold text-slate-600 hover:text-slate-800" type="submit">Archive</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td class="px-4 py-6 text-center text-slate-500" colspan="5">Chưa có template.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

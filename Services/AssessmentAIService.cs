@@ -14,7 +14,7 @@ namespace DuAnTotNghiep.Services
 {
     public class AssessmentAIService : IAssessmentAIService
     {
-        private readonly IPromptTemplateService _tmpl;
+        private readonly DuAnTotNghiep.Services.Interfaces.IPromptTemplateService _tmpl;
         private readonly IHttpClientFactory _http;
         private readonly AiProviderSettings _cfg;
         private readonly ILogger<AssessmentAIService> _log;
@@ -22,7 +22,7 @@ namespace DuAnTotNghiep.Services
         private readonly IAiLoggingService _aiLog;
 
         public AssessmentAIService(
-            IPromptTemplateService tmpl,
+            DuAnTotNghiep.Services.Interfaces.IPromptTemplateService tmpl,
             IHttpClientFactory http,
             IOptions<AiProviderSettings> cfg,
             ILogger<AssessmentAIService> log,
@@ -71,7 +71,7 @@ namespace DuAnTotNghiep.Services
                     var client = _http.CreateClient("AiProvider");
                     client.Timeout = TimeSpan.FromSeconds(30);
                     var resp = await client.PostAsJsonAsync(string.Empty, payload);
-                    
+
                     if (!resp.IsSuccessStatusCode)
                     {
                         var errTxt = await resp.Content.ReadAsStringAsync();
@@ -92,7 +92,7 @@ namespace DuAnTotNghiep.Services
                     err = ex;
                 }
             }
-            
+
             sw.Stop();
             var latencyMs = (int)sw.ElapsedMilliseconds;
 

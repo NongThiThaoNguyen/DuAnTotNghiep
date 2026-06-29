@@ -1,0 +1,113 @@
+@model DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathDetailViewModel
+
+@{
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    ViewData["Title"] = "Chi tiết lộ trình AI";
+
+    var groupedNodes = Model.Nodes
+        .OrderBy(node => node.OrderIndex)
+        .GroupBy(node => string.IsNullOrWhiteSpace(node.PathPhase) ? "Lộ trình" : node.PathPhase)
+        .ToList();
+}
+
+<link rel="stylesheet" href="~/css/learning-path-m8.css" asp-append-version="true" />
+
+<div class="m8-path-detail">
+    <header class="m8-page-header">
+        <p class="m8-page-header__eyebrow">AI Learning Path</p>
+        <h1 class="m8-page-header__title">@Model.Title</h1>
+        <p class="m8-page-header__description">@Model.AiPlanSummary</p>
+    </header>
+
+    <section class="m8-detail-toolbar" aria-label="Tổng quan chi tiết">
+        <div>
+            <span class="m8-detail-toolbar__label">Tiến độ</span>
+            <strong class="m8-detail-toolbar__value">@Model.CompletedNodes/@Model.TotalNodes nodes</strong>
+        </div>
+        <a class="m8-btn m8-btn--secondary" asp-area="Student" asp-controller="LearningPath" asp-action="Summary">
+            Quay lại tóm tắt
+        </a>
+    </section>
+
+    @if (!Model.Nodes.Any())
+    {
+        <section class="m8-missing-step">
+            <h2 class="m8-missing-step__title">Chưa có node trong lộ trình</h2>
+            <p class="m8-missing-step__text">Lộ trình này chưa có nội dung học tập để hiển thị.</p>
+        </section>
+    }
+    else
+    {
+        <section class="m8-node-list" aria-label="Danh sách nodes trong lộ trình">
+            @foreach (var group in groupedNodes)
+            {
+                <div class="m8-node-group">
+                    <h2 class="m8-node-group__title">@group.Key</h2>
+
+                    @foreach (var node in group)
+                    {
+                        var status = (node.Status ?? string.Empty).ToUpperInvariant();
+                        var statusClass = status switch
+                        {
+                            "AVAILABLE" => "m8-node-status--available",
+                            "COMPLETED" => "m8-node-status--completed",
+                            _ => "m8-node-status--locked"
+                        };
+                        <article class="m8-node-card" aria-label="@node.Title">
+                            <div class="m8-node-card__main">
+                                <div class="m8-node-card__order">@node.OrderIndex</div>
+                                <div class="m8-node-card__content">
+                                    <div class="m8-node-card__header">
+                                        <h3 class="m8-node-card__title">@node.Title</h3>
+                                        <span class="m8-node-status @statusClass">
+                                            @(string.IsNullOrWhiteSpace(node.StatusLabel) ? node.Status : node.StatusLabel)
+                                        </span>
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(node.Description))
+                                    {
+                                        <p class="m8-node-card__description">@node.Description</p>
+                                    }
+
+                                    <div class="m8-node-card__meta">
+                                        <span>@node.NodeType.Replace("_", " ")</span>
+                                        @if (node.EstimatedMinutes.HasValue)
+                                        {
+                                            <span>@node.EstimatedMinutes.Value phút</span>
+                                        }
+                                        @if (node.ScheduledDate.HasValue)
+                                        {
+                                            <span>@node.ScheduledDate.Value.ToString("dd/MM/yyyy")</span>
+                                        }
+                                    </div>
+
+                                    @if (!string.IsNullOrWhiteSpace(node.AiReason))
+                                    {
+                                        <p class="m8-node-card__reason">@node.AiReason</p>
+                                    }
+                                </div>
+                            </div>
+
+                            <div class="m8-node-card__action">
+                                @if (status == "COMPLETED")
+                                {
+                                    <span class="m8-node-action m8-node-action--done">Đã hoàn thành</span>
+                                }
+                                else if (status == "AVAILABLE" && node.IsClickable)
+                                {
+                                    <a class="m8-btn m8-btn--primary" asp-area="Student" asp-controller="LearningPath" asp-action="OpenNode" asp-route-nodeId="@node.NodeId">
+                                        Bắt đầu
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="m8-node-action m8-node-action--locked">Đang khóa</span>
+                                }
+                            </div>
+                        </article>
+                    }
+                </div>
+            }
+        </section>
+    }
+</div>

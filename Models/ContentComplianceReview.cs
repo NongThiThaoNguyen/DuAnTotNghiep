@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-﻿using System;
-=======
 using System;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-using System;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -31,19 +23,9 @@ public partial class ContentComplianceReview
 
     public DateTime ReviewedAt { get; set; }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    public virtual User Reviewer { get; set; } = null!;
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public int? ReferenceSourceId { get; set; }
 
     public virtual User Reviewer { get; set; } = null!;
 
     public virtual ReferenceSource? ReferenceSource { get; set; }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 }

@@ -4,15 +4,10 @@ using DuAnTotNghiep.Repositories.Interfaces;
 using DuAnTotNghiep.Repositories;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Services;
-<<<<<<< HEAD
-<<<<<<< HEAD
 using DuAnTotNghiep.Services.AI;
 using DuAnTotNghiep.Services.Validators;
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using DuAnTotNghiep.Data.Seeders;
+using DuAnTotNghiep.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,16 +21,17 @@ builder.Services.AddControllersWithViews(options =>
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<AiProviderSettings>(builder.Configuration.GetSection("AI"));
+builder.Services.AddHttpClient("AiProvider", client =>
+{
+    var endpoint = builder.Configuration["AI:Endpoint"];
+    if (!string.IsNullOrWhiteSpace(endpoint))
+    {
+        client.BaseAddress = new Uri(endpoint);
+    }
+});
 
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-builder.Services.AddHttpContextAccessor();
-
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 // Đăng ký Generic Repository
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 
@@ -47,11 +43,6 @@ builder.Services.AddScoped<IAuditLogRepository, AuditLogRepository>();
 builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepository>();
 builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
 builder.Services.AddScoped<ILearningProfileRepository, LearningProfileRepository>();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 builder.Services.AddScoped<ILearningTopicRepository, LearningTopicRepository>();
 builder.Services.AddScoped<IReferenceSourceRepository, ReferenceSourceRepository>();
 builder.Services.AddScoped<IEnglishSkillRepository, EnglishSkillRepository>();
@@ -59,10 +50,9 @@ builder.Services.AddScoped<IEnglishProficiencyLevelRepository, EnglishProficienc
 builder.Services.AddScoped<ILearningObjectiveRepository, LearningObjectiveRepository>();
 builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+builder.Services.AddScoped<ILearningPathRepository, LearningPathRepository>();
+builder.Services.AddScoped<ICompetencyAnalysisRepository, CompetencyAnalysisRepository>();
+builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();
 
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -77,38 +67,11 @@ builder.Services.AddScoped<IPlacementTestService, PlacementTestService>();
 builder.Services.AddScoped<IMasterDataService, MasterDataService>();
 builder.Services.AddScoped<ITestScoringService, TestScoringService>();
 builder.Services.AddScoped<IPlacementTestManagementService, PlacementTestManagementService>();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 builder.Services.AddScoped<IPlacementAttemptService, PlacementAttemptService>();
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-builder.Services.AddScoped<IPlacementAttemptService, PlacementAttemptService>();
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 builder.Services.AddScoped<IPlacementTestSectionService, PlacementTestSectionService>();
 builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionService>();
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-// Đăng ký Seeder
-// Đăng ký Seeder
-builder.Services.AddScoped<DatabaseSeeder>();
-
-// AI services
-builder.Services.AddHttpClient<IAIProvider, OpenAIProvider>();
-builder.Services.AddScoped<AIQuizGenerationService>();
-builder.Services.AddScoped<AiOutputSchemaValidator>();
-builder.Services.AddScoped<AiUsageLogService>();
-builder.Services.AddScoped<IPromptTemplateService, PromptTemplateService>();
-builder.Services.AddScoped<ITaxonomyService, TaxonomyService>();
-builder.Services.AddScoped<IAIContentReviewService, AIContentReviewService>();
-builder.Services.AddScoped<IPublishingService, PublishingService>();
-builder.Services.AddScoped<IReplanningRuleService, ReplanningRuleService>();
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 builder.Services.AddScoped<ILearningTopicService, LearningTopicService>();
 builder.Services.AddScoped<IReferenceSourceService, ReferenceSourceService>();
 builder.Services.AddScoped<IValidateLicenseService, ValidateLicenseService>();
@@ -122,6 +85,25 @@ builder.Services.AddScoped<IStudentProgressService, StudentProgressService>();
 builder.Services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPathViewService, PathViewService>();
+builder.Services.AddScoped<ILearningPathEngineService, LearningPathEngineService>();
+builder.Services.AddScoped<ILearningPathAiService, LearningPathAiService>();
+builder.Services.AddScoped<ILearningPathComplianceService, LearningPathComplianceService>();
+builder.Services.AddScoped<DuAnTotNghiep.Services.IPromptTemplateService, PromptTemplateService>();
+builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IPromptTemplateService, PromptTemplateService>();
+builder.Services.AddScoped<ITaxonomyService, TaxonomyService>();
+builder.Services.AddScoped<IAIContentReviewService, AIContentReviewService>();
+builder.Services.AddScoped<IPublishingService, PublishingService>();
+builder.Services.AddScoped<IReplanningRuleService, ReplanningRuleService>();
+builder.Services.AddScoped<IResponseValidator, ResponseValidator>();
+builder.Services.AddScoped<IAssessmentAIService, AssessmentAIService>();
+builder.Services.AddScoped<ICompetencyPersistenceService, CompetencyPersistenceService>();
+builder.Services.AddScoped<ITestResultAggregatorService, TestResultAggregatorService>();
+
+// AI services
+builder.Services.AddHttpClient<IAIProvider, OpenAIProvider>();
+builder.Services.AddScoped<AIQuizGenerationService>();
+builder.Services.AddScoped<AiOutputSchemaValidator>();
+builder.Services.AddScoped<AiUsageLogService>();
 
 // Đăng ký M7 AI Analysis Services
 builder.Services.AddScoped<IPlacementTestAnalysisPayloadBuilder, PlacementTestAnalysisPayloadBuilder>();
@@ -129,23 +111,14 @@ builder.Services.AddScoped<ICompetencyAnalysisService, CompetencyAnalysisService
 builder.Services.AddSingleton<DuAnTotNghiep.Services.Background.IAiAnalysisQueue, DuAnTotNghiep.Services.Background.AiAnalysisQueue>();
 builder.Services.AddHostedService<DuAnTotNghiep.Services.Background.AiAnalysisBackgroundService>();
 builder.Services.AddHostedService<DuAnTotNghiep.Services.ProgressSnapshotBackgroundService>();
-
-builder.Services.AddScoped<ITestResultAggregatorService, TestResultAggregatorService>();
-// M7 - AI Assessment Pipeline
 builder.Services.AddScoped<ICompetencyScoreCalculatorService, CompetencyScoreCalculatorService>();
 builder.Services.AddScoped<ICompetencyFeedbackService, CompetencyFeedbackService>();
 builder.Services.AddScoped<ICompetencyAnalysisOrchestrator, CompetencyAnalysisOrchestrator>();
-builder.Services.AddSingleton<IAiLoggingService, AiLoggingService>(); // Singleton since it uses IServiceScopeFactory internally
+builder.Services.AddSingleton<IAiLoggingService, AiLoggingService>();
 
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();
-builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IM4SchemaService, DuAnTotNghiep.Services.M4SchemaService>();
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-
 
 // Đăng ký Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -167,7 +140,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -189,20 +161,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-
 // Chạy Database Seeder
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
     await seeder.SeedAsync();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 }
 
 app.Run();

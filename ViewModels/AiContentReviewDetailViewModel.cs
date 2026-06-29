@@ -7,7 +7,7 @@ namespace DuAnTotNghiep.ViewModels
     public class AiContentReviewDetailViewModel
     {
         public int Id { get; set; }
-        
+
         [Display(Name = "Content Type")]
         public string? ContentType { get; set; }
 

@@ -8,7 +8,7 @@ namespace DuAnTotNghiep.ViewModels
         public int? CreatedQuizId { get; set; }
         public int AiContentId { get; set; }
         public string ErrorMessage { get; set; }
-        
+
         // Links for user
         public string ViewQuestionLink { get; set; }
         public string ViewQuizLink { get; set; }

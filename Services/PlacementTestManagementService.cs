@@ -15,16 +15,6 @@ namespace DuAnTotNghiep.Services
     {
         private readonly ApplicationDbContext _dbContext;
         private readonly IPlacementTestValidationService _validationService;
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-        public PlacementTestManagementService(ApplicationDbContext dbContext, IPlacementTestValidationService validationService)
-        {
-            _dbContext = dbContext;
-            _validationService = validationService;
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private readonly IAuditService _auditService;
 
         public PlacementTestManagementService(ApplicationDbContext dbContext, IPlacementTestValidationService validationService, IAuditService auditService)
@@ -32,10 +22,6 @@ namespace DuAnTotNghiep.Services
             _dbContext = dbContext;
             _validationService = validationService;
             _auditService = auditService;
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         public async Task<int> CreateAsync(CreatePlacementTestDto dto, int createdBy)
@@ -62,16 +48,8 @@ namespace DuAnTotNghiep.Services
             _dbContext.PlacementTests.Add(newTest);
             await _dbContext.SaveChangesAsync();
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
             await _auditService.LogAsync(createdBy, "CREATE_TEST", "PlacementTest", newTest.Id, null, dto.Title);
 
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-            await _auditService.LogAsync(createdBy, "CREATE_TEST", "PlacementTest", newTest.Id, null, dto.Title);
-
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             return newTest.Id;
         }
 
@@ -100,19 +78,10 @@ namespace DuAnTotNghiep.Services
             test.UpdatedAt = DateTime.UtcNow;
             _dbContext.PlacementTests.Update(test);
             await _dbContext.SaveChangesAsync();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             // Lấy ID user từ context có thể không cần thiết nếu update không truyền vào user id, tạm thời dùng null hoặc 0.
             // Wait, UpdateAsync doesn't receive userId. We can pass null.
             await _auditService.LogAsync(null, "UPDATE_TEST", "PlacementTest", test.Id, null, dto.Title);
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         public async Task PublishAsync(int placementTestId, int userId)
@@ -139,16 +108,8 @@ namespace DuAnTotNghiep.Services
 
             _dbContext.PlacementTests.Update(test);
             await _dbContext.SaveChangesAsync();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
             await _auditService.LogAsync(userId, "PUBLISH_TEST", "PlacementTest", test.Id, "DRAFT", "PUBLISHED");
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-
-            await _auditService.LogAsync(userId, "PUBLISH_TEST", "PlacementTest", test.Id, "DRAFT", "PUBLISHED");
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         public async Task ArchiveAsync(int placementTestId, int userId)
@@ -160,29 +121,14 @@ namespace DuAnTotNghiep.Services
             var test = await _dbContext.PlacementTests.FindAsync(placementTestId);
             if (test == null) throw new InvalidOperationException("Không tìm thấy bài thi.");
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
             var oldStatus = test.Status;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-            var oldStatus = test.Status;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             test.Status = "ARCHIVED";
             test.UpdatedAt = DateTime.UtcNow;
 
             _dbContext.PlacementTests.Update(test);
             await _dbContext.SaveChangesAsync();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
             await _auditService.LogAsync(userId, "ARCHIVE_TEST", "PlacementTest", test.Id, oldStatus, "ARCHIVED");
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-
-            await _auditService.LogAsync(userId, "ARCHIVE_TEST", "PlacementTest", test.Id, oldStatus, "ARCHIVED");
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         public async Task<PlacementTestDetailDto?> GetDetailAsync(int id)

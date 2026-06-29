@@ -81,24 +81,11 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         }
 
         [HttpGet]
-<<<<<<< HEAD
-<<<<<<< HEAD
-        public async Task<IActionResult> Take(int attemptId)
-        {
-            var userId = GetUserId();
-            var viewModel = await _placementTestService.GetTestTakingViewModelAsync(attemptId, userId);
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public async Task<IActionResult> Take(int? id, int? attemptId)
         {
             var userId = GetUserId();
             int finalAttemptId = id ?? attemptId ?? 0;
             var viewModel = await _placementTestService.GetTestTakingViewModelAsync(finalAttemptId, userId);
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             if (viewModel == null)
             {
@@ -148,21 +135,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         public async Task<IActionResult> Submit(int attemptId)
         {
             var studentId = GetUserId();
-<<<<<<< HEAD
-<<<<<<< HEAD
-            // Just mark it as SUBMITTED to break the infinite loop
-            // The real logic will be implemented in Task 14
-            var attempt = await _placementTestService.GetCurrentAttemptAsync(studentId, 0); // We just need any method to get it, or we can use dbContext directly but we don't have it here.
-
-            // Since we haven't fully implemented Task 14, let's just redirect to Intro.
-            // If they are redirected to Intro, the filter will let them pass.
-            // Wait, we need to mark it as EXPIRED or SUBMITTED.
-            // We already marked it EXPIRED in GetTestTakingViewModelAsync.
-            // So if they POST here, we can just redirect them to Intro.
-            return RedirectToAction("Intro");
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             var result = await _placementTestService.SubmitAttemptAsync(attemptId, studentId, new List<AnswerInputDto>());
 
             if (result.IsSuccess)
@@ -198,10 +170,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             {
                 return RedirectToAction("Take", new { attemptId = attemptId });
             }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
     }
 }

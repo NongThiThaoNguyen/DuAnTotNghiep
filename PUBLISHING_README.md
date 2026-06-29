@@ -44,10 +44,10 @@ Routes:
   POST /Admin/AIContent/Approve/{id}       → Set APPROVED (with edit capture)
   POST /Admin/AIContent/Reject/{id}        → Set REJECTED (require note)
   POST /Admin/AIContent/RequestRevision/{id} → Set NEEDS_REVISION
-  
+
   POST /Admin/AIContent/Publish/{id}           → Publish single to Question Bank
   GET  /Admin/AIContent/PublishResult          → Result page for single publish
-  
+
   POST /Admin/AIContent/PublishBatch           → Batch publish all APPROVED
   GET  /Admin/AIContent/PublishBatchResult     → Result page for batch publish
 ```
@@ -133,7 +133,7 @@ ALTER TABLE ai_generated_contents
 ADD published_question_id INT NULL;
 
 ALTER TABLE ai_generated_contents
-ADD CONSTRAINT FK_AiGeneratedContent_PublishedQuestion 
+ADD CONSTRAINT FK_AiGeneratedContent_PublishedQuestion
 FOREIGN KEY (published_question_id) REFERENCES question_bank(id);
 ```
 

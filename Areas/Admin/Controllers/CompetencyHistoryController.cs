@@ -167,7 +167,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 return Unauthorized();
             }
 
-            // We need to know which student this analysis belongs to. 
+            // We need to know which student this analysis belongs to.
             // In a real app, Admin doesn't trigger for themselves, they trigger for the student.
             // For now, we will fetch the analysis to find the student ID.
             var analysis = await _context.CompetencyAnalyses.FindAsync(id);

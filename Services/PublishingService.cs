@@ -92,7 +92,7 @@ namespace DuAnTotNghiep.Services
                 {
                     // Determine question_type from ContentType
                     var questionType = aiContent.ContentType == "QUESTION" ? "MCQ" : "MCQ"; // Default: MCQ for now
-                    
+
                     // Determine level_id (default to NULL, user can set later)
                     int? levelId = null;
 
@@ -185,10 +185,10 @@ namespace DuAnTotNghiep.Services
                 var batchItems = await query.ToListAsync(cancellationToken);
 
                 if (batchItems.Count == 0)
-                    return new PublishBatchResult 
-                    { 
-                        IsSuccess = false, 
-                        ErrorMessage = "No approved items found in batch." 
+                    return new PublishBatchResult
+                    {
+                        IsSuccess = false,
+                        ErrorMessage = "No approved items found in batch."
                     };
 
                 int publishedCount = 0;

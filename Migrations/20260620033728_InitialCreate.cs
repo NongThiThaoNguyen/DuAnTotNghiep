@@ -11,13 +11,6 @@ namespace DuAnTotNghiep.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-            /*
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             migrationBuilder.CreateTable(
                 name: "english_proficiency_levels",
                 columns: table => new
@@ -2136,25 +2129,11 @@ namespace DuAnTotNghiep.Migrations
                 table: "users",
                 column: "email",
                 unique: true);
-<<<<<<< HEAD
-<<<<<<< HEAD
-            */
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-            /*
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             migrationBuilder.DropTable(
                 name: "ai_feedbacks");
 
@@ -2304,13 +2283,6 @@ namespace DuAnTotNghiep.Migrations
 
             migrationBuilder.DropTable(
                 name: "roles");
-<<<<<<< HEAD
-<<<<<<< HEAD
-            */
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
     }
 }

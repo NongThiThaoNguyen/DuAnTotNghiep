@@ -67,7 +67,7 @@ namespace DuAnTotNghiep.Controllers
                 // Query database to check if Student already has an active Learning Path
                 var hasLearningPath = await _context.StudentLearningPaths
                     .AnyAsync(lp => lp.StudentId == viewModel.StudentId || (role == "Student" && lp.StudentId == userId));
-                
+
                 // Check if this analysis is the latest one
                 var latestAnalysisId = await _context.CompetencyAnalyses
                     .Where(a => a.StudentId == viewModel.StudentId && a.Status == "COMPLETED")

@@ -1,10 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +10,6 @@ using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Enums;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Areas.Student.Controllers
 {
@@ -26,15 +17,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
     [Authorize(Roles = "STUDENT")]
     public class HomeController : Controller
     {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        public IActionResult Index()
-        {
-            return View();
-        }
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private readonly ILearningProfileService _profileService;
         private readonly IStudentProgressService _progressService;
         private readonly ApplicationDbContext _context;
@@ -212,9 +194,5 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                 .ToListAsync();
             ViewBag.NotificationsList = notifications;
         }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

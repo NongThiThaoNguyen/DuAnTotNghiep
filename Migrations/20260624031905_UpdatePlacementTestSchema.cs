@@ -1,12 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-﻿using Microsoft.EntityFrameworkCore.Migrations;
-=======
 using Microsoft.EntityFrameworkCore.Migrations;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-using Microsoft.EntityFrameworkCore.Migrations;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 #nullable disable
 
@@ -46,18 +38,6 @@ namespace DuAnTotNghiep.Migrations
                 name: "IX_test_attempt_student",
                 table: "test_attempts");
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-            migrationBuilder.DropIndex(
-                name: "IX_test_answers_attempt_id",
-                table: "test_answers");
-
-            migrationBuilder.DropIndex(
-                name: "IX_placement_test_sections_placement_test_id",
-                table: "placement_test_sections");
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             // migrationBuilder.DropIndex(
             //     name: "IX_test_answers_attempt_id",
             //     table: "test_answers");
@@ -65,10 +45,6 @@ namespace DuAnTotNghiep.Migrations
             // migrationBuilder.DropIndex(
             //     name: "IX_placement_test_sections_placement_test_id",
             //     table: "placement_test_sections");
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             migrationBuilder.CreateIndex(
                 name: "IX_test_attempt_student",

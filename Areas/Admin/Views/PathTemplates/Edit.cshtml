@@ -1,0 +1,69 @@
+@model DuAnTotNghiep.Models.LearningPathTemplate
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Edit Path Template";
+    var nodes = Model.LearningPathTemplateNodes.OrderBy(node => node.OrderIndex).ToList();
+}
+
+<div class="space-y-6">
+    <header class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+        <p class="text-xs font-bold uppercase text-blue-600 mb-2">AI Learning Path</p>
+        <h1 class="text-2xl font-bold text-slate-900">Edit Path Template</h1>
+        <p class="text-sm text-slate-500 mt-2">@Model.TemplateName</p>
+    </header>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">@TempData["ErrorMessage"]</div>
+    }
+
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-5">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="CreatedAt" />
+
+        <div class="grid gap-4 md:grid-cols-3">
+            <label class="block md:col-span-2">
+                <span class="text-sm font-semibold text-slate-700">Tên template</span>
+                <input asp-for="TemplateName" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+            </label>
+            <label class="block">
+                <span class="text-sm font-semibold text-slate-700">Trạng thái</span>
+                <input asp-for="Status" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+            </label>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+            <label class="block">
+                <span class="text-sm font-semibold text-slate-700">Thời lượng tuần</span>
+                <input asp-for="DurationWeeks" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+            </label>
+            <label class="block">
+                <span class="text-sm font-semibold text-slate-700">Mô tả</span>
+                <input asp-for="Description" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+            </label>
+        </div>
+
+        <section class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <h2 class="text-base font-bold text-slate-900">Nodes</h2>
+            <div class="mt-4 space-y-3">
+                @for (var index = 0; index < nodes.Count; index++)
+                {
+                    <div class="grid gap-3 md:grid-cols-5">
+                        <input type="hidden" name="LearningPathTemplateNodes[@index].Id" value="@nodes[index].Id" />
+                        <input type="text" name="LearningPathTemplateNodes[@index].NodeTitle" value="@nodes[index].NodeTitle" class="rounded-xl border border-slate-200 px-3 py-2 text-sm md:col-span-2" />
+                        <input type="text" name="LearningPathTemplateNodes[@index].NodeType" value="@nodes[index].NodeType" class="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+                        <input type="number" name="LearningPathTemplateNodes[@index].EstimatedMinutes" value="@nodes[index].EstimatedMinutes" class="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+                        <input type="number" name="LearningPathTemplateNodes[@index].OrderIndex" value="@nodes[index].OrderIndex" class="rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+                    </div>
+                }
+            </div>
+        </section>
+
+        <div class="flex flex-wrap gap-3">
+            <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">Lưu thay đổi</button>
+            <a asp-action="Index" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700">Hủy</a>
+        </div>
+    </form>
+</div>

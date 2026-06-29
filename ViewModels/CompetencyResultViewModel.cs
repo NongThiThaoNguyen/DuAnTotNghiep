@@ -13,39 +13,39 @@ namespace DuAnTotNghiep.ViewModels
     {
         public int AnalysisId { get; set; }
         public int StudentId { get; set; }
-        
+
         public string StudentName { get; set; } = "Student";
-        
+
         /// <summary>
         /// Thời điểm tính toán.
         /// </summary>
         public DateTime CalculatedAt { get; set; }
-        
+
         /// <summary>
         /// Điểm tổng quan (tính theo %).
         /// </summary>
         public decimal OverallAccuracy { get; set; }
-        
+
         /// <summary>
         /// Trình độ CEFR ước lượng bằng Rule-based.
         /// </summary>
         public string EstimatedCefrLevel { get; set; } = null!;
-        
+
         /// <summary>
         /// Tên mức độ hiện tại.
         /// </summary>
         public string CurrentLevelName { get; set; } = "";
-        
+
         /// <summary>
         /// Tên mức độ khuyến nghị tiếp theo.
         /// </summary>
         public string RecommendedLevelName { get; set; } = "";
-        
+
         /// <summary>
         /// Đoạn tóm tắt tổng quan do AI viết.
         /// </summary>
         public string DashboardSummary { get; set; } = "";
-        
+
         /// <summary>
         /// Trạng thái của bài phân tích (COMPLETED, PENDING, FAILED).
         /// </summary>

@@ -65,7 +65,7 @@ namespace DuAnTotNghiep.Services
             int debounceHours = rule?.DebounceHours ?? 24;
 
             var lastEvent = await _context.AiReplanningEvents
-                .Where(e => e.StudentId == studentId && e.TriggerType == type)
+                .Where(e => e.StudentId == studentId && e.TriggerType == type.ToString())
                 .OrderByDescending(e => e.CreatedAt)
                 .FirstOrDefaultAsync();
 
@@ -87,9 +87,9 @@ namespace DuAnTotNghiep.Services
         public async Task<bool> HasPendingSuggestionAsync(int studentId, TriggerType type)
         {
             return await _context.AiReplanningEvents
-                .AnyAsync(e => e.StudentId == studentId 
-                            && e.TriggerType == type 
-                            && e.Status == ReplanningStatus.SUGGESTED);
+                .AnyAsync(e => e.StudentId == studentId
+                            && e.TriggerType == type.ToString()
+                            && e.Status == ReplanningStatus.SUGGESTED.ToString());
         }
     }
 }

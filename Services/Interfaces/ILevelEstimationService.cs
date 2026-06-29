@@ -7,7 +7,7 @@ namespace DuAnTotNghiep.Services.Interfaces
     {
         // Ước lượng trình độ hiện tại và so sánh mục tiêu
         Task<LevelEstimationResultDTO> EstimateStudentLevelAsync(int studentId, int attemptId, decimal aiSuggestedScore);
-        
+
         // Phân tích khoảng cách (Gap) phục vụ giao diện
         Task<LevelGapViewModel> GetLevelGapAnalysisAsync(int analysisId, int currentUserId);
     }

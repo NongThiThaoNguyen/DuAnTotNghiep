@@ -234,7 +234,7 @@ namespace DuAnTotNghiep.Services
                 else
                 {
                     _logger.LogWarning($"Topic {item.TopicId} ({item.TopicTitle}) has insufficient approved learning material. Activating Fallback selection.");
-                    
+
                     // Fallback Selection Logic:
                     // Find another ACTIVE topic belonging to the same Skill and Level that is fully populated
                     var fallbackTopic = await _context.LearningTopics
@@ -242,10 +242,10 @@ namespace DuAnTotNghiep.Services
                         .Include(t => t.Quizzes)
                         .Include(t => t.PracticeTasks)
                         .Include(t => t.Skill)
-                        .Where(t => t.SkillId == (topic != null ? topic.SkillId : 1) && 
-                                    t.Status == "ACTIVE" && 
-                                    (t.OriginalLessons.Any(l => l.ReviewStatus == "APPROVED") || 
-                                     t.Quizzes.Any(q => q.Status == "ACTIVE" || q.Status == "APPROVED") || 
+                        .Where(t => t.SkillId == (topic != null ? topic.SkillId : 1) &&
+                                    t.Status == "ACTIVE" &&
+                                    (t.OriginalLessons.Any(l => l.ReviewStatus == "APPROVED") ||
+                                     t.Quizzes.Any(q => q.Status == "ACTIVE" || q.Status == "APPROVED") ||
                                      t.PracticeTasks.Any()))
                         .FirstOrDefaultAsync();
 
@@ -260,7 +260,7 @@ namespace DuAnTotNghiep.Services
                             GapLevel = "HIGH", // treat fallback as high gap to ensure proper coverage
                             RelatedSkill = fallbackTopic.Skill?.SkillName ?? "English Skill"
                         });
-                        
+
                         _logger.LogInformation($"Successfully replaced topic {item.TopicId} with fallback topic {fallbackTopic.Id}");
                     }
                     else
@@ -275,9 +275,9 @@ namespace DuAnTotNghiep.Services
             // 7. Ghi nhận Audit Log (Action: linked_to_path) với cơ chế cô lập lỗi
             try
             {
-                var payload = JsonSerializer.Serialize(new 
-                { 
-                    StudentId = dto.StudentId, 
+                var payload = JsonSerializer.Serialize(new
+                {
+                    StudentId = dto.StudentId,
                     EstimatedCefrLevel = dto.EstimatedCefrLevel,
                     TargetCefrLevel = dto.TargetCefrLevel,
                     PriorityTopicsCount = resultTopics.Count
@@ -348,9 +348,9 @@ namespace DuAnTotNghiep.Services
             // Ghi Audit Log giai đoạn 1: Bắt đầu yêu cầu regenerate
             try
             {
-                var payload = JsonSerializer.Serialize(new 
-                { 
-                    NewAnalysisId = newAnalysis.Id, 
+                var payload = JsonSerializer.Serialize(new
+                {
+                    NewAnalysisId = newAnalysis.Id,
                     OldAnalysisId = oldAnalysis.Id,
                     StudentId = studentId,
                     Status = "Started"
@@ -405,9 +405,9 @@ namespace DuAnTotNghiep.Services
                     // Ghi Audit Log giai đoạn 2: Regenerate hoàn tất thành công
                     try
                     {
-                        var payload = JsonSerializer.Serialize(new 
-                        { 
-                            NewAnalysisId = newAnalysis.Id, 
+                        var payload = JsonSerializer.Serialize(new
+                        {
+                            NewAnalysisId = newAnalysis.Id,
                             OldAnalysisId = oldAnalysis.Id,
                             StudentId = newAnalysis.StudentId,
                             Status = "Success"
@@ -432,7 +432,7 @@ namespace DuAnTotNghiep.Services
             {
                 _logger.LogError(ex, "Background AI processing failed.");
                 await scope.RollbackAsync();
-                
+
                 // Fallback process
                 var newAnalysis = await _context.CompetencyAnalyses.FindAsync(newAnalysisId);
                 if (newAnalysis != null)
@@ -443,11 +443,11 @@ namespace DuAnTotNghiep.Services
                     // Ghi Audit Log: AI Failed
                     try
                     {
-                        var payload = JsonSerializer.Serialize(new 
-                        { 
-                            AnalysisId = newAnalysisId, 
+                        var payload = JsonSerializer.Serialize(new
+                        {
+                            AnalysisId = newAnalysisId,
                             StudentId = newAnalysis.StudentId,
-                            ErrorMessage = ex.Message 
+                            ErrorMessage = ex.Message
                         });
                         await _auditService.LogActionAsync(
                             userId: newAnalysis.StudentId,

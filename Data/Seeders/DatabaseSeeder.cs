@@ -1,16 +1,8 @@
 using DuAnTotNghiep.Helpers;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Repositories.Interfaces;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 using DuAnTotNghiep.Enums;
 using Microsoft.EntityFrameworkCore;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
-using DuAnTotNghiep.Enums;
-using Microsoft.EntityFrameworkCore;
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Data.Seeders
 {
@@ -50,21 +42,12 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedLevelsAsync();
             await SeedSkillsAsync();
             await SeedPlacementTestsAsync();
-<<<<<<< HEAD
-<<<<<<< HEAD
-            await SeedDemoProfilesAsync();
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             await SeedPlacementTestDemoAsync();
             await SeedDemoProfilesAsync();
             await SeedTopicsAndObjectivesAsync();
+            await SeedM8LearningPathAssetsAsync();
             await SeedLearningPathDemoAsync();
             await SeedReferenceSourcesAsync();
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         private async Task SeedRolesAsync()
@@ -119,20 +102,10 @@ namespace DuAnTotNghiep.Data.Seeders
                 new User { Email = "lockeduser@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Locked User", RoleId = studentRole.Id, Status = "LOCKED", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0, LockoutUntil = DateTime.UtcNow.AddYears(100) },
                 
                 // Test OTP User
-<<<<<<< HEAD
-<<<<<<< HEAD
-                new User { Email = "testotp@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Test OTP User", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 }
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 new User { Email = "testotp@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Test OTP User", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 },
 
                 // Demo User for Task 20
                 new User { Email = "student.demo@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Student Demo", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             };
 
             bool changesMade = false;
@@ -360,11 +333,6 @@ namespace DuAnTotNghiep.Data.Seeders
                 }
             }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             var studentDemo = await _userRepository.GetByEmailAsync("student.demo@aistudyenglish.com");
             if (studentDemo != null && ieltsGoal != null && beginnerLevel != null)
             {
@@ -382,10 +350,6 @@ namespace DuAnTotNghiep.Data.Seeders
                 }
             }
 
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             await _profileRepository.SaveChangesAsync();
         }
 
@@ -413,11 +377,6 @@ namespace DuAnTotNghiep.Data.Seeders
                 }
             }
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private async Task SeedPlacementTestDemoAsync()
         {
             if (_context.PlacementTests.Any(t => t.Title == "English Placement Test Demo"))
@@ -775,6 +734,90 @@ namespace DuAnTotNghiep.Data.Seeders
             }
         }
 
+        public async Task SeedM8LearningPathAssetsAsync()
+        {
+            await SeedM8PromptTemplateAsync();
+            await SeedM8PathTemplatesAsync();
+        }
+
+        private async Task SeedM8PromptTemplateAsync()
+        {
+            if (await _context.AiPromptTemplates.AnyAsync(t => t.PromptCode == "M8_LEARNING_PATH_V1")) return;
+
+            _context.AiPromptTemplates.Add(new AiPromptTemplate
+            {
+                PromptCode = "M8_LEARNING_PATH_V1",
+                PromptName = "M8 Learning Path Generator",
+                ModuleCode = "LEARNING_PATH",
+                VersionNo = 1,
+                SystemPrompt = "Generate a personalized English learning path using approved topics, lessons, and quizzes only.",
+                OutputSchema = "LearningPathOutputDto: pathTitle, summary, totalWeeks, phases[n].nodes[n]",
+                Status = "ACTIVE",
+                CreatedAt = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        private async Task SeedM8PathTemplatesAsync()
+        {
+            var topics = await _context.LearningTopics.Where(t => t.Status == "ACTIVE").OrderBy(t => t.OrderIndex).Take(6).ToListAsync();
+            if (topics.Count == 0) return;
+
+            var goal = await _context.LearningGoals.OrderBy(g => g.Id).FirstOrDefaultAsync(g => g.IsActive);
+            var startLevel = await _context.EnglishProficiencyLevels.OrderBy(l => l.OrderIndex).FirstOrDefaultAsync(l => l.IsActive);
+            var targetLevel = await _context.EnglishProficiencyLevels.OrderBy(l => l.OrderIndex).Skip(1).FirstOrDefaultAsync(l => l.IsActive);
+            var adminId = await _context.Users.Where(u => u.Email == "admin@aistudyenglish.com").Select(u => (int?)u.Id).FirstOrDefaultAsync();
+
+            await AddM8TemplateAsync("M8 Foundation Template", goal?.Id, startLevel?.Id, targetLevel?.Id, topics.Take(3).ToList(), adminId);
+            await AddM8TemplateAsync("M8 Practice Template", goal?.Id, startLevel?.Id, targetLevel?.Id, topics.Skip(3).DefaultIfEmpty(topics[0]).Take(3).ToList(), adminId);
+        }
+
+        private async Task AddM8TemplateAsync(
+            string name,
+            int? goalId,
+            int? startLevelId,
+            int? targetLevelId,
+            List<LearningTopic> topics,
+            int? adminId)
+        {
+            if (await _context.LearningPathTemplates.AnyAsync(t => t.TemplateName == name)) return;
+
+            var template = new LearningPathTemplate
+            {
+                TemplateName = name,
+                GoalId = goalId,
+                StartLevelId = startLevelId,
+                TargetLevelId = targetLevelId,
+                DurationWeeks = 4,
+                Description = "Published fallback template for M8 AI learning path generation.",
+                Status = "PUBLISHED",
+                CreatedBy = adminId,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            foreach (var topic in topics.Select((topic, index) => new { topic, index }))
+            {
+                template.LearningPathTemplateNodes.Add(CreateM8TemplateNode(topic.topic, topic.index + 1));
+            }
+
+            _context.LearningPathTemplates.Add(template);
+            await _context.SaveChangesAsync();
+        }
+
+        private static LearningPathTemplateNode CreateM8TemplateNode(LearningTopic topic, int orderIndex)
+        {
+            return new LearningPathTemplateNode
+            {
+                TopicId = topic.Id,
+                SkillId = topic.SkillId,
+                NodeTitle = topic.Title,
+                NodeType = NodeType.Topic,
+                EstimatedMinutes = topic.EstimatedMinutes ?? 20,
+                OrderIndex = orderIndex,
+                UnlockCondition = orderIndex == 1 ? "FIRST_NODE" : "PREVIOUS_NODE_COMPLETED"
+            };
+        }
+
         private async Task SeedReferenceSourcesAsync()
         {
             if (!await _context.ReferenceSources.AnyAsync())
@@ -937,9 +980,5 @@ namespace DuAnTotNghiep.Data.Seeders
             _context.LearningPathNodes.AddRange(nodes);
             await _context.SaveChangesAsync();
         }
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

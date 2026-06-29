@@ -138,14 +138,14 @@ namespace DuAnTotNghiep.Services
                 // ── 8. Ghi nhận Audit Log (Action: generate) với cơ chế cô lập lỗi ──
                 try
                 {
-                    var payload = JsonSerializer.Serialize(new 
-                    { 
-                        AttemptId = attemptId, 
+                    var payload = JsonSerializer.Serialize(new
+                    {
+                        AttemptId = attemptId,
                         ConfidenceScore = aiResponse.ConfidenceScore,
                         SummarySnippet = aiResponse.Summary.Length > 100 ? aiResponse.Summary.Substring(0, 100) + "..." : aiResponse.Summary
                     });
 
-                    // IpAddress được truyền qua HttpContext ở Controller, ở đây tạm để null hoặc lấy từ context nếu có. 
+                    // IpAddress được truyền qua HttpContext ở Controller, ở đây tạm để null hoặc lấy từ context nếu có.
                     // Do tầng Service không trực tiếp giữ HttpContext, ta ghi nhận thông tin thực thể cơ bản.
                     await _auditService.LogActionAsync(
                         userId: studentId,
@@ -160,7 +160,7 @@ namespace DuAnTotNghiep.Services
                 catch (Exception auditEx)
                 {
                     // Fallback Logging: Ghi log thô vào file hệ thống qua ILogger để bảo toàn vết an ninh khi DB Log lỗi
-                    _log.LogError(auditEx, "FALLBACK_LOG: Lỗi khi ghi audit log 'generate' vào DB cho StudentId={S}, AnalysisId={A}. Dữ liệu thô: AttemptId={AttemptId}", 
+                    _log.LogError(auditEx, "FALLBACK_LOG: Lỗi khi ghi audit log 'generate' vào DB cho StudentId={S}, AnalysisId={A}. Dữ liệu thô: AttemptId={AttemptId}",
                         studentId, newId, attemptId);
                 }
 

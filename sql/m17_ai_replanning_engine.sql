@@ -72,7 +72,7 @@ BEGIN
         CONSTRAINT FK_replan_student FOREIGN KEY (student_id) REFERENCES dbo.users(id),
         CONSTRAINT FK_replan_path FOREIGN KEY (learning_path_id) REFERENCES dbo.student_learning_paths(id)
     );
-    
+
     PRINT 'Đã khởi tạo thành công bảng dbo.ai_replanning_events.';
 END
 ELSE
@@ -268,12 +268,12 @@ END
 IF NOT EXISTS (SELECT 1 FROM dbo.replanning_rules WHERE is_active = 1)
 BEGIN
     INSERT INTO dbo.replanning_rules (
-        low_score_threshold, 
-        missed_days_threshold, 
-        fast_progress_score_threshold, 
-        auto_apply_enabled, 
-        suggestion_expiry_days, 
-        debounce_hours, 
+        low_score_threshold,
+        missed_days_threshold,
+        fast_progress_score_threshold,
+        auto_apply_enabled,
+        suggestion_expiry_days,
+        debounce_hours,
         is_active
     )
     VALUES (60.00, 3, 85.00, 0, 7, 24, 1);

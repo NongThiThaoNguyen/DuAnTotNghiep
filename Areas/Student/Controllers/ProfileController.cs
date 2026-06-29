@@ -5,19 +5,10 @@ using System.Threading.Tasks;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.ViewModels.Onboarding;
 using System.Linq;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using Microsoft.EntityFrameworkCore;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Enums;
 using DuAnTotNghiep.Models;
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Areas.Student.Controllers
 {
@@ -26,15 +17,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
     public class ProfileController : Controller
     {
         private readonly ILearningProfileService _profileService;
-<<<<<<< HEAD
-<<<<<<< HEAD
-
-        public ProfileController(ILearningProfileService profileService)
-        {
-            _profileService = profileService;
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private readonly IStudentProgressService _progressService;
         private readonly ApplicationDbContext _context;
 
@@ -46,10 +28,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             _profileService = profileService;
             _progressService = progressService;
             _context = context;
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
         private int GetUserId()
@@ -62,24 +40,12 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         [HttpGet]
         public async Task<IActionResult> EditLearningProfile()
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-            var profile = await _profileService.GetProfileByUserIdAsync(GetUserId());
-            if (profile == null) return RedirectToAction("Index", "Onboarding");
-
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             int userId = GetUserId();
             var profile = await _profileService.GetProfileByUserIdAsync(userId);
             if (profile == null) return RedirectToAction("Index", "Onboarding");
 
             await PopulateLearningProfileDataAsync(userId);
 
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             var model = new UpdateLearningProfileViewModel
             {
                 MainGoalId = profile.MainGoal?.Id,
@@ -93,16 +59,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                 SelectedSkillCodes = profile.PrioritySkills?.Select(s => s.SkillCode).ToList() ?? new System.Collections.Generic.List<string>()
             };
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-            ViewBag.Goals = await _profileService.GetActiveGoalsAsync();
-            ViewBag.Levels = await _profileService.GetActiveLevelsAsync();
-            ViewBag.Skills = await _profileService.GetActiveSkillsAsync();
-
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             return View(model);
         }
 
@@ -110,26 +66,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditLearningProfile(UpdateLearningProfileViewModel model)
         {
-<<<<<<< HEAD
-<<<<<<< HEAD
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Goals = await _profileService.GetActiveGoalsAsync();
-                ViewBag.Levels = await _profileService.GetActiveLevelsAsync();
-                ViewBag.Skills = await _profileService.GetActiveSkillsAsync();
-                return View(model);
-            }
-
-            var success = await _profileService.EditLearningProfileAsync(GetUserId(), model);
-            if (!success)
-            {
-                ModelState.AddModelError(string.Empty, "Không thể cập nhật hồ sơ. Vui lòng kiểm tra lại thông tin và thử lại.");
-                ViewBag.Goals = await _profileService.GetActiveGoalsAsync();
-                ViewBag.Levels = await _profileService.GetActiveLevelsAsync();
-                ViewBag.Skills = await _profileService.GetActiveSkillsAsync();
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             int userId = GetUserId();
             if (!ModelState.IsValid)
             {
@@ -142,20 +78,10 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             {
                 ModelState.AddModelError(string.Empty, "Không thể cập nhật hồ sơ. Vui lòng kiểm tra lại thông tin và thử lại.");
                 await PopulateLearningProfileDataAsync(userId);
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 return View(model);
             }
 
             TempData["SuccessMessage"] = "Cập nhật hồ sơ học tập thành công!";
-<<<<<<< HEAD
-<<<<<<< HEAD
-            return RedirectToAction("Index", "Home");
-=======
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             return RedirectToAction("EditLearningProfile");
         }
 
@@ -299,10 +225,6 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             ViewBag.Goals = await _profileService.GetActiveGoalsAsync();
             ViewBag.Levels = await _profileService.GetActiveLevelsAsync();
             ViewBag.Skills = await _profileService.GetActiveSkillsAsync();
-<<<<<<< HEAD
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
-=======
->>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
     }
 }

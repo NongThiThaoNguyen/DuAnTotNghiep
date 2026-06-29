@@ -10,7 +10,7 @@ namespace DuAnTotNghiep.Services
     /// <summary>
     /// Triển khai tất cả logic Rule-based để tính điểm năng lực học sinh
     /// từ dữ liệu thô AssessmentInputDto (Task 2 output).
-    /// 
+    ///
     /// Service này KHÔNG gọi database và KHÔNG gọi AI.
     /// Nó là tầng xử lý thuần túy (Pure Computation Layer) đảm bảo:
     ///   - An toàn phép chia cho 0 ở mọi nơi.
@@ -452,7 +452,7 @@ namespace DuAnTotNghiep.Services
 
         /// <summary>
         /// Phân tích cấu trúc lỗi học sinh để xác định "pattern" kiến thức hổng:
-        /// 
+        ///
         ///   - BASIC_GAP:        Bị gãy ngay từ cấp BASIC. Kiến thức nền rất yếu.
         ///   - INTERMEDIATE_GAP: Ổn ở BASIC nhưng gãy ở MEDIUM. Hổng kiến thức trung bình.
         ///   - ADVANCED_GAP:     Ổn ở BASIC và MEDIUM, chỉ gãy ở ADVANCED. Cần nâng cao.
@@ -522,7 +522,7 @@ namespace DuAnTotNghiep.Services
         /// Ước lượng trình độ CEFR sơ bộ dựa trên tỷ lệ % chính xác tổng thể.
         /// Đây là ước lượng Rule-based đơn giản, chỉ mang tính tham khảo.
         /// AI ở Task 4 sẽ có thể bác bỏ hoặc tinh chỉnh dựa trên phân tích sâu hơn.
-        /// 
+        ///
         /// Thang đối chiếu (quy ước nội bộ):
         ///   0–24%   → Pre-A1 (hoàn toàn mới bắt đầu)
         ///   25–39%  → A1    (Beginner)
@@ -573,7 +573,7 @@ namespace DuAnTotNghiep.Services
 
         /// <summary>
         /// Xác định danh sách 3–5 Topic cần học ưu tiên nhất bằng thuật toán:
-        /// 
+        ///
         ///   1. Lọc các topic có AccuracyPercentage dưới ngưỡng STRONG (80%).
         ///      Các topic STRONG không cần ưu tiên.
         ///   2. Sắp xếp theo PriorityScore tăng dần (giá trị thấp = cần học gấp hơn).
@@ -625,10 +625,10 @@ namespace DuAnTotNghiep.Services
                     {
                         int parentId = topicNode.ParentTopicId.Value;
                         var parentScore = topicScores.FirstOrDefault(t => t.TopicId == parentId);
-                        
+
                         // Parent chưa hoàn thành: điểm thấp hoặc chưa học
                         bool parentIsGap = parentScore == null || parentScore.AccuracyPercentage < StrengthThreshold;
-                        
+
                         if (parentIsGap && !expandedGapTopicIds.Contains(parentId))
                         {
                             expandedGapTopicIds.Add(parentId);
@@ -649,7 +649,7 @@ namespace DuAnTotNghiep.Services
             {
                 if (t.ParentTopicId.HasValue)
                 {
-                    if (!childrenMap.ContainsKey(t.ParentTopicId.Value)) 
+                    if (!childrenMap.ContainsKey(t.ParentTopicId.Value))
                         childrenMap[t.ParentTopicId.Value] = new List<int>();
                     childrenMap[t.ParentTopicId.Value].Add(t.TopicId);
                 }
@@ -667,7 +667,7 @@ namespace DuAnTotNghiep.Services
             }
 
             // ── Bước 4: Tập hợp Ready-to-Learn ────────────────────────────
-            var readyToLearnTopics = validGapTopics.Where(t => 
+            var readyToLearnTopics = validGapTopics.Where(t =>
                 !t.ParentTopicId.HasValue || !validGapTopics.Any(g => g.TopicId == t.ParentTopicId.Value)
             ).ToList();
 
@@ -680,12 +680,12 @@ namespace DuAnTotNghiep.Services
             {
                 var ts = topicScores.FirstOrDefault(x => x.TopicId == r.TopicId);
                 decimal accuracy = ts != null ? ts.AccuracyPercentage : 0m;
-                
+
                 // (G) Gap
                 decimal gNorm = (100m - accuracy) / 100m;
-                
+
                 // (P) Profile Priority
-                decimal pNorm = 0.1m; 
+                decimal pNorm = 0.1m;
                 string skillCode = ts?.SkillCode ?? (skillCodeLookup.TryGetValue(r.SkillId, out var sc) ? sc : $"SKILL_{r.SkillId}");
                 string skillCodeUpper = skillCode.ToUpper();
 
@@ -712,7 +712,7 @@ namespace DuAnTotNghiep.Services
                 if (accuracy < CriticalThreshold) reasons.Add($"Hổng kiến thức nghiêm trọng ({accuracy}%)");
                 else if (accuracy < WeaknessThreshold) reasons.Add($"Hổng kiến thức ({accuracy}%)");
                 else if (ts == null) reasons.Add("Kiến thức nền tảng chưa được học");
-                
+
                 if (pNorm >= 0.66m) reasons.Add($"Kỹ năng trọng điểm ({skillCode})");
                 if (descCount > 0) reasons.Add($"Mở khóa {descCount} bài học khác");
 
@@ -753,7 +753,7 @@ namespace DuAnTotNghiep.Services
         /// <summary>
         /// Chuyển danh sách OnboardingSkillPreferenceDto thành Dictionary
         /// để tra cứu O(1) theo SkillCode (key = SkillCode.ToUpper()).
-        /// 
+        ///
         /// Nếu có nhiều preference trùng SkillCode, giữ lại cái có PriorityLevel thấp nhất
         /// (PriorityLevel thấp = ưu tiên cao hơn).
         /// </summary>
