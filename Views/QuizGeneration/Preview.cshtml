@@ -1,0 +1,48 @@
+@model IEnumerable<DuAnTotNghiep.Models.AiGeneratedContent>
+@{
+    ViewData["Title"] = "Preview Generated Questions";
+}
+
+<h2>Preview Generated Questions</h2>
+
+<p>
+    <a class="btn btn-warning" href="/Admin/ContentReview/Index">Xem danh sách chờ duyệt</a>
+    <!-- Adjust the link to your review list route -->
+</p>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Question</th>
+            <th>Options</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+    @if (!Model.Any()) {
+        <tr><td colspan="4">No generated items found for this batch.</td></tr>
+    }
+    else
+    {
+        int i = 0;
+        foreach(var it in Model)
+        {
+            i++;
+            <tr>
+                <td>@i</td>
+                <td>
+                    <pre>@it.GeneratedContent</pre>
+                </td>
+                <td>
+                    <!-- If you want, parse and display options client-side -->
+                    <em>See JSON</em>
+                </td>
+                <td>
+                    <span class="badge bg-warning text-dark">@it.ReviewStatus</span>
+                </td>
+            </tr>
+        }
+    }
+    </tbody>
+</table>

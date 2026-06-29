@@ -4,7 +4,10 @@ using DuAnTotNghiep.Repositories.Interfaces;
 using DuAnTotNghiep.Repositories;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Services;
+using DuAnTotNghiep.Services.AI;
+using DuAnTotNghiep.Services.Validators;
 using DuAnTotNghiep.Data.Seeders;
+using DuAnTotNghiep.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +22,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<AiProviderSettings>(builder.Configuration.GetSection("AI"));
+builder.Services.AddHttpClient("AiProvider", client =>
+{
+    var endpoint = builder.Configuration["AI:Endpoint"];
+    if (!string.IsNullOrWhiteSpace(endpoint))
+    {
+        client.BaseAddress = new Uri(endpoint);
+    }
+});
 
 // Đăng ký Generic Repository
 builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -39,6 +51,8 @@ builder.Services.AddScoped<ILearningObjectiveRepository, LearningObjectiveReposi
 builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
 builder.Services.AddScoped<ILearningPathRepository, LearningPathRepository>();
+builder.Services.AddScoped<ICompetencyAnalysisRepository, CompetencyAnalysisRepository>();
+builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();
 
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -74,6 +88,22 @@ builder.Services.AddScoped<IPathViewService, PathViewService>();
 builder.Services.AddScoped<ILearningPathEngineService, LearningPathEngineService>();
 builder.Services.AddScoped<ILearningPathAiService, LearningPathAiService>();
 builder.Services.AddScoped<ILearningPathComplianceService, LearningPathComplianceService>();
+builder.Services.AddScoped<DuAnTotNghiep.Services.IPromptTemplateService, PromptTemplateService>();
+builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IPromptTemplateService, PromptTemplateService>();
+builder.Services.AddScoped<ITaxonomyService, TaxonomyService>();
+builder.Services.AddScoped<IAIContentReviewService, AIContentReviewService>();
+builder.Services.AddScoped<IPublishingService, PublishingService>();
+builder.Services.AddScoped<IReplanningRuleService, ReplanningRuleService>();
+builder.Services.AddScoped<IResponseValidator, ResponseValidator>();
+builder.Services.AddScoped<IAssessmentAIService, AssessmentAIService>();
+builder.Services.AddScoped<ICompetencyPersistenceService, CompetencyPersistenceService>();
+builder.Services.AddScoped<ITestResultAggregatorService, TestResultAggregatorService>();
+
+// AI services
+builder.Services.AddHttpClient<IAIProvider, OpenAIProvider>();
+builder.Services.AddScoped<AIQuizGenerationService>();
+builder.Services.AddScoped<AiOutputSchemaValidator>();
+builder.Services.AddScoped<AiUsageLogService>();
 
 // Đăng ký M7 AI Analysis Services
 builder.Services.AddScoped<IPlacementTestAnalysisPayloadBuilder, PlacementTestAnalysisPayloadBuilder>();
@@ -81,12 +111,14 @@ builder.Services.AddScoped<ICompetencyAnalysisService, CompetencyAnalysisService
 builder.Services.AddSingleton<DuAnTotNghiep.Services.Background.IAiAnalysisQueue, DuAnTotNghiep.Services.Background.AiAnalysisQueue>();
 builder.Services.AddHostedService<DuAnTotNghiep.Services.Background.AiAnalysisBackgroundService>();
 builder.Services.AddHostedService<DuAnTotNghiep.Services.ProgressSnapshotBackgroundService>();
+builder.Services.AddScoped<ICompetencyScoreCalculatorService, CompetencyScoreCalculatorService>();
+builder.Services.AddScoped<ICompetencyFeedbackService, CompetencyFeedbackService>();
+builder.Services.AddScoped<ICompetencyAnalysisOrchestrator, CompetencyAnalysisOrchestrator>();
+builder.Services.AddSingleton<IAiLoggingService, AiLoggingService>();
 
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();
-builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IM4SchemaService, DuAnTotNghiep.Services.M4SchemaService>();
-
 
 // Đăng ký Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -108,7 +140,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -130,13 +161,11 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-
 // Chạy Database Seeder
 using (var scope = app.Services.CreateScope())
 {
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
     await seeder.SeedAsync();
-
 }
 
 app.Run();

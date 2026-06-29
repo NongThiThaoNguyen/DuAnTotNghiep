@@ -1,0 +1,74 @@
+@using DuAnTotNghiep.Enums
+@*
+  Partial view for AI generation options: cascading dropdowns Skill -> Topic -> Level -> QuestionType
+  This partial expects a controller or API endpoints to supply JSON for skills/topics/levels:
+    GET /Taxonomy/GetActiveSkills
+    GET /Taxonomy/GetActiveTopicsBySkill?skillId={id}
+    GET /Taxonomy/GetProficiencyLevels
+  Validation should be performed server-side by ITaxonomyService before calling AI.
+*@
+
+<div id="generation-options">
+    <div class="form-group">
+        <label for="skillSelect">Skill</label>
+        <select id="skillSelect" name="SkillId" class="form-control">
+            <option value="">-- Select skill --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="topicSelect">Topic</label>
+        <select id="topicSelect" name="TopicId" class="form-control" disabled>
+            <option value="">-- Select topic --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="levelSelect">Proficiency Level</label>
+        <select id="levelSelect" name="LevelId" class="form-control">
+            <option value="">-- Select level --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="questionTypeSelect">Question Type</label>
+        <select id="questionTypeSelect" name="QuestionType" class="form-control">
+            <option value="">-- Select question type --</option>
+            @foreach (var qt in Enum.GetValues(typeof(QuestionType)))
+            {
+                <option value="@qt">@qt</option>
+            }
+        </select>
+    </div>
+</div>
+
+<script>
+    (function(){
+        function fetchJson(url){ return fetch(url, {credentials: 'same-origin'}).then(r=>r.json()); }
+
+        function populateSelect($sel, items, placeholder){
+            $sel.innerHTML = '';
+            var opt = document.createElement('option'); opt.value=''; opt.textContent = placeholder; $sel.appendChild(opt);
+            items.forEach(function(it){ var o = document.createElement('option'); o.value = it.id; o.textContent = it.name; $sel.appendChild(o); });
+        }
+
+        var skillSelect = document.getElementById('skillSelect');
+        var topicSelect = document.getElementById('topicSelect');
+        var levelSelect = document.getElementById('levelSelect');
+
+        // Load skills
+        fetchJson('/api/taxonomy/GetActiveSkills').then(function(data){ populateSelect(skillSelect, data, '-- Select skill --'); }).catch(()=>{});
+
+        skillSelect.addEventListener('change', function(){
+            var id = this.value;
+            if(!id){ topicSelect.innerHTML = '<option value="">-- Select topic --</option>'; topicSelect.disabled = true; return; }
+            topicSelect.disabled = false;
+            fetchJson('/api/taxonomy/GetActiveTopicsBySkill?skillId=' + encodeURIComponent(id))
+                .then(function(data){ populateSelect(topicSelect, data, '-- Select topic --'); })
+                .catch(function(){ topicSelect.innerHTML = '<option value="">-- Select topic --</option>'; });
+        });
+
+        // Load levels
+        fetchJson('/api/taxonomy/GetProficiencyLevels').then(function(data){ populateSelect(levelSelect, data, '-- Select level --'); }).catch(()=>{});
+    })();
+</script>

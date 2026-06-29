@@ -27,6 +27,10 @@ public partial class AiGeneratedContent
 
     public DateTime? ReviewedAt { get; set; }
 
+    public string? BatchId { get; set; }
+
+    public int? PublishedQuestionId { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public virtual LearningTopic? RelatedTopic { get; set; }

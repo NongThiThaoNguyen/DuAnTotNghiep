@@ -27,6 +27,16 @@ public partial class CompetencyAnalysis
 
     public decimal? ConfidenceScore { get; set; }
 
+    public string Status { get; set; } = "COMPLETED";
+
+    public bool IsLatest { get; set; } = true;
+
+    public string? PrioritizedTopicsJson { get; set; }
+
+    public string? KnowledgeGapsJson { get; set; }
+
+    public string? MetadataJson { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<CompetencySkillScore> CompetencySkillScores { get; set; } = new List<CompetencySkillScore>();

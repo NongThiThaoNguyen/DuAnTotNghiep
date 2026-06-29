@@ -48,10 +48,10 @@ namespace DuAnTotNghiep.Services
         {
             return new List<SelectListItem>
             {
-                new SelectListItem { Value = QuestionType.MCQ, Text = "Trắc nghiệm nhiều lựa chọn" },
-                new SelectListItem { Value = QuestionType.TrueFalse, Text = "Đúng/Sai" },
-                new SelectListItem { Value = QuestionType.ShortAnswer, Text = "Câu trả lời ngắn" },
-                new SelectListItem { Value = QuestionType.Listening, Text = "Nghe hiểu" }
+                new SelectListItem { Value = QuestionTypeConstants.MCQ, Text = "Trắc nghiệm nhiều lựa chọn" },
+                new SelectListItem { Value = QuestionTypeConstants.TrueFalse, Text = "Đúng/Sai" },
+                new SelectListItem { Value = QuestionTypeConstants.ShortAnswer, Text = "Câu trả lời ngắn" },
+                new SelectListItem { Value = QuestionTypeConstants.Listening, Text = "Nghe hiểu" }
             };
         }
 

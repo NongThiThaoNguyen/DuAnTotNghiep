@@ -1,0 +1,33 @@
+-- Module M14: AI-Generated Content Publishing Workflow
+-- Complete end-to-end workflow: Generate → Review → Approve → Publish to Question Bank
+
+-- Execution order:
+-- 1. m14_ai_module_check_and_create.sql (main schema: ai_generated_contents, question_bank, content_compliance_reviews, etc.)
+-- 2. m14_seed_prompt_templates.sql (seed QUIZ_GENERATION_ENGLISH_V1 prompt template)
+-- 3. m14_add_batchid_to_ai_generated_contents.sql (add batch_id for grouping generated items)
+-- 4. m14_add_published_question_id.sql (add published_question_id FK to track published questions)
+
+-- After running all migrations, the full publishing workflow is available:
+-- 1. Generate → AIQuizGenerationController.Generate → save to ai_generated_contents with review_status=PENDING
+-- 2. Review → /Admin/AIContent/Index → list PENDING items with filters
+-- 3. Details → /Admin/AIContent/Details/{id} → inline edit question/explanation
+-- 4. Approve → update review_status=APPROVED, create ContentComplianceReview, create AuditLog
+-- 5. Publish (Single) → /Admin/AIContent/Publish → PublishingService.PublishToQuestionBankAsync
+--    - Verify APPROVED status
+--    - Check duplicates (exact match normalized question_text)
+--    - INSERT question_bank + question_options in transaction
+--    - Update ai_generated_contents.published_question_id
+--    - Return question_id
+-- 6. Publish (Batch) → /Admin/AIContent/PublishBatch → PublishingService.PublishBatchAsync
+--    - Publish all APPROVED items (or by batchId filter)
+--    - Optionally create Quiz draft with all published questions
+--    - Return count + quiz_id
+
+-- Key Features:
+-- ✓ Transaction rollback on publish error (options insert failure)
+-- ✓ Duplicate detection via normalized text matching
+-- ✓ Audit trail: every review_status change logged to AuditLog
+-- ✓ Compliance review: CopyrightCheck, PlagiarismRisk, ReviewNote tracked
+-- ✓ Inline editing: Reviewer can edit question_text/explanation before approve
+-- ✓ Batch operations: publish multiple items at once + auto-create quiz
+-- ✓ Foreign key constraint: published_question_id → question_bank.id

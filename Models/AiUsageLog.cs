@@ -25,6 +25,14 @@ public partial class AiUsageLog
 
     public string? ErrorMessage { get; set; }
 
+    public string? PromptInput { get; set; }
+
+    public string? ResponseOutput { get; set; }
+
+    public int? DurationMs { get; set; }
+
+    public int? LatencyMs { get; set; }
+
     public DateTime CreatedAt { get; set; }
 
     public virtual AiPromptTemplate? PromptTemplate { get; set; }

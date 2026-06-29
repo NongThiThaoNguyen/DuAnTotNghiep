@@ -14,7 +14,7 @@ namespace DuAnTotNghiep.Enums
         }
     }
 
-    public static class QuestionType
+    public static class QuestionTypeConstants
     {
         public const string MCQ = "MCQ";
         public const string TrueFalse = "TRUE_FALSE";

@@ -11,6 +11,8 @@ public partial class CompetencySkillScore
 
     public int SkillId { get; set; }
 
+    public int? TopicId { get; set; }
+
     public decimal Score { get; set; }
 
     public int? LevelId { get; set; }
@@ -24,4 +26,6 @@ public partial class CompetencySkillScore
     public virtual EnglishProficiencyLevel? Level { get; set; }
 
     public virtual EnglishSkill Skill { get; set; } = null!;
+
+    public virtual LearningTopic? Topic { get; set; }
 }

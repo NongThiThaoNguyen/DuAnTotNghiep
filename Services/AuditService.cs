@@ -55,5 +55,17 @@ namespace DuAnTotNghiep.Services
 
             return Task.CompletedTask;
         }
+
+        public Task LogActionAsync(
+            int? userId,
+            string action,
+            string entityName,
+            int? entityId,
+            string? oldValue = null,
+            string? newValue = null,
+            string? ipAddress = null)
+        {
+            return LogAsync(userId, action, entityName, entityId, oldValue, newValue);
+        }
     }
 }

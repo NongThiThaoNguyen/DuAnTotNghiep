@@ -1,0 +1,36 @@
+@model DuAnTotNghiep.Models.AiPromptTemplate
+@{
+    ViewData["Title"] = "Prompt Details";
+}
+
+<h2>Prompt Details</h2>
+
+<dl class="row">
+    <dt class="col-sm-2">Id</dt>
+    <dd class="col-sm-10">@Model.Id</dd>
+
+    <dt class="col-sm-2">Prompt Code</dt>
+    <dd class="col-sm-10">@Model.PromptCode</dd>
+
+    <dt class="col-sm-2">Name</dt>
+    <dd class="col-sm-10">@Model.PromptName</dd>
+
+    <dt class="col-sm-2">Module</dt>
+    <dd class="col-sm-10">@Model.ModuleCode</dd>
+
+    <dt class="col-sm-2">Version</dt>
+    <dd class="col-sm-10">@Model.VersionNo</dd>
+
+    <dt class="col-sm-2">Status</dt>
+    <dd class="col-sm-10">@Model.Status</dd>
+
+    <dt class="col-sm-2">System Prompt</dt>
+    <dd class="col-sm-10"><pre>@Model.SystemPrompt</pre></dd>
+
+    <dt class="col-sm-2">Output Schema</dt>
+    <dd class="col-sm-10"><pre>@Model.OutputSchema</pre></dd>
+</dl>
+
+<p>
+    <a asp-area="Admin" asp-controller="AiPrompts" asp-action="Index">Back to list</a>
+</p>

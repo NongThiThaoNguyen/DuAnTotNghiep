@@ -109,6 +109,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<SystemSetting> SystemSettings { get; set; }
 
+    public virtual DbSet<ReplanningRule> ReplanningRules { get; set; }
+
     public virtual DbSet<TestAnswer> TestAnswers { get; set; }
 
     public virtual DbSet<TestAttempt> TestAttempts { get; set; }
@@ -691,7 +693,7 @@ public partial class ApplicationDbContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PK__learning__3213E83F6239F152");
 
-            entity.ToTable("learning_objectives", t => 
+            entity.ToTable("learning_objectives", t =>
             {
                 t.HasCheckConstraint("CK_objective_cognitive_level", "cognitive_level IN ('REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'CREATE')");
             });

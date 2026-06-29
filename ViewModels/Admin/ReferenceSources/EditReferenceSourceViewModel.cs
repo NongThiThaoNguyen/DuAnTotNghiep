@@ -49,5 +49,6 @@ namespace DuAnTotNghiep.ViewModels.Admin.ReferenceSources
 
         [Display(Name = "Cho phép hoạt động")]
         public bool IsActive { get; set; }
+
     }
 }

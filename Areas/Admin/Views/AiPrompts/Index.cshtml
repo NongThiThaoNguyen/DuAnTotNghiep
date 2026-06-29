@@ -1,0 +1,36 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "AI Prompt Templates";
+}
+
+<h2>AI Prompt Templates</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>PromptCode</th>
+            <th>Name</th>
+            <th>Module</th>
+            <th>Version</th>
+            <th>Status</th>
+            <th>CreatedAt</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var it in Model)
+    {
+        <tr>
+            <td>@it.Id</td>
+            <td>@it.PromptCode</td>
+            <td>@it.PromptName</td>
+            <td>@it.ModuleCode</td>
+            <td>@it.VersionNo</td>
+            <td>@it.Status</td>
+            <td>@it.CreatedAt</td>
+            <td><a asp-area="Admin" asp-controller="AiPrompts" asp-action="Details" asp-route-id="@it.Id">Details</a></td>
+        </tr>
+    }
+    </tbody>
+</table>

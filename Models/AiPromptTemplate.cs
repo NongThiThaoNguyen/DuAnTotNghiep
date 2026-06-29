@@ -15,6 +15,8 @@ public partial class AiPromptTemplate
 
     public string SystemPrompt { get; set; } = null!;
 
+    public string? UserPromptTemplate { get; set; }
+
     public string? OutputSchema { get; set; }
 
     public string Status { get; set; } = null!;

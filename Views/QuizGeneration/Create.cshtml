@@ -1,0 +1,28 @@
+@model DuAnTotNghiep.ViewModels.GenerateQuizRequestViewModel
+@{
+    ViewData["Title"] = "Generate Quiz Questions";
+}
+
+<h2>Generate Quiz Questions</h2>
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @Html.Partial("_GenerationOptions")
+
+    <div class="form-group">
+        <label asp-for="QuestionCount"></label>
+        <input asp-for="QuestionCount" class="form-control" />
+        <span asp-validation-for="QuestionCount" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Notes"></label>
+        <textarea asp-for="Notes" class="form-control" rows="3"></textarea>
+        <span asp-validation-for="Notes" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Generate</button>
+</form>
+
+@Html.Partial("_ValidationScriptsPartial")
