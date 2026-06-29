@@ -47,10 +47,9 @@ namespace DuAnTotNghiep.Services
                     dbContext.AuditLogs.Add(log);
                     await dbContext.SaveChangesAsync();
                 }
-                catch (Exception ex)
+                catch
                 {
-                    // Do not bubble up exception to break the main flow.
-                    Console.WriteLine($"[AuditLog Error] {ex.Message}");
+                    // Audit persistence should not interrupt the main flow.
                 }
             });
 

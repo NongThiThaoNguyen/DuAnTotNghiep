@@ -226,9 +226,6 @@ namespace DuAnTotNghiep.Services
                 if (remainingSeconds < 0) remainingSeconds = 0;
             }
 
-            // Debug log
-            System.Console.WriteLine($"[DEBUG PlacementTest] StartedAt: {attemptInfo.StartedAt}, EndTime: {endTime}, ServerTime: {serverTime}, TimeLimitMinutes: {attemptInfo.TimeLimitMinutes}, RemainingSeconds: {remainingSeconds}, AttemptStatus: {attemptInfo.Status}");
-
             // Fix Infinite Loop: If expired, mark as EXPIRED so RequirePlacementTestFilter doesn't keep redirecting
             var currentStatus = attemptInfo.Status;
             if (remainingSeconds == 0 && currentStatus == "IN_PROGRESS")
@@ -240,8 +237,6 @@ namespace DuAnTotNghiep.Services
                     _dbContext.TestAttempts.Update(attemptToUpdate);
                     await _dbContext.SaveChangesAsync();
                     currentStatus = "EXPIRED";
-                    
-                    System.Console.WriteLine($"[DEBUG PlacementTest] Attempt {attemptId} status updated to EXPIRED due to remainingSeconds == 0");
                 }
             }
 

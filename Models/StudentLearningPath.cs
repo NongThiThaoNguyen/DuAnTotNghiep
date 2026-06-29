@@ -33,13 +33,23 @@ public partial class StudentLearningPath
 
     public DateTime UpdatedAt { get; set; }
 
+    public int PathVersion { get; set; } = 1;
+
+    public DateTime? ArchivedAt { get; set; }
+
+    public int? ReplacedByPathId { get; set; }
+
     public virtual ICollection<AiReplanningEvent> AiReplanningEvents { get; set; } = new List<AiReplanningEvent>();
 
     public virtual CompetencyAnalysis? CompetencyAnalysis { get; set; }
 
     public virtual LearningGoal? Goal { get; set; }
 
+    public virtual ICollection<StudentLearningPath> InverseReplacedByPath { get; set; } = new List<StudentLearningPath>();
+
     public virtual ICollection<LearningPathNode> LearningPathNodes { get; set; } = new List<LearningPathNode>();
+
+    public virtual StudentLearningPath? ReplacedByPath { get; set; }
 
     public virtual User Student { get; set; } = null!;
 

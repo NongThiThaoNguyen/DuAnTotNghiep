@@ -1,0 +1,52 @@
+@model DuAnTotNghiep.ViewModels.Admin.LearningPaths.GenerationLogViewModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Generation Logs";
+}
+
+<div class="space-y-6">
+    <header class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+        <p class="text-xs font-bold uppercase text-blue-600 mb-2">@Model.ModuleCode</p>
+        <h1 class="text-2xl font-bold text-slate-900">Generation Logs</h1>
+        <p class="text-sm text-slate-500 mt-2">Nhật ký các lần gọi AI tạo lộ trình học.</p>
+    </header>
+
+    <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-xs font-bold uppercase text-slate-500">
+                    <tr>
+                        <th class="px-4 py-3">Log</th>
+                        <th class="px-4 py-3">User</th>
+                        <th class="px-4 py-3">Model</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Error</th>
+                        <th class="px-4 py-3">Created</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var log in Model.Logs)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 font-bold text-slate-900">#@log.LogId</td>
+                            <td class="px-4 py-3 text-slate-600">@log.UserName</td>
+                            <td class="px-4 py-3 text-slate-600">@log.AiModel</td>
+                            <td class="px-4 py-3">
+                                <span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">@log.RequestStatus</span>
+                            </td>
+                            <td class="px-4 py-3 text-slate-600">@(string.IsNullOrWhiteSpace(log.ErrorMessage) ? "None" : log.ErrorMessage)</td>
+                            <td class="px-4 py-3 text-slate-600">@log.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                        </tr>
+                    }
+                    @if (!Model.Logs.Any())
+                    {
+                        <tr>
+                            <td class="px-4 py-6 text-center text-slate-500" colspan="6">Chưa có log tạo lộ trình.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>

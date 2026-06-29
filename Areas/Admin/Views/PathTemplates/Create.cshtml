@@ -1,0 +1,57 @@
+@model DuAnTotNghiep.Models.LearningPathTemplate
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Create Path Template";
+}
+
+<div class="space-y-6">
+    <header class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+        <p class="text-xs font-bold uppercase text-blue-600 mb-2">AI Learning Path</p>
+        <h1 class="text-2xl font-bold text-slate-900">Create Path Template</h1>
+        <p class="text-sm text-slate-500 mt-2">Tạo template lộ trình và node mẫu đầu tiên.</p>
+    </header>
+
+    <form asp-action="Create" method="post" class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6 space-y-5">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-sm text-red-600"></div>
+
+        <div class="grid gap-4 md:grid-cols-2">
+            <label class="block">
+                <span class="text-sm font-semibold text-slate-700">Tên template</span>
+                <input asp-for="TemplateName" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+            </label>
+            <label class="block">
+                <span class="text-sm font-semibold text-slate-700">Thời lượng tuần</span>
+                <input asp-for="DurationWeeks" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm" />
+            </label>
+        </div>
+
+        <label class="block">
+            <span class="text-sm font-semibold text-slate-700">Mô tả</span>
+            <textarea asp-for="Description" rows="4" class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm"></textarea>
+        </label>
+
+        <input type="hidden" asp-for="Status" value="DRAFT" />
+
+        <section class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <h2 class="text-base font-bold text-slate-900">Node đầu tiên</h2>
+            <div class="mt-4 grid gap-4 md:grid-cols-4">
+                <input type="text" name="LearningPathTemplateNodes[0].NodeTitle" class="rounded-xl border border-slate-200 px-3 py-2 text-sm md:col-span-2" placeholder="Tiêu đề node" />
+                <select name="LearningPathTemplateNodes[0].NodeType" class="rounded-xl border border-slate-200 px-3 py-2 text-sm">
+                    <option value="LESSON">LESSON</option>
+                    <option value="TOPIC">TOPIC</option>
+                    <option value="QUIZ">QUIZ</option>
+                    <option value="PRACTICE">PRACTICE</option>
+                </select>
+                <input type="number" name="LearningPathTemplateNodes[0].EstimatedMinutes" class="rounded-xl border border-slate-200 px-3 py-2 text-sm" placeholder="Phút" />
+                <input type="hidden" name="LearningPathTemplateNodes[0].OrderIndex" value="1" />
+            </div>
+        </section>
+
+        <div class="flex flex-wrap gap-3">
+            <button type="submit" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700">Lưu template</button>
+            <a asp-action="Index" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700">Hủy</a>
+        </div>
+    </form>
+</div>

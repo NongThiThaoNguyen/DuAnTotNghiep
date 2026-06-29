@@ -21,9 +21,7 @@ namespace DuAnTotNghiep.Services
 
             if (string.IsNullOrEmpty(senderEmail) || string.IsNullOrEmpty(appPassword))
             {
-                // In production, we might throw an exception.
-                // For development without credentials, we just log or return.
-                Console.WriteLine($"[Email Service Disabled] To: {to}, Subject: {subject}, Body: {body}");
+                // Skip sending when SMTP credentials are not configured.
                 return;
             }
 

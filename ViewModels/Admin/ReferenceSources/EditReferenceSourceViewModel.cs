@@ -18,6 +18,11 @@ namespace DuAnTotNghiep.ViewModels.Admin.ReferenceSources
         [Display(Name = "Địa chỉ URL")]
         public string? SourceUrl { get; set; }
 
+        [StringLength(1000, ErrorMessage = "URL bằng chứng tuân thủ không được vượt quá 1000 ký tự.")]
+        [Url(ErrorMessage = "URL bằng chứng tuân thủ không đúng định dạng HTTP hoặc HTTPS.")]
+        [Display(Name = "URL bằng chứng tuân thủ")]
+        public string? ComplianceEvidenceUrl { get; set; }
+
         [Required(ErrorMessage = "Loại nguồn tham khảo là bắt buộc.")]
         [Display(Name = "Loại nguồn tham khảo")]
         public ReferenceSourceType SourceType { get; set; }

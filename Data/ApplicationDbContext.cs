@@ -759,6 +759,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("path_phase");
             entity.Property(e => e.PracticeTaskId).HasColumnName("practice_task_id");
             entity.Property(e => e.QuizId).HasColumnName("quiz_id");
+            entity.Property(e => e.RequiredNodeId).HasColumnName("required_node_id");
             entity.Property(e => e.ScheduledDate).HasColumnName("scheduled_date");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
@@ -783,6 +784,10 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.Quiz).WithMany(p => p.LearningPathNodes)
                 .HasForeignKey(d => d.QuizId)
                 .HasConstraintName("FK_lpn_quiz");
+
+            entity.HasOne(d => d.RequiredNode).WithMany(p => p.InverseRequiredNode)
+                .HasForeignKey(d => d.RequiredNodeId)
+                .HasConstraintName("FK_learning_path_nodes_required_node");
 
             entity.HasOne(d => d.Topic).WithMany(p => p.LearningPathNodes)
                 .HasForeignKey(d => d.TopicId)
@@ -1680,6 +1685,9 @@ public partial class ApplicationDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AiPlanSummary).HasColumnName("ai_plan_summary");
+            entity.Property(e => e.ArchivedAt)
+                .HasColumnType("datetime")
+                .HasColumnName("archived_at");
             entity.Property(e => e.CompetencyAnalysisId).HasColumnName("competency_analysis_id");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
@@ -1689,6 +1697,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValue(true)
                 .HasColumnName("generated_by_ai");
             entity.Property(e => e.GoalId).HasColumnName("goal_id");
+            entity.Property(e => e.PathVersion)
+                .HasDefaultValue(1)
+                .HasColumnName("path_version");
+            entity.Property(e => e.ReplacedByPathId).HasColumnName("replaced_by_path_id");
             entity.Property(e => e.StartDate).HasColumnName("start_date");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
@@ -1712,6 +1724,10 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.Goal).WithMany(p => p.StudentLearningPaths)
                 .HasForeignKey(d => d.GoalId)
                 .HasConstraintName("FK_slpath_goal");
+
+            entity.HasOne(d => d.ReplacedByPath).WithMany(p => p.InverseReplacedByPath)
+                .HasForeignKey(d => d.ReplacedByPathId)
+                .HasConstraintName("FK_student_learning_paths_replaced_by_path");
 
             entity.HasOne(d => d.Student).WithMany(p => p.StudentLearningPaths)
                 .HasForeignKey(d => d.StudentId)

@@ -106,6 +106,7 @@ namespace DuAnTotNghiep.Services
                 Id = existing.Id,
                 SourceName = existing.SourceName,
                 SourceUrl = existing.SourceUrl,
+                ComplianceEvidenceUrl = existing.ComplianceEvidenceUrl,
                 SourceType = existing.SourceType,
                 Author = existing.Author,
                 Organization = existing.Organization,

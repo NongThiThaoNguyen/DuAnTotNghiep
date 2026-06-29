@@ -38,6 +38,7 @@ builder.Services.AddScoped<IEnglishProficiencyLevelRepository, EnglishProficienc
 builder.Services.AddScoped<ILearningObjectiveRepository, LearningObjectiveRepository>();
 builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
+builder.Services.AddScoped<ILearningPathRepository, LearningPathRepository>();
 
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
@@ -70,6 +71,9 @@ builder.Services.AddScoped<IStudentProgressService, StudentProgressService>();
 builder.Services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPathViewService, PathViewService>();
+builder.Services.AddScoped<ILearningPathEngineService, LearningPathEngineService>();
+builder.Services.AddScoped<ILearningPathAiService, LearningPathAiService>();
+builder.Services.AddScoped<ILearningPathComplianceService, LearningPathComplianceService>();
 
 // Đăng ký M7 AI Analysis Services
 builder.Services.AddScoped<IPlacementTestAnalysisPayloadBuilder, PlacementTestAnalysisPayloadBuilder>();

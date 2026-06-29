@@ -1,0 +1,119 @@
+@model DuAnTotNghiep.ViewModels.LearningPath.M8.LearningPathGenerateViewModel
+
+@{
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    ViewData["Title"] = "Tạo lộ trình AI";
+
+    var canGenerate = Model.HasOnboarding
+        && Model.HasPlacementTest
+        && Model.HasCompetencyAnalysis
+        && !Model.HasActivePath;
+
+    var missingController = "Onboarding";
+    var missingAction = "Start";
+    var missingLabel = "Hoàn thành onboarding";
+
+    if (Model.HasOnboarding && !Model.HasPlacementTest)
+    {
+        missingController = "PlacementTest";
+        missingAction = "Intro";
+        missingLabel = "Làm placement test";
+    }
+    else if (Model.HasOnboarding && Model.HasPlacementTest && !Model.HasCompetencyAnalysis)
+    {
+        missingController = "Progress";
+        missingAction = "Index";
+        missingLabel = "Xem phân tích năng lực";
+    }
+}
+
+<link rel="stylesheet" href="~/css/learning-path-m8.css" asp-append-version="true" />
+
+<div class="m8-generate-form">
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="m8-alert" role="alert">
+            <span class="m8-alert__icon" aria-hidden="true">!</span>
+            <span>@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    <header class="m8-page-header">
+        <p class="m8-page-header__eyebrow">AI Learning Path</p>
+        <h1 class="m8-page-header__title">Tạo lộ trình học cá nhân hóa</h1>
+        <p class="m8-page-header__description">
+            Hệ thống dùng hồ sơ học tập, placement test và phân tích năng lực để xây dựng lộ trình phù hợp.
+        </p>
+    </header>
+
+    <section class="m8-readiness" aria-labelledby="readiness-heading">
+        <div class="m8-section-heading">
+            <p class="m8-section-heading__eyebrow">Trạng thái</p>
+            <h2 id="readiness-heading" class="m8-section-heading__title">Dữ liệu đầu vào</h2>
+        </div>
+
+        <div class="m8-readiness__grid">
+            @RenderStatus("Onboarding", Model.HasOnboarding, "Mục tiêu, trình độ và thời gian học")
+            @RenderStatus("Placement test", Model.HasPlacementTest, "Kết quả kiểm tra đầu vào")
+            @RenderStatus("AI competency", Model.HasCompetencyAnalysis, "Phân tích năng lực mới nhất")
+        </div>
+    </section>
+
+    @if (Model.HasActivePath)
+    {
+        <section class="m8-missing-step" aria-labelledby="active-path-heading">
+            <h2 id="active-path-heading" class="m8-missing-step__title">Bạn đã có lộ trình đang hoạt động</h2>
+            <p class="m8-missing-step__text">Tiếp tục theo dõi lộ trình hiện tại hoặc tạo lại từ trang tóm tắt.</p>
+            <a class="m8-btn m8-btn--primary" asp-area="Student" asp-controller="LearningPath" asp-action="Summary">
+                Xem lộ trình hiện tại
+            </a>
+        </section>
+    }
+    else if (canGenerate)
+    {
+        <section class="m8-generate-ready" aria-labelledby="generate-ready-heading">
+            <div>
+                <p class="m8-generate-ready__eyebrow">Sẵn sàng</p>
+                <h2 id="generate-ready-heading" class="m8-generate-ready__title">Dữ liệu đã đủ để tạo lộ trình</h2>
+                <p class="m8-generate-ready__text">Lộ trình mới sẽ được tạo dựa trên năng lực hiện tại của bạn.</p>
+            </div>
+
+            <form asp-area="Student" asp-controller="LearningPath" asp-action="Generate" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="m8-btn m8-btn--primary">Tạo lộ trình học</button>
+            </form>
+        </section>
+    }
+    else
+    {
+        <section class="m8-missing-step" aria-labelledby="missing-step-heading">
+            <h2 id="missing-step-heading" class="m8-missing-step__title">Cần hoàn thành thêm một bước</h2>
+            <p class="m8-missing-step__text">
+                @(string.IsNullOrWhiteSpace(Model.MissingStep) ? "Bạn cần bổ sung dữ liệu học tập trước khi tạo lộ trình." : Model.MissingStep)
+            </p>
+            <a class="m8-btn m8-btn--secondary" asp-area="Student" asp-controller="@missingController" asp-action="@missingAction">
+                @missingLabel
+            </a>
+        </section>
+    }
+</div>
+
+@functions {
+    private Microsoft.AspNetCore.Html.IHtmlContent RenderStatus(string title, bool isDone, string description)
+    {
+        var statusClass = isDone ? "m8-status-card--done" : "m8-status-card--missing";
+        var statusText = isDone ? "Đã có" : "Còn thiếu";
+        var icon = isDone ? "✓" : "!";
+
+        return new Microsoft.AspNetCore.Html.HtmlString($"""
+            <article class="m8-status-card {statusClass}">
+                <span class="m8-status-card__icon" aria-hidden="true">{icon}</span>
+                <div class="m8-status-card__body">
+                    <h3 class="m8-status-card__title">{title}</h3>
+                    <p class="m8-status-card__text">{description}</p>
+                    <span class="m8-status-card__state">{statusText}</span>
+                </div>
+            </article>
+            """);
+    }
+}

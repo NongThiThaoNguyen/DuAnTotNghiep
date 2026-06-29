@@ -37,7 +37,11 @@ public partial class LearningPathNode
 
     public DateTime? CompletedAt { get; set; }
 
+    public int? RequiredNodeId { get; set; }
+
     public virtual ICollection<AiTutorConversation> AiTutorConversations { get; set; } = new List<AiTutorConversation>();
+
+    public virtual ICollection<LearningPathNode> InverseRequiredNode { get; set; } = new List<LearningPathNode>();
 
     public virtual StudentLearningPath LearningPath { get; set; } = null!;
 
@@ -48,6 +52,8 @@ public partial class LearningPathNode
     public virtual Quiz? Quiz { get; set; }
 
     public virtual ICollection<StudyActivityLog> StudyActivityLogs { get; set; } = new List<StudyActivityLog>();
+
+    public virtual LearningPathNode? RequiredNode { get; set; }
 
     public virtual LearningTopic? Topic { get; set; }
 }

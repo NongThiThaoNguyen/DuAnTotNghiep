@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using DuAnTotNghiep.Data;
+using DuAnTotNghiep.Exceptions;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,13 +17,13 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         private readonly IPathViewService _pathViewService;
         private readonly ApplicationDbContext _context;
         private readonly ILogger<LearningPathController> _logger;
+        private readonly ILearningPathEngineService? _learningPathEngineService;
 
         public LearningPathController(IPathViewService pathViewService, ApplicationDbContext context)
             : this(pathViewService, context, NullLogger<LearningPathController>.Instance)
         {
         }
 
-        [ActivatorUtilitiesConstructor]
         public LearningPathController(
             IPathViewService pathViewService,
             ApplicationDbContext context,
@@ -31,6 +32,17 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             _pathViewService = pathViewService;
             _context = context;
             _logger = logger;
+        }
+
+        [ActivatorUtilitiesConstructor]
+        public LearningPathController(
+            IPathViewService pathViewService,
+            ApplicationDbContext context,
+            ILogger<LearningPathController> logger,
+            ILearningPathEngineService learningPathEngineService)
+            : this(pathViewService, context, logger)
+        {
+            _learningPathEngineService = learningPathEngineService;
         }
 
         private int GetUserId()
@@ -46,6 +58,85 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             var userId = GetUserId();
             var model = await _pathViewService.GetCurrentPathPageAsync(userId);
             return View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Generate()
+        {
+            var userId = GetUserId();
+            var model = await LearningPathEngineService.CanGeneratePathAsync(userId);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ActionName("Generate")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> GeneratePost()
+        {
+            var userId = GetUserId();
+            var analysisId = await GetLatestCompetencyAnalysisIdAsync(userId);
+            if (!analysisId.HasValue) return RedirectWithError(nameof(Generate), "Bạn cần hoàn thành phân tích năng lực trước.");
+
+            try
+            {
+                await LearningPathEngineService.GenerateInitialPathAsync(userId, analysisId.Value);
+                return RedirectToAction(nameof(Summary));
+            }
+            catch (BusinessException ex)
+            {
+                return RedirectWithError(nameof(Generate), ex.Message);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Detail(int id)
+        {
+            try
+            {
+                var model = await LearningPathEngineService.GetPathDetailAsync(id, GetUserId());
+                return View(model);
+            }
+            catch (NotFoundException)
+            {
+                return NotFound();
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Summary()
+        {
+            try
+            {
+                var model = await LearningPathEngineService.GetPathSummaryAsync(GetUserId());
+                return View(model);
+            }
+            catch (NotFoundException ex)
+            {
+                return RedirectWithError(nameof(Generate), ex.Message);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Regenerate(string reason)
+        {
+            try
+            {
+                await LearningPathEngineService.RegeneratePathAsync(GetUserId(), reason);
+                return RedirectToAction(nameof(Summary));
+            }
+            catch (BusinessException ex)
+            {
+                return RedirectWithError(nameof(Summary), ex.Message);
+            }
+            catch (NotFoundException ex)
+            {
+                return RedirectWithError(nameof(Generate), ex.Message);
+            }
         }
 
         [HttpGet("/Student/LearningPath/OpenNode/{nodeId:int}")]
@@ -81,6 +172,31 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
 
             _logger.LogInformation("Student {StudentId} opened learning path node {NodeId}", userId, nodeId);
             return Redirect(targetUrl);
+        }
+
+        private ILearningPathEngineService LearningPathEngineService
+        {
+            get
+            {
+                return _learningPathEngineService
+                    ?? throw new InvalidOperationException("Learning path engine service is not configured.");
+            }
+        }
+
+        private async Task<int?> GetLatestCompetencyAnalysisIdAsync(int userId)
+        {
+            return await _context.CompetencyAnalyses
+                .AsNoTracking()
+                .Where(analysis => analysis.StudentId == userId)
+                .OrderByDescending(analysis => analysis.CreatedAt)
+                .Select(analysis => (int?)analysis.Id)
+                .FirstOrDefaultAsync();
+        }
+
+        private IActionResult RedirectWithError(string actionName, string message)
+        {
+            TempData["ErrorMessage"] = message;
+            return RedirectToAction(actionName);
         }
     }
 }

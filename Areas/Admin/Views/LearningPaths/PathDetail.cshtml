@@ -1,0 +1,90 @@
+@model DuAnTotNghiep.ViewModels.Admin.LearningPaths.PathDetailAdminViewModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Path Detail";
+}
+
+<div class="space-y-6">
+    <header class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+        <p class="text-xs font-bold uppercase text-blue-600 mb-2">AI Learning Path</p>
+        <h1 class="text-2xl font-bold text-slate-900">Path Detail</h1>
+        <p class="text-sm text-slate-500 mt-2">@Model.Title</p>
+    </header>
+
+    <section class="grid gap-4 lg:grid-cols-3">
+        <article class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5 lg:col-span-2">
+            <h2 class="text-lg font-bold text-slate-900">Thông tin lộ trình</h2>
+            <dl class="mt-4 grid gap-3 sm:grid-cols-2 text-sm">
+                <div>
+                    <dt class="font-semibold text-slate-500">Student</dt>
+                    <dd class="mt-1 text-slate-900">@Model.StudentName</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-slate-500">Status</dt>
+                    <dd class="mt-1 text-slate-900">@Model.Status</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-slate-500">Created</dt>
+                    <dd class="mt-1 text-slate-900">@Model.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-slate-500">Nodes</dt>
+                    <dd class="mt-1 text-slate-900">@Model.Nodes.Count</dd>
+                </div>
+            </dl>
+            <p class="mt-4 text-sm leading-6 text-slate-600">@Model.AiPlanSummary</p>
+        </article>
+
+        <article class="bg-white border border-slate-200 rounded-2xl shadow-sm p-5">
+            <h2 class="text-lg font-bold text-slate-900">AI log</h2>
+            <dl class="mt-4 space-y-3 text-sm">
+                <div>
+                    <dt class="font-semibold text-slate-500">Model</dt>
+                    <dd class="mt-1 text-slate-900">@(string.IsNullOrWhiteSpace(Model.AiModel) ? "N/A" : Model.AiModel)</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-slate-500">Prompt version</dt>
+                    <dd class="mt-1 text-slate-900">@(string.IsNullOrWhiteSpace(Model.PromptVersion) ? "N/A" : Model.PromptVersion)</dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-slate-500">Error</dt>
+                    <dd class="mt-1 text-slate-900">@(string.IsNullOrWhiteSpace(Model.ErrorMessage) ? "None" : Model.ErrorMessage)</dd>
+                </div>
+            </dl>
+        </article>
+    </section>
+
+    <section class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="border-b border-slate-200 p-5">
+            <h2 class="text-lg font-bold text-slate-900">Nodes</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-xs font-bold uppercase text-slate-500">
+                    <tr>
+                        <th class="px-4 py-3">Order</th>
+                        <th class="px-4 py-3">Title</th>
+                        <th class="px-4 py-3">Type</th>
+                        <th class="px-4 py-3">Status</th>
+                        <th class="px-4 py-3">Minutes</th>
+                        <th class="px-4 py-3">AI reason</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach (var node in Model.Nodes)
+                    {
+                        <tr>
+                            <td class="px-4 py-3 font-bold text-slate-900">@node.OrderIndex</td>
+                            <td class="px-4 py-3 text-slate-900">@node.Title</td>
+                            <td class="px-4 py-3 text-slate-600">@node.NodeType</td>
+                            <td class="px-4 py-3 text-slate-600">@node.Status</td>
+                            <td class="px-4 py-3 text-slate-600">@(node.EstimatedMinutes?.ToString() ?? "N/A")</td>
+                            <td class="px-4 py-3 text-slate-600">@node.AiReason</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
