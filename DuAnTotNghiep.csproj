@@ -9,6 +9,10 @@
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    <PackageReference Include="ClosedXML" Version="0.105.0" />
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     <PackageReference Include="ClosedXML" Version="0.105.0" />
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -17,6 +21,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.9" />
+<<<<<<< HEAD
 <<<<<<< HEAD
   </ItemGroup>
 
@@ -28,6 +33,8 @@
   </Target>
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
@@ -44,5 +51,8 @@
     <None Remove="Tests\**" />
   </ItemGroup>
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 </Project>

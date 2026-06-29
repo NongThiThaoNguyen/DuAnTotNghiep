@@ -1,7 +1,11 @@
 @model DuAnTotNghiep.ViewModels.Onboarding.UpdateLearningProfileViewModel
 @{
 <<<<<<< HEAD
+<<<<<<< HEAD
     ViewData["Title"] = "Cập nhật hồ sơ học tập";
+=======
+    ViewData["Title"] = "Hồ sơ học tập";
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     ViewData["Title"] = "Hồ sơ học tập";
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -9,6 +13,7 @@
     var levels = ViewBag.Levels as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.LevelDto>;
     var skills = ViewBag.Skills as IEnumerable<DuAnTotNghiep.DTOs.Onboarding.SkillDto>;
     var currentGoalId = Model.MainGoalId?.ToString() ?? "";
+<<<<<<< HEAD
 <<<<<<< HEAD
 }
 
@@ -175,6 +180,8 @@
         </div>
     </form>
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
     var user = ViewBag.User as DuAnTotNghiep.Models.User;
     var profile = ViewBag.UserLearningProfile as DuAnTotNghiep.DTOs.Onboarding.LearningProfileDto;
@@ -844,6 +851,9 @@
             </div>
         </form>
     </div>
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 </div>
 
@@ -851,8 +861,11 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
 <<<<<<< HEAD
+<<<<<<< HEAD
         document.addEventListener('DOMContentLoaded', function () {
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         function setMode(mode) {
             const dashboardSection = document.getElementById('mode-dashboard');
             const editSection = document.getElementById('mode-edit');
@@ -875,6 +888,9 @@
         document.addEventListener('DOMContentLoaded', function () {
             setMode('@defaultMode');
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             const initialGoalId = '@currentGoalId';
             const goalRadios = document.querySelectorAll('.goal-radio');

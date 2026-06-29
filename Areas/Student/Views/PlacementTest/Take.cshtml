@@ -139,7 +139,10 @@
             }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             // Using ServerTime directly helps avoid local client time discrepancies
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             var serverTimeMs = new Date('@Model.ServerTime.ToString("o")').getTime();
@@ -149,14 +152,20 @@
             // Calculate how much time is left in milliseconds
             var distance = endTimeMs - serverTimeMs;
 <<<<<<< HEAD
+<<<<<<< HEAD
 
             function updateCountdown() {
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             var isSubmitting = false;
 
             function updateCountdown() {
                 if (isSubmitting) return;
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 var currentClientMs = new Date().getTime();
                 var elapsedSinceLoad = currentClientMs - clientLoadTimeMs;
@@ -164,6 +173,10 @@
 
                 if (currentDistance <= 0) {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    isSubmitting = true;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     isSubmitting = true;
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -172,13 +185,19 @@
                     
                     // Timeout actions
 <<<<<<< HEAD
+<<<<<<< HEAD
                     clearInterval(timerInterval);
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     if (typeof timerInterval !== 'undefined') {
                         clearInterval(timerInterval);
                     }
                     
                     // Replace alert with a non-blocking UI update if possible, or just one alert
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài.");
                     
@@ -204,12 +223,18 @@
 
             updateCountdown();
 <<<<<<< HEAD
+<<<<<<< HEAD
             var timerInterval = setInterval(updateCountdown, 1000);
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             var timerInterval;
             if (!isSubmitting) {
                 timerInterval = setInterval(updateCountdown, 1000);
             }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             // Auto Save Logic
@@ -263,7 +288,10 @@
                 }
             });
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             // Prevent manual submit without confirmation
             form.addEventListener('submit', function(e) {
@@ -277,6 +305,9 @@
                     }
                 }
             });
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
     </script>

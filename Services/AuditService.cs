@@ -1,6 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 using DuAnTotNghiep.Services.Interfaces;
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +11,9 @@ using Microsoft.Extensions.DependencyInjection;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Data;
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Services
@@ -15,7 +21,10 @@ namespace DuAnTotNghiep.Services
     public class AuditService : IAuditService
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private readonly IServiceScopeFactory _scopeFactory;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ApplicationDbContext _context;
@@ -82,6 +91,9 @@ namespace DuAnTotNghiep.Services
             _context.AuditLogs.Add(auditLog);
             await _context.SaveChangesAsync();
         }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

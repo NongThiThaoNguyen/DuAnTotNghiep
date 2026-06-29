@@ -1,6 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using System;
 using System.Collections.Generic;
+=======
+using System;
+using System.Collections.Generic;
+using DuAnTotNghiep.Enums;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 using System;
 using System.Collections.Generic;
@@ -18,6 +24,7 @@ public partial class ReferenceSource
     public string? SourceUrl { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public string SourceType { get; set; } = null!;
 
     public string? LicenseNote { get; set; }
@@ -26,6 +33,8 @@ public partial class ReferenceSource
 
     public string Status { get; set; } = null!;
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public ReferenceSourceType SourceType { get; set; }
 
     public string? LicenseNote { get; set; }
@@ -41,6 +50,9 @@ public partial class ReferenceSource
     public ReferenceUsagePolicy? UsagePolicy { get; set; }
 
     public ReferenceReviewStatus Status { get; set; }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
     public int? CreatedBy { get; set; }
@@ -50,9 +62,12 @@ public partial class ReferenceSource
     public DateTime? ApprovedAt { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public DateTime CreatedAt { get; set; }
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public int? RejectedBy { get; set; }
 
     public DateTime? RejectedAt { get; set; }
@@ -65,18 +80,27 @@ public partial class ReferenceSource
 
     public bool IsActive { get; set; }
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public virtual User? ApprovedByNavigation { get; set; }
 
     public virtual User? CreatedByNavigation { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public virtual ICollection<TopicReference> TopicReferences { get; set; } = new List<TopicReference>();
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public virtual User? RejectedByNavigation { get; set; }
 
     public virtual ICollection<TopicReference> TopicReferences { get; set; } = new List<TopicReference>();
 
     public virtual ICollection<ContentComplianceReview> ContentComplianceReviews { get; set; } = new List<ContentComplianceReview>();
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 }

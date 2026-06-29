@@ -1,11 +1,17 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using System;
 using System.Collections.Generic;
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 namespace DuAnTotNghiep.Models;
@@ -14,6 +20,7 @@ public partial class LearningTopic
 {
     public int Id { get; set; }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     public int SkillId { get; set; }
 
@@ -24,6 +31,8 @@ public partial class LearningTopic
     public string? TopicCode { get; set; }
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     [ForeignKey("Skill")]
     public int SkillId { get; set; }
 
@@ -38,12 +47,20 @@ public partial class LearningTopic
 
     [Required]
     [StringLength(255)]
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public string Title { get; set; } = null!;
 
     public string? Description { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    [Required]
+    [StringLength(50)]
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     [Required]
     [StringLength(50)]
@@ -55,6 +72,11 @@ public partial class LearningTopic
     public int OrderIndex { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    [Required]
+    [StringLength(50)]
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     [Required]
     [StringLength(50)]
@@ -64,6 +86,11 @@ public partial class LearningTopic
     public int? CreatedBy { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public int? UpdatedBy { get; set; }
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     public int? UpdatedBy { get; set; }
 
@@ -79,6 +106,11 @@ public partial class LearningTopic
     public virtual User? CreatedByNavigation { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public virtual User? UpdatedByNavigation { get; set; }
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     public virtual User? UpdatedByNavigation { get; set; }
 
@@ -111,10 +143,16 @@ public partial class LearningTopic
 
     public virtual ICollection<TopicReference> TopicReferences { get; set; } = new List<TopicReference>();
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
     public virtual ICollection<TopicPrerequisite> TopicPrerequisites { get; set; } = new List<TopicPrerequisite>();
 
     public virtual ICollection<TopicPrerequisite> PrerequisiteForTopics { get; set; } = new List<TopicPrerequisite>();
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 }

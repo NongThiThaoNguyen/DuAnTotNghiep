@@ -2,6 +2,11 @@ using DuAnTotNghiep.Helpers;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Repositories.Interfaces;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+using DuAnTotNghiep.Enums;
+using Microsoft.EntityFrameworkCore;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 using DuAnTotNghiep.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -46,13 +51,19 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedSkillsAsync();
             await SeedPlacementTestsAsync();
 <<<<<<< HEAD
+<<<<<<< HEAD
             await SeedDemoProfilesAsync();
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             await SeedPlacementTestDemoAsync();
             await SeedDemoProfilesAsync();
             await SeedTopicsAndObjectivesAsync();
             await SeedLearningPathDemoAsync();
             await SeedReferenceSourcesAsync();
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
 
@@ -109,12 +120,18 @@ namespace DuAnTotNghiep.Data.Seeders
                 
                 // Test OTP User
 <<<<<<< HEAD
+<<<<<<< HEAD
                 new User { Email = "testotp@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Test OTP User", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 }
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 new User { Email = "testotp@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Test OTP User", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 },
 
                 // Demo User for Task 20
                 new User { Email = "student.demo@aistudyenglish.com", PasswordHash = defaultPassword, FullName = "Student Demo", RoleId = studentRole.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow, FailedLoginCount = 0 }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             };
 
@@ -344,7 +361,10 @@ namespace DuAnTotNghiep.Data.Seeders
             }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             var studentDemo = await _userRepository.GetByEmailAsync("student.demo@aistudyenglish.com");
             if (studentDemo != null && ieltsGoal != null && beginnerLevel != null)
             {
@@ -362,6 +382,9 @@ namespace DuAnTotNghiep.Data.Seeders
                 }
             }
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             await _profileRepository.SaveChangesAsync();
         }
@@ -391,7 +414,10 @@ namespace DuAnTotNghiep.Data.Seeders
             }
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         private async Task SeedPlacementTestDemoAsync()
         {
             if (_context.PlacementTests.Any(t => t.Title == "English Placement Test Demo"))
@@ -911,6 +937,9 @@ namespace DuAnTotNghiep.Data.Seeders
             _context.LearningPathNodes.AddRange(nodes);
             await _context.SaveChangesAsync();
         }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

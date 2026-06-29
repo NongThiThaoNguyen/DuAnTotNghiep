@@ -690,11 +690,17 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("plagiarism_risk");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<int?>("ReferenceSourceId")
                         .HasColumnType("int")
                         .HasColumnName("reference_source_id");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<string>("ReviewNote")
                         .HasColumnType("nvarchar(max)")
@@ -721,10 +727,13 @@ namespace DuAnTotNghiep.Migrations
                         .HasName("PK__content___3213E83FABD8D38F");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.HasIndex("ReviewerId");
 
                     b.ToTable("content_compliance_reviews", (string)null);
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex("ReferenceSourceId");
 
                     b.HasIndex("ReviewStatus");
@@ -737,6 +746,9 @@ namespace DuAnTotNghiep.Migrations
 
                             t.HasCheckConstraint("CK_content_compliance_reviews_status", "[review_status] IN ('APPROVED', 'REJECTED', 'NEEDS_REVISION')");
                         });
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 });
 
@@ -755,8 +767,11 @@ namespace DuAnTotNghiep.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(20)")
 <<<<<<< HEAD
+<<<<<<< HEAD
                         .HasColumnName("code");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                         .HasColumnName("level_code");
 
                     b.Property<DateTime>("CreatedAt")
@@ -768,6 +783,9 @@ namespace DuAnTotNghiep.Migrations
                     b.Property<int?>("CreatedBy")
                         .HasColumnType("int")
                         .HasColumnName("created_by");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
                     b.Property<string>("Description")
@@ -776,20 +794,30 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("description");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
 <<<<<<< HEAD
+<<<<<<< HEAD
                         .HasColumnName("name");
+=======
+                        .HasColumnName("level_name");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                         .HasColumnName("level_name");
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -799,10 +827,13 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("order_index");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.HasKey("Id")
                         .HasName("PK__english___3213E83F203E1EC7");
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -820,6 +851,9 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex("UpdatedBy");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex(new[] { "Code" }, "UQ__english___357D4CF9AA0D901F")
                         .IsUnique();
@@ -837,7 +871,10 @@ namespace DuAnTotNghiep.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -848,6 +885,9 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int")
                         .HasColumnName("created_by");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -878,10 +918,13 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("skill_name");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.HasKey("Id")
                         .HasName("PK__english___3213E83F663F25FF");
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -899,6 +942,9 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex("UpdatedBy");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex(new[] { "SkillCode" }, "UQ__english___03ED21D844E200DF")
                         .IsUnique();
@@ -916,7 +962,10 @@ namespace DuAnTotNghiep.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -927,6 +976,9 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int")
                         .HasColumnName("created_by");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
@@ -953,10 +1005,13 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("is_active");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.HasKey("Id")
                         .HasName("PK__learning__3213E83FD1E17598");
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<int>("OrderIndex")
                         .HasColumnType("int")
                         .HasColumnName("order_index");
@@ -978,6 +1033,9 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex("UpdatedBy");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex(new[] { "GoalCode" }, "UQ__learning__A2EA35BF031D9129")
                         .IsUnique();
@@ -1004,7 +1062,10 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("cognitive_level");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -1015,6 +1076,9 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int")
                         .HasColumnName("created_by");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<string>("ObjectiveText")
                         .IsRequired()
@@ -1032,6 +1096,7 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("topic_id");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.HasKey("Id")
                         .HasName("PK__learning__3213E83F6239F152");
 
@@ -1039,6 +1104,8 @@ namespace DuAnTotNghiep.Migrations
 
                     b.ToTable("learning_objectives", (string)null);
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
@@ -1062,6 +1129,9 @@ namespace DuAnTotNghiep.Migrations
                         {
                             t.HasCheckConstraint("CK_objective_cognitive_level", "cognitive_level IN ('REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'CREATE')");
                         });
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 });
 
@@ -1318,7 +1388,11 @@ namespace DuAnTotNghiep.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(30)")
 <<<<<<< HEAD
+<<<<<<< HEAD
                         .HasDefaultValue("BASIC")
+=======
+                        .HasDefaultValue("BEGINNER")
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                         .HasDefaultValue("BEGINNER")
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -1374,11 +1448,17 @@ namespace DuAnTotNghiep.Migrations
                         .HasDefaultValueSql("(sysutcdatetime())");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<int?>("UpdatedBy")
                         .HasColumnType("int")
                         .HasColumnName("updated_by");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasKey("Id")
                         .HasName("PK__learning__3213E83F8C330B01");
@@ -1388,11 +1468,14 @@ namespace DuAnTotNghiep.Migrations
                     b.HasIndex("LevelId");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.HasIndex("ParentTopicId");
 
                     b.HasIndex(new[] { "SkillId", "LevelId" }, "IX_topics_skill_level");
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex("UpdatedBy");
 
                     b.HasIndex(new[] { "OrderIndex" }, "IX_topics_order_index");
@@ -1403,20 +1486,29 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex(new[] { "Status" }, "IX_topics_status");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex(new[] { "TopicCode" }, "UQ__learning__DDA414C51EC96AFC")
                         .IsUnique()
                         .HasFilter("[topic_code] IS NOT NULL");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.ToTable("learning_topics", (string)null);
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.ToTable("learning_topics", null, t =>
                         {
                             t.HasCheckConstraint("CK_topic_difficulty_level", "difficulty_level IN ('BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'UPPER_INTERMEDIATE', 'ADVANCED')");
 
                             t.HasCheckConstraint("CK_topic_status", "status IN ('ACTIVE', 'INACTIVE', 'ARCHIVED')");
                         });
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 });
 
@@ -2405,13 +2497,19 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("created_by");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true)
                         .HasColumnName("is_active");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<string>("LicenseNote")
                         .HasColumnType("nvarchar(max)")
@@ -2446,9 +2544,12 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("status");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.Property<string>("UsagePolicy")
                         .HasColumnType("nvarchar(max)")
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at");
@@ -2457,6 +2558,9 @@ namespace DuAnTotNghiep.Migrations
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)")
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                         .HasColumnName("usage_policy");
 
@@ -2468,8 +2572,11 @@ namespace DuAnTotNghiep.Migrations
                     b.HasIndex("CreatedBy");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.ToTable("reference_sources", (string)null);
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex("SourceType");
 
                     b.HasIndex("Status");
@@ -2482,6 +2589,9 @@ namespace DuAnTotNghiep.Migrations
 
                             t.HasCheckConstraint("CK_ref_usage_policy", "[usage_policy] IS NULL OR [usage_policy] IN ('REFERENCE_ONLY', 'OPEN_USE', 'INTERNAL_ONLY')");
                         });
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 });
 
@@ -2684,7 +2794,10 @@ namespace DuAnTotNghiep.Migrations
                 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentAvailableStudySlot", b =>
                 {
                     b.Property<int>("Id")
@@ -2715,6 +2828,9 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("StudentAvailableStudySlots");
                 });
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentLearningPath", b =>
                 {
@@ -2940,11 +3056,14 @@ namespace DuAnTotNghiep.Migrations
                     b.HasIndex("SkillId");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.HasIndex("StudentId");
 
                     b.HasIndex("TopicId");
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasIndex("TopicId");
 
                     b.HasIndex(new[] { "StudentId", "SnapshotDate" }, "IX_sps_student_date");
@@ -2953,6 +3072,9 @@ namespace DuAnTotNghiep.Migrations
 
                     b.HasIndex(new[] { "StudentId", "TopicId" }, "IX_sps_student_topic");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.ToTable("student_progress_snapshots", (string)null);
                 });
@@ -3214,7 +3336,10 @@ namespace DuAnTotNghiep.Migrations
                 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.TopicPrerequisite", b =>
                 {
                     b.Property<int>("Id")
@@ -3249,6 +3374,9 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("topic_prerequisites", (string)null);
                 });
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.TopicReference", b =>
                 {
@@ -3284,6 +3412,11 @@ namespace DuAnTotNghiep.Migrations
                     b.HasIndex("ReferenceSourceId");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    b.HasIndex("TopicId");
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     b.HasIndex("TopicId");
 
@@ -3808,12 +3941,18 @@ namespace DuAnTotNghiep.Migrations
             modelBuilder.Entity("DuAnTotNghiep.Models.ContentComplianceReview", b =>
                 {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasOne("DuAnTotNghiep.Models.ReferenceSource", "ReferenceSource")
                         .WithMany("ContentComplianceReviews")
                         .HasForeignKey("ReferenceSourceId")
                         .HasConstraintName("FK_content_reviews_ref_source");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasOne("DuAnTotNghiep.Models.User", "Reviewer")
                         .WithMany("ContentComplianceReviews")
@@ -3822,12 +3961,15 @@ namespace DuAnTotNghiep.Migrations
                         .HasConstraintName("FK_content_reviews_reviewer");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.Navigation("Reviewer");
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.LearningObjective", b =>
                 {
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Navigation("ReferenceSource");
 
                     b.Navigation("Reviewer");
@@ -3891,6 +4033,9 @@ namespace DuAnTotNghiep.Migrations
                         .HasForeignKey("CreatedBy")
                         .HasConstraintName("FK_objectives_created_by");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasOne("DuAnTotNghiep.Models.LearningTopic", "Topic")
                         .WithMany("LearningObjectives")
@@ -3899,8 +4044,11 @@ namespace DuAnTotNghiep.Migrations
                         .HasConstraintName("FK_objectives_topics");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
                     b.Navigation("Topic");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasOne("DuAnTotNghiep.Models.User", "UpdatedByNavigation")
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
@@ -3911,6 +4059,9 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("Topic");
 
                     b.Navigation("UpdatedByNavigation");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 });
 
@@ -4033,12 +4184,18 @@ namespace DuAnTotNghiep.Migrations
                         .HasConstraintName("FK_topics_skills");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.HasOne("DuAnTotNghiep.Models.User", "UpdatedByNavigation")
                         .WithMany()
                         .HasForeignKey("UpdatedBy")
                         .HasConstraintName("FK_topics_updated_by");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                     b.Navigation("CreatedByNavigation");
 
@@ -4048,6 +4205,11 @@ namespace DuAnTotNghiep.Migrations
 
                     b.Navigation("Skill");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+                    b.Navigation("UpdatedByNavigation");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 
                     b.Navigation("UpdatedByNavigation");
@@ -4427,7 +4589,10 @@ namespace DuAnTotNghiep.Migrations
                 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentAvailableStudySlot", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.StudentLearningProfile", "StudentProfile")
@@ -4439,6 +4604,9 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("StudentProfile");
                 });
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentLearningPath", b =>
                 {
@@ -4632,7 +4800,10 @@ namespace DuAnTotNghiep.Migrations
                 });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.TopicPrerequisite", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.LearningTopic", "PrerequisiteTopic")
@@ -4652,6 +4823,9 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("Topic");
                 });
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             modelBuilder.Entity("DuAnTotNghiep.Models.TopicReference", b =>
                 {
@@ -4831,6 +5005,11 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("PracticeTasks");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    b.Navigation("PrerequisiteForTopics");
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     b.Navigation("PrerequisiteForTopics");
 
@@ -4844,6 +5023,11 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("StudyActivityLogs");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    b.Navigation("TopicPrerequisites");
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     b.Navigation("TopicPrerequisites");
 
@@ -4924,6 +5108,11 @@ namespace DuAnTotNghiep.Migrations
             modelBuilder.Entity("DuAnTotNghiep.Models.ReferenceSource", b =>
                 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    b.Navigation("ContentComplianceReviews");
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     b.Navigation("ContentComplianceReviews");
 
@@ -4946,6 +5135,11 @@ namespace DuAnTotNghiep.Migrations
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentLearningProfile", b =>
                 {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    b.Navigation("StudentAvailableStudySlots");
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     b.Navigation("StudentAvailableStudySlots");
 

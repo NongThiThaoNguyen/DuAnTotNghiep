@@ -20,6 +20,11 @@ namespace DuAnTotNghiep.Services
         private readonly ITestScoringService _scoringService;
         private readonly DuAnTotNghiep.Data.ApplicationDbContext _dbContext;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        private readonly DuAnTotNghiep.Services.Background.IAiAnalysisQueue _aiQueue;
+        private readonly IAuditService _auditService;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
         private readonly DuAnTotNghiep.Services.Background.IAiAnalysisQueue _aiQueue;
         private readonly IAuditService _auditService;
@@ -32,7 +37,13 @@ namespace DuAnTotNghiep.Services
             IGenericRepository<TestAnswer> answerRepository,
             ITestScoringService scoringService,
 <<<<<<< HEAD
+<<<<<<< HEAD
             DuAnTotNghiep.Data.ApplicationDbContext dbContext)
+=======
+            DuAnTotNghiep.Data.ApplicationDbContext dbContext,
+            DuAnTotNghiep.Services.Background.IAiAnalysisQueue aiQueue,
+            IAuditService auditService)
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             DuAnTotNghiep.Data.ApplicationDbContext dbContext,
             DuAnTotNghiep.Services.Background.IAiAnalysisQueue aiQueue,
@@ -46,6 +57,11 @@ namespace DuAnTotNghiep.Services
             _scoringService = scoringService;
             _dbContext = dbContext;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            _aiQueue = aiQueue;
+            _auditService = auditService;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             _aiQueue = aiQueue;
             _auditService = auditService;
@@ -219,9 +235,12 @@ namespace DuAnTotNghiep.Services
 
             var serverTime = DateTime.UtcNow;
 <<<<<<< HEAD
+<<<<<<< HEAD
             DateTime? endTime = attemptInfo.TimeLimitMinutes.HasValue 
                 ? attemptInfo.StartedAt.AddMinutes(attemptInfo.TimeLimitMinutes.Value) 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             // Fix Timezone bug: specify UTC kind if Unspecified
             var startedAtUtc = attemptInfo.StartedAt.Kind == DateTimeKind.Unspecified
@@ -231,6 +250,9 @@ namespace DuAnTotNghiep.Services
             // Fix TimeLimitMinutes == 0 meaning no limit
             DateTime? endTime = (attemptInfo.TimeLimitMinutes.HasValue && attemptInfo.TimeLimitMinutes.Value > 0) 
                 ? startedAtUtc.AddMinutes(attemptInfo.TimeLimitMinutes.Value) 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 : null;
 
@@ -242,6 +264,12 @@ namespace DuAnTotNghiep.Services
             }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            // Debug log
+            System.Console.WriteLine($"[DEBUG PlacementTest] StartedAt: {attemptInfo.StartedAt}, EndTime: {endTime}, ServerTime: {serverTime}, TimeLimitMinutes: {attemptInfo.TimeLimitMinutes}, RemainingSeconds: {remainingSeconds}, AttemptStatus: {attemptInfo.Status}");
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             // Debug log
             System.Console.WriteLine($"[DEBUG PlacementTest] StartedAt: {attemptInfo.StartedAt}, EndTime: {endTime}, ServerTime: {serverTime}, TimeLimitMinutes: {attemptInfo.TimeLimitMinutes}, RemainingSeconds: {remainingSeconds}, AttemptStatus: {attemptInfo.Status}");
@@ -259,6 +287,11 @@ namespace DuAnTotNghiep.Services
                     await _dbContext.SaveChangesAsync();
                     currentStatus = "EXPIRED";
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                    
+                    System.Console.WriteLine($"[DEBUG PlacementTest] Attempt {attemptId} status updated to EXPIRED due to remainingSeconds == 0");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     
                     System.Console.WriteLine($"[DEBUG PlacementTest] Attempt {attemptId} status updated to EXPIRED due to remainingSeconds == 0");
@@ -383,7 +416,11 @@ namespace DuAnTotNghiep.Services
                 {
                     var test = await _testRepository.GetByIdAsync(placementTestId);
 <<<<<<< HEAD
+<<<<<<< HEAD
                     if (test!.TimeLimitMinutes.HasValue)
+=======
+                    if (test!.TimeLimitMinutes.HasValue && test.TimeLimitMinutes.Value > 0)
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                     if (test!.TimeLimitMinutes.HasValue && test.TimeLimitMinutes.Value > 0)
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -437,6 +474,11 @@ namespace DuAnTotNghiep.Services
                 await transaction.CommitAsync();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                await _auditService.LogAsync(studentId, "START_ATTEMPT", "TestAttempt", newAttempt.Id);
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                 await _auditService.LogAsync(studentId, "START_ATTEMPT", "TestAttempt", newAttempt.Id);
 
@@ -463,11 +505,14 @@ namespace DuAnTotNghiep.Services
             try
             {
 <<<<<<< HEAD
+<<<<<<< HEAD
                 var attempt = await _dbContext.TestAttempts.FindAsync(attemptId);
                 if (attempt == null || attempt.StudentId != studentId || attempt.Status != "IN_PROGRESS")
                 {
                     return new SubmitResultDto { IsSuccess = false, Message = "Attempt invalid or already submitted." };
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 var attempt = await _dbContext.TestAttempts
                     .Include(a => a.PlacementTest)
                     .FirstOrDefaultAsync(a => a.Id == attemptId);
@@ -498,6 +543,9 @@ namespace DuAnTotNghiep.Services
                         await transaction.CommitAsync();
                         return new SubmitResultDto { IsSuccess = false, Message = "Thời gian làm bài đã hết. Bài thi của bạn không được công nhận." };
                     }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 }
 
@@ -523,6 +571,12 @@ namespace DuAnTotNghiep.Services
                 await _dbContext.SaveChangesAsync();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                // Log Submit
+                await _auditService.LogAsync(studentId, "SUBMIT_ATTEMPT", "TestAttempt", attemptId);
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                 // Log Submit
                 await _auditService.LogAsync(studentId, "SUBMIT_ATTEMPT", "TestAttempt", attemptId);
@@ -542,13 +596,19 @@ namespace DuAnTotNghiep.Services
                 await transaction.CommitAsync();
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 // Log Grade
                 await _auditService.LogAsync(studentId, "GRADE_ATTEMPT", "TestAttempt", attemptId, null, $"Score: {scoreResult.TotalScore}");
 
                 // Queue AI Analysis
                 await _aiQueue.QueueAttemptForAnalysisAsync(attemptId, studentId);
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 return new SubmitResultDto
                 {
@@ -564,7 +624,10 @@ namespace DuAnTotNghiep.Services
             }
         }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
         public async Task<TestResultViewModel> GetResultForStudentAsync(int attemptId, int studentId)
         {
@@ -639,6 +702,9 @@ namespace DuAnTotNghiep.Services
                 SubmittedAt = attempt.SubmittedAt
             };
         }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

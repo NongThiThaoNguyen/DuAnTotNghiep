@@ -4,7 +4,10 @@ using DuAnTotNghiep.Repositories.Interfaces;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.ViewModels.Onboarding;
 <<<<<<< HEAD
+<<<<<<< HEAD
 using DuAnTotNghiep.Enums;
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using System;
@@ -314,9 +317,15 @@ namespace DuAnTotNghiep.Services
                             StudentId = userId,
                             LearningPathId = activePath.Id,
 <<<<<<< HEAD
+<<<<<<< HEAD
                             TriggerType = TriggerType.GOAL_CHANGED,
                             Reason = "Người dùng thay đổi mục tiêu học tập (Goal)",
                             Status = ReplanningStatus.SUGGESTED,
+=======
+                            TriggerType = "MANUAL_GOAL_UPDATE",
+                            Reason = "Người dùng thay đổi mục tiêu học tập (Goal)",
+                            Status = "PENDING",
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                             TriggerType = "MANUAL_GOAL_UPDATE",
                             Reason = "Người dùng thay đổi mục tiêu học tập (Goal)",

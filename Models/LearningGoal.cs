@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using System;
+=======
+using System;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 using System;
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -20,7 +24,10 @@ public partial class LearningGoal
     public bool IsActive { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public int OrderIndex { get; set; }
 
     public int? CreatedBy { get; set; }
@@ -35,6 +42,9 @@ public partial class LearningGoal
 
     public virtual User? UpdatedByNavigation { get; set; }
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public virtual ICollection<LearningPathTemplate> LearningPathTemplates { get; set; } = new List<LearningPathTemplate>();
 

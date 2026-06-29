@@ -1,6 +1,12 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using System;
 using System.Collections.Generic;
+=======
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 using System;
 using System.Collections.Generic;
@@ -14,15 +20,21 @@ public partial class EnglishProficiencyLevel
     public int Id { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public string Code { get; set; } = null!;
 
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     [Required]
     [StringLength(50)]
     public string Code { get; set; } = null!;
 
     [Required]
     [StringLength(255)]
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public string Name { get; set; } = null!;
 
@@ -31,7 +43,10 @@ public partial class EnglishProficiencyLevel
     public string? Description { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public bool IsActive { get; set; }
 
     public int? CreatedBy { get; set; }
@@ -46,6 +61,9 @@ public partial class EnglishProficiencyLevel
 
     public virtual User? UpdatedByNavigation { get; set; }
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public virtual ICollection<CompetencyAnalysis> CompetencyAnalysisCurrentLevels { get; set; } = new List<CompetencyAnalysis>();
 

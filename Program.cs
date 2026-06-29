@@ -5,8 +5,11 @@ using DuAnTotNghiep.Repositories;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Services;
 <<<<<<< HEAD
+<<<<<<< HEAD
 using DuAnTotNghiep.Services.AI;
 using DuAnTotNghiep.Services.Validators;
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 using DuAnTotNghiep.Data.Seeders;
@@ -24,6 +27,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+builder.Services.AddHttpContextAccessor();
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 builder.Services.AddHttpContextAccessor();
 
@@ -40,7 +48,10 @@ builder.Services.AddScoped<IPasswordResetTokenRepository, PasswordResetTokenRepo
 builder.Services.AddScoped<IUserSessionRepository, UserSessionRepository>();
 builder.Services.AddScoped<ILearningProfileRepository, LearningProfileRepository>();
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 builder.Services.AddScoped<ILearningTopicRepository, LearningTopicRepository>();
 builder.Services.AddScoped<IReferenceSourceRepository, ReferenceSourceRepository>();
 builder.Services.AddScoped<IEnglishSkillRepository, EnglishSkillRepository>();
@@ -48,6 +59,9 @@ builder.Services.AddScoped<IEnglishProficiencyLevelRepository, EnglishProficienc
 builder.Services.AddScoped<ILearningObjectiveRepository, LearningObjectiveRepository>();
 builder.Services.AddScoped<IProgressRepository, ProgressRepository>();
 builder.Services.AddScoped<IActivityLogRepository, ActivityLogRepository>();
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 // Đăng ký Services
@@ -64,6 +78,10 @@ builder.Services.AddScoped<IMasterDataService, MasterDataService>();
 builder.Services.AddScoped<ITestScoringService, TestScoringService>();
 builder.Services.AddScoped<IPlacementTestManagementService, PlacementTestManagementService>();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+builder.Services.AddScoped<IPlacementAttemptService, PlacementAttemptService>();
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 builder.Services.AddScoped<IPlacementAttemptService, PlacementAttemptService>();
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -71,6 +89,7 @@ builder.Services.AddScoped<IPlacementTestSectionService, PlacementTestSectionSer
 builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionService>();
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 // Đăng ký Seeder
@@ -88,6 +107,8 @@ builder.Services.AddScoped<IAIContentReviewService, AIContentReviewService>();
 builder.Services.AddScoped<IPublishingService, PublishingService>();
 builder.Services.AddScoped<IReplanningRuleService, ReplanningRuleService>();
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 builder.Services.AddScoped<ILearningTopicService, LearningTopicService>();
 builder.Services.AddScoped<IReferenceSourceService, ReferenceSourceService>();
 builder.Services.AddScoped<IValidateLicenseService, ValidateLicenseService>();
@@ -120,6 +141,9 @@ builder.Services.AddSingleton<IAiLoggingService, AiLoggingService>(); // Singlet
 builder.Services.AddScoped<DatabaseSeeder>();
 builder.Services.AddScoped<DuAnTotNghiep.Repositories.Interfaces.ITopicPrerequisiteRepository, DuAnTotNghiep.Repositories.TopicPrerequisiteRepository>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IM4SchemaService, DuAnTotNghiep.Services.M4SchemaService>();
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
 
@@ -172,6 +196,10 @@ using (var scope = app.Services.CreateScope())
     var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
     await seeder.SeedAsync();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52

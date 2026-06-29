@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using System;
+=======
+using System;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 using System;
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -24,6 +28,11 @@ public partial class CompetencySkillScore
     public int PriorityLevel { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public int? TopicId { get; set; }
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     public int? TopicId { get; set; }
 
@@ -34,6 +43,11 @@ public partial class CompetencySkillScore
 
     public virtual EnglishSkill Skill { get; set; } = null!;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+    public virtual LearningTopic? Topic { get; set; }
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 
     public virtual LearningTopic? Topic { get; set; }

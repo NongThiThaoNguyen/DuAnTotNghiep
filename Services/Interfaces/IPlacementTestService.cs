@@ -16,6 +16,10 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task<SaveAnswerResultDto> SaveAnswerAsync(SaveAnswerInputDto input, int studentId);
         Task<SubmitResultDto> SubmitAttemptAsync(int attemptId, int studentId, List<AnswerInputDto> answers);
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+        Task<TestResultViewModel> GetResultForStudentAsync(int attemptId, int studentId);
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
         Task<TestResultViewModel> GetResultForStudentAsync(int attemptId, int studentId);
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52

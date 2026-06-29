@@ -22,12 +22,15 @@ namespace DuAnTotNghiep.DTOs.PlacementTest
         public string SkillName { get; set; } = null!;
         
 <<<<<<< HEAD
+<<<<<<< HEAD
         public int TotalQuestions { get; set; }
         
         public int CorrectQuestions { get; set; }
         
         public decimal Score { get; set; }
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         public decimal EarnedScore { get; set; }
         
         public decimal MaxScore { get; set; }
@@ -46,6 +49,9 @@ namespace DuAnTotNghiep.DTOs.PlacementTest
         public decimal MaxScore { get; set; }
         
         public decimal Percentage { get; set; }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     }
 }

@@ -9,7 +9,10 @@ public class HomeController : Controller
     public IActionResult Index()
     {
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         if (User.Identity != null && User.Identity.IsAuthenticated)
         {
             if (User.IsInRole("STUDENT"))
@@ -25,6 +28,9 @@ public class HomeController : Controller
                 return RedirectToAction("Index", "Home", new { area = "Teacher" });
             }
         }
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         return View();
     }

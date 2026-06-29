@@ -56,6 +56,11 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<LearningTopic> LearningTopics { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public virtual DbSet<TopicPrerequisite> TopicPrerequisites { get; set; }
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     public virtual DbSet<TopicPrerequisite> TopicPrerequisites { get; set; }
 
@@ -107,6 +112,11 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<StudentSkillPreference> StudentSkillPreferences { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    public virtual DbSet<StudentAvailableStudySlot> StudentAvailableStudySlots { get; set; }
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
     public virtual DbSet<StudentAvailableStudySlot> StudentAvailableStudySlots { get; set; }
 
@@ -116,8 +126,11 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<SystemSetting> SystemSettings { get; set; }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public virtual DbSet<ReplanningRule> ReplanningRules { get; set; }
 
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
     public virtual DbSet<TestAnswer> TestAnswers { get; set; }
@@ -261,6 +274,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("status");
             entity.Property(e => e.SystemPrompt).HasColumnName("system_prompt");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.Property(e => e.UserPromptTemplate).HasColumnName("user_prompt_template");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.Property(e => e.UserPromptTemplate).HasColumnName("user_prompt_template");
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -289,10 +306,16 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Reason).HasColumnName("reason");
             entity.Property(e => e.Status)
 <<<<<<< HEAD
+<<<<<<< HEAD
                 .HasMaxLength(30)
                 .IsUnicode(false)
                 .HasConversion<string>()
                 .HasDefaultValue(ReplanningStatus.SUGGESTED)
+=======
+                .HasMaxLength(50)
+                .IsUnicode(false)
+                .HasDefaultValue("APPLIED")
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -304,6 +327,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
 <<<<<<< HEAD
+<<<<<<< HEAD
                 .HasConversion<string>()
                 .HasColumnName("trigger_type");
             entity.Property(e => e.ChangedNodesJson).HasColumnName("changed_nodes_json");
@@ -314,6 +338,9 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.ErrorMessage)
                 .HasMaxLength(1000)
                 .HasColumnName("error_message");
+=======
+                .HasColumnName("trigger_type");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                 .HasColumnName("trigger_type");
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -408,6 +435,11 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => new { e.ModuleCode, e.CreatedAt }, "IX_ai_usage_module_date");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.HasIndex(e => e.PromptTemplateId, "IX_ai_usage_logs_prompt_template_id");
+            entity.HasIndex(e => e.UserId, "IX_ai_usage_logs_user_id");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.HasIndex(e => e.PromptTemplateId, "IX_ai_usage_logs_prompt_template_id");
             entity.HasIndex(e => e.UserId, "IX_ai_usage_logs_user_id");
@@ -426,7 +458,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.ErrorMessage).HasColumnName("error_message");
 <<<<<<< HEAD
+<<<<<<< HEAD
             entity.Property(e => e.DurationMs).HasColumnName("duration_ms");
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.InputTokens).HasColumnName("input_tokens");
@@ -443,6 +478,12 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("request_status");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.Property(e => e.PromptInput).HasColumnName("prompt_input");
+            entity.Property(e => e.ResponseOutput).HasColumnName("response_output");
+            entity.Property(e => e.LatencyMs).HasColumnName("latency_ms");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.Property(e => e.PromptInput).HasColumnName("prompt_input");
             entity.Property(e => e.ResponseOutput).HasColumnName("response_output");
@@ -497,6 +538,12 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("competency_analyses");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.HasIndex(e => e.StudentId, "IX_competency_analyses_student_id");
+            entity.HasIndex(e => e.TestAttemptId, "IX_competency_analyses_test_attempt_id");
+
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.HasIndex(e => e.StudentId, "IX_competency_analyses_student_id");
             entity.HasIndex(e => e.TestAttemptId, "IX_competency_analyses_test_attempt_id");
@@ -522,6 +569,12 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.TestAttemptId).HasColumnName("test_attempt_id");
             entity.Property(e => e.Weaknesses).HasColumnName("weaknesses");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.Property(e => e.PrioritizedTopicsJson).HasColumnName("prioritized_topics_json");
+            entity.Property(e => e.KnowledgeGapsJson).HasColumnName("knowledge_gaps_json");
+            entity.Property(e => e.MetadataJson).HasColumnName("metadata_json");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.Property(e => e.PrioritizedTopicsJson).HasColumnName("prioritized_topics_json");
             entity.Property(e => e.KnowledgeGapsJson).HasColumnName("knowledge_gaps_json");
@@ -553,11 +606,17 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("competency_skill_scores");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.HasIndex(e => e.CompetencyAnalysisId, "IX_competency_skill_scores_competency_analysis_id");
             entity.HasIndex(e => e.SkillId, "IX_competency_skill_scores_skill_id");
             entity.HasIndex(e => e.TopicId, "IX_competency_skill_scores_topic_id");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CompetencyAnalysisId).HasColumnName("competency_analysis_id");
@@ -571,6 +630,10 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.SkillId).HasColumnName("skill_id");
             entity.Property(e => e.WeaknessNote).HasColumnName("weakness_note");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.Property(e => e.TopicId).HasColumnName("topic_id");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.Property(e => e.TopicId).HasColumnName("topic_id");
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -589,12 +652,18 @@ public partial class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_css_skill");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.HasOne(d => d.Topic).WithMany()
                 .HasForeignKey(d => d.TopicId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_css_topic");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
 
@@ -603,8 +672,11 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__content___3213E83FABD8D38F");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             entity.ToTable("content_compliance_reviews");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.ToTable("content_compliance_reviews", t =>
             {
                 t.HasCheckConstraint("CK_content_compliance_reviews_status", "[review_status] IN ('APPROVED', 'REJECTED', 'NEEDS_REVISION')");
@@ -614,6 +686,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.ReferenceSourceId);
             entity.HasIndex(e => e.ReviewerId);
             entity.HasIndex(e => e.ReviewStatus);
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.Property(e => e.Id).HasColumnName("id");
@@ -637,6 +712,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("reviewed_at");
             entity.Property(e => e.ReviewerId).HasColumnName("reviewer_id");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.Property(e => e.ReferenceSourceId).HasColumnName("reference_source_id");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.Property(e => e.ReferenceSourceId).HasColumnName("reference_source_id");
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -646,12 +725,18 @@ public partial class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_content_reviews_reviewer");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.HasOne(d => d.ReferenceSource).WithMany(p => p.ContentComplianceReviews)
                 .HasForeignKey(d => d.ReferenceSourceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_content_reviews_ref_source");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
 
@@ -668,7 +753,11 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(20)
                 .IsUnicode(false)
 <<<<<<< HEAD
+<<<<<<< HEAD
                 .HasColumnName("code");
+=======
+                .HasColumnName("level_code");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                 .HasColumnName("level_code");
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -678,9 +767,12 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
 <<<<<<< HEAD
+<<<<<<< HEAD
                 .HasColumnName("name");
             entity.Property(e => e.OrderIndex).HasColumnName("order_index");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 .HasColumnName("level_name");
             entity.Property(e => e.OrderIndex).HasColumnName("order_index");
             entity.Property(e => e.IsActive)
@@ -702,6 +794,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.UpdatedByNavigation).WithMany()
                 .HasForeignKey(d => d.UpdatedBy)
                 .HasConstraintName("FK_levels_updated_by");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
 
@@ -729,7 +824,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("skill_name");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -746,6 +844,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.UpdatedByNavigation).WithMany()
                 .HasForeignKey(d => d.UpdatedBy)
                 .HasConstraintName("FK_skills_updated_by");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
 
@@ -772,7 +873,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValue(true)
                 .HasColumnName("is_active");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.OrderIndex).HasColumnName("order_index");
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
@@ -790,6 +894,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.UpdatedByNavigation).WithMany()
                 .HasForeignKey(d => d.UpdatedBy)
                 .HasConstraintName("FK_goals_updated_by");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
 
@@ -798,12 +905,18 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__learning__3213E83F6239F152");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             entity.ToTable("learning_objectives");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.ToTable("learning_objectives", t => 
             {
                 t.HasCheckConstraint("CK_objective_cognitive_level", "cognitive_level IN ('REMEMBER', 'UNDERSTAND', 'APPLY', 'ANALYZE', 'CREATE')");
             });
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.Property(e => e.Id).HasColumnName("id");
@@ -818,7 +931,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("order_index");
             entity.Property(e => e.TopicId).HasColumnName("topic_id");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.CreatedAt)
                 .HasDefaultValueSql("(sysutcdatetime())")
                 .HasColumnName("created_at");
@@ -827,6 +943,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("updated_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.HasOne(d => d.Topic).WithMany(p => p.LearningObjectives)
@@ -834,7 +953,10 @@ public partial class ApplicationDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_objectives_topics");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.HasOne(d => d.CreatedByNavigation).WithMany()
                 .HasForeignKey(d => d.CreatedBy)
@@ -843,6 +965,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.UpdatedByNavigation).WithMany()
                 .HasForeignKey(d => d.UpdatedBy)
                 .HasConstraintName("FK_objectives_updated_by");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
 
@@ -987,19 +1112,31 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__learning__3213E83F8C330B01");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             entity.ToTable("learning_topics");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.ToTable("learning_topics", t =>
             {
                 t.HasCheckConstraint("CK_topic_status", "status IN ('ACTIVE', 'INACTIVE', 'ARCHIVED')");
                 t.HasCheckConstraint("CK_topic_difficulty_level", "difficulty_level IN ('BEGINNER', 'ELEMENTARY', 'INTERMEDIATE', 'UPPER_INTERMEDIATE', 'ADVANCED')");
             });
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.HasIndex(e => new { e.SkillId, e.LevelId }, "IX_topics_skill_level");
 
             entity.HasIndex(e => e.TopicCode, "UQ__learning__DDA414C51EC96AFC").IsUnique();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.HasIndex(e => e.Status, "IX_topics_status");
+            entity.HasIndex(e => e.OrderIndex, "IX_topics_order_index");
+            entity.HasIndex(e => e.ParentTopicId, "IX_topics_parent_topic_id");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.HasIndex(e => e.Status, "IX_topics_status");
             entity.HasIndex(e => e.OrderIndex, "IX_topics_order_index");
@@ -1012,6 +1149,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -1020,7 +1161,11 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(30)
                 .IsUnicode(false)
 <<<<<<< HEAD
+<<<<<<< HEAD
                 .HasDefaultValue("BASIC")
+=======
+                .HasDefaultValue("BEGINNER")
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                 .HasDefaultValue("BEGINNER")
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -1053,11 +1198,17 @@ public partial class ApplicationDbContext : DbContext
                 .HasConstraintName("FK_topics_users");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.HasOne(d => d.UpdatedByNavigation).WithMany()
                 .HasForeignKey(d => d.UpdatedBy)
                 .HasConstraintName("FK_topics_updated_by");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.HasOne(d => d.Level).WithMany(p => p.LearningTopics)
                 .HasForeignKey(d => d.LevelId)
@@ -1627,8 +1778,11 @@ public partial class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__referenc__3213E83F85C4EC5F");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
             entity.ToTable("reference_sources");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.ToTable("reference_sources", t =>
             {
                 t.HasCheckConstraint("CK_ref_status", "[status] IN ('DRAFT', 'PENDING', 'APPROVED', 'REJECTED', 'ARCHIVED')");
@@ -1642,6 +1796,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.ApprovedBy);
             entity.HasIndex(e => e.SourceName, "IX_reference_sources_source_name");
             entity.HasIndex(e => e.SourceUrl, "IX_reference_sources_source_url");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.Property(e => e.Id).HasColumnName("id");
@@ -1653,17 +1810,27 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.LicenseNote).HasColumnName("license_note");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.ComplianceEvidenceUrl)
                 .HasMaxLength(1000)
                 .IsUnicode(false)
                 .HasColumnName("compliance_evidence_url");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.SourceName)
                 .HasMaxLength(255)
                 .HasColumnName("source_name");
             entity.Property(e => e.SourceType)
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+                .HasConversion<string>()
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
                 .HasConversion<string>()
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -1676,12 +1843,15 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("source_url");
             entity.Property(e => e.Status)
 <<<<<<< HEAD
+<<<<<<< HEAD
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasDefaultValue("PENDING")
                 .HasColumnName("status");
             entity.Property(e => e.UsagePolicy).HasColumnName("usage_policy");
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
                 .HasConversion<string>()
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -1707,6 +1877,9 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.RejectedBy).HasColumnName("rejected_by");
             entity.Property(e => e.RejectedAt).HasColumnName("rejected_at");
             entity.Property(e => e.RejectionReason).HasColumnName("rejection_reason");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.HasOne(d => d.ApprovedByNavigation).WithMany(p => p.ReferenceSourceApprovedByNavigations)
@@ -1717,11 +1890,17 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.CreatedBy)
                 .HasConstraintName("FK_ref_created_by");
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 
             entity.HasOne(d => d.RejectedByNavigation).WithMany()
                 .HasForeignKey(d => d.RejectedBy)
                 .HasConstraintName("FK_reference_sources_users_rejected_by");
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         });
 
@@ -1937,11 +2116,17 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("student_progress_snapshots");
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.HasIndex(e => new { e.StudentId, e.SnapshotDate }, "IX_sps_student_date");
             entity.HasIndex(e => new { e.StudentId, e.SkillId }, "IX_sps_student_skill");
             entity.HasIndex(e => new { e.StudentId, e.TopicId }, "IX_sps_student_topic");
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AverageScore)
@@ -2068,6 +2253,7 @@ public partial class ApplicationDbContext : DbContext
         });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
         modelBuilder.Entity<ReplanningRule>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -2105,6 +2291,8 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("updated_at");
         });
 
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         modelBuilder.Entity<TestAnswer>(entity =>
@@ -2184,7 +2372,10 @@ public partial class ApplicationDbContext : DbContext
         });
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         modelBuilder.Entity<TopicPrerequisite>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK_topic_prerequisites");
@@ -2211,6 +2402,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasConstraintName("FK_topic_prerequisites_prerequisite");
         });
 
+<<<<<<< HEAD
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
+=======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         modelBuilder.Entity<TopicReference>(entity =>
         {
@@ -2220,6 +2414,11 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => new { e.TopicId, e.ReferenceSourceId }, "UQ_topic_reference").IsUnique();
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+            entity.HasIndex(e => e.TopicId);
+            entity.HasIndex(e => e.ReferenceSourceId);
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
             entity.HasIndex(e => e.TopicId);
             entity.HasIndex(e => e.ReferenceSourceId);

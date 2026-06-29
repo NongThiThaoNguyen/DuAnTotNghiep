@@ -12,7 +12,10 @@ namespace DuAnTotNghiep.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             /*
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             migrationBuilder.CreateTable(
@@ -2134,7 +2137,10 @@ namespace DuAnTotNghiep.Migrations
                 column: "email",
                 unique: true);
 <<<<<<< HEAD
+<<<<<<< HEAD
             */
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }
@@ -2143,7 +2149,10 @@ namespace DuAnTotNghiep.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             /*
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
             migrationBuilder.DropTable(
@@ -2296,7 +2305,10 @@ namespace DuAnTotNghiep.Migrations
             migrationBuilder.DropTable(
                 name: "roles");
 <<<<<<< HEAD
+<<<<<<< HEAD
             */
+=======
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
         }

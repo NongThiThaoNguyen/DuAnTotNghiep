@@ -1,5 +1,9 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 ﻿using System;
+=======
+using System;
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 using System;
 >>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
@@ -45,6 +49,11 @@ public partial class StudentLearningProfile
 
     public virtual User User { get; set; } = null!;
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+
+    public virtual ICollection<StudentAvailableStudySlot> StudentAvailableStudySlots { get; set; } = new List<StudentAvailableStudySlot>();
+>>>>>>> 10d440cfc50975d485254fa28852b6c95afd8a52
 =======
 
     public virtual ICollection<StudentAvailableStudySlot> StudentAvailableStudySlots { get; set; } = new List<StudentAvailableStudySlot>();
