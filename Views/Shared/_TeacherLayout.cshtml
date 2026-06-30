@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AI Learn (Teacher)</title>
+    <title>@ViewData["Title"] - LMS Giảng Viên</title>
 
     <!-- Bootstrap 5.3 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -18,6 +18,9 @@
 
     <!-- Style overrides to support collapsible submenus and responsive drawer -->
     <style>
+        a, a:hover {
+            text-decoration: none !important;
+        }
         .sidebar {
             overflow-y: auto;
         }
@@ -27,6 +30,289 @@
         .sidebar::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
+        }
+        
+        /* Premium Button Overrides */
+        .btn, .btn-primary-ailearn, .btn-secondary-ailearn, .btn-outline-primary, .btn-outline-secondary {
+            text-decoration: none !important;
+        }
+        
+        .btn-primary-ailearn {
+            background-color: #6C63FF !important;
+            background: #6C63FF !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            border-radius: 9999px !important;
+            padding: 10px 24px !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            box-shadow: 0 4px 14px rgba(108, 99, 255, 0.25) !important;
+            transition: all 0.25s ease !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary-ailearn:hover {
+            transform: translateY(-1px) !important;
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.35) !important;
+            background-color: #5A52E6 !important;
+            background: #5A52E6 !important;
+            color: #FFFFFF !important;
+        }
+        
+        .btn-secondary-ailearn {
+            background-color: #F1F5F9 !important;
+            color: #334155 !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 9999px !important;
+            padding: 10px 24px !important;
+            font-weight: 600 !important;
+            font-size: 0.85rem !important;
+            transition: all 0.25s ease !important;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-secondary-ailearn:hover {
+            background-color: #E2E8F0 !important;
+            color: #1E293B !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        /* Action buttons in tables */
+        .btn-action-edit {
+            background-color: rgba(108, 99, 255, 0.1) !important;
+            color: #6C63FF !important;
+            border: none !important;
+            border-radius: 8px !important;
+            width: 34px !important;
+            height: 34px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .btn-action-edit:hover {
+            background-color: #6C63FF !important;
+            color: #FFFFFF !important;
+            transform: scale(1.05) !important;
+        }
+        
+        .btn-action-delete {
+            background-color: rgba(239, 68, 68, 0.1) !important;
+            color: #EF4444 !important;
+            border: none !important;
+            border-radius: 8px !important;
+            width: 34px !important;
+            height: 34px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .btn-action-delete:hover {
+            background-color: #EF4444 !important;
+            color: #FFFFFF !important;
+            transform: scale(1.05) !important;
+        }
+        
+        /* Refresh button */
+        .btn-refresh-ailearn {
+            background-color: #F1F5F9 !important;
+            color: #64748B !important;
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 12px !important;
+            width: 42px !important;
+            height: 42px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .btn-refresh-ailearn:hover {
+            background-color: #E2E8F0 !important;
+            color: #334155 !important;
+            transform: rotate(45deg) !important;
+        }
+        
+        /* Premium Form Controls */
+        .form-control, .form-select {
+            border: 1px solid #E2E8F0 !important;
+            border-radius: 12px !important;
+            padding: 10px 16px !important;
+            font-size: 0.9rem !important;
+            transition: all 0.2s ease !important;
+            background-color: #FFFFFF !important;
+        }
+        .form-control:focus, .form-select:focus {
+            outline: none !important;
+            border-color: #6C63FF !important;
+            box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+        }
+
+        /* Dynamic Synchronization of Buttons to Brand Purple */
+        .bg-blue-600, .bg-indigo-600, .bg-indigo-650, .bg-blue-650, 
+        .bg-blue-700, .bg-indigo-700, .hover\:bg-blue-700:hover, 
+        .hover\:bg-indigo-700:hover, .btn-primary, .bg-indigo-650,
+        a[href*="/Create"].bg-blue-600, a[href*="/Create"].bg-indigo-600,
+        a[href*="/Create"].btn-primary-ailearn, a[href*="/Create"].px-4,
+        a[href*="/Create"].px-5 {
+            background-color: #6C63FF !important;
+            background: #6C63FF !important;
+            color: #FFFFFF !important;
+            border: none !important;
+            text-decoration: none !important;
+            border-radius: 9999px !important;
+            box-shadow: 0 4px 14px rgba(108, 99, 255, 0.25) !important;
+        }
+        .bg-blue-600:hover, .bg-indigo-600:hover, .bg-blue-700:hover, 
+        .bg-indigo-700:hover, .btn-primary:hover,
+        a[href*="/Create"].bg-blue-600:hover, a[href*="/Create"].bg-indigo-600:hover,
+        a[href*="/Create"].btn-primary-ailearn:hover {
+            background-color: #5A52E6 !important;
+            background: #5A52E6 !important;
+            color: #FFFFFF !important;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(108, 99, 255, 0.35) !important;
+        }
+        
+        /* Red/Danger Warning Buttons Sync */
+        .bg-red-650, .bg-red-700, .btn-danger, .btn-danger-ailearn,
+        button[type="submit"].bg-red-650, button[type="submit"].bg-red-700 {
+            background-color: #EF4444 !important;
+            background: #EF4444 !important;
+            color: #FFFFFF !important;
+            border-radius: 9999px !important;
+            border: none !important;
+            box-shadow: 0 4px 14px rgba(239, 68, 68, 0.25) !important;
+            font-weight: 600 !important;
+            transition: all 0.25s ease !important;
+            padding: 10px 24px !important;
+        }
+        .bg-red-650:hover, .bg-red-700:hover, .btn-danger:hover, .btn-danger-ailearn:hover,
+        button[type="submit"].bg-red-650:hover, button[type="submit"].bg-red-700:hover {
+            background-color: #DC2626 !important;
+            background: #DC2626 !important;
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.35) !important;
+            transform: translateY(-1px);
+        }
+        
+        /* Links and Text Brand color sync */
+        .text-blue-600, .text-indigo-600, .text-blue-650, .text-indigo-650, 
+        .hover\:text-blue-700:hover, .hover\:text-indigo-700:hover {
+            color: #6C63FF !important;
+        }
+        .text-blue-600:hover, .text-indigo-600:hover {
+            color: #5A52E6 !important;
+        }
+        
+        /* Border color sync */
+        .border-blue-600, .border-indigo-600, .border-blue-500, .border-indigo-500 {
+            border-color: #6C63FF !important;
+        }
+        
+        /* Shadows sync */
+        .shadow-blue-600\/10, .shadow-purple-500\/20, .shadow-purple-500\/15 {
+            box-shadow: 0 4px 15px rgba(108, 99, 255, 0.2) !important;
+        }
+
+        /* Kill browser default underlines globally for main content area links */
+        .main-content a {
+            text-decoration: none !important;
+        }
+
+        /* Premium Toast Notifications */
+        #toastContainer {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+            max-width: 380px;
+            width: 100%;
+        }
+        .toast-notification {
+            pointer-events: auto;
+            background: rgba(255, 255, 255, 0.85) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.5) !important;
+            border-radius: 16px !important;
+            padding: 16px 20px !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02) !important;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            transform: translateX(120%);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        .toast-notification::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+        }
+        .toast-notification.success::before { background-color: #10B981; }
+        .toast-notification.danger::before { background-color: #EF4444; }
+        .toast-notification.warning::before { background-color: #F59E0B; }
+        .toast-notification.info::before { background-color: #3B82F6; }
+
+        .toast-icon {
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .toast-notification.success .toast-icon { color: #10B981; }
+        .toast-notification.danger .toast-icon { color: #EF4444; }
+        .toast-notification.warning .toast-icon { color: #F59E0B; }
+        .toast-notification.info .toast-icon { color: #3B82F6; }
+
+        .toast-content {
+            flex-grow: 1;
+        }
+        .toast-title {
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: #1E293B;
+            margin: 0 0 2px 0;
+        }
+        .toast-message {
+            font-size: 0.8rem;
+            color: #64748B;
+            margin: 0;
+            line-height: 1.4;
+        }
+        .toast-close {
+            background: none;
+            border: none;
+            color: #94A3B8;
+            cursor: pointer;
+            padding: 4px;
+            font-size: 0.85rem;
+            transition: color 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .toast-close:hover {
+            color: #64748B;
         }
     </style>
 
@@ -135,6 +421,12 @@
                             <span>Cài đặt</span>
                         </a>
                     </li>
+                    <li class="menu-item">
+                        <a href="/Account/Logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Đăng xuất</span>
+                        </a>
+                    </li>
                 </ul>
             </div>
 
@@ -152,22 +444,24 @@
         <main class="main-content">
             <!-- Header bar -->
             <header class="app-header">
-                <!-- Title / Breadcrumb replacement -->
-                <div class="d-flex align-items-center gap-2">
-                    <h5 class="m-0 font-weight-bold text-dark">LMS Giảng Viên</h5>
+                <!-- Search -->
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Tìm kiếm nhanh..." id="headerSearchInput" />
                 </div>
 
                 <!-- Header Actions -->
                 <div class="header-actions">
+                    <!-- Notification -->
+                    <button class="notification-btn" title="Thông báo">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+
                     <!-- User Profile Dropdown -->
                     <a href="/Teacher/Profile" class="profile-dropdown-btn">
                         <img src="@(User.FindFirst("AvatarUrl")?.Value ?? "/default-images/avatar.png")" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "GV")&background=6C63FF&color=fff'" />
                         <span class="d-none d-md-inline">@User.Identity?.Name</span>
-                    </a>
-
-                    <!-- Logout link -->
-                    <a href="/Account/Logout" class="text-danger ms-2" title="Đăng xuất">
-                        <i class="fa-solid fa-right-from-bracket"></i>
                     </a>
                 </div>
             </header>
@@ -179,9 +473,263 @@
         </main>
     </div>
 
+    <!-- Global AJAX Modal -->
+    <div class="modal fade" id="globalAjaxModal" tabindex="-1" aria-labelledby="globalAjaxModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-2xl shadow-lg">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <h5 class="modal-title font-weight-bold text-dark px-4 pt-3" id="globalAjaxModalLabel">Thao tác</h5>
+                    <button type="button" class="btn-close me-3 mt-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4" id="globalAjaxModalBody">
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
+
+    <!-- Scripts -->
+    <script src="/lib/jquery/dist/jquery.min.js"></script>
     <!-- Bootstrap 5.3 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
+    <!-- jQuery Validation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.13/jquery.validate.unobtrusive.min.js"></script>
+
+    <!-- Global Modal & Toast Interceptor Script -->
+    <script>
+        function showToast(message, type = 'success', title = '') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            // Generate title based on type if empty
+            if (!title) {
+                title = type === 'success' ? 'Thành công' : 
+                        type === 'danger' ? 'Lỗi' : 
+                        type === 'warning' ? 'Cảnh báo' : 'Thông báo';
+            }
+
+            // Get corresponding icon
+            const icon = type === 'success' ? 'fa-circle-check' : 
+                         type === 'danger' ? 'fa-circle-xmark' : 
+                         type === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-info';
+
+            const toast = document.createElement('div');
+            toast.className = `toast-notification ${type}`;
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fa-solid ${icon}"></i>
+                </div>
+                <div class="toast-content">
+                    <h5 class="toast-title">${title}</h5>
+                    <p class="toast-message">${message}</p>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation frame to slide in
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                // Remove element after transition ends
+                toast.addEventListener('transitionend', () => {
+                    toast.remove();
+                });
+            }, 4000);
+        }
+
+        // Show TempData alerts on load
+        $(document).ready(function() {
+            @if (TempData["Success"] != null) {
+                <text>showToast('@Html.Raw(TempData["Success"])', 'success');</text>
+            }
+            @if (TempData["Error"] != null) {
+                <text>showToast('@Html.Raw(TempData["Error"])', 'danger');</text>
+            }
+            @if (TempData["Warning"] != null) {
+                <text>showToast('@Html.Raw(TempData["Warning"])', 'warning');</text>
+            }
+            @if (TempData["Info"] != null) {
+                <text>showToast('@Html.Raw(TempData["Info"])', 'info');</text>
+            }
+        });
+        function polishButtons() {
+            // Remove text underlines from all buttons and specific action links
+            $('.btn, .btn-primary-ailearn, .btn-secondary-ailearn, .btn-outline-primary, .btn-outline-secondary, a[href*="/Edit/"], a[href*="/Delete/"], a[href*="/Details/"]').css('text-decoration', 'none');
+
+            // Convert raw action links to premium action buttons in tables
+            $('a[href*="/Edit/"]').each(function() {
+                const $btn = $(this);
+                if ($btn.find('.fa-pen, .fa-pencil, .fa-edit').length > 0 || $btn.attr('title') === 'Sửa' || $btn.text().trim() === '') {
+                    $btn.removeClass().addClass('btn-action-edit').attr('title', 'Sửa').html('<i class="fa-solid fa-pen"></i>');
+                }
+            });
+            
+            $('a[href*="/Delete/"]').each(function() {
+                const $btn = $(this);
+                if ($btn.find('.fa-trash, .fa-trash-can, .fa-destroy').length > 0 || $btn.attr('title') === 'Xóa' || $btn.text().trim() === '') {
+                    $btn.removeClass().addClass('btn-action-delete').attr('title', 'Xóa').html('<i class="fa-solid fa-trash"></i>');
+                }
+            });
+            
+            // Format refresh buttons
+            $('a[href*="/Teacher/"][title*="mới"], a[href*="/Teacher/"][title*="Refresh"], a[href*="/Teacher/"][title*="Mới"], a[title="Làm mới"]').each(function() {
+                const href = $(this).attr('href');
+                if (href && (href.endsWith('/Courses') || href.endsWith('/Lessons') || href.endsWith('/Assignments') || href.endsWith('/Quizzes') || href.endsWith('/Schedule') || href.endsWith('/Resources'))) {
+                    $(this).removeClass().addClass('btn-refresh-ailearn').html('<i class="fa-solid fa-rotate"></i>');
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            polishButtons();
+            
+            // Re-polish when content changes (ajax, pagination, etc.)
+            $(document).ajaxComplete(function() {
+                polishButtons();
+            });
+
+            $(document).on('click', 'a[href*="/Teacher/"]', function(e) {
+                const href = $(this).attr('href');
+                if (!href) return;
+                
+                const lowerHref = href.toLowerCase();
+                const isCreate = lowerHref.includes('/create') && !lowerHref.includes('questionbank');
+                const isEdit = lowerHref.includes('/edit');
+                const isDelete = lowerHref.includes('/delete');
+                const isGrade = lowerHref.includes('/grade/'); // For grading popup
+                
+                if (!isCreate && !isEdit && !isDelete && !isGrade) return;
+                if ($(this).hasClass('no-modal') || $(this).attr('target') === '_blank') return;
+                
+                e.preventDefault();
+                
+                const title = $(this).attr('title') || $(this).text().trim() || 'Thao tác';
+                
+                const $dialog = $('#globalAjaxModal .modal-dialog');
+                if (isDelete) {
+                    $dialog.removeClass('modal-lg').addClass('modal-md');
+                } else {
+                    $dialog.removeClass('modal-md').addClass('modal-lg');
+                }
+                
+                $('#globalAjaxModalLabel').text(title);
+                $('#globalAjaxModalBody').html(`
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `);
+                
+                const modalEl = document.getElementById('globalAjaxModal');
+                const myModal = new bootstrap.Modal(modalEl);
+                myModal.show();
+                
+                $.get(href, function(html) {
+                    const $parsed = $(html);
+                    
+                    let $content = $parsed.find('.max-w-2xl, .max-w-md, .max-w-4xl, .max-w-7xl');
+                    if ($content.length === 0) {
+                        $content = $parsed.find('form');
+                    }
+                    if ($content.length === 0) {
+                        $content = $parsed;
+                    }
+                    
+                    // Defensive cleanup: ensure sidebar and top layout headers are never loaded inside modal
+                    $content.find('.sidebar, .app-header, header, aside, .sidebar-user').remove();
+                    $content.find('.flex.items-center.gap-2, a:contains("Quay lại"), a:contains("back")').remove();
+                    $content.find('h1, h2, p.text-muted').remove();
+                    
+                    $('#globalAjaxModalBody').html($content);
+                    
+                    // Style buttons inside modal
+                    polishButtons();
+                    
+                    if (window.jQuery && $.validator && $.validator.unobtrusive) {
+                        $.validator.unobtrusive.parse("#globalAjaxModalBody form");
+                    }
+                    
+                    $('#globalAjaxModalBody form').on('submit', function(eForm) {
+                        if ($(this).data('validator') && !$(this).valid()) {
+                            return;
+                        }
+                        
+                        eForm.preventDefault();
+                        
+                        const formAction = $(this).attr('action') || href;
+                        const formData = new FormData(this);
+                        
+                        const $submitBtn = $(this).find('button[type="submit"]');
+                        const originalBtnHtml = $submitBtn.html();
+                        $submitBtn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> Đang lưu...');
+                        
+                        $.ajax({
+                            url: formAction,
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                if (response.indexOf('<!DOCTYPE html>') !== -1 || response.indexOf('app-container') !== -1) {
+                                    myModal.hide();
+                                    window.location.reload();
+                                } else {
+                                    const $resParsed = $(response);
+                                    let $resContent = $resParsed.find('.max-w-2xl, .max-w-md, .max-w-4xl, .max-w-7xl');
+                                    if ($resContent.length === 0) {
+                                        $resContent = $resParsed.find('form');
+                                    }
+                                    if ($resContent.length === 0) {
+                                        $resContent = $resParsed;
+                                    }
+                                    $resContent.find('.sidebar, .app-header, header, aside, .sidebar-user').remove();
+                                    $resContent.find('.flex.items-center.gap-2, a:contains("Quay lại"), a:contains("back")').remove();
+                                    $resContent.find('h1, h2, p.text-muted').remove();
+                                    
+                                    $('#globalAjaxModalBody').html($resContent);
+                                    polishButtons();
+                                    if ($.validator && $.validator.unobtrusive) {
+                                        $.validator.unobtrusive.parse("#globalAjaxModalBody form");
+                                    }
+                                }
+                            },
+                            error: function() {
+                                $submitBtn.prop('disabled', false).html(originalBtnHtml);
+                                alert('Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.');
+                            }
+                        });
+                    });
+                    
+                    // Bind cancel buttons inside modal to close it instead of redirecting
+                    $('#globalAjaxModalBody').find('a:contains("Hủy"), a:contains("Cancel")').removeClass().addClass('btn btn-secondary-ailearn no-modal').on('click', function(eCancel) {
+                        eCancel.preventDefault();
+                        myModal.hide();
+                    });
+                }).fail(function() {
+                    $('#globalAjaxModalBody').html('<p class="text-danger text-center">Không thể tải nội dung. Vui lòng thử lại.</p>');
+                });
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+

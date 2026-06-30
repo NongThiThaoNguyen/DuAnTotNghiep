@@ -16,53 +16,79 @@
     var nodeValues = ViewBag.NodeValues as List<int> ?? new List<int>();
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/statistics.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
-    <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Báo cáo & Phân tích chuyên sâu</h1>
-        <p class="text-muted m-0 small">Xem biểu đồ phân tích kỹ năng học viên, chuyên cần, và tiến trình hoàn thành bài học.</p>
-    </div>
-</div>
-
-<!-- Summary Metrics Grid -->
-<div class="stats-summary-grid">
-    <div class="card-ailearn d-flex flex-column justify-content-between">
-        <span class="text-muted small uppercase font-weight-bold tracking-wider">Học viên hoạt động</span>
-        <div class="fs-2 font-weight-bold text-primary mt-1">@totalStudents</div>
-        <span class="text-muted small mt-1">Tài khoản student active</span>
-    </div>
-    <div class="card-ailearn d-flex flex-column justify-content-between">
-        <span class="text-muted small uppercase font-weight-bold tracking-wider">Khóa học hiện có</span>
-        <div class="fs-2 font-weight-bold text-dark mt-1">@totalCourses</div>
-        <span class="text-muted small mt-1">Khóa học đang phát hành</span>
-    </div>
-    <div class="card-ailearn d-flex flex-column justify-content-between">
-        <span class="text-muted small uppercase font-weight-bold tracking-wider">Bài giảng biên soạn</span>
-        <div class="fs-2 font-weight-bold text-dark mt-1">@totalLessons</div>
-        <span class="text-muted small mt-1">Tài liệu học tập chi tiết</span>
-    </div>
-    <div class="card-ailearn d-flex flex-column justify-content-between">
-        <span class="text-muted small uppercase font-weight-bold tracking-wider">Bài làm thực hành</span>
-        <div class="fs-2 font-weight-bold text-success mt-1">@totalSubmissions</div>
-        <span class="text-muted small mt-1">Tổng lượt nộp bài của lớp</span>
-    </div>
-</div>
-
-<!-- Charts Row (2 columns) -->
-<div class="row g-4 mb-4">
+<div class="max-w-7xl mx-auto py-8 px-4 font-sans space-y-8">
     
-    <!-- 1. Attendance Distribution (Donut Display) -->
-    <div class="col-md-6">
-        <div class="card-ailearn h-100">
-            <h3 class="fs-6 text-dark font-weight-bold mb-3 pb-2 border-bottom"><i class="fa-solid fa-user-check text-primary me-2"></i>Phân phối Điểm danh</h3>
+    <!-- Title Header -->
+    <div class="border-b border-slate-100 pb-4">
+        <h1 class="text-2xl font-black text-slate-900 leading-tight">Báo cáo & Phân tích chuyên sâu</h1>
+        <p class="text-slate-500 text-sm mt-1">Xem biểu đồ phân tích kỹ năng học viên, chuyên cần, và tiến trình hoàn thành bài học.</p>
+    </div>
+
+    <!-- Summary Metrics Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Card 1: Active Students -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-between hover:shadow-md transition-all duration-300">
+            <div class="space-y-1">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Học viên hoạt động</span>
+                <div class="text-3xl font-black text-slate-800">@totalStudents</div>
+                <span class="block text-[11px] text-slate-500 font-medium">Tài khoản student active</span>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg shadow-sm">
+                <i class="fa-solid fa-users"></i>
+            </div>
+        </div>
+
+        <!-- Card 2: Total Courses -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-between hover:shadow-md transition-all duration-300">
+            <div class="space-y-1">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Khóa học hiện có</span>
+                <div class="text-3xl font-black text-slate-800">@totalCourses</div>
+                <span class="block text-[11px] text-slate-500 font-medium">Khóa học đang phát hành</span>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-lg shadow-sm">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </div>
+        </div>
+
+        <!-- Card 3: Total Lessons -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-between hover:shadow-md transition-all duration-300">
+            <div class="space-y-1">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bài giảng biên soạn</span>
+                <div class="text-3xl font-black text-slate-800">@totalLessons</div>
+                <span class="block text-[11px] text-slate-500 font-medium">Tài liệu học tập chi tiết</span>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-sm">
+                <i class="fa-solid fa-book-open"></i>
+            </div>
+        </div>
+
+        <!-- Card 4: Total Submissions -->
+        <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex items-center justify-between hover:shadow-md transition-all duration-300">
+            <div class="space-y-1">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Bài làm thực hành</span>
+                <div class="text-3xl font-black text-slate-800">@totalSubmissions</div>
+                <span class="block text-[11px] text-slate-500 font-medium">Tổng lượt nộp bài của lớp</span>
+            </div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg shadow-sm">
+                <i class="fa-solid fa-clipboard-check"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Row (2 columns) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        <!-- 1. Attendance Distribution -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+            <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <i class="fa-solid fa-user-check text-purple-500"></i>
+                Phân phối Điểm danh
+            </h3>
             
-            <div class="skills-progress-list">
+            <div class="space-y-5">
                 @if (!attendanceLabels.Any())
                 {
-                    <p class="text-muted small text-center py-4">Chưa có dữ liệu điểm danh.</p>
+                    <p class="text-slate-400 text-xs text-center py-8 italic">Chưa có dữ liệu điểm danh.</p>
                 }
                 @for (int i = 0; i < attendanceLabels.Count; i++)
                 {
@@ -71,42 +97,45 @@
                     var max = attendanceValues.Max();
                     var pct = max > 0 ? (double)val / max * 100 : 0;
                     
-                    <div class="skill-progress-item">
-                        <div class="skill-progress-header">
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-semibold text-slate-700">
                             <span>@label</span>
-                            <span>@val lượt</span>
+                            <span class="text-slate-500">@val lượt</span>
                         </div>
-                        <div class="skill-progress-track">
-                            <div class="skill-progress-fill listening" style="width: @pct%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="bg-purple-500 h-full rounded-full transition-all duration-300" style="width: @pct%"></div>
                         </div>
                     </div>
                 }
             </div>
         </div>
-    </div>
 
-    <!-- 2. Skill Performance Averages (Bar Display) -->
-    <div class="col-md-6">
-        <div class="card-ailearn h-100">
-            <h3 class="fs-6 text-dark font-weight-bold mb-3 pb-2 border-bottom"><i class="fa-solid fa-chart-line text-primary me-2"></i>Điểm số trung bình theo Kỹ năng</h3>
+        <!-- 2. Skill Performance Averages -->
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+            <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <i class="fa-solid fa-chart-line text-purple-500"></i>
+                Điểm số trung bình theo Kỹ năng
+            </h3>
             
-            <div class="skills-progress-list">
+            <div class="space-y-5">
                 @if (!skillLabels.Any())
                 {
-                    <p class="text-muted small text-center py-4">Chưa có bài viết/bài nói nào được chấm điểm.</p>
+                    <p class="text-slate-400 text-xs text-center py-8 italic">Chưa có bài viết/bài nói nào được chấm điểm.</p>
                 }
                 @for (int i = 0; i < skillLabels.Count; i++)
                 {
                     var label = skillLabels[i];
                     var val = skillValues[i];
+                    var colors = new[] { "bg-blue-500", "bg-emerald-500", "bg-amber-500", "bg-rose-500" };
+                    var colorClass = colors[i % 4];
                     
-                    <div class="skill-progress-item">
-                        <div class="skill-progress-header">
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between text-xs font-semibold text-slate-700">
                             <span>@label</span>
-                            <span class="text-success font-weight-bold">@val.ToString("0.0")đ</span>
+                            <span class="text-emerald-600 font-extrabold">@val.ToString("0.0")đ</span>
                         </div>
-                        <div class="skill-progress-track">
-                            <div class="skill-progress-fill speaking" style="width: @(val * 10)%"></div>
+                        <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden">
+                            <div class="@colorClass h-full rounded-full transition-all duration-300" style="width: @(val * 10)%"></div>
                         </div>
                     </div>
                 }
@@ -115,34 +144,42 @@
     </div>
 
     <!-- 3. Learning Path Progress Distribution -->
-    <div class="col-12 mt-4">
-        <div class="card-ailearn">
-            <h3 class="fs-6 text-dark font-weight-bold mb-3 pb-2 border-bottom"><i class="fa-solid fa-route text-primary me-2"></i>Tiến trình Node lộ trình của học viên</h3>
-            
-            <div class="row g-3">
-                @if (!nodeLabels.Any())
-                {
-                    <p class="text-muted small text-center py-4 col-12">Chưa có thông tin tiến trình lộ trình học tập.</p>
-                }
-                @for (int i = 0; i < nodeLabels.Count; i++)
-                {
-                    var label = nodeLabels[i];
-                    var val = nodeValues[i];
-                    var max = nodeValues.Max();
-                    var pct = max > 0 ? (double)val / max * 100 : 0;
-                    
-                    <div class="col-md-4">
-                        <div class="p-3 bg-light rounded-3 border">
-                            <span class="text-muted small uppercase font-weight-bold tracking-wider">Trạng thái: @label</span>
-                            <div class="fs-4 font-weight-bold text-dark mt-1">@val bài</div>
-                            <div class="progress mt-2" style="height: 5px;">
-                                <div class="progress-bar bg-primary" role="progressbar" style="width: @pct%"></div>
-                            </div>
-                        </div>
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
+        <h3 class="text-base font-extrabold text-slate-900 flex items-center gap-2 border-b border-slate-100 pb-3">
+            <i class="fa-solid fa-route text-purple-500"></i>
+            Tiến trình Node lộ trình của học viên
+        </h3>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            @if (!nodeLabels.Any())
+            {
+                <p class="text-slate-400 text-xs text-center py-8 col-span-full italic">Chưa có thông tin tiến trình lộ trình học tập.</p>
+            }
+            @for (int i = 0; i < nodeLabels.Count; i++)
+            {
+                var label = nodeLabels[i];
+                var val = nodeValues[i];
+                var max = nodeValues.Max();
+                var pct = max > 0 ? (double)val / max * 100 : 0;
+                
+                var badgeColor = label.ToUpper() switch {
+                    "COMPLETED" => "bg-emerald-50 text-emerald-700 border-emerald-100",
+                    "IN_PROGRESS" => "bg-blue-50 text-blue-700 border-blue-100",
+                    "AVAILABLE" => "bg-indigo-50 text-indigo-700 border-indigo-100",
+                    "LOCKED" => "bg-slate-50 text-slate-650 border-slate-100",
+                    _ => "bg-rose-50 text-rose-700 border-rose-100"
+                };
+                
+                <div class="p-4 bg-slate-50/50 border border-slate-150 rounded-2xl space-y-2 hover:bg-slate-50 transition-colors">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[9px] font-bold border @badgeColor">
+                        @label
+                    </span>
+                    <div class="text-lg font-black text-slate-800">@val bài</div>
+                    <div class="w-full bg-slate-200/80 rounded-full h-1 overflow-hidden">
+                        <div class="bg-purple-500 h-full rounded-full" style="width: @pct%"></div>
                     </div>
-                }
-            </div>
+                </div>
+            }
         </div>
     </div>
-
 </div>

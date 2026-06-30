@@ -4,71 +4,78 @@
     var avatar = string.IsNullOrEmpty(Model.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.FullName ?? "GV")}&background=6C63FF&color=fff" : Model.AvatarUrl;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
-    <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Hồ sơ cá nhân</h1>
-        <p class="text-muted m-0 small">Quản lý và cập nhật thông tin cá nhân của bạn trên hệ thống.</p>
+<div class="max-w-4xl mx-auto py-8 px-4 font-sans space-y-8">
+    
+    <!-- Title Header -->
+    <div class="border-b border-slate-100 pb-4">
+        <h1 class="text-2xl font-black text-slate-900 leading-tight">Hồ sơ cá nhân</h1>
+        <p class="text-slate-500 text-sm mt-1">Quản lý và cập nhật thông tin cá nhân của bạn trên hệ thống.</p>
     </div>
-</div>
 
-<div class="row justify-content-center">
-    <div class="col-md-8">
-        <div class="card-ailearn p-4">
-            
-            <!-- Avatar Section -->
-            <div class="d-flex align-items-center gap-4 mb-4 pb-3 border-bottom">
-                <img src="@avatar" alt="Avatar" class="user-avatar-sidebar border border-2 border-primary" style="width: 56px; height: 56px;" onerror="this.src='https://ui-avatars.com/api/?name=GV&background=6C63FF&color=fff';" />
-                <div>
-                    <h4 class="text-dark font-weight-bold mb-1 fs-5">@Model.FullName</h4>
-                    <p class="text-muted small mb-0">Tài khoản: @Model.Email | Quyền: Giảng viên</p>
-                </div>
+    <!-- Main Profile Card -->
+    <div class="bg-white rounded-3xl border border-slate-200 shadow-md p-8 relative overflow-hidden">
+        <!-- Top decorative gradient line -->
+        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500"></div>
+
+        <!-- Avatar & User Metadata Block -->
+        <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-100 mb-6">
+            <div class="relative">
+                <img src="@avatar" alt="Avatar" class="w-24 h-24 rounded-full object-cover ring-4 ring-purple-100 shadow-md" onerror="this.src='https://ui-avatars.com/api/?name=GV&background=6C63FF&color=fff';" />
+                <span class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full" title="Online"></span>
             </div>
+            <div class="text-center sm:text-left space-y-1.5">
+                <h4 class="text-xl font-bold text-slate-800">@Model.FullName</h4>
+                <p class="text-slate-400 text-xs flex flex-wrap items-center justify-center sm:justify-start gap-2">
+                    <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-600 font-bold">Giảng viên</span>
+                    <span class="text-slate-300">|</span>
+                    <span>Tài khoản: @Model.Email</span>
+                </p>
+            </div>
+        </div>
 
-            <form asp-action="Update" method="post" class="d-flex flex-column gap-3">
-                <input type="hidden" asp-for="Id" />
-                <input type="hidden" asp-for="PasswordHash" />
-                <input type="hidden" asp-for="RoleId" />
-                <input type="hidden" asp-for="Status" />
+        <!-- Edit Form -->
+        <form asp-action="Update" method="post" class="space-y-6">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="PasswordHash" />
+            <input type="hidden" asp-for="RoleId" />
+            <input type="hidden" asp-for="Status" />
 
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <!-- FullName -->
-                <div>
-                    <label asp-for="FullName" class="form-label text-muted small uppercase font-weight-bold mb-1">Họ và tên</label>
-                    <input asp-for="FullName" class="form-control border-1 rounded-3" required />
-                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                <div class="space-y-1.5">
+                    <label asp-for="FullName" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Họ và tên</label>
+                    <input asp-for="FullName" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập họ và tên..." required />
+                    <span asp-validation-for="FullName" class="text-xs text-red-500"></span>
                 </div>
 
                 <!-- Email -->
-                <div>
-                    <label asp-for="Email" class="form-label text-muted small uppercase font-weight-bold mb-1">Email liên hệ</label>
-                    <input asp-for="Email" type="email" class="form-control border-1 rounded-3" required />
-                    <span asp-validation-for="Email" class="text-danger small"></span>
+                <div class="space-y-1.5">
+                    <label asp-for="Email" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email liên hệ</label>
+                    <input asp-for="Email" type="email" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="example@domain.com" required />
+                    <span asp-validation-for="Email" class="text-xs text-red-500"></span>
                 </div>
 
                 <!-- Phone -->
-                <div>
-                    <label asp-for="Phone" class="form-label text-muted small uppercase font-weight-bold mb-1">Số điện thoại</label>
-                    <input asp-for="Phone" class="form-control border-1 rounded-3" />
-                    <span asp-validation-for="Phone" class="text-danger small"></span>
+                <div class="space-y-1.5">
+                    <label asp-for="Phone" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Số điện thoại</label>
+                    <input asp-for="Phone" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập số điện thoại..." />
+                    <span asp-validation-for="Phone" class="text-xs text-red-500"></span>
                 </div>
 
                 <!-- AvatarUrl -->
-                <div>
-                    <label asp-for="AvatarUrl" class="form-label text-muted small uppercase font-weight-bold mb-1">Đường dẫn ảnh đại diện (Avatar URL)</label>
-                    <input asp-for="AvatarUrl" class="form-control border-1 rounded-3" placeholder="http://example.com/avatar.jpg..." />
-                    <span asp-validation-for="AvatarUrl" class="text-danger small"></span>
+                <div class="space-y-1.5">
+                    <label asp-for="AvatarUrl" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Đường dẫn ảnh đại diện (Avatar URL)</label>
+                    <input asp-for="AvatarUrl" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="http://example.com/avatar.jpg..." />
+                    <span asp-validation-for="AvatarUrl" class="text-xs text-red-500"></span>
                 </div>
+            </div>
 
-                <!-- Submit buttons -->
-                <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
-                    <button type="submit" class="btn btn-primary-ailearn">
-                        <i class="fa-solid fa-save me-1"></i> Cập nhật hồ sơ
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="flex items-center justify-end gap-3 pt-5 border-t border-slate-100">
+                <button type="submit" class="btn btn-primary-ailearn">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    Cập nhật hồ sơ
+                </button>
+            </div>
+        </form>
     </div>
 </div>
