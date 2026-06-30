@@ -22,6 +22,21 @@ namespace DuAnTotNghiep.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (roleClaim != null)
+                {
+                    string roleCode = roleClaim.ToUpper().Trim();
+                    return roleCode switch
+                    {
+                        "ADMIN" => RedirectToAction("Index", "Home", new { area = "Admin" }),
+                        "TEACHER" => RedirectToAction("Index", "Home", new { area = "Teacher" }),
+                        _ => RedirectToAction("Index", "Dashboard") // STUDENT
+                    };
+                }
+                return RedirectToAction("Index", "Dashboard");
+            }
             return View();
         }
 
@@ -49,6 +64,21 @@ namespace DuAnTotNghiep.Controllers
         [HttpGet]
         public IActionResult Login()
         {
+            if (User.Identity?.IsAuthenticated == true)
+            {
+                var roleClaim = User.FindFirst(ClaimTypes.Role)?.Value;
+                if (roleClaim != null)
+                {
+                    string roleCode = roleClaim.ToUpper().Trim();
+                    return roleCode switch
+                    {
+                        "ADMIN" => RedirectToAction("Index", "Home", new { area = "Admin" }),
+                        "TEACHER" => RedirectToAction("Index", "Home", new { area = "Teacher" }),
+                        _ => RedirectToAction("Index", "Dashboard") // STUDENT
+                    };
+                }
+                return RedirectToAction("Index", "Dashboard");
+            }
             return View();
         }
 

@@ -9,6 +9,7 @@ using DuAnTotNghiep.Services.Validators;
 using DuAnTotNghiep.Data.Seeders;
 using DuAnTotNghiep.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 Console.WriteLine("CONNECTION STRING IS: " + builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -138,6 +139,30 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.Cookie.SameSite = SameSiteMode.Strict;
         options.ExpireTimeSpan = TimeSpan.FromDays(1);
         options.SlidingExpiration = true;
+        options.Events = new CookieAuthenticationEvents
+        {
+            OnValidatePrincipal = async context =>
+            {
+                var userPrincipal = context.Principal;
+                var sessionToken = userPrincipal?.FindFirst("SessionToken")?.Value;
+
+                if (string.IsNullOrEmpty(sessionToken))
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    return;
+                }
+
+                var dbContext = context.HttpContext.RequestServices.GetRequiredService<ApplicationDbContext>();
+                var session = await dbContext.UserSessions.FirstOrDefaultAsync(s => s.SessionToken == sessionToken);
+
+                if (session == null || session.RevokedAt != null || session.ExpiresAt < DateTime.UtcNow)
+                {
+                    context.RejectPrincipal();
+                    await context.HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                }
+            }
+        };
     });
 
 var app = builder.Build();
