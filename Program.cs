@@ -123,6 +123,7 @@ builder.Services.AddSingleton<IAiLoggingService, AiLoggingService>();
 
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();
+builder.Services.AddScoped<AILearnSeeder>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IM4SchemaService, DuAnTotNghiep.Services.M4SchemaService>();
 
 // Đăng ký Authentication
@@ -169,8 +170,18 @@ app.MapControllerRoute(
 // Chạy Database Seeder
 using (var scope = app.Services.CreateScope())
 {
-    var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
-    await seeder.SeedAsync();
+    try
+    {
+        var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+        await seeder.SeedAsync();
+
+        var aiSeeder = scope.ServiceProvider.GetRequiredService<AILearnSeeder>();
+        await aiSeeder.SeedAsync();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error during database seeding: {ex.Message}");
+    }
 }
 
 app.Run();

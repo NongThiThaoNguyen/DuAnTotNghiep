@@ -1,0 +1,118 @@
+@model List<DuAnTotNghiep.Areas.Teacher.Controllers.AttendanceController.StudentAttendanceViewModel>
+@{
+    ViewData["Title"] = "Điểm danh học viên";
+    var topicId = ViewBag.TopicId as int?;
+    var selectedDate = ViewBag.SelectedDate as string;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
+}
+
+<div class="courses-header mb-4">
+    <div>
+        <h1 class="text-dark m-0 fs-3 font-weight-bold">Điểm danh học viên</h1>
+        <p class="text-muted m-0 small">Điểm danh điểm số chuyên cần và ghi chú tình hình học tập hàng ngày.</p>
+    </div>
+    <a href="/Teacher/Attendance/History" class="btn btn-secondary-ailearn">
+        Lịch sử điểm danh &rarr;
+    </a>
+</div>
+
+<!-- Selection Bar -->
+<div class="card-ailearn mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-5">
+            <label class="form-label text-muted small uppercase font-weight-bold">Khóa học</label>
+            <select name="topicId" asp-items="ViewBag.TopicsList" class="form-select border-1 rounded-3" required>
+                <option value="">-- Chọn khóa học --</option>
+            </select>
+        </div>
+        
+        <div class="col-md-4">
+            <label class="form-label text-muted small uppercase font-weight-bold">Ngày điểm danh</label>
+            <input type="date" name="date" value="@selectedDate" class="form-control border-1 rounded-3" required />
+        </div>
+
+        <div class="col-md-3 d-grid">
+            <button type="submit" class="btn btn-primary-ailearn btn-sm">Tải danh sách</button>
+        </div>
+    </form>
+</div>
+
+@if (topicId.HasValue)
+{
+    <!-- Attendance Form list Card -->
+    <div class="card-ailearn p-0 overflow-hidden">
+        <form asp-action="Save" method="post">
+            <input type="hidden" name="topicId" value="@topicId" />
+            <input type="hidden" name="date" value="@selectedDate" />
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted small font-weight-bold uppercase bg-light">
+                            <th class="py-3 px-4">Học viên</th>
+                            <th class="py-3 px-4 text-center">Điểm danh</th>
+                            <th class="py-3 px-4">Ghi chú</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="3" class="py-4 text-center text-muted small">Không có học viên hoạt động trong lớp này.</td>
+                            </tr>
+                        }
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            <tr>
+                                <td class="py-3 px-4">
+                                    <div class="d-flex flex-column">
+                                        <span class="font-weight-bold text-dark">@Model[i].StudentName</span>
+                                        <span class="text-muted small">@Model[i].StudentEmail</span>
+                                    </div>
+                                    <input type="hidden" name="attendances[@i].StudentId" value="@Model[i].StudentId" />
+                                    <input type="hidden" name="attendances[@i].StudentName" value="@Model[i].StudentName" />
+                                    <input type="hidden" name="attendances[@i].StudentEmail" value="@Model[i].StudentEmail" />
+                                </td>
+                                <td class="py-3 px-4">
+                                    <div class="d-flex align-items-center justify-content-center gap-3">
+                                        <div class="form-check form-check-inline m-0">
+                                            <input class="form-check-input" type="radio" name="attendances[@i].Status" id="pres_@i" value="PRESENT" @(Model[i].Status == "PRESENT" ? "checked" : "") />
+                                            <label class="form-check-label text-success font-weight-bold small" for="pres_@i">Đi học</label>
+                                        </div>
+                                        <div class="form-check form-check-inline m-0">
+                                            <input class="form-check-input" type="radio" name="attendances[@i].Status" id="late_@i" value="LATE" @(Model[i].Status == "LATE" ? "checked" : "") />
+                                            <label class="form-check-label text-warning font-weight-bold small" for="late_@i">Muộn</label>
+                                        </div>
+                                        <div class="form-check form-check-inline m-0">
+                                            <input class="form-check-input" type="radio" name="attendances[@i].Status" id="exc_@i" value="EXCUSED" @(Model[i].Status == "EXCUSED" ? "checked" : "") />
+                                            <label class="form-check-label text-primary font-weight-bold small" for="exc_@i">Phép</label>
+                                        </div>
+                                        <div class="form-check form-check-inline m-0">
+                                            <input class="form-check-input" type="radio" name="attendances[@i].Status" id="abs_@i" value="ABSENT" @(Model[i].Status == "ABSENT" ? "checked" : "") />
+                                            <label class="form-check-label text-danger font-weight-bold small" for="abs_@i">Vắng</label>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4">
+                                    <input type="text" name="attendances[@i].Remarks" value="@Model[i].Remarks" placeholder="Lý do nghỉ, đi muộn..." class="form-control form-control-sm border-1 rounded-2" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            @if (Model.Any())
+            {
+                <div class="p-3 bg-light border-top d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary-ailearn">
+                        <i class="fa-solid fa-save me-1"></i> Lưu kết quả điểm danh
+                    </button>
+                </div>
+            }
+        </form>
+    </div>
+}

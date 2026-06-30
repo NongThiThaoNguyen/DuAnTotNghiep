@@ -1,0 +1,151 @@
+@using System.Security.Claims
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - AI Learn</title>
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome 6.4 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    
+    <!-- AI Learn custom layout and responsive styles -->
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
+
+    <!-- Page Specific CSS Section -->
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div>
+                <!-- Brand logo -->
+                <a href="/Dashboard" class="sidebar-logo">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="logo-text">AI Learn</div>
+                </a>
+
+                <!-- Menus -->
+                <ul class="sidebar-menu">
+                    @{
+                        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+                        var action = ViewContext.RouteData.Values["action"]?.ToString();
+                    }
+                    <li class="menu-item @(controller == "Dashboard" ? "active" : "")">
+                        <a href="/Dashboard">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Tổng quan</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "LearningPath" ? "active" : "")">
+                        <a href="/Student/LearningPath">
+                            <i class="fa-solid fa-route"></i>
+                            <span>Lộ trình học</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Courses" ? "active" : "")">
+                        <a href="/Courses">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Khóa học</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/Courses">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <span>Bài tập</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "AITutor" ? "active" : "")">
+                        <a href="/AITutor">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            <span>Trợ lý AI</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Statistics" ? "active" : "")">
+                        <a href="/Statistics">
+                            <i class="fa-solid fa-chart-simple"></i>
+                            <span>Thống kê</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Achievements" ? "active" : "")">
+                        <a href="/Achievements">
+                            <i class="fa-solid fa-award"></i>
+                            <span>Thành tích</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#">
+                            <i class="fa-solid fa-note-sticky"></i>
+                            <span>Ghi chú</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Profile" ? "active" : "")">
+                        <a href="/Profile">
+                            <i class="fa-solid fa-gear"></i>
+                            <span>Cài đặt</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Bottom User Profile Info -->
+            <div class="sidebar-user">
+                <img src="@(User.FindFirst("AvatarUrl")?.Value ?? "/default-images/avatar.png")" alt="Avatar" class="user-avatar-sidebar" onerror="this.src='https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "HV")&background=6C63FF&color=fff'" />
+                <div class="user-info-sidebar">
+                    <span class="user-name-sidebar">@User.Identity?.Name</span>
+                    <span class="user-role-sidebar">Học viên Premium</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <main class="main-content">
+            <!-- Header bar -->
+            <header class="app-header">
+                <!-- Search -->
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Tìm kiếm khóa học..." id="headerSearchInput" />
+                </div>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <!-- Notification -->
+                    <button class="notification-btn" title="Thông báo">
+                        <i class="fa-regular fa-bell"></i>
+                        <span class="notification-badge"></span>
+                    </button>
+
+                    <!-- User Profile Dropdown -->
+                    <a href="/Profile" class="profile-dropdown-btn">
+                        <img src="@(User.FindFirst("AvatarUrl")?.Value ?? "/default-images/avatar.png")" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "HV")&background=6C63FF&color=fff'" />
+                        <span class="d-none d-md-inline">@User.Identity?.Name</span>
+                    </a>
+
+                    <!-- Logout link -->
+                    <a href="/Account/Logout" class="text-danger ms-2" title="Đăng xuất">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Render Main View Content -->
+            <div class="container-fluid p-0 flex-grow-1">
+                @RenderBody()
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap 5.3 JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Page Specific JS Section -->
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -903,37 +903,25 @@ namespace DuAnTotNghiep.Data.Seeders
 
             var existingPath = await _context.StudentLearningPaths
                 .Include(p => p.LearningPathNodes)
-                .FirstOrDefaultAsync(p => p.StudentId == student.Id && p.Title == "M9 Demo Learning Path");
+                .FirstOrDefaultAsync(p => p.StudentId == student.Id && (p.Title == "M9 Demo Learning Path" || p.Title == "Lộ trình học tập AI mẫu"));
             if (existingPath != null)
             {
-                var availableNode = existingPath.LearningPathNodes
-                    .OrderBy(n => n.OrderIndex)
-                    .FirstOrDefault(n => n.Status == ProgressStatus.Available);
-
-                if (availableNode != null)
+                if (existingPath.LearningPathNodes != null && existingPath.LearningPathNodes.Any())
                 {
-                    availableNode.TopicId ??= topics[0].Id;
-                    availableNode.LessonId = null;
-                    availableNode.QuizId = null;
-                    availableNode.PracticeTaskId = null;
-                    availableNode.NodeTitle = "Topic: Daily routines";
-                    availableNode.NodeType = NodeType.Topic;
-                    availableNode.PathPhase = "Foundation";
-                    existingPath.UpdatedAt = now;
-                    await _context.SaveChangesAsync();
+                    _context.LearningPathNodes.RemoveRange(existingPath.LearningPathNodes);
                 }
-
-                return;
+                _context.StudentLearningPaths.Remove(existingPath);
+                await _context.SaveChangesAsync();
             }
 
             var path = new StudentLearningPath
             {
                 StudentId = student.Id,
-                Title = "M9 Demo Learning Path",
-                Description = "Duolingo-style demo path for the M9 learning path UI.",
+                Title = "Lộ trình học tập AI mẫu",
+                Description = "Lộ trình học tập thông minh gợi ý bởi AI theo phong cách Duolingo.",
                 StartDate = today.AddDays(-2),
                 TargetEndDate = today.AddDays(21),
-                AiPlanSummary = "Start with grammar foundations, check understanding, then rotate review and practice.",
+                AiPlanSummary = "Bắt đầu với các nền tảng ngữ pháp cơ bản, kiểm tra mức độ hiểu bài, sau đó ôn luyện xen kẽ với thực hành.",
                 Status = "ACTIVE",
                 GeneratedByAi = true,
                 CreatedAt = now,
@@ -945,16 +933,16 @@ namespace DuAnTotNghiep.Data.Seeders
 
             var nodeSpecs = new[]
             {
-                ("Grammar warm-up", NodeType.Topic, ProgressStatus.Completed, "Foundation", -2, 12),
-                ("Lesson: Present Simple", NodeType.Lesson, ProgressStatus.Completed, "Foundation", -1, 18),
-                ("Topic: Daily routines", NodeType.Topic, ProgressStatus.Available, "Foundation", 0, 12),
-                ("Practice: Habit sentences", NodeType.Practice, ProgressStatus.InProgress, "Practice", 0, 20),
-                ("Review weak patterns", NodeType.Review, ProgressStatus.NeedReview, "Practice", 1, 15),
-                ("AI Tutor check-in", NodeType.AiTutor, ProgressStatus.Locked, "Guided AI", 2, 10),
-                ("Topic: Family vocabulary", NodeType.Topic, ProgressStatus.Locked, "Vocabulary", 3, 16),
-                ("Lesson: School words", NodeType.Lesson, ProgressStatus.Locked, "Vocabulary", 4, 18),
-                ("Quiz: Travel basics", NodeType.Quiz, ProgressStatus.Locked, "Checkpoint", 5, 12),
-                ("Final review", NodeType.Review, ProgressStatus.Locked, "Checkpoint", 6, 20)
+                ("Khởi động Ngữ pháp", NodeType.Topic, ProgressStatus.Completed, "Foundation", -2, 12),
+                ("Bài học: Thì Hiện tại đơn", NodeType.Lesson, ProgressStatus.Completed, "Foundation", -1, 18),
+                ("Chủ đề: Thói quen hàng ngày", NodeType.Topic, ProgressStatus.Available, "Foundation", 0, 12),
+                ("Thực hành: Câu về thói quen", NodeType.Practice, ProgressStatus.InProgress, "Practice", 0, 20),
+                ("Ôn tập các phần còn yếu", NodeType.Review, ProgressStatus.NeedReview, "Practice", 1, 15),
+                ("Tương tác với AI Tutor", NodeType.AiTutor, ProgressStatus.Locked, "Guided AI", 2, 10),
+                ("Chủ đề: Từ vựng gia đình", NodeType.Topic, ProgressStatus.Locked, "Vocabulary", 3, 16),
+                ("Bài học: Từ vựng trường học", NodeType.Lesson, ProgressStatus.Locked, "Vocabulary", 4, 18),
+                ("Trắc nghiệm: Cơ bản du lịch", NodeType.Quiz, ProgressStatus.Locked, "Checkpoint", 5, 12),
+                ("Ôn tập tổng kết", NodeType.Review, ProgressStatus.Locked, "Checkpoint", 6, 20)
             };
 
             var nodes = nodeSpecs.Select((spec, index) =>
@@ -972,7 +960,7 @@ namespace DuAnTotNghiep.Data.Seeders
                     EstimatedMinutes = spec.Item6,
                     OrderIndex = index + 1,
                     Status = spec.Item3,
-                    AiReason = $"Recommended because it supports {topic.Title}.",
+                    AiReason = $"Được đề xuất vì bài học này bổ trợ kiến thức cho chủ đề {topic.Title}.",
                     CompletedAt = spec.Item3 == ProgressStatus.Completed ? now.AddDays(-Math.Max(1, 2 - index)) : null
                 };
             });

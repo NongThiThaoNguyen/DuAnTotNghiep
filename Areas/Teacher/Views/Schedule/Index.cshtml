@@ -1,0 +1,111 @@
+@model IEnumerable<DuAnTotNghiep.Models.Schedule>
+@{
+    ViewData["Title"] = "Lịch giảng dạy";
+    var keyword = ViewBag.Keyword as string;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+}
+
+<div class="max-w-7xl mx-auto py-6 px-4 space-y-6 font-sans">
+    
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 leading-tight">Lịch giảng dạy</h1>
+            <p class="text-slate-500 text-sm">Quản lý lịch học, lớp trực tiếp (Offline) hoặc trực tuyến (Online Classroom) của bạn.</p>
+        </div>
+        <a href="/Teacher/Schedule/Create" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold transition-all text-xs flex items-center gap-1.5 shadow-sm shadow-blue-600/10 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Thêm lịch dạy mới
+        </a>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+        <form method="get" class="flex flex-col sm:flex-row gap-4">
+            <!-- Keyword Search -->
+            <div class="flex-1">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Tìm kiếm lịch dạy</label>
+                <div class="relative">
+                    <input type="text" name="keyword" value="@keyword" placeholder="Nhập tiêu đề lớp, phòng học, mô tả..." class="w-full pl-9 pr-4 py-2 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-slate-50/50" />
+                    <svg class="w-4 h-4 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-end gap-2">
+                <button type="submit" class="px-6 py-2 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-sm cursor-pointer text-center">Tìm kiếm</button>
+                <a href="/Teacher/Schedule" class="p-2 text-sm font-bold text-slate-500 border border-slate-200 hover:bg-slate-50 rounded-xl transition-all cursor-pointer" title="Làm mới">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H12V4"></path></svg>
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table List -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                    <tr class="border-b border-slate-200 bg-slate-50/50 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                        <th class="py-3.5 px-6">Lớp học / Sự kiện</th>
+                        <th class="py-3.5 px-6">Khóa học đính kèm</th>
+                        <th class="py-3.5 px-6 text-center">Thời gian bắt đầu</th>
+                        <th class="py-3.5 px-6 text-center">Thời gian kết thúc</th>
+                        <th class="py-3.5 px-6 text-center">Phòng học</th>
+                        <th class="py-3.5 px-6 text-right">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @if (!Model.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="py-8 text-center text-slate-400">Không tìm thấy lịch giảng dạy nào.</td>
+                        </tr>
+                    }
+                    @foreach (var item in Model)
+                    {
+                        var isOnline = string.IsNullOrEmpty(item.Classroom) || item.Classroom.ToLower().Contains("online") || item.Classroom.ToLower().Contains("zoom") || item.Classroom.ToLower().Contains("meet");
+
+                        <tr class="hover:bg-slate-50/40 transition-colors">
+                            <td class="py-4 px-6">
+                                <div class="flex flex-col">
+                                    <span class="font-bold text-slate-800">@item.Title</span>
+                                    <span class="text-xs text-slate-450 line-clamp-1 mt-0.5">@(item.Description ?? "Không có mô tả.")</span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-slate-650 font-medium">@(item.Topic?.Title ?? "Không có")</td>
+                            <td class="py-4 px-6 text-center text-slate-600 font-semibold">@item.StartTime.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="py-4 px-6 text-center text-slate-600 font-semibold">@item.EndTime.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold @(isOnline ? "bg-purple-50 text-purple-600 border border-purple-100" : "bg-blue-50 text-blue-600 border border-blue-100")">
+                                    @(item.Classroom ?? "Online Classroom")
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-right">
+                                <div class="flex justify-end gap-2.5">
+                                    <a href="/Teacher/Schedule/Edit/@item.Id" class="text-xs font-bold text-blue-600 hover:text-blue-700">Sửa</a>
+                                    <a href="/Teacher/Schedule/Delete/@item.Id" class="text-xs font-bold text-red-650 hover:text-red-700">Xóa</a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalPages > 1)
+    {
+        <div class="flex justify-center gap-1.5 pt-2">
+            @for (int p = 1; p <= totalPages; p++)
+            {
+                <a href="/Teacher/Schedule?page=@p&keyword=@keyword" class="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs border transition-all @(currentPage == p ? "bg-blue-600 text-white border-blue-600" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50")">
+                    @p
+                </a>
+            }
+        </div>
+    }
+
+</div>

@@ -1,0 +1,78 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.AchievementsViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = "Thành tích";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/achievement.css" asp-append-version="true" />
+}
+
+<!-- Achievement overview banner -->
+<div class="achievement-progress-card">
+    <div class="achievement-progress-info">
+        <h3>Huy hiệu của tôi</h3>
+        <p>Hoàn thành các nhiệm vụ học tập, giải đề và tham gia trò chuyện để mở khóa huy hiệu độc quyền.</p>
+    </div>
+    <div class="text-end">
+        <span class="achievement-progress-percentage">@Model.EarnedCount / @Model.TotalCount</span>
+        <div class="small">Huy hiệu đã mở</div>
+    </div>
+</div>
+
+<!-- Progress bar -->
+<div class="card-ailearn mb-4">
+    <div class="progress-container-ailearn m-0">
+        <div class="progress-header-ailearn">
+            <span>Tiến trình mở khóa</span>
+            <span>@Model.ProgressPercent.ToString("0.1")%</span>
+        </div>
+        <div class="progress-bar-ailearn">
+            <div class="progress-bar-fill" style="width: @Model.ProgressPercent%"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Badges list grid -->
+<div class="badges-grid-ailearn">
+    @foreach (var badge in Model.Badges)
+    {
+        <div class="badge-card-ailearn @(badge.IsUnlocked ? "unlocked" : "locked")">
+            <!-- Lock indicator overlay -->
+            <div class="badge-lock-overlay">
+                @if (badge.IsUnlocked)
+                {
+                    <i class="fa-solid fa-circle-check text-success"></i>
+                }
+                else
+                {
+                    <i class="fa-solid fa-lock text-muted"></i>
+                }
+            </div>
+
+            <!-- Icon -->
+            <div class="badge-icon-container">
+                <i class="fa-solid @badge.IconUrl"></i>
+            </div>
+
+            <!-- Text details -->
+            <h4>@badge.Title</h4>
+            <p>@badge.Description</p>
+
+            <!-- Unlock reward or progress -->
+            @if (badge.IsUnlocked)
+            {
+                <span class="badge bg-success-subtle text-success small border border-success-subtle">Mở ngày @badge.UnlockedAtLabel</span>
+            }
+            else
+            {
+                <div class="small text-muted mb-1">Tiến độ: @badge.ProgressValue / @badge.TargetValue</div>
+                <div class="badge-mini-progress">
+                    <div class="badge-mini-progress-fill" style="width: @((double)badge.ProgressValue / badge.TargetValue * 100)%"></div>
+                </div>
+            }
+
+            <div class="badge-reward">+@badge.XpReward XP</div>
+        </div>
+    }
+</div>

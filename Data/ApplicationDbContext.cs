@@ -131,6 +131,16 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<PasswordResetToken> PasswordResetTokens { get; set; }
 
+    public virtual DbSet<Achievement> Achievements { get; set; }
+
+    public virtual DbSet<UserAchievement> UserAchievements { get; set; }
+
+    public virtual DbSet<Attendance> Attendances { get; set; }
+
+    public virtual DbSet<ChatMessage> ChatMessages { get; set; }
+
+    public virtual DbSet<Schedule> Schedules { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -2271,6 +2281,114 @@ public partial class ApplicationDbContext : DbContext
                   .WithMany(p => p.UserAvatarHistories)
                   .HasForeignKey(d => d.UserId)
                   .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Achievement>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("achievements");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Code).HasMaxLength(50).IsRequired().HasColumnName("code");
+            entity.Property(e => e.Title).HasMaxLength(255).IsRequired().HasColumnName("title");
+            entity.Property(e => e.Description).HasMaxLength(1000).IsRequired().HasColumnName("description");
+            entity.Property(e => e.IconUrl).HasMaxLength(255).IsRequired().HasColumnName("icon_url");
+            entity.Property(e => e.XpReward).HasColumnName("xp_reward");
+            entity.Property(e => e.IsActive).HasColumnName("is_active");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
+        });
+
+        modelBuilder.Entity<UserAchievement>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("user_achievements");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
+            entity.Property(e => e.AchievementId).HasColumnName("achievement_id");
+            entity.Property(e => e.IsUnlocked).HasColumnName("is_unlocked");
+            entity.Property(e => e.UnlockedAt).HasColumnName("unlocked_at");
+            entity.Property(e => e.ProgressValue).HasColumnName("progress_value");
+            entity.Property(e => e.TargetValue).HasColumnName("target_value");
+
+            entity.HasOne(d => d.User).WithMany(p => p.UserAchievements)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_user_achievements_users");
+
+            entity.HasOne(d => d.Achievement).WithMany(p => p.UserAchievements)
+                .HasForeignKey(d => d.AchievementId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_user_achievements_achievements");
+        });
+
+        modelBuilder.Entity<Attendance>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("attendances");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.StudentId).HasColumnName("student_id");
+            entity.Property(e => e.TopicId).HasColumnName("topic_id");
+            entity.Property(e => e.AttendanceDate).HasColumnName("attendance_date");
+            entity.Property(e => e.Status).HasMaxLength(50).HasColumnName("status");
+            entity.Property(e => e.Remarks).HasMaxLength(500).HasColumnName("remarks");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Student).WithMany()
+                .HasForeignKey(d => d.StudentId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_attendances_users");
+
+            entity.HasOne(d => d.Topic).WithMany()
+                .HasForeignKey(d => d.TopicId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_attendances_learning_topics");
+        });
+
+        modelBuilder.Entity<ChatMessage>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("chat_messages");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.SenderId).HasColumnName("sender_id");
+            entity.Property(e => e.ReceiverId).HasColumnName("receiver_id");
+            entity.Property(e => e.MessageText).HasColumnName("message_text");
+            entity.Property(e => e.IsRead).HasColumnName("is_read");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
+
+            entity.HasOne(d => d.Sender).WithMany()
+                .HasForeignKey(d => d.SenderId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_chat_messages_sender");
+
+            entity.HasOne(d => d.Receiver).WithMany()
+                .HasForeignKey(d => d.ReceiverId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_chat_messages_receiver");
+        });
+
+        modelBuilder.Entity<Schedule>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("schedules");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
+            entity.Property(e => e.TopicId).HasColumnName("topic_id");
+            entity.Property(e => e.Title).HasMaxLength(255).HasColumnName("title");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.StartTime).HasColumnName("start_time");
+            entity.Property(e => e.EndTime).HasColumnName("end_time");
+            entity.Property(e => e.Classroom).HasMaxLength(255).HasColumnName("classroom");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
+
+            entity.HasOne(d => d.Teacher).WithMany()
+                .HasForeignKey(d => d.TeacherId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_schedules_users");
+
+            entity.HasOne(d => d.Topic).WithMany()
+                .HasForeignKey(d => d.TopicId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_schedules_learning_topics");
         });
 
         OnModelCreatingPartial(modelBuilder);

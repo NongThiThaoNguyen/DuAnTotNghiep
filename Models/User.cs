@@ -114,4 +114,6 @@ public partial class User
     public virtual ICollection<LoginLog> LoginLogs { get; set; } = new List<LoginLog>();
 
     public virtual ICollection<PasswordResetToken> PasswordResetTokens { get; set; } = new List<PasswordResetToken>();
+
+    public virtual ICollection<UserAchievement> UserAchievements { get; set; } = new List<UserAchievement>();
 }

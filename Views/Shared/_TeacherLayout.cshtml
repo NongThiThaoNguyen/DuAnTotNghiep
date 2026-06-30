@@ -1,129 +1,186 @@
 @using System.Security.Claims
 <!DOCTYPE html>
-<html lang="vi" class="h-full bg-slate-50">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DuAnTotNghiep (Teacher)</title>
+    <title>@ViewData["Title"] - AI Learn (Teacher)</title>
+
+    <!-- Bootstrap 5.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <!-- Font Awesome 6.4 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
+    <!-- AI Learn custom layout and responsive styles -->
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DuAnTotNghiep.styles.css" asp-append-version="true" />
+
+    <!-- Style overrides to support collapsible submenus and responsive drawer -->
+    <style>
+        .sidebar {
+            overflow-y: auto;
+        }
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+        }
+    </style>
+
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="h-full flex flex-col font-sans text-slate-900 bg-slate-50">
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div>
+                <!-- Brand logo -->
+                <a href="/Teacher" class="sidebar-logo">
+                    <div class="logo-icon">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="logo-text">AI Learn</div>
+                </a>
 
-    <partial name="_Navbar" />
-
-    <div class="flex flex-1 relative overflow-hidden">
-        
-        <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 lg:hidden"></div>
-
-        <aside id="mobileSidebar" class="fixed inset-y-0 left-0 z-50 w-70 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:h-[calc(100vh-4rem)] flex flex-col justify-between shrink-0 overflow-y-auto">
-            <div class="p-6">
-                <div class="lg:hidden flex items-center gap-2 mb-6">
-                    <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">D</div>
-                    <span class="font-bold text-lg text-slate-800">DuAn<span class="text-blue-600">TotNghiep</span></span>
-                </div>
-                
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-4">Giáo Viên</span>
-                <ul class="space-y-1 mb-8">
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Teacher" asp-controller="Home" asp-action="Index">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                            </svg>
-                            Dashboard
+                <!-- Menus -->
+                <ul class="sidebar-menu">
+                    @{
+                        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+                        var action = ViewContext.RouteData.Values["action"]?.ToString();
+                    }
+                    <li class="menu-item @(controller == "Home" ? "active" : "")">
+                        <a href="/Teacher">
+                            <i class="fa-solid fa-house"></i>
+                            <span>Tổng quan</span>
                         </a>
                     </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
-                            Khóa học giảng dạy
+                    <li class="menu-item @(controller == "Courses" ? "active" : "")">
+                        <a href="/Teacher/Courses">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                            <span>Khóa học giảng dạy</span>
                         </a>
                     </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                            </svg>
-                            Quản lý học viên
+                    <li class="menu-item @(controller == "Lessons" ? "active" : "")">
+                        <a href="/Teacher/Lessons">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span>Quản lý Bài học</span>
                         </a>
                     </li>
-                    <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                            </svg>
-                            Bài tập
+                    <li class="menu-item @(controller == "Assignments" ? "active" : "")">
+                        <a href="/Teacher/Assignments">
+                            <i class="fa-solid fa-clipboard-list"></i>
+                            <span>Quản lý Bài tập</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Quizzes" ? "active" : "")">
+                        <a href="/Teacher/Quizzes">
+                            <i class="fa-solid fa-lightbulb"></i>
+                            <span>Quản lý Quiz</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Students" ? "active" : "")">
+                        <a href="/Teacher/Students">
+                            <i class="fa-solid fa-users"></i>
+                            <span>Quản lý Học viên</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Grades" ? "active" : "")">
+                        <a href="/Teacher/Grades">
+                            <i class="fa-solid fa-award"></i>
+                            <span>Quản lý Điểm số</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Attendance" ? "active" : "")">
+                        <a href="/Teacher/Attendance">
+                            <i class="fa-solid fa-user-check"></i>
+                            <span>Điểm danh</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Resources" ? "active" : "")">
+                        <a href="/Teacher/Resources">
+                            <i class="fa-solid fa-folder-open"></i>
+                            <span>Tài liệu học tập</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Messages" ? "active" : "")">
+                        <a href="/Teacher/Messages">
+                            <i class="fa-solid fa-comment-dots"></i>
+                            <span>Tin nhắn</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Schedule" ? "active" : "")">
+                        <a href="/Teacher/Schedule">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span>Lịch dạy</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Reports" ? "active" : "")">
+                        <a href="/Teacher/Reports">
+                            <i class="fa-solid fa-chart-simple"></i>
+                            <span>Báo cáo tổng hợp</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Profile" ? "active" : "")">
+                        <a href="/Teacher/Profile">
+                            <i class="fa-solid fa-user-gear"></i>
+                            <span>Hồ sơ cá nhân</span>
+                        </a>
+                    </li>
+                    <li class="menu-item @(controller == "Settings" ? "active" : "")">
+                        <a href="/Teacher/Settings">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Cài đặt</span>
                         </a>
                     </li>
                 </ul>
             </div>
-            
-            <div class="p-6 border-t border-slate-200">
-                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Logout">
-                    <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                    </svg>
-                    Đăng xuất
-                </a>
+
+            <!-- Bottom User Profile Info -->
+            <div class="sidebar-user">
+                <img src="@(User.FindFirst("AvatarUrl")?.Value ?? "/default-images/avatar.png")" alt="Avatar" class="user-avatar-sidebar" onerror="this.src='https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "GV")&background=6C63FF&color=fff'" />
+                <div class="user-info-sidebar">
+                    <span class="user-name-sidebar">@User.Identity?.Name</span>
+                    <span class="user-role-sidebar">Giảng viên</span>
+                </div>
             </div>
         </aside>
 
-        <!-- Content Area -->
-        <main role="main" class="flex-1 overflow-y-auto min-h-0 flex flex-col bg-slate-50">
-            <div class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+        <!-- Main Content Wrapper -->
+        <main class="main-content">
+            <!-- Header bar -->
+            <header class="app-header">
+                <!-- Title / Breadcrumb replacement -->
+                <div class="d-flex align-items-center gap-2">
+                    <h5 class="m-0 font-weight-bold text-dark">LMS Giảng Viên</h5>
+                </div>
+
+                <!-- Header Actions -->
+                <div class="header-actions">
+                    <!-- User Profile Dropdown -->
+                    <a href="/Teacher/Profile" class="profile-dropdown-btn">
+                        <img src="@(User.FindFirst("AvatarUrl")?.Value ?? "/default-images/avatar.png")" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "GV")&background=6C63FF&color=fff'" />
+                        <span class="d-none d-md-inline">@User.Identity?.Name</span>
+                    </a>
+
+                    <!-- Logout link -->
+                    <a href="/Account/Logout" class="text-danger ms-2" title="Đăng xuất">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </a>
+                </div>
+            </header>
+
+            <!-- Render Main View Content -->
+            <div class="container-fluid p-0 flex-grow-1">
                 @RenderBody()
             </div>
-            
-            <footer class="bg-white border-t border-slate-200 py-6 px-8 text-center text-sm text-slate-500">
-                <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <span>&copy; 2026 - DuAnTotNghiep - Thiết kế bởi Nông Thị Thảo Nguyên</span>
-                </div>
-            </footer>
         </main>
     </div>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const sidebarToggle = document.getElementById('sidebarToggle');
-            const mobileSidebar = document.getElementById('mobileSidebar');
-            const sidebarOverlay = document.getElementById('sidebarOverlay');
-
-            if (sidebarToggle && mobileSidebar && sidebarOverlay) {
-                function toggleSidebar() {
-                    mobileSidebar.classList.toggle('-translate-x-full');
-                    sidebarOverlay.classList.toggle('hidden');
-                    document.body.classList.toggle('overflow-hidden');
-                }
-                sidebarToggle.addEventListener('click', toggleSidebar);
-                sidebarOverlay.addEventListener('click', toggleSidebar);
-            }
-
-            const userMenuBtn = document.getElementById('userMenuBtn');
-            const userDropdown = document.getElementById('userDropdown');
-
-            if (userMenuBtn && userDropdown) {
-                userMenuBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    userDropdown.classList.toggle('hidden');
-                });
-                document.addEventListener('click', function(e) {
-                    if (!userMenuBtn.contains(e.target) && !userDropdown.contains(e.target)) {
-                        userDropdown.classList.add('hidden');
-                    }
-                });
-            }
-        });
-    </script>
+    <!-- Bootstrap 5.3 JavaScript Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     @await RenderSectionAsync("Scripts", required: false)
 </body>

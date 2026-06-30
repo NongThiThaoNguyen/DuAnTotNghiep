@@ -1,0 +1,113 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.StatisticsViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = "Thống kê học tập";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/statistics.css" asp-append-version="true" />
+}
+
+<!-- Summary Statistics Row -->
+<div class="stats-summary-grid">
+    <div class="card-ailearn stat-card-ailearn">
+        <div class="stat-icon-wrapper blue">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="stat-details">
+            <span class="stat-title">Thời gian học</span>
+            <span class="stat-value">@(Model.TotalStudyMinutes / 60)h @(Model.TotalStudyMinutes % 60)m</span>
+        </div>
+    </div>
+    
+    <div class="card-ailearn stat-card-ailearn">
+        <div class="stat-icon-wrapper purple">
+            <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div class="stat-details">
+            <span class="stat-title">Bài học xong</span>
+            <span class="stat-value">@Model.TotalLessonsCompleted bài</span>
+        </div>
+    </div>
+
+    <div class="card-ailearn stat-card-ailearn">
+        <div class="stat-icon-wrapper green">
+            <i class="fa-solid fa-bullseye"></i>
+        </div>
+        <div class="stat-details">
+            <span class="stat-title">Độ chính xác Quiz</span>
+            <span class="stat-value">@Model.AverageQuizAccuracy.ToString("0.0")%</span>
+        </div>
+    </div>
+
+    <div class="card-ailearn stat-card-ailearn">
+        <div class="stat-icon-wrapper orange">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+        <div class="stat-details">
+            <span class="stat-title">Chuỗi Streak</span>
+            <span class="stat-value">@Model.WeeklyStreak ngày 🔥</span>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="charts-row-ailearn">
+    <!-- Bar Chart: Weekly hours -->
+    <div class="card-ailearn chart-card-wrapper">
+        <div class="chart-title-block">
+            <h3>Thời gian học theo ngày</h3>
+            <span class="text-muted small">Tuần hiện tại</span>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="weeklyStudyChart" 
+                    data-labels="@System.Text.Json.JsonSerializer.Serialize(Model.WeeklyDaysLabel)"
+                    data-minutes="@System.Text.Json.JsonSerializer.Serialize(Model.WeeklyStudyMinutes)"></canvas>
+        </div>
+    </div>
+
+    <!-- Doughnut Chart: Skills ratio -->
+    <div class="card-ailearn chart-card-wrapper">
+        <div class="chart-title-block">
+            <h3>Tỷ lệ kỹ năng</h3>
+            <span class="text-muted small">Thành tích</span>
+        </div>
+        <div class="chart-canvas-container">
+            <canvas id="skillsChart"
+                    data-labels="@System.Text.Json.JsonSerializer.Serialize(Model.SkillsLabel)"
+                    data-scores="@System.Text.Json.JsonSerializer.Serialize(Model.SkillAverages)"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Skills progression table details -->
+<div class="card-ailearn">
+    <h3 class="h6 font-weight-bold mb-3">Tiến độ theo kỹ năng chi tiết</h3>
+    <div class="skills-progress-list">
+        @{
+            string[] classes = new string[] { "listening", "speaking", "reading", "writing", "grammar" };
+        }
+        @for (int i = 0; i < Model.SkillsLabel.Count; i++)
+        {
+            var label = Model.SkillsLabel[i];
+            var score = Model.SkillAverages[i];
+            var clsName = classes[i % 5];
+            
+            <div class="skill-progress-item">
+                <div class="skill-progress-header">
+                    <span>@label</span>
+                    <span>@score%</span>
+                </div>
+                <div class="skill-progress-track">
+                    <div class="skill-progress-fill @clsName" style="width: @score%"></div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <!-- CDN Link to Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="~/js/statistics.js" asp-append-version="true"></script>
+}

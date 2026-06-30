@@ -121,7 +121,7 @@ namespace DuAnTotNghiep.Controllers
             {
                 "ADMIN" => RedirectToAction("Index", "Home", new { area = "Admin" }),
                 "TEACHER" => RedirectToAction("Index", "Home", new { area = "Teacher" }),
-                _ => RedirectToAction("Index", "Home", new { area = "Student" }) // STUDENT
+                _ => RedirectToAction("Index", "Dashboard") // STUDENT
             };
         }
 

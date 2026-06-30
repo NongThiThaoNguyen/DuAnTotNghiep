@@ -1,0 +1,102 @@
+@model IEnumerable<DuAnTotNghiep.Models.User>
+@{
+    ViewData["Title"] = "Danh sách học viên";
+    var keyword = ViewBag.Keyword as string;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
+}
+
+<div class="courses-header mb-4">
+    <div>
+        <h1 class="text-dark m-0 fs-3 font-weight-bold">Danh sách Học viên</h1>
+        <p class="text-muted m-0 small">Theo dõi danh sách học viên, tiến trình học tập và bảng điểm tổng hợp.</p>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="card-ailearn mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <!-- Keyword Search -->
+        <div class="col-md-9">
+            <label class="form-label text-muted small uppercase font-weight-bold">Tìm kiếm học viên</label>
+            <div class="search-box w-100">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="keyword" value="@keyword" placeholder="Nhập tên học viên, email hoặc số điện thoại..." />
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-ailearn flex-grow-1 btn-sm">Tìm kiếm</button>
+            <a href="/Teacher/Students" class="btn btn-secondary-ailearn btn-sm" title="Làm mới">
+                <i class="fa-solid fa-rotate"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Student Cards Grid -->
+<div class="course-grid-ailearn">
+    @if (!Model.Any())
+    {
+        <div class="card-ailearn col-span-full w-100 text-center py-5 text-muted">
+            Không tìm thấy học viên nào.
+        </div>
+    }
+    @foreach (var user in Model)
+    {
+        var avatar = string.IsNullOrEmpty(user.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(user.FullName ?? "HV")}&background=6C63FF&color=fff" : user.AvatarUrl;
+
+        <div class="course-card-wrapper-item">
+            <div class="card-ailearn h-100 d-flex flex-column justify-content-between p-4">
+                <div>
+                    <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
+                        <img src="@avatar" alt="Avatar" class="user-avatar-sidebar border border-2 border-primary" style="width: 48px; height: 48px;" onerror="this.src='https://ui-avatars.com/api/?name=HV&background=6C63FF&color=fff';" />
+                        <div class="d-flex flex-column">
+                            <span class="font-weight-bold text-dark text-sm">@user.FullName</span>
+                            <span class="text-muted small text-truncate" style="max-width: 140px;">@user.Email</span>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-column gap-2 text-muted small">
+                        <div class="d-flex justify-content-between">
+                            <span>SĐT:</span>
+                            <span class="font-weight-semibold text-dark">@(user.Phone ?? "N/A")</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Ngày gia nhập:</span>
+                            <span class="font-weight-semibold text-dark">@user.CreatedAt.ToString("dd/MM/yyyy")</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Trạng thái:</span>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">@user.Status</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-3 border-top d-grid">
+                    <a href="/Teacher/Students/Details/@user.Id" class="btn btn-secondary-ailearn btn-sm">
+                        Chi tiết tiến trình <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        @for (int p = 1; p <= totalPages; p++)
+        {
+            <a href="/Teacher/Students?page=@p&keyword=@keyword" class="btn @(currentPage == p ? "btn-primary-ailearn" : "btn-secondary-ailearn") btn-sm px-3">
+                @p
+            </a>
+        }
+    </div>
+}

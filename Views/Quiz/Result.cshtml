@@ -1,0 +1,86 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.QuizViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = "Kết quả Quiz";
+    decimal score = ViewBag.Score;
+    int correctCount = ViewBag.CorrectCount;
+    int totalCount = ViewBag.TotalCount;
+    var answers = ViewBag.Answers as Dictionary<int, string>;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/quiz.css" asp-append-version="true" />
+}
+
+<div class="card-ailearn">
+    <!-- Score Circle Section -->
+    <div class="score-screen">
+        <div class="score-circle">
+            <span class="score-number">@score.ToString("0.0")</span>
+            <span class="score-total">/ 10 điểm</span>
+        </div>
+        <h2 class="score-title">@((score >= 7.0m) ? "Chúc mừng! Bạn đã đạt yêu cầu! 🎉" : "Cố gắng hơn nữa vào lần sau nhé!")</h2>
+        <p class="score-desc">Bạn trả lời đúng <strong>@correctCount / @totalCount</strong> câu hỏi.</p>
+        <a href="/Courses" class="btn-primary-ailearn"><i class="fa-solid fa-graduation-cap"></i>Xem khóa học khác</a>
+    </div>
+
+    <!-- Review Questions -->
+    <h3 class="h5 font-weight-bold border-top pt-4 mb-4">Xem lại các câu hỏi</h3>
+
+    @for (int i = 0; i < Model.Questions.Count; i++)
+    {
+        var q = Model.Questions[i];
+        answers.TryGetValue(q.Id, out string? studentAnswer);
+        bool isCorrect = (studentAnswer != null && studentAnswer.Trim().ToUpper() == q.CorrectAnswer.Trim().ToUpper());
+
+        <div class="question-container submitted mb-5" data-question-id="@q.Id">
+            <h3 class="question-text">
+                @if (isCorrect)
+                {
+                    <i class="fa-solid fa-circle-check text-success me-2"></i>
+                }
+                else
+                {
+                    <i class="fa-solid fa-circle-xmark text-danger me-2"></i>
+                }
+                Câu hỏi @(i + 1): @q.QuestionText
+            </h3>
+
+            <div class="quiz-options-list">
+                @{
+                    string[] letters = new string[] { "A", "B", "C", "D" };
+                }
+                @for (int o = 0; o < q.Options.Count; o++)
+                {
+                    var opt = q.Options[o];
+                    var letter = letters[o % 4];
+
+                    // Class states
+                    string stateClass = "";
+                    if (letter == q.CorrectAnswer)
+                    {
+                        stateClass = "correct";
+                    }
+                    else if (letter == studentAnswer && !isCorrect)
+                    {
+                        stateClass = "wrong";
+                    }
+
+                    <div class="quiz-option-item @stateClass" data-letter="@letter">
+                        <div class="quiz-option-letter">@letter</div>
+                        <div class="quiz-option-text">@opt.OptionText</div>
+                    </div>
+                }
+            </div>
+
+            <!-- Explanation Panel -->
+            <div class="quiz-explanation-panel show">
+                <div class="quiz-explanation-title">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <span>Giải thích từ AI Tutor:</span>
+                </div>
+                <p class="quiz-explanation-text">@q.Explanation</p>
+            </div>
+        </div>
+    }
+</div>

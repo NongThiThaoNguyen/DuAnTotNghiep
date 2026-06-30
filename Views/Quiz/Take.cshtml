@@ -1,0 +1,66 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.QuizViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = Model.Title;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/quiz.css" asp-append-version="true" />
+}
+
+<div class="card-ailearn">
+    <!-- Header -->
+    <div class="quiz-header">
+        <div>
+            <span class="purple-badge mb-2">Khóa học: @Model.CourseTitle</span>
+            <h2 class="h4 font-weight-bold mb-0">@Model.Title</h2>
+        </div>
+        <div class="quiz-timer">
+            <i class="fa-regular fa-clock"></i>
+            <span id="timerValue" data-limit="@Model.TimeLimitMinutes">@Model.TimeLimitMinutes:00</span>
+        </div>
+    </div>
+
+    <!-- Instructions -->
+    <p class="text-muted small mb-4">@Model.Description</p>
+
+    <!-- Quiz Form -->
+    <form asp-controller="Quiz" asp-action="Submit" method="post" id="quizForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="quizId" value="@Model.QuizId" />
+
+        @for (int i = 0; i < Model.Questions.Count; i++)
+        {
+            var q = Model.Questions[i];
+            <div class="question-container" data-question-id="@q.Id">
+                <h3 class="question-text">Câu hỏi @(i + 1): @q.QuestionText</h3>
+                
+                <!-- Hidden input for selected option -->
+                <input type="hidden" name="answers[@q.Id]" class="selected-option-input" />
+
+                <div class="quiz-options-list">
+                    @{
+                        string[] letters = new string[] { "A", "B", "C", "D" };
+                    }
+                    @for (int o = 0; o < q.Options.Count; o++)
+                    {
+                        var opt = q.Options[o];
+                        var letter = letters[o % 4];
+                        <div class="quiz-option-item" data-letter="@letter">
+                            <div class="quiz-option-letter">@letter</div>
+                            <div class="quiz-option-text">@opt.OptionText</div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="d-flex justify-content-end mt-4">
+            <button type="button" class="btn-primary-ailearn" id="submitQuizBtn">Nộp bài thi</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/quiz.js" asp-append-version="true"></script>
+}

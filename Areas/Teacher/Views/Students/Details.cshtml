@@ -1,0 +1,167 @@
+@using DuAnTotNghiep.Models
+@model DuAnTotNghiep.Models.User
+@{
+    ViewData["Title"] = "Tiến trình học viên - " + Model.FullName;
+    var snapshots = ViewBag.ProgressSnapshots as List<StudentProgressSnapshot> ?? new List<StudentProgressSnapshot>();
+    var pathNodes = ViewBag.PathNodes as List<LearningPathNode> ?? new List<LearningPathNode>();
+    var activities = ViewBag.StudyActivities as List<StudyActivityLog> ?? new List<StudyActivityLog>();
+    var avatar = string.IsNullOrEmpty(Model.AvatarUrl) ? "/default-images/avatar.png" : Model.AvatarUrl;
+}
+
+<div class="max-w-7xl mx-auto py-6 px-4 font-sans space-y-8">
+    
+    <!-- Navigation back -->
+    <div class="flex items-center justify-between">
+        <a href="/Teacher/Students" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Quay lại danh sách
+        </a>
+    </div>
+
+    <!-- Student profile header card -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between">
+        <div class="flex items-center gap-4">
+            <img src="@avatar" alt="Avatar" class="w-16 h-16 rounded-full object-cover ring-4 ring-slate-55 bg-white" onerror="this.src='/default-images/avatar.png';" />
+            <div>
+                <h1 class="text-xl font-black text-slate-900 leading-tight">@Model.FullName</h1>
+                <p class="text-slate-500 text-xs mt-1">Học viên hệ thống | Tham gia: @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-green-50 text-green-700 border border-green-100">
+                        Email: @Model.Email
+                    </span>
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
+                        SĐT: @(Model.Phone ?? "N/A")
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <a href="/Teacher/Messages?studentId=@Model.Id" class="px-4 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold transition-all text-xs flex items-center gap-1.5 shadow-sm shadow-blue-600/10 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                Nhắn tin trao đổi
+            </a>
+        </div>
+    </div>
+
+    <!-- Main columns -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Cột Trái: Lộ trình và Hoạt động gần đây -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- 1. Lộ trình học tập (Learning Path Nodes) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-4">
+                <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Lộ trình học tập hiện tại</h3>
+                
+                <div class="space-y-4">
+                    @if (!pathNodes.Any())
+                    {
+                        <p class="text-slate-400 text-xs py-4 text-center">Chưa cấu hình lộ trình học tập cho học viên này.</p>
+                    }
+                    @foreach (var node in pathNodes)
+                    {
+                        var statusColor = node.Status switch
+                        {
+                            "COMPLETED" => "bg-green-50 text-green-700 border-green-100",
+                            "IN_PROGRESS" => "bg-blue-50 text-blue-600 border-blue-100",
+                            _ => "bg-slate-50 text-slate-500 border-slate-150"
+                        };
+
+                        <div class="p-3 bg-slate-50/50 border border-slate-150 rounded-xl flex items-center justify-between gap-3 hover:bg-slate-50 transition-colors">
+                            <div class="flex flex-col">
+                                <span class="text-sm font-semibold text-slate-800">@node.NodeTitle</span>
+                                <span class="text-xs text-slate-500 mt-0.5">Chủ đề: @(node.Topic?.Title ?? "N/A") | Dự tính: @node.EstimatedMinutes phút</span>
+                            </div>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold border @statusColor">
+                                @node.Status
+                            </span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- 2. Nhật ký học tập gần đây (Study Activity Log) -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-4">
+                <h3 class="text-base font-bold text-slate-900 border-b border-slate-100 pb-3">Nhật ký học tập gần đây</h3>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                <th class="py-3 px-4">Chủ đề</th>
+                                <th class="py-3 px-4">Hoạt động</th>
+                                <th class="py-3 px-4 text-center">Thời lượng</th>
+                                <th class="py-3 px-4 text-center">Điểm số</th>
+                                <th class="py-3 px-4 text-right">Ngày thực hiện</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (!activities.Any())
+                            {
+                                <tr>
+                                    <td colspan="5" class="py-6 text-center text-slate-400">Không có bản ghi hoạt động nào.</td>
+                                </tr>
+                            }
+                            @foreach (var log in activities)
+                            {
+                                <tr class="border-b border-slate-50 hover:bg-slate-50/50 transition-colors">
+                                    <td class="py-3.5 px-4 font-medium text-slate-750">@(log.Topic?.Title ?? "Tổng quát")</td>
+                                    <td class="py-3.5 px-4 text-slate-600 text-xs">@log.ActivityType</td>
+                                    <td class="py-3.5 px-4 text-center text-slate-500">@log.DurationMinutes phút</td>
+                                    <td class="py-3.5 px-4 text-center font-semibold text-slate-800">@(log.Score?.ToString("0.0") ?? "-")đ</td>
+                                    <td class="py-3.5 px-4 text-right text-slate-450 text-xs">@log.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Cột Phải: Tiến trình và Điểm số Snapshots -->
+        <div class="space-y-8">
+            
+            <!-- Snapshot Progress Cards -->
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
+                <h3 class="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">Tiến trình định kỳ</h3>
+                
+                <div class="space-y-4">
+                    @if (!snapshots.Any())
+                    {
+                        <p class="text-slate-400 text-xs py-4 text-center">Không có báo cáo snapshot tiến trình nào.</p>
+                    }
+                    @foreach (var snap in snapshots)
+                    {
+                        <div class="p-3 bg-slate-50/55 rounded-xl border border-slate-150 flex flex-col gap-1.5">
+                            <div class="flex justify-between text-xs text-slate-500 font-semibold border-b border-slate-100 pb-1.5">
+                                <span>@snap.SnapshotDate.ToString("dd/MM/yyyy")</span>
+                                <span class="text-blue-600">Đạt @snap.ProgressPercent%</span>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-[11px] text-slate-600 mt-1">
+                                <div>
+                                    <span class="text-slate-400 block">Số Node xong</span>
+                                    <span class="font-bold text-slate-850">@snap.CompletedNodes bài</span>
+                                </div>
+                                <div>
+                                    <span class="text-slate-400 block">Điểm TB</span>
+                                    <span class="font-bold text-green-600">@(snap.AverageScore?.ToString("0.0") ?? "-")đ</span>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(snap.WeakPoints))
+                            {
+                                <div class="text-[10px] text-red-650 bg-red-50 p-1.5 rounded-lg border border-red-100 mt-1">
+                                    <span class="font-bold">Hạn chế:</span> @snap.WeakPoints
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

@@ -22,6 +22,58 @@ namespace DuAnTotNghiep.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.Achievement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("code");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("description");
+
+                    b.Property<string>("IconUrl")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("icon_url");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_active");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("title");
+
+                    b.Property<int>("XpReward")
+                        .HasColumnType("int")
+                        .HasColumnName("xp_reward");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("achievements", (string)null);
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.AiFeedback", b =>
                 {
                     b.Property<int>("Id")
@@ -503,6 +555,59 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("ai_usage_logs", (string)null);
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.Attendance", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("AttendanceDate")
+                        .HasColumnType("date")
+                        .HasColumnName("attendance_date");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.Property<string>("Remarks")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("remarks");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("status");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int")
+                        .HasColumnName("student_id");
+
+                    b.Property<int>("TopicId")
+                        .HasColumnType("int")
+                        .HasColumnName("topic_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StudentId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("attendances", (string)null);
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.AuditLog", b =>
                 {
                     b.Property<long>("Id")
@@ -559,6 +664,47 @@ namespace DuAnTotNghiep.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("audit_logs", (string)null);
+                });
+
+            modelBuilder.Entity("DuAnTotNghiep.Models.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_read");
+
+                    b.Property<string>("MessageText")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("message_text");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("int")
+                        .HasColumnName("receiver_id");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int")
+                        .HasColumnName("sender_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("chat_messages", (string)null);
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.CompetencyAnalysis", b =>
@@ -2677,6 +2823,61 @@ namespace DuAnTotNghiep.Migrations
                         });
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.Schedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Classroom")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("classroom");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_time");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_time");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int")
+                        .HasColumnName("teacher_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("title");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int")
+                        .HasColumnName("topic_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TeacherId");
+
+                    b.HasIndex("TopicId");
+
+                    b.ToTable("schedules", (string)null);
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.SearchLog", b =>
                 {
                     b.Property<long>("Id")
@@ -3442,6 +3643,48 @@ namespace DuAnTotNghiep.Migrations
                         });
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.UserAchievement", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AchievementId")
+                        .HasColumnType("int")
+                        .HasColumnName("achievement_id");
+
+                    b.Property<bool>("IsUnlocked")
+                        .HasColumnType("bit")
+                        .HasColumnName("is_unlocked");
+
+                    b.Property<int>("ProgressValue")
+                        .HasColumnType("int")
+                        .HasColumnName("progress_value");
+
+                    b.Property<int>("TargetValue")
+                        .HasColumnType("int")
+                        .HasColumnName("target_value");
+
+                    b.Property<DateTime?>("UnlockedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("unlocked_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AchievementId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("user_achievements", (string)null);
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.UserAvatarHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -3777,6 +4020,27 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.Attendance", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.User", "Student")
+                        .WithMany()
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_attendances_users");
+
+                    b.HasOne("DuAnTotNghiep.Models.LearningTopic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_attendances_learning_topics");
+
+                    b.Navigation("Student");
+
+                    b.Navigation("Topic");
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.AuditLog", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.User", "User")
@@ -3785,6 +4049,25 @@ namespace DuAnTotNghiep.Migrations
                         .HasConstraintName("FK_audit_logs_users");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DuAnTotNghiep.Models.ChatMessage", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .IsRequired()
+                        .HasConstraintName("FK_chat_messages_receiver");
+
+                    b.HasOne("DuAnTotNghiep.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .IsRequired()
+                        .HasConstraintName("FK_chat_messages_sender");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.CompetencyAnalysis", b =>
@@ -4455,6 +4738,26 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("GeneratedByNavigation");
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.Schedule", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.User", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_schedules_users");
+
+                    b.HasOne("DuAnTotNghiep.Models.LearningTopic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_schedules_learning_topics");
+
+                    b.Navigation("Teacher");
+
+                    b.Navigation("Topic");
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.SearchLog", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.User", "User")
@@ -4723,6 +5026,27 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.UserAchievement", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.Achievement", "Achievement")
+                        .WithMany("UserAchievements")
+                        .HasForeignKey("AchievementId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_user_achievements_achievements");
+
+                    b.HasOne("DuAnTotNghiep.Models.User", "User")
+                        .WithMany("UserAchievements")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_user_achievements_users");
+
+                    b.Navigation("Achievement");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.UserAvatarHistory", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.User", "User")
@@ -4766,6 +5090,11 @@ namespace DuAnTotNghiep.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DuAnTotNghiep.Models.Achievement", b =>
+                {
+                    b.Navigation("UserAchievements");
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.AiPromptTemplate", b =>
@@ -5067,6 +5396,8 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("SystemSettings");
 
                     b.Navigation("TestAttempts");
+
+                    b.Navigation("UserAchievements");
 
                     b.Navigation("UserAvatarHistories");
 

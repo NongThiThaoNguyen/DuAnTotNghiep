@@ -1,7 +1,7 @@
 @model DuAnTotNghiep.Models.ViewModels.LearningPath.M8.LearningPathDetailViewModel
 
 @{
-    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    Layout = "~/Views/Shared/_AILearnLayout.cshtml";
     ViewData["Title"] = "Chi tiết lộ trình AI";
 
     var groupedNodes = Model.Nodes
@@ -41,8 +41,17 @@
         <section class="m8-node-list" aria-label="Danh sách nodes trong lộ trình">
             @foreach (var group in groupedNodes)
             {
+                var groupTitle = group.Key.ToUpperInvariant() switch
+                {
+                    "FOUNDATION" => "CƠ BẢN",
+                    "PRACTICE" => "LUYỆN TẬP",
+                    "VOCABULARY" => "TỪ VỰNG",
+                    "CHECKPOINT" => "KIỂM TRA",
+                    "GUIDED AI" => "AI DẪN ĐƯỜNG",
+                    _ => group.Key
+                };
                 <div class="m8-node-group">
-                    <h2 class="m8-node-group__title">@group.Key</h2>
+                    <h2 class="m8-node-group__title">@groupTitle</h2>
 
                     @foreach (var node in group)
                     {

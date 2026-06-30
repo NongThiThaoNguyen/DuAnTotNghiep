@@ -1,0 +1,126 @@
+@model IEnumerable<DuAnTotNghiep.Models.Quiz>
+@{
+    ViewData["Title"] = "Quản lý Quiz";
+    var keyword = ViewBag.Keyword as string;
+    var topicId = ViewBag.TopicId as int?;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
+}
+
+<div class="courses-header mb-4">
+    <div>
+        <h1 class="text-dark m-0 fs-3 font-weight-bold">Quản lý Quiz</h1>
+        <p class="text-muted m-0 small">Tạo các bài kiểm tra trắc nghiệm, đánh giá kết quả học tập tự động.</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="/Teacher/Quizzes/QuestionBank" class="btn btn-secondary-ailearn">
+            Ngân hàng câu hỏi
+        </a>
+        <a href="/Teacher/Quizzes/Create@(topicId.HasValue ? "?topicId=" + topicId.Value : "")" class="btn btn-primary-ailearn">
+            <i class="fa-solid fa-plus me-1"></i> Tạo Quiz mới
+        </a>
+    </div>
+</div>
+
+<!-- Filters Section -->
+<div class="card-ailearn mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <!-- Keyword Search -->
+        <div class="col-md-5">
+            <label class="form-label text-muted small uppercase font-weight-bold">Tìm kiếm</label>
+            <div class="search-box w-100">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="keyword" value="@keyword" placeholder="Nhập tên Quiz, từ khóa..." />
+            </div>
+        </div>
+
+        <!-- Topic Filter -->
+        <div class="col-md-4">
+            <label class="form-label text-muted small uppercase font-weight-bold">Khóa học</label>
+            <select name="topicId" asp-items="ViewBag.Topics" class="form-select border-1 rounded-3">
+                <option value="">Tất cả khóa học</option>
+            </select>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-ailearn flex-grow-1 btn-sm">Lọc</button>
+            <a href="/Teacher/Quizzes" class="btn btn-secondary-ailearn btn-sm" title="Làm mới">
+                <i class="fa-solid fa-rotate"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Table List Card -->
+<div class="card-ailearn p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr class="text-muted small font-weight-bold uppercase bg-light">
+                    <th class="py-3 px-4">Tên Quiz</th>
+                    <th class="py-3 px-4">Khóa học</th>
+                    <th class="py-3 px-4 text-center">Dạng Quiz</th>
+                    <th class="py-3 px-4 text-center">Giới hạn thời gian</th>
+                    <th class="py-3 px-4 text-center">Điểm đạt</th>
+                    <th class="py-3 px-4 text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="py-4 text-center text-muted small">Không tìm thấy bài Quiz nào.</td>
+                    </tr>
+                }
+                @foreach (var quiz in Model)
+                {
+                    <tr>
+                        <td class="py-3 px-4">
+                            <div class="d-flex flex-col">
+                                <span class="font-weight-bold text-dark">@quiz.Title</span>
+                                <span class="text-muted small line-clamp-1">@(quiz.Description ?? "Không có mô tả.")</span>
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-muted">@(quiz.Topic?.Title ?? "Tổng quát")</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">@quiz.QuizType</span>
+                        </td>
+                        <td class="py-3 px-4 text-center text-dark font-weight-semibold">@quiz.TimeLimitMinutes phút</td>
+                        <td class="py-3 px-4 text-center text-muted">@(quiz.PassingScore?.ToString("0") ?? "50")đ</td>
+                        <td class="py-3 px-4 text-end">
+                            <div class="d-flex justify-content-end gap-2 align-items-center">
+                                <a href="/Teacher/Quizzes/QuestionBank?quizId=@quiz.Id" class="btn btn-outline-secondary btn-sm py-1 px-2 fs-7" title="Câu hỏi">
+                                    Câu hỏi (@(quiz.QuizQuestions?.Count ?? 0))
+                                </a>
+                                <a href="/Teacher/Quizzes/Edit/@quiz.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <a href="/Teacher/Quizzes/Delete/@quiz.Id" class="btn btn-outline-danger btn-sm p-1 px-2" title="Xóa">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        @for (int p = 1; p <= totalPages; p++)
+        {
+            <a href="/Teacher/Quizzes?page=@p&keyword=@keyword&topicId=@topicId" class="btn @(currentPage == p ? "btn-primary-ailearn" : "btn-secondary-ailearn") btn-sm px-3">
+                @p
+            </a>
+        }
+    </div>
+}

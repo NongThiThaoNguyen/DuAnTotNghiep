@@ -1,0 +1,203 @@
+/* Quiz specific styles */
+
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+}
+
+.quiz-timer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #FF5A5F;
+    background-color: rgba(255, 90, 95, 0.05);
+    padding: 6px 14px;
+    border-radius: 20px;
+}
+
+.quiz-progress-bar-container {
+    width: 100%;
+    height: 6px;
+    background-color: var(--border-color);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 32px;
+}
+
+.quiz-progress-bar-fill {
+    height: 100%;
+    background-color: var(--primary-color);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Question Container */
+.question-container {
+    margin-bottom: 32px;
+}
+
+.question-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.quiz-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.quiz-option-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 24px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-md);
+    background-color: #FFFFFF;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.quiz-option-item:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(108, 99, 255, 0.02);
+}
+
+.quiz-option-letter {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background-color: var(--body-bg);
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.quiz-option-item.selected {
+    border-color: var(--primary-color);
+    background-color: rgba(108, 99, 255, 0.05);
+}
+
+.quiz-option-item.selected .quiz-option-letter {
+    background-color: var(--primary-color);
+    color: #FFFFFF;
+    border-color: var(--primary-color);
+}
+
+/* Correct / Incorrect Option states */
+.quiz-option-item.correct {
+    border-color: #4ADE80;
+    background-color: rgba(74, 222, 128, 0.08);
+}
+
+.quiz-option-item.correct .quiz-option-letter {
+    background-color: #4ADE80;
+    color: #FFFFFF;
+    border-color: #4ADE80;
+}
+
+.quiz-option-item.wrong {
+    border-color: #FF5A5F;
+    background-color: rgba(255, 90, 95, 0.08);
+}
+
+.quiz-option-item.wrong .quiz-option-letter {
+    background-color: #FF5A5F;
+    color: #FFFFFF;
+    border-color: #FF5A5F;
+}
+
+/* Explanation Panel */
+.quiz-explanation-panel {
+    background-color: rgba(74, 222, 128, 0.03);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    border-radius: var(--border-radius-md);
+    padding: 20px;
+    margin-top: 24px;
+    display: none;
+}
+
+.quiz-explanation-panel.show {
+    display: block;
+}
+
+.quiz-explanation-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2F855A;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.quiz-explanation-text {
+    font-size: 0.85rem;
+    color: var(--text-main);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Score Screen */
+.score-screen {
+    text-align: center;
+    padding: 40px 20px;
+}
+
+.score-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background-color: rgba(108, 99, 255, 0.05);
+    border: 4px solid var(--primary-color);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px auto;
+}
+
+.score-number {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.score-total {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.score-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin-bottom: 12px;
+}
+
+.score-desc {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    max-width: 360px;
+    margin: 0 auto 32px auto;
+    line-height: 1.6;
+}

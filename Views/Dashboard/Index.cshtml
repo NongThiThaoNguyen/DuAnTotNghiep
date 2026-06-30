@@ -1,0 +1,143 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.DashboardViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = "Tổng quan";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+}
+
+<!-- Welcome Section -->
+<div class="dashboard-header-block">
+    <h1>Xin chào, @Model.StudentName! 👋</h1>
+    <p>Hôm nay bạn muốn học gì nào?</p>
+</div>
+
+<!-- Stats Row Grid -->
+<div class="dashboard-stats-row">
+    <!-- Stat 1: Study time -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box purple">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Thời gian học hôm nay</span>
+            <span class="dashboard-stat-value">45 phút</span>
+            <span class="dashboard-stat-subtext green">+15 phút so với hôm qua</span>
+        </div>
+    </div>
+
+    <!-- Stat 2: Completed lessons -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box green">
+            <i class="fa-solid fa-book-open"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Bài đã hoàn thành</span>
+            <span class="dashboard-stat-value">@Model.CompletedLessonsCount bài</span>
+            <span class="dashboard-stat-subtext green">+3 bài so với hôm qua</span>
+        </div>
+    </div>
+
+    <!-- Stat 3: Avg score -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box blue">
+            <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Điểm trung bình</span>
+            <span class="dashboard-stat-value">@(Model.AverageQuizScore > 0 ? $"{(Model.AverageQuizScore * 10).ToString("0.0")}%" : "85%")</span>
+            <span class="dashboard-stat-subtext green">+5% so với tuần trước</span>
+        </div>
+    </div>
+
+    <!-- Stat 4: Streak -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box orange">
+            <i class="fa-solid fa-fire"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Chuỗi ngày học</span>
+            <span class="dashboard-stat-value">@Model.StreakDays ngày</span>
+            <span class="dashboard-stat-subtext orange">Tuyệt vời 🔥</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Section columns -->
+<div class="dashboard-cols-layout">
+    <!-- Left Column -->
+    <div>
+        <!-- Learning Path Progress Card -->
+        <div class="dashboard-panel-card">
+            <div class="path-timeline-header">
+                <h3>Lộ trình học tập của bạn</h3>
+                <span>60%</span>
+            </div>
+            <div class="progress-bar-ailearn mb-4">
+                <div class="progress-bar-fill" style="width: 60%"></div>
+            </div>
+
+            <div class="path-timeline-list">
+                <div class="path-timeline-node completed">Listening Strategies</div>
+                <div class="path-timeline-node">Reading Practice</div>
+                <div class="path-timeline-node">Grammar for IELTS</div>
+                <div class="path-timeline-node">Writing Task 1</div>
+            </div>
+        </div>
+
+        <!-- AI Recommendations Card -->
+        <div class="dashboard-panel-card">
+            <h2><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>AI gợi ý cho bạn</h2>
+            <div class="ai-recommendation-list">
+                <div class="ai-recommendation-card">
+                    <span class="ai-rec-title">Bài nghe nền tảng #12</span>
+                    <a href="/Courses" class="ai-rec-btn">Học ngay</a>
+                </div>
+                <div class="ai-recommendation-card">
+                    <span class="ai-rec-title">Ngữ pháp: Mệnh đề quan hệ</span>
+                    <a href="/Courses" class="ai-rec-btn">Học ngay</a>
+                </div>
+                <div class="ai-recommendation-card">
+                    <span class="ai-rec-title">Đề luyện IELTS Reading</span>
+                    <a href="/Courses" class="ai-rec-btn">Học ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div>
+        <!-- AI Tutor Quick Chat Card -->
+        <div class="tutor-banner-card">
+            <h3>AI Tutor luôn sẵn sàng hỗ trợ bạn!</h3>
+            <p>Bạn cần giải thích bài tập, hay gợi ý cách học? Hỏi AI ngay nhé!</p>
+            <a href="/AITutor" class="tutor-banner-btn">
+                <span>Chat với AI Tutor</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </a>
+        </div>
+
+        <!-- Recent Activities Card -->
+        <div class="dashboard-panel-card">
+            <h2>Hoạt động gần đây</h2>
+            <div class="timeline-list">
+                @foreach (var act in Model.RecentActivities)
+                {
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-item-info">
+                            <span class="timeline-item-title">@act.Title</span>
+                            <span class="timeline-item-time">@act.Time.ToString("HH:mm") - @act.Detail</span>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/dashboard.js" asp-append-version="true"></script>
+}

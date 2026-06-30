@@ -1,0 +1,105 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.CoursesViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = "Khóa học";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
+}
+
+<!-- Courses Filter Header -->
+<div class="card-ailearn mb-4">
+    <div class="row align-items-center">
+        <!-- Search bar -->
+        <div class="col-md-4 mb-3 mb-md-0">
+            <div class="search-box w-100">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" placeholder="Tìm kiếm theo tên khóa học..." id="courseSearchInput" value="@Model.SearchQuery" />
+            </div>
+        </div>
+
+        <!-- Filter tabs -->
+        <div class="col-md-8">
+            <div class="category-tabs-wrapper">
+                @foreach (var cat in Model.Categories)
+                {
+                    <button class="category-tab-ailearn @(Model.ActiveCategory == cat ? "active" : "")" data-category="@cat">
+                        @if (cat == "ALL")
+                        {
+                            <span>Tất cả</span>
+                        }
+                        else if (cat == "COMMUNICATION")
+                        {
+                            <span>Giao tiếp</span>
+                        }
+                        else
+                        {
+                            <span>@cat</span>
+                        }
+                    </button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Courses Grid List -->
+<div class="course-grid-ailearn" id="coursesListGrid">
+    @foreach (var c in Model.Courses)
+    {
+        <div class="course-card-wrapper-item" data-category="@c.SkillCode" data-title="@c.Title">
+            <div class="card-ailearn course-card-ailearn hoverable">
+                <!-- Thumbnail -->
+                <div class="course-card-thumb">
+                    <!-- Standard mockup background using CSS gradient -->
+                    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #7B6DFF, #6C63FF, #08142E); display: flex; align-items: center; justify-content: center; color: white;">
+                        <i class="fa-solid fa-book-open" style="font-size: 3rem; opacity: 0.25;"></i>
+                    </div>
+                    <span class="course-card-tag">@c.SkillName</span>
+                </div>
+
+                <!-- Card Details -->
+                <div class="course-card-info">
+                    <div>
+                        <h3>@c.Title</h3>
+                        <p>@c.Description</p>
+                    </div>
+
+                    <!-- Progress bar -->
+                    <div class="progress-container-ailearn mb-3">
+                        <div class="progress-header-ailearn">
+                            <span class="small text-muted">Tiến độ</span>
+                            <span class="small text-muted">@c.ProgressPercent%</span>
+                        </div>
+                        <div class="progress-bar-ailearn">
+                            <div class="progress-bar-fill" style="width: @c.ProgressPercent%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom metadata -->
+                    <div class="course-card-meta">
+                        <div class="course-card-meta-item">
+                            <i class="fa-solid fa-signal"></i>
+                            <span>@c.Difficulty</span>
+                        </div>
+                        <div class="course-card-meta-item">
+                            <i class="fa-solid fa-file-invoice"></i>
+                            <span>@c.LessonCount bài học</span>
+                        </div>
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="d-grid gap-2 mt-3">
+                        <a href="/Courses/StartCourse/@c.Id" class="btn btn-primary-ailearn btn-sm">Bắt đầu học</a>
+                        <a href="/Quiz/Take/@c.Id" class="btn btn-secondary-ailearn btn-sm">Làm Quiz</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <script src="~/js/courses.js" asp-append-version="true"></script>
+}

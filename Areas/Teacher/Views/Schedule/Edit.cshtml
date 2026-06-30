@@ -1,0 +1,85 @@
+@model DuAnTotNghiep.Models.Schedule
+@{
+    ViewData["Title"] = "Chỉnh sửa lịch giảng dạy";
+}
+
+<div class="max-w-2xl mx-auto py-6 px-4 font-sans space-y-6">
+    
+    <!-- Breadcrumb back -->
+    <div class="flex items-center gap-2">
+        <a href="/Teacher/Schedule" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Quay lại danh sách
+        </a>
+    </div>
+
+    <!-- Title Header -->
+    <div>
+        <h1 class="text-2xl font-black text-slate-900 leading-tight">Chỉnh sửa lịch giảng dạy</h1>
+        <p class="text-slate-500 text-sm">Chỉnh sửa các trường thông tin của lịch học và lưu lại thay đổi.</p>
+    </div>
+
+    <!-- Form card -->
+    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
+        <form asp-action="Edit" method="post" class="space-y-5">
+            <div asp-validation-summary="ModelOnly" class="text-xs text-red-500"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="TeacherId" />
+
+            <!-- Title -->
+            <div class="space-y-1.5">
+                <label asp-for="Title" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tiêu đề buổi dạy / Sự kiện</label>
+                <input asp-for="Title" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" required />
+                <span asp-validation-for="Title" class="text-xs text-red-500"></span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- TopicId -->
+                <div class="space-y-1.5">
+                    <label asp-for="TopicId" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Khóa học giảng dạy tương ứng</label>
+                    <select asp-for="TopicId" asp-items="ViewBag.TopicId" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white">
+                        <option value="">-- Không đính kèm --</option>
+                    </select>
+                    <span asp-validation-for="TopicId" class="text-xs text-red-500"></span>
+                </div>
+
+                <!-- Classroom -->
+                <div class="space-y-1.5">
+                    <label asp-for="Classroom" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Phòng học</label>
+                    <input asp-for="Classroom" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" />
+                    <span asp-validation-for="Classroom" class="text-xs text-red-500"></span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <!-- StartTime -->
+                <div class="space-y-1.5">
+                    <label asp-for="StartTime" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Thời gian bắt đầu</label>
+                    <input asp-for="StartTime" type="datetime-local" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" asp-format="{0:yyyy-MM-ddTHH:mm}" required />
+                    <span asp-validation-for="StartTime" class="text-xs text-red-500"></span>
+                </div>
+
+                <!-- EndTime -->
+                <div class="space-y-1.5">
+                    <label asp-for="EndTime" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Thời gian kết thúc</label>
+                    <input asp-for="EndTime" type="datetime-local" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" asp-format="{0:yyyy-MM-ddTHH:mm}" required />
+                    <span asp-validation-for="EndTime" class="text-xs text-red-500"></span>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="space-y-1.5">
+                <label asp-for="Description" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Mô tả nội dung / Ghi chú buổi dạy</label>
+                <textarea asp-for="Description" rows="4" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"></textarea>
+                <span asp-validation-for="Description" class="text-xs text-red-500"></span>
+            </div>
+
+            <!-- Submit buttons -->
+            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+                <a href="/Teacher/Schedule" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-770 hover:bg-slate-50 font-bold transition-all text-xs cursor-pointer">Hủy</a>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold transition-all text-xs shadow-sm shadow-blue-600/10 cursor-pointer">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+
+</div>

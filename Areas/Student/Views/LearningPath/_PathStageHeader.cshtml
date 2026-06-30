@@ -1,7 +1,16 @@
 @model string
 
 @{
-    var label = string.IsNullOrWhiteSpace(Model) ? "Learning stage" : Model;
+    var rawLabel = string.IsNullOrWhiteSpace(Model) ? "Learning stage" : Model;
+    var label = rawLabel.ToUpperInvariant() switch
+    {
+        "FOUNDATION" => "CƠ BẢN",
+        "PRACTICE" => "LUYỆN TẬP",
+        "VOCABULARY" => "TỪ VỰNG",
+        "CHECKPOINT" => "KIỂM TRA",
+        "GUIDED AI" => "AI DẪN ĐƯỜNG",
+        _ => rawLabel
+    };
 }
 
 <div class="lp-stage">

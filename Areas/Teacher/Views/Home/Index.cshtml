@@ -1,8 +1,248 @@
+@using DuAnTotNghiep.Models
 @{
-    ViewData["Title"] = "Dashboard Giáo Viên";
+    ViewData["Title"] = "Tổng quan giảng dạy";
+    var teacherName = ViewBag.TeacherName as string ?? "Giáo viên";
+    var avatarUrl = ViewBag.AvatarUrl as string;
+    
+    int coursesCount = ViewBag.CoursesCount != null ? (int)ViewBag.CoursesCount : 0;
+    int studentsCount = ViewBag.StudentsCount != null ? (int)ViewBag.StudentsCount : 0;
+    int pendingSubmissionsCount = ViewBag.PendingSubmissionsCount != null ? (int)ViewBag.PendingSubmissionsCount : 0;
+    int todaySchedulesCount = ViewBag.TodaySchedulesCount != null ? (int)ViewBag.TodaySchedulesCount : 0;
+
+    var recentSubmissions = ViewBag.RecentSubmissions as List<PracticeSubmission> ?? new List<PracticeSubmission>();
+    var todaySchedules = ViewBag.TodaySchedules as List<Schedule> ?? new List<Schedule>();
+    var recentQuizAttempts = ViewBag.RecentQuizAttempts as List<QuizAttempt> ?? new List<QuizAttempt>();
+    
+    var chartLabels = ViewBag.ChartLabels as List<string> ?? new List<string>();
+    var chartValues = ViewBag.ChartValues as List<int> ?? new List<int>();
+
+    // Time of day greeting
+    var hour = DateTime.Now.Hour;
+    var timeGreeting = "Chào buổi sáng";
+    if (hour >= 12 && hour < 18) timeGreeting = "Chào buổi chiều";
+    else if (hour >= 18) timeGreeting = "Chào buổi tối";
 }
 
-<div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
-    <h1 class="text-2xl font-bold text-slate-800 mb-4">Chào mừng đến với khu vực Giáo Viên</h1>
-    <p class="text-slate-600">Bạn đang xem giao diện dành riêng cho tài khoản Teacher.</p>
+@section Styles {
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+}
+
+<!-- Welcome Section -->
+<div class="dashboard-header-block card-ailearn mb-4">
+    <div class="d-flex align-items-center gap-4">
+        <div class="position-relative">
+            <img class="user-avatar-sidebar border border-2 border-primary" style="width: 64px; height: 64px;" src="@avatarUrl" alt="Avatar" />
+        </div>
+        <div>
+            <h1 class="mb-1 text-dark">@timeGreeting, @teacherName! 👋</h1>
+            <p class="mb-0 text-muted">Chào mừng bạn quay trở lại. Hãy quản lý lớp học và bài tập của học viên hiệu quả.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Stats Row Grid -->
+<div class="dashboard-stats-row">
+    <!-- Stat 1: Courses -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box purple">
+            <i class="fa-solid fa-graduation-cap"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Khóa học active</span>
+            <span class="dashboard-stat-value">@coursesCount</span>
+            <span class="dashboard-stat-subtext text-muted">Đang giảng dạy</span>
+        </div>
+    </div>
+
+    <!-- Stat 2: Students -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box green">
+            <i class="fa-solid fa-users"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Học viên hoạt động</span>
+            <span class="dashboard-stat-value">@studentsCount</span>
+            <span class="dashboard-stat-subtext text-muted">Trên hệ thống</span>
+        </div>
+    </div>
+
+    <!-- Stat 3: Pending grades -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box orange">
+            <i class="fa-solid fa-clipboard-list"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Bài tập cần chấm</span>
+            <span class="dashboard-stat-value text-danger">@pendingSubmissionsCount</span>
+            <span class="dashboard-stat-subtext text-muted">Yêu cầu chờ duyệt</span>
+        </div>
+    </div>
+
+    <!-- Stat 4: Schedule -->
+    <div class="dashboard-stat-card">
+        <div class="dashboard-stat-icon-box blue">
+            <i class="fa-solid fa-calendar-days"></i>
+        </div>
+        <div class="dashboard-stat-info">
+            <span class="dashboard-stat-label">Lịch dạy hôm nay</span>
+            <span class="dashboard-stat-value">@todaySchedulesCount ca</span>
+            <span class="dashboard-stat-subtext text-muted">Giảng dạy & phòng học</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Column Grid Layout -->
+<div class="dashboard-cols-layout">
+    <!-- Left Column (Tables & info) -->
+    <div>
+        <!-- 1. Recent Student Submissions -->
+        <div class="dashboard-panel-card card-ailearn p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h2 class="mb-0 fs-6 text-dark font-weight-bold"><i class="fa-solid fa-file-signature text-primary me-2"></i>Bài tập học viên nộp gần đây</h2>
+                <a href="/Teacher/Assignments" class="small text-decoration-none text-primary">Xem tất cả &rarr;</a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted small font-weight-bold uppercase">
+                            <th>Học viên</th>
+                            <th>Bài tập</th>
+                            <th>Ngày nộp</th>
+                            <th class="text-center">Trạng thái</th>
+                            <th class="text-end">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!recentSubmissions.Any())
+                        {
+                            <tr>
+                                <td colspan="5" class="py-4 text-center text-muted small">Không có bài tập mới nào cần chấm.</td>
+                            </tr>
+                        }
+                        @foreach (var sub in recentSubmissions)
+                        {
+                            <tr>
+                                <td><span class="font-weight-semibold text-dark">@sub.Student.FullName</span></td>
+                                <td>@sub.PracticeTask.Title</td>
+                                <td class="text-muted small">@sub.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-center">
+                                    @if (sub.Status == "SUBMITTED")
+                                    {
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Đợi chấm</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Đã chấm</span>
+                                    }
+                                </td>
+                                <td class="text-end">
+                                    <a href="/Teacher/Assignments/Grade/@sub.Id" class="btn btn-primary-ailearn btn-sm py-1 px-3 fs-7">Chấm điểm</a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 2. Recent Quiz Attempts -->
+        <div class="dashboard-panel-card card-ailearn p-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h2 class="mb-0 fs-6 text-dark font-weight-bold"><i class="fa-solid fa-circle-check text-primary me-2"></i>Kết quả làm Quiz mới nhất</h2>
+                <a href="/Teacher/Grades" class="small text-decoration-none text-primary">Sổ điểm &rarr;</a>
+            </div>
+            
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead>
+                        <tr class="text-muted small font-weight-bold uppercase">
+                            <th>Học viên</th>
+                            <th>Bài thi Quiz</th>
+                            <th>Ngày làm</th>
+                            <th class="text-end">Điểm số</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (!recentQuizAttempts.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="py-4 text-center text-muted small">Chưa có lượt làm Quiz nào gần đây.</td>
+                            </tr>
+                        }
+                        @foreach (var attempt in recentQuizAttempts)
+                        {
+                            <tr>
+                                <td><span class="font-weight-semibold text-dark">@attempt.Student.FullName</span></td>
+                                <td>@attempt.Quiz.Title</td>
+                                <td class="text-muted small">@(attempt.SubmittedAt?.ToString("dd/MM/yyyy HH:mm") ?? "")</td>
+                                <td class="text-end font-weight-bold @(attempt.Score >= 50 ? "text-success" : "text-danger")">
+                                    @attempt.Score?.ToString("0.0")đ
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column (Schedule and metrics) -->
+    <div>
+        <!-- 1. Today's teaching schedule -->
+        <div class="dashboard-panel-card card-ailearn p-4 mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
+                <h2 class="mb-0 fs-6 text-dark font-weight-bold"><i class="fa-solid fa-calendar-day text-primary me-2"></i>Lịch dạy hôm nay</h2>
+                <span class="badge bg-primary-subtle text-primary">@todaySchedules.Count ca</span>
+            </div>
+
+            <div class="d-flex flex-column gap-3 mb-3">
+                @if (!todaySchedules.Any())
+                {
+                    <p class="text-muted small text-center py-3 mb-0">Hôm nay bạn không có lịch giảng dạy.</p>
+                }
+                @foreach (var sch in todaySchedules)
+                {
+                    <div class="p-3 bg-light rounded-3 border">
+                        <h6 class="mb-1 text-dark font-weight-semibold">@sch.Title</h6>
+                        <div class="d-flex align-items-center gap-2 text-muted small mt-1">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>@sch.StartTime.ToString("HH:mm") - @sch.EndTime.ToString("HH:mm")</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 text-muted small mt-1">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <span>Phòng: @(sch.Classroom ?? "Online")</span>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            <a href="/Teacher/Schedule" class="btn btn-secondary-ailearn w-100 btn-sm">Xem lịch biểu đầy đủ</a>
+        </div>
+
+        <!-- 2. Course Distribution -->
+        <div class="dashboard-panel-card card-ailearn p-4">
+            <h2 class="mb-3 pb-2 border-bottom fs-6 text-dark font-weight-bold"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Phân bố khóa học</h2>
+            
+            <div class="d-flex flex-column gap-3">
+                @for (int i = 0; i < chartLabels.Count; i++)
+                {
+                    var label = chartLabels[i];
+                    var val = chartValues[i];
+                    var maxVal = chartValues.Max();
+                    var pct = maxVal > 0 ? (double)val / maxVal * 100 : 0;
+                    
+                    <div>
+                        <div class="d-flex justify-content-between text-muted small mb-1">
+                            <span>@label</span>
+                            <span class="font-weight-semibold text-dark">@val khóa</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar bg-primary rounded-pill" role="progressbar" style="width: @pct%"></div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
 </div>

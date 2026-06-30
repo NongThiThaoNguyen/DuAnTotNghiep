@@ -1,0 +1,49 @@
+@model IEnumerable<DuAnTotNghiep.Models.SystemSetting>
+@{
+    ViewData["Title"] = "Cấu hình hệ thống";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+}
+
+<div class="courses-header mb-4">
+    <div>
+        <h1 class="text-dark m-0 fs-3 font-weight-bold">Cài đặt hệ thống</h1>
+        <p class="text-muted m-0 small">Quản lý và điều chỉnh các cấu hình chung liên quan đến việc học và vận hành.</p>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card-ailearn">
+            <form asp-action="Update" method="post">
+                <div class="d-flex flex-column gap-4">
+                    @if (!Model.Any())
+                    {
+                        <p class="text-muted text-center py-4 small">Không tìm thấy cấu hình hệ thống nào.</p>
+                    }
+                    @foreach (var setting in Model)
+                    {
+                        <div class="border-bottom pb-3 last:border-bottom-0">
+                            <div class="mb-2">
+                                <span class="font-weight-bold text-dark text-sm block">@setting.SettingKey</span>
+                                <span class="text-muted small d-block">@(setting.Description ?? "Không có mô tả.")</span>
+                            </div>
+                            <input type="text" name="settingsData[@setting.Id]" value="@setting.SettingValue" class="form-control border-1 rounded-3" required />
+                        </div>
+                    }
+                </div>
+
+                @if (Model.Any())
+                {
+                    <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+                        <button type="submit" class="btn btn-primary-ailearn">
+                            <i class="fa-solid fa-save me-1"></i> Lưu cấu hình
+                        </button>
+                    </div>
+                }
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,72 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.ChatViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = "AI Tutor";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/chat.css" asp-append-version="true" />
+}
+
+<div class="chat-container-ailearn">
+    <!-- Chat Header -->
+    <div class="chat-header-ailearn">
+        <div class="chat-tutor-profile">
+            <div class="chat-tutor-avatar">
+                <img src="/images/ai-tutor.png" alt="AI Tutor" onerror="this.src='https://ui-avatars.com/api/?name=AI&background=6C63FF&color=fff'" />
+                <span class="chat-tutor-status"></span>
+            </div>
+            <div class="chat-tutor-info">
+                <h3>AI English Tutor</h3>
+                <span>Đang hoạt động &bull; Gemini 1.5 Pro</span>
+            </div>
+        </div>
+        <div>
+            <button class="btn btn-sm btn-outline-secondary" onclick="window.location.reload();">
+                <i class="fa-solid fa-arrows-rotate me-1"></i>Làm mới
+            </button>
+        </div>
+    </div>
+
+    <!-- Hidden configs -->
+    <input type="hidden" id="conversationId" value="@Model.ConversationId" />
+    <input type="hidden" id="studentAvatarUrl" value="@ViewBag.StudentAvatarUrl" />
+    @Html.AntiForgeryToken()
+
+    <!-- Messages Log -->
+    <div class="chat-messages-log" id="chatMessagesLog">
+        @foreach (var msg in Model.Messages)
+        {
+            var isStudent = (msg.SenderType == "STUDENT");
+            <div class="chat-bubble-wrapper @(isStudent ? "student" : "ai")">
+                <img src="@(isStudent ? ViewBag.StudentAvatarUrl : "/images/ai-tutor.png")" alt="Avatar" class="chat-bubble-avatar" onerror="this.src='https://ui-avatars.com/api/?name=@(isStudent ? "HV" : "AI")&background=6C63FF&color=fff'" />
+                <div class="chat-bubble-content">
+                    <p class="chat-bubble-text">@msg.MessageText</p>
+                    <span class="chat-bubble-time">@msg.TimeLabel</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Question Suggestions -->
+    <div class="chat-suggestions-container">
+        @foreach (var sug in Model.SuggestedQuestions)
+        {
+            <div class="chat-suggestion-chip">@sug</div>
+        }
+    </div>
+
+    <!-- Input bar -->
+    <div class="chat-input-bar">
+        <form class="chat-input-form" id="chatForm">
+            <input type="text" placeholder="Nhập câu hỏi tiếng Anh của bạn tại đây..." id="chatInput" autocomplete="off" required />
+            <button type="submit" class="chat-send-btn">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/chat.js" asp-append-version="true"></script>
+}

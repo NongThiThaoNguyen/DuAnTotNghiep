@@ -1,0 +1,162 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.LessonViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = Model.LessonTitle;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/lesson.css" asp-append-version="true" />
+}
+
+<div class="lesson-layout">
+    <!-- Left Column: Video and Tabs -->
+    <div>
+        <!-- Video Player -->
+        <div class="lesson-player-container">
+            <video controls poster="/images/lesson-poster.png">
+                <source src="@Model.VideoUrl" type="video/mp4" />
+                Trình duyệt của bạn không hỗ trợ tag video.
+            </video>
+        </div>
+
+        <!-- Lesson Header Actions -->
+        <div class="lesson-header-section">
+            <div class="lesson-title-block">
+                <h2>@Model.LessonTitle</h2>
+                <span>Khóa học: @Model.CourseTitle &bull; Thời lượng dự kiến: @Model.EstimatedMinutes phút</span>
+            </div>
+            
+            <form asp-controller="Lesson" asp-action="MarkCompleted" asp-route-id="@Model.LessonId" method="post">
+                @Html.AntiForgeryToken()
+                @if (Model.IsCompleted)
+                {
+                    <button class="btn btn-success" disabled>
+                        <i class="fa-solid fa-circle-check me-2"></i>Đã hoàn thành
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="btn-primary-ailearn">
+                        <i class="fa-solid fa-check me-2"></i>Đánh dấu hoàn thành
+                    </button>
+                }
+            </form>
+        </div>
+
+        <!-- Details tabs -->
+        <div class="card-ailearn lesson-details-card">
+            <div class="lesson-details-tabs">
+                <div class="lesson-details-tab active" data-tab="desc">Nội dung bài học</div>
+                <div class="lesson-details-tab" data-tab="examples">Ví dụ & Giải nghĩa</div>
+                <div class="lesson-details-tab" data-tab="resources">Tài liệu tham khảo</div>
+            </div>
+
+            <!-- Tab content -->
+            <div class="tab-content">
+                <!-- Description -->
+                <div class="tab-content-item active" id="descContent">
+                    @Html.Raw(Model.Content)
+                </div>
+
+                <!-- Examples -->
+                <div class="tab-content-item" id="examplesContent">
+                    <h5>Cấu trúc ngữ pháp áp dụng</h5>
+                    <p>Trong bài giảng này, học sinh nên lưu ý các cấu trúc câu sau:</p>
+                    <div class="p-3 border rounded bg-light mb-3">
+                        <strong>1. Relative Clauses (Mệnh đề quan hệ):</strong><br>
+                        Syntax: `Noun + who/which/that + Verb/Clause`<br>
+                        <em>Example:</em> The tutor who supports me is very friendly.<br>
+                        <strong>Dịch:</strong> Trợ lý người hỗ trợ tôi rất thân thiện.
+                    </div>
+                    <div class="p-3 border rounded bg-light">
+                        <strong>2. Active / Passive Voice (Chủ động / Bị động):</strong><br>
+                        Syntax: `S + be + V3/ed + by Noun`<br>
+                        <em>Example:</em> The lesson was prepared by AI Tutor.<br>
+                        <strong>Dịch:</strong> Bài học được chuẩn bị bởi Trợ lý AI.
+                    </div>
+                </div>
+
+                <!-- Resources -->
+                <div class="tab-content-item" id="resourcesContent">
+                    <div class="resource-list">
+                        <div class="resource-item">
+                            <div class="resource-item-info">
+                                <i class="fa-regular fa-file-pdf"></i>
+                                <span>Tài liệu tóm tắt ngữ pháp bài học.pdf</span>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-download"></i></a>
+                        </div>
+                        <div class="resource-item">
+                            <div class="resource-item-info">
+                                <i class="fa-regular fa-file-audio"></i>
+                                <span>Audio phát âm ví dụ bài giảng.mp3</span>
+                            </div>
+                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-download"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sibling Navigation footer links -->
+        <div class="d-flex justify-content-between">
+            @if (Model.PreviousLessonId.HasValue)
+            {
+                <a href="/Lesson/Detail/@Model.PreviousLessonId" class="btn btn-secondary-ailearn">
+                    <i class="fa-solid fa-arrow-left me-2"></i>Bài trước
+                </a>
+            }
+            else
+            {
+                <button class="btn btn-secondary-ailearn" disabled>
+                    <i class="fa-solid fa-arrow-left me-2"></i>Bài trước
+                </button>
+            }
+
+            @if (Model.NextLessonId.HasValue)
+            {
+                <a href="/Lesson/Detail/@Model.NextLessonId" class="btn btn-primary-ailearn">
+                    Bài tiếp theo<i class="fa-solid fa-arrow-right ms-2"></i>
+                </a>
+            }
+            else
+            {
+                <a href="/Courses" class="btn btn-primary-ailearn">
+                    Quay về khóa học<i class="fa-solid fa-house ms-2"></i>
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Right Column: Sidebar Navigation -->
+    <div>
+        <div class="card-ailearn">
+            <h3 class="h6 font-weight-bold mb-3">Danh sách bài học</h3>
+            <div class="lesson-sidebar-list">
+                @foreach (var sib in Model.LessonsInCourse)
+                {
+                    <a href="/Lesson/Detail/@sib.Id" class="lesson-sidebar-item @(sib.IsCurrent ? "active" : "")">
+                        <div class="lesson-sidebar-item-status @(sib.IsCompleted ? "completed" : "pending")">
+                            @if (sib.IsCompleted)
+                            {
+                                <i class="fa-solid fa-check"></i>
+                            }
+                            else
+                            {
+                                <span>@sib.OrderIndex</span>
+                            }
+                        </div>
+                        <div class="lesson-sidebar-item-info">
+                            <h4 class="lesson-sidebar-item-title">@sib.Title</h4>
+                            <span class="lesson-sidebar-item-duration">@((sib.OrderIndex * 2) + 12) phút</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/lesson.js" asp-append-version="true"></script>
+}

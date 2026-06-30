@@ -1,0 +1,127 @@
+@model IEnumerable<DuAnTotNghiep.Models.ReferenceSource>
+@using DuAnTotNghiep.Models.Enums
+@{
+    ViewData["Title"] = "Kho tài liệu tham khảo";
+    var keyword = ViewBag.Keyword as string;
+    var sourceType = ViewBag.SourceType as ReferenceSourceType?;
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
+}
+
+<div class="courses-header mb-4">
+    <div>
+        <h1 class="text-dark m-0 fs-3 font-weight-bold">Kho tài liệu tham khảo</h1>
+        <p class="text-muted m-0 small">Quản lý sách điện tử, file nghe podcast, liên kết ngoài hỗ trợ học tập.</p>
+    </div>
+    <a href="/Teacher/Resources/Create" class="btn btn-primary-ailearn">
+        <i class="fa-solid fa-plus me-1"></i> Tải lên học liệu mới
+    </a>
+</div>
+
+<!-- Filters Section -->
+<div class="card-ailearn mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <!-- Keyword Search -->
+        <div class="col-md-5">
+            <label class="form-label text-muted small uppercase font-weight-bold">Tìm kiếm</label>
+            <div class="search-box w-100">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" name="keyword" value="@keyword" placeholder="Nhập tên học liệu, tác giả..." />
+            </div>
+        </div>
+
+        <!-- Source Type Filter -->
+        <div class="col-md-4">
+            <label class="form-label text-muted small uppercase font-weight-bold">Loại tài liệu</label>
+            <select name="sourceType" class="form-select border-1 rounded-3">
+                <option value="">Tất cả</option>
+                <option value="TEACHER_CREATED">Giáo viên biên soạn</option>
+                <option value="OFFICIAL">Chính thống (OFFICIAL)</option>
+                <option value="OPEN_LICENSE">Giấy phép mở (OPEN_LICENSE)</option>
+                <option value="REFERENCE_ONLY">Chỉ tham khảo (REFERENCE_ONLY)</option>
+            </select>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="col-md-3 d-flex gap-2">
+            <button type="submit" class="btn btn-primary-ailearn flex-grow-1 btn-sm">Lọc</button>
+            <a href="/Teacher/Resources" class="btn btn-secondary-ailearn btn-sm" title="Làm mới">
+                <i class="fa-solid fa-rotate"></i>
+            </a>
+        </div>
+    </form>
+</div>
+
+<!-- Table List Card -->
+<div class="card-ailearn p-0 overflow-hidden">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr class="text-muted small font-weight-bold uppercase bg-light">
+                    <th class="py-3 px-4">Tên học liệu</th>
+                    <th class="py-3 px-4">Tác giả/Tổ chức</th>
+                    <th class="py-3 px-4 text-center">Phân loại nguồn</th>
+                    <th class="py-3 px-4 text-center">Chính sách sử dụng</th>
+                    <th class="py-3 px-4 text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="5" class="py-4 text-center text-muted small">Không tìm thấy tài liệu nào.</td>
+                    </tr>
+                }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="py-3 px-4">
+                            <div class="d-flex flex-column">
+                                <span class="font-weight-bold text-dark">@item.SourceName</span>
+                                @if (!string.IsNullOrEmpty(item.SourceUrl))
+                                {
+                                    <a href="@item.SourceUrl" target="_blank" class="text-xs text-primary text-decoration-underline text-truncate d-inline-block" style="max-width: 250px;">@item.SourceUrl</a>
+                                }
+                            </div>
+                        </td>
+                        <td class="py-3 px-4 text-muted">@(item.Author ?? "N/A") / @(item.Organization ?? "N/A")</td>
+                        <td class="py-3 px-4 text-center">
+                            <span class="purple-badge">@item.SourceType</span>
+                        </td>
+                        <td class="py-3 px-4 text-center text-muted">@item.UsagePolicy</td>
+                        <td class="py-3 px-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="/Teacher/Resources/Details/@item.Id" class="btn btn-outline-primary btn-sm p-1 px-2" title="Xem">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a href="/Teacher/Resources/Edit/@item.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa">
+                                    <i class="fa-solid fa-pen"></i>
+                                </a>
+                                <a href="/Teacher/Resources/Delete/@item.Id" class="btn btn-outline-danger btn-sm p-1 px-2" title="Xóa">
+                                    <i class="fa-solid fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Pagination -->
+@if (totalPages > 1)
+{
+    <div class="d-flex justify-content-center gap-2 mt-4">
+        @for (int p = 1; p <= totalPages; p++)
+        {
+            <a href="/Teacher/Resources?page=@p&keyword=@keyword&sourceType=@sourceType" class="btn @(currentPage == p ? "btn-primary-ailearn" : "btn-secondary-ailearn") btn-sm px-3">
+                @p
+            </a>
+        }
+    </div>
+}

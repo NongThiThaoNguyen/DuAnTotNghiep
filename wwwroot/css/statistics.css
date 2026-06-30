@@ -1,0 +1,82 @@
+/* Statistics Page Stylesheet */
+
+.stats-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.charts-row-ailearn {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+.chart-card-wrapper {
+    min-height: 380px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.chart-title-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.chart-title-block h3 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-main);
+}
+
+.chart-canvas-container {
+    position: relative;
+    flex-grow: 1;
+    width: 100%;
+    height: 280px;
+}
+
+/* Skills stats progress bar */
+.skills-progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.skill-progress-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.skill-progress-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-main);
+}
+
+.skill-progress-track {
+    height: 8px;
+    background-color: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.skill-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+}
+.skill-progress-fill.listening { background-color: #6C63FF; }
+.skill-progress-fill.speaking { background-color: #4ADE80; }
+.skill-progress-fill.reading { background-color: #60A5FA; }
+.skill-progress-fill.writing { background-color: #FB923C; }
+.skill-progress-fill.grammar { background-color: #F472B6; }

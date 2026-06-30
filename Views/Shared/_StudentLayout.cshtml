@@ -65,7 +65,7 @@
         // 1. Dashboard
         new MenuItem
         {
-            Label = "Dashboard",
+            Label = "Tổng quan",
             Controller = "Home",
             Action = "Index",
             Area = "Student",
@@ -101,12 +101,12 @@
         // 4. Placement Test
         new MenuItem
         {
-            Label = "Placement Test",
+            Label = "Bài test đầu vào",
             IsActive = (controller == "PlacementTest"),
             IconSvg = "<svg class=\"w-5 h-5 shrink-0\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01\"></path></svg>",
             Children = new List<SubMenuItem>
             {
-                new SubMenuItem { Label = "Placement Test", Controller = "PlacementTest", Action = "Intro", Area = "Student" },
+                new SubMenuItem { Label = "Giới thiệu kiểm tra", Controller = "PlacementTest", Action = "Intro", Area = "Student" },
                 new SubMenuItem { Label = "Làm bài kiểm tra", Controller = "PlacementTest", Action = "Suggestion", Area = "Student" },
                 new SubMenuItem { Label = "Tiếp tục bài đang làm", Controller = "PlacementTest", Action = "Intro", Area = "Student" },
                 new SubMenuItem { Label = "Lịch sử làm bài", Controller = "PlacementTest", Action = "Intro", Area = "Student", IsEnabled = false, BadgeText = "Sắp ra mắt" }
@@ -130,12 +130,12 @@
         // 6. Learning Path
         new MenuItem
         {
-            Label = "Learning Path",
+            Label = "Lộ trình học",
             IsActive = (controller == "LearningPath"),
             IconSvg = "<svg class=\"w-5 h-5 shrink-0\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7\"></path></svg>",
             Children = new List<SubMenuItem>
             {
-                new SubMenuItem { Label = "Learning Path", Controller = "LearningPath", Action = "Index", Area = "Student" },
+                new SubMenuItem { Label = "Lộ trình học AI", Controller = "LearningPath", Action = "Index", Area = "Student" },
                 new SubMenuItem { Label = "Lộ trình hiện tại + tiến độ", Controller = "LearningPath", Action = "Index", Area = "Student" }
             }
         },

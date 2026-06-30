@@ -1,0 +1,41 @@
+@model DuAnTotNghiep.Models.Quiz
+@{
+    ViewData["Title"] = "Xóa Quiz - " + Model.Title;
+}
+
+<div class="max-w-md mx-auto py-6 px-4 font-sans space-y-6">
+    
+    <!-- Header -->
+    <div class="text-center space-y-2">
+        <div class="w-12 h-12 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto border border-red-100 shadow-xs">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h1 class="text-xl font-black text-slate-900 leading-tight">Xác nhận xóa bài Quiz?</h1>
+        <p class="text-slate-500 text-xs">Hành động này không thể hoàn tác. Mọi câu hỏi trắc nghiệm và kết quả bài làm của học viên cũng sẽ bị xóa bỏ.</p>
+    </div>
+
+    <!-- Details Card -->
+    <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+        <div>
+            <span class="block text-[9px] text-slate-400 font-bold uppercase tracking-wider">Tên bài Quiz</span>
+            <span class="text-slate-800 font-bold text-sm block">@Model.Title</span>
+        </div>
+        
+        <div>
+            <span class="block text-[9px] text-slate-400 font-bold uppercase tracking-wider">Khóa học đính kèm</span>
+            <span class="text-slate-800 text-xs block">@(Model.Topic?.Title ?? "Tổng quát")</span>
+        </div>
+
+        <div>
+            <span class="block text-[9px] text-slate-400 font-bold uppercase tracking-wider">Dạng Quiz</span>
+            <span class="text-slate-800 text-xs block">@Model.QuizType</span>
+        </div>
+
+        <form asp-action="Delete" method="post" class="flex gap-3 pt-4 border-t border-slate-100">
+            <input type="hidden" asp-for="Id" />
+            <a href="/Teacher/Quizzes" class="flex-1 py-2.5 text-center rounded-xl border border-slate-200 text-slate-770 hover:bg-slate-50 font-bold text-xs transition-all cursor-pointer">Hủy</a>
+            <button type="submit" class="flex-1 py-2.5 rounded-xl bg-red-650 text-white hover:bg-red-700 font-bold text-xs transition-all cursor-pointer">Xác nhận xóa</button>
+        </form>
+    </div>
+
+</div>

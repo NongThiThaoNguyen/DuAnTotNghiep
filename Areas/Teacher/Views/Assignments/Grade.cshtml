@@ -1,0 +1,127 @@
+@model DuAnTotNghiep.Models.PracticeSubmission
+@{
+    ViewData["Title"] = "Chấm điểm bài làm - " + Model.Student.FullName;
+}
+
+<div class="max-w-3xl mx-auto py-6 px-4 font-sans space-y-6">
+    
+    <!-- Breadcrumb back -->
+    <div class="flex items-center justify-between">
+        <a href="/Teacher/Assignments/Submissions" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Quay lại danh sách
+        </a>
+    </div>
+
+    <!-- Title Header -->
+    <div>
+        <h1 class="text-2xl font-black text-slate-900 leading-tight">Chấm điểm bài nộp</h1>
+        <p class="text-slate-500 text-sm">Xem chi tiết câu trả lời, nhận xét của AI và nhập điểm/phản hồi của giáo viên.</p>
+    </div>
+
+    <!-- Main Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        <!-- Cột Trái (Nội dung bài nộp & Nhận xét của AI) -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- Đề bài & Bài nộp -->
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Đề bài: @Model.PracticeTask.Title</span>
+                    <p class="text-slate-800 font-semibold text-sm mt-1 whitespace-pre-line">@Model.PracticeTask.Instruction</p>
+                </div>
+                
+                <div>
+                    <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-2">Bài nộp của Học viên:</span>
+                    <div class="p-4 bg-slate-50 border border-slate-150 rounded-xl text-sm text-slate-850 leading-relaxed whitespace-pre-line">
+                        @if (string.IsNullOrEmpty(Model.SubmissionText))
+                        {
+                            <span class="text-slate-400 italic">Không có nội dung văn bản.</span>
+                        }
+                        else
+                        {
+                            @Model.SubmissionText
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.FileUrl))
+                        {
+                            <div class="mt-4 pt-3 border-t border-slate-200">
+                                <span class="text-xs font-semibold text-slate-500 block">Tệp đính kèm:</span>
+                                <a href="@Model.FileUrl" target="_blank" class="text-xs font-bold text-blue-600 underline flex items-center gap-1.5 mt-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                    Xem tệp tài liệu
+                                </a>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.AudioUrl))
+                        {
+                            <div class="mt-4 pt-3 border-t border-slate-200">
+                                <span class="text-xs font-semibold text-slate-500 block">Bản ghi âm:</span>
+                                <audio controls class="mt-2 w-full">
+                                    <source src="@Model.AudioUrl" type="audio/mpeg" />
+                                    Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                                </audio>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phản hồi tự động của AI -->
+            @if (!string.IsNullOrEmpty(Model.AiFeedback))
+            {
+                <div class="bg-purple-50 p-6 rounded-2xl border border-purple-150 space-y-3">
+                    <div class="flex items-center gap-2 text-purple-800">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 2a1 1 0 011 1v1.323l3.95 2.296a1 1 0 01.5 1.157l-1.95 7.8A1 1 0 0112.5 15H7.5a1 1 0 01-.975-.776l-1.95-7.8a1 1 0 01.5-1.157L9 4.323V3a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                        <h4 class="text-sm font-bold uppercase tracking-wider">Đánh giá gợi ý từ AI</h4>
+                    </div>
+                    <div class="text-xs text-purple-950 leading-relaxed whitespace-pre-line">
+                        @Model.AiFeedback
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Cột Phải (Bảng điểm & Nhận xét của Giáo viên) -->
+        <div>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <h4 class="text-sm font-bold text-slate-900 uppercase tracking-wider border-b border-slate-100 pb-3">Bảng chấm điểm</h4>
+
+                <form asp-action="Grade" method="post" class="space-y-4">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Học viên nộp</label>
+                        <span class="text-slate-800 font-bold text-sm block">@Model.Student.FullName</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Thời gian nộp</label>
+                        <span class="text-slate-500 text-xs block">@Model.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+
+                    <!-- Score Input -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Điểm số (Thang 100)</label>
+                        <input type="number" step="0.1" name="score" value="@(Model.Score ?? 0)" min="0" max="100" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-bold" required />
+                        <span class="text-[10px] text-slate-450">Nhập điểm từ 0.0 đến 100.0</span>
+                    </div>
+
+                    <!-- Teacher Feedback -->
+                    <div class="space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nhận xét của Giáo viên</label>
+                        <textarea name="teacherFeedback" rows="5" class="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" placeholder="Nhập lời khuyên, nhận định chi tiết cho học viên...">@Model.TeacherFeedback</textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-sm shadow-blue-600/10 cursor-pointer">
+                        Hoàn tất chấm điểm
+                    </button>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+</div>
