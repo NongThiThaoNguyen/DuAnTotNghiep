@@ -27,9 +27,23 @@ namespace DuAnTotNghiep.Services.AI
             _config = config;
             _db = db;
             _usageLogService = usageLogService;
-            _apiKey = config["OpenAI:ApiKey"] ?? throw new ArgumentNullException("OpenAI:ApiKey");
-            _http.BaseAddress = new Uri("https://api.openai.com/");
-            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            _apiKey = config["AI:ApiKey"] ?? config["OpenAI:ApiKey"] ?? "";
+            
+            string baseAddress = "https://api.openai.com/";
+            if (!string.IsNullOrEmpty(config["AI:Endpoint"]))
+            {
+                baseAddress = config["AI:Endpoint"];
+            }
+            else if (_apiKey.StartsWith("AIzaSy"))
+            {
+                baseAddress = "https://generativelanguage.googleapis.com/v1beta/openai/";
+            }
+
+            _http.BaseAddress = new Uri(baseAddress);
+            if (!string.IsNullOrEmpty(_apiKey))
+            {
+                _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _apiKey);
+            }
         }
 
         public async Task<string> GenerateAsync(string systemPrompt, string userPrompt, string moduleCode = "M14", int? promptTemplateId = null, int? userId = null, string? aiModel = null, CancellationToken cancellationToken = default)
@@ -39,7 +53,25 @@ namespace DuAnTotNghiep.Services.AI
             string? errorMessage = null;
             int? inputTokens = null;
             int? outputTokens = null;
+            
             var model = aiModel ?? "gpt-4o-mini";
+            
+            bool isGemini = _apiKey.StartsWith("AIzaSy");
+            if (isGemini)
+            {
+                if (!string.IsNullOrEmpty(_config["AI:Model"]))
+                {
+                    model = _config["AI:Model"];
+                }
+                else if (model.Contains("gpt-4o-mini") || model.Contains("gpt-3.5"))
+                {
+                    model = "gemini-1.5-flash";
+                }
+                else if (model.Contains("gpt-4"))
+                {
+                    model = "gemini-1.5-pro";
+                }
+            }
 
             try
             {

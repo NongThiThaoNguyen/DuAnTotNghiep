@@ -1,0 +1,90 @@
+@model DuAnTotNghiep.Models.ViewModels.StudyPlan.DailyStudyTaskViewModel
+
+@{
+    var isClickable = !Model.HasConfigError && Model.Status != "LOCKED" && !string.IsNullOrEmpty(Model.TargetUrl);
+}
+
+<div class="task-card bg-white rounded-2xl border border-slate-100 p-5 shadow-sm transition-all hover:shadow-md @Model.StatusCssClass mb-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="flex-1 min-w-0">
+        <!-- Badges & Metadata -->
+        <div class="flex flex-wrap items-center gap-2 mb-2">
+            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-blue-50 text-blue-600">
+                @Model.NodeType
+            </span>
+            @if (!string.IsNullOrEmpty(Model.SkillName))
+            {
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                    <i class="fa-solid fa-graduation-cap mr-1"></i> @Model.SkillName
+                </span>
+            }
+            @if (Model.IsOverdue)
+            {
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-100 text-rose-600 animate-pulse">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Quá hạn
+                </span>
+            }
+            @if (Model.IsTodayTask)
+            {
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-600">
+                    <i class="fa-solid fa-calendar-day mr-1"></i> Hôm nay
+                </span>
+            }
+            @if (Model.RescheduledFrom.HasValue)
+            {
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-600" title="Dời từ ngày @Model.RescheduledFrom.Value.ToString("dd/MM/yyyy")">
+                    <i class="fa-solid fa-clock-rotate-left mr-1"></i> Đã dời lịch
+                </span>
+            }
+            <span class="ml-auto md:ml-0 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-50 text-slate-500">
+                <i class="fa-regular fa-clock mr-1"></i> @Model.EstimatedMinutes phút
+            </span>
+        </div>
+
+        <!-- Task Title -->
+        <h4 class="text-base font-semibold text-slate-800 mb-1 flex items-center gap-2">
+            @Model.Title
+            @if (Model.HasConfigError)
+            {
+                <span class="text-rose-500 text-xs font-normal bg-rose-50 px-2 py-0.5 rounded" title="Nhiệm vụ này bị thiếu cấu hình nội dung. Vui lòng liên hệ Admin.">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> Lỗi cấu hình
+                </span>
+            }
+        </h4>
+
+        <!-- AI Advice/Reason -->
+        @if (!string.IsNullOrEmpty(Model.AiReason))
+        {
+            <p class="text-xs text-slate-500 line-clamp-2 md:line-clamp-1 italic" title="@Model.AiReason">
+                <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> Gợi ý học tập: @Model.AiReason
+            </p>
+        }
+    </div>
+
+    <!-- Status Label & Action Buttons -->
+    <div class="flex items-center gap-3 shrink-0 self-end md:self-center">
+        <span class="text-xs font-semibold px-3 py-1 rounded-lg bg-slate-100 text-slate-600 border border-slate-200">
+            @Model.StatusLabel
+        </span>
+
+        @if (isClickable)
+        {
+            <a href="@Url.Action("OpenTask", "StudyPlan", new { area = "Student", nodeId = Model.NodeId })" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium text-xs rounded-xl shadow-xs transition-all hover:shadow flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-play"></i> Bắt đầu học
+            </a>
+        }
+        else
+        {
+            <button disabled class="px-4 py-2 bg-slate-100 text-slate-400 font-medium text-xs rounded-xl border border-slate-200 cursor-not-allowed flex items-center gap-1.5">
+                <i class="fa-solid fa-lock"></i> Chưa mở
+            </button>
+        }
+
+        @if (Model.Status != "COMPLETED" && Model.Status != "LOCKED" && Model.Status != "SKIPPED")
+        {
+            <!-- Button skip triggers modal or simple quick-skip -->
+            <button type="button" onclick="openSkipModal(@Model.NodeId, '@Model.Title')" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all cursor-pointer" title="Tạm bỏ qua nhiệm vụ này">
+                <i class="fa-regular fa-eye-slash text-base"></i>
+            </button>
+        }
+    </div>
+</div>

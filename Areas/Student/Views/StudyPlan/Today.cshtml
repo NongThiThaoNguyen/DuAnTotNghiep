@@ -1,0 +1,260 @@
+@model DuAnTotNghiep.Models.ViewModels.StudyPlan.TodayStudyPlanViewModel
+
+@{
+    ViewData["Title"] = "Nhiệm vụ hôm nay";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<link rel="stylesheet" href="~/css/studyplan.css" asp-append-version="true" />
+
+<div class="container mx-auto">
+    <!-- Header Page & Tab navigation -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Kế Hoạch Học Tập</h1>
+            <p class="text-sm text-slate-500">Lộ trình: <span class="font-semibold text-slate-700">@Model.PathTitle</span></p>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200 self-start md:self-center">
+            <a href="@Url.Action("Today", "StudyPlan", new { area = "Student" })" class="px-4 py-2 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-xs border border-slate-200">
+                <i class="fa-solid fa-calendar-day mr-1 text-blue-600"></i> Hôm nay
+            </a>
+            <a href="@Url.Action("Week", "StudyPlan", new { area = "Student" })" class="px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-800 hover:bg-slate-200/50">
+                <i class="fa-solid fa-calendar-week mr-1"></i> Tuần này
+            </a>
+            <a href="@Url.Action("Month", "StudyPlan", new { area = "Student" })" class="px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-800 hover:bg-slate-200/50">
+                <i class="fa-solid fa-calendar-days mr-1"></i> Tháng này
+            </a>
+        </div>
+    </div>
+
+    <!-- Daily Progress Tracker Widget -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm mb-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex-1 w-full">
+            <div class="flex justify-between items-center mb-2">
+                <div class="flex items-center gap-2">
+                    <span class="font-semibold text-slate-700">Thời lượng học mục tiêu hôm nay:</span>
+                    <span class="text-sm text-slate-500">@Model.TotalMinutesToday / @Model.DailyLimitMinutes phút</span>
+                    @if (Model.IsOverloaded)
+                    {
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-700 animate-pulse border border-amber-200">
+                            <i class="fa-solid fa-fire mr-1"></i> Lịch quá tải
+                        </span>
+                    }
+                </div>
+                @{
+                    var percent = Model.DailyLimitMinutes > 0 ? (int)Math.Min(Model.TotalMinutesToday * 100 / Model.DailyLimitMinutes, 100) : 0;
+                }
+                <span class="text-xs font-bold text-blue-600">@percent%</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-3">
+                <div class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: @percent%"></div>
+            </div>
+            <p class="text-xs text-slate-500 mt-2">
+                <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> 
+                Hãy dành khoảng @Model.TotalMinutesToday phút để hoàn thành toàn bộ các nhiệm vụ được lập lịch trong hôm nay.
+            </p>
+        </div>
+    </div>
+
+    <!-- Main Tasks Layout Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Left 2 Cols: Main Study Tasks -->
+        <div class="lg:col-span-2 space-y-6">
+            
+            <!-- 1. Continue Task (Highlight block) -->
+            @if (Model.ContinueTask != null)
+            {
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 shadow-xs relative overflow-hidden">
+                    <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-y-4 translate-x-4">
+                        <i class="fa-solid fa-book-open text-9xl text-blue-900"></i>
+                    </div>
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-600 text-white flex items-center gap-1">
+                            <i class="fa-solid fa-play text-[10px]"></i> ĐANG HỌC DỞ
+                        </span>
+                        <span class="text-xs text-slate-500">
+                            <i class="fa-regular fa-clock mr-1"></i> Ước lượng: @Model.ContinueTask.EstimatedMinutes phút
+                        </span>
+                    </div>
+                    
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">@Model.ContinueTask.Title</h3>
+                    
+                    @if (!string.IsNullOrEmpty(Model.ContinueTask.AiReason))
+                    {
+                        <p class="text-sm text-slate-600 mb-4 italic">
+                            <i class="fa-solid fa-lightbulb text-amber-500 mr-1"></i> @Model.ContinueTask.AiReason
+                        </p>
+                    }
+
+                    <div class="flex items-center gap-3">
+                        <a href="@Url.Action("OpenTask", "StudyPlan", new { area = "Student", nodeId = Model.ContinueTask.NodeId })" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-xs rounded-xl shadow-md transition-all hover:shadow flex items-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-forward"></i> Tiếp tục học ngay
+                        </a>
+                        @if (Model.ContinueTask.Status != "SKIPPED")
+                        {
+                            <button type="button" onclick="openSkipModal(@Model.ContinueTask.NodeId, '@Model.ContinueTask.Title')" class="px-4 py-2.5 bg-white hover:bg-rose-50 text-slate-600 hover:text-rose-600 border border-slate-200 hover:border-rose-200 font-medium text-xs rounded-xl transition-all cursor-pointer">
+                                Tạm bỏ qua
+                            </button>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 2. Overdue Tasks Section -->
+            @if (Model.OverdueTasks.Any())
+            {
+                <div class="bg-rose-50/50 border border-rose-100 rounded-2xl p-5 shadow-2xs">
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-rose-100 flex items-center justify-center text-rose-600">
+                            <i class="fa-solid fa-circle-exclamation text-base"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-bold text-rose-800">Nhiệm Vụ Quá Hạn</h3>
+                            <p class="text-xs text-rose-600">Bạn đang bị trễ hạn @Model.OverdueTasks.Count nhiệm vụ học tập. Hãy ưu tiên học trước!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-1">
+                        @foreach (var task in Model.OverdueTasks)
+                        {
+                            <partial name="_DailyTaskCard" model="task" />
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- 3. Today Tasks Section -->
+            <div>
+                <h3 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-blue-600"></i>
+                    Nhiệm Vụ Lập Lịch Hôm Nay
+                    <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-100 text-slate-600">
+                        @Model.TodayTasks.Count
+                    </span>
+                </h3>
+
+                @if (!Model.TodayTasks.Any())
+                {
+                    <div class="bg-emerald-50/50 border border-emerald-100 text-emerald-800 rounded-2xl p-8 text-center shadow-2xs">
+                        <span class="text-4xl mb-2 block">🎉</span>
+                        <h4 class="font-bold text-emerald-800 mb-1">Hôm nay bạn đã hoàn thành xuất sắc!</h4>
+                        <p class="text-xs text-emerald-600 max-w-sm mx-auto">Không còn nhiệm vụ nào cần làm trong hôm nay. Bạn có thể tự học thêm bài học mới hoặc ôn tập lại nhé!</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="space-y-1">
+                        @foreach (var task in Model.TodayTasks)
+                        {
+                            <partial name="_DailyTaskCard" model="task" />
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Right 1 Col: Sidebar Info & Next Tasks -->
+        <div class="space-y-6">
+            
+            <!-- Next Task Highlight Card -->
+            @if (Model.NextTask != null && !Model.TodayTasks.Any(t => t.NodeId == Model.NextTask.NodeId))
+            {
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5 uppercase tracking-wider text-xs">
+                        <i class="fa-regular fa-calendar-plus text-slate-400"></i> Nhiệm Vụ Tiếp Theo
+                    </h3>
+                    
+                    <div class="p-4 bg-slate-50 rounded-xl border border-slate-100 mb-4">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700 uppercase mb-2 inline-block">
+                            @Model.NextTask.NodeType
+                        </span>
+                        <h4 class="font-semibold text-sm text-slate-800 mb-1">@Model.NextTask.Title</h4>
+                        <p class="text-xs text-slate-500">Dự kiến: @Model.NextTask.EstimatedMinutes phút</p>
+                    </div>
+
+                    <a href="@Url.Action("OpenTask", "StudyPlan", new { area = "Student", nodeId = Model.NextTask.NodeId })" class="w-full text-center px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-medium text-xs rounded-xl shadow-xs transition-all hover:shadow block cursor-pointer">
+                        Học trước nhiệm vụ
+                    </a>
+                </div>
+            }
+
+            <!-- Study Advice & Stats Tips -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <h3 class="text-sm font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+                    <i class="fa-regular fa-bell text-blue-500"></i> Lời Khuyên Học Tập
+                </h3>
+                <ul class="space-y-3 text-xs text-slate-600">
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 shrink-0">•</span>
+                        <span>Hoàn thành bài tập đúng hạn giúp duy trì chuỗi học tập (Streak) và nhận thêm điểm thưởng XP.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 shrink-0">•</span>
+                        <span>Nếu bạn bận rộn, hãy tận dụng tính năng <strong>Tạm bỏ qua</strong> để hoãn nhiệm vụ sang thời gian thích hợp khác.</span>
+                    </li>
+                    <li class="flex gap-2">
+                        <span class="text-blue-500 shrink-0">•</span>
+                        <span>Dùng AI Tutor thường xuyên để hỏi nhanh các kiến thức khó hoặc ngữ pháp phức tạp.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Skip Task -->
+<div id="skipModal" class="fixed inset-0 z-[100] flex items-center justify-center hidden bg-slate-950/40 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl border border-slate-200 w-full max-w-md p-6 shadow-xl mx-4 transform transition-all">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-slate-800">Bỏ qua nhiệm vụ học tập</h3>
+            <button type="button" onclick="closeSkipModal()" class="text-slate-400 hover:text-slate-600 cursor-pointer">
+                <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
+        
+        <form id="skipForm" method="post" action="@Url.Action("SkipTask", "StudyPlan", new { area = "Student" })">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="nodeId" id="skipNodeId" value="" />
+            
+            <p class="text-sm text-slate-600 mb-4">
+                Bạn đang chuẩn bị bỏ qua nhiệm vụ: <strong id="skipTaskTitle" class="text-slate-800"></strong>.
+                Hệ thống sẽ dời tiến độ bài này. Vui lòng cho biết lý do để tối ưu hóa lộ trình của AI sau này:
+            </p>
+
+            <div class="mb-5">
+                <label for="reason" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Lý do bỏ qua</label>
+                <textarea name="reason" id="reason" rows="3" required class="w-full px-3 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 placeholder-slate-400" placeholder="Ví dụ: Bận đột xuất, Kiến thức này đã vững, Muốn học kỹ năng khác trước..."></textarea>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeSkipModal()" class="px-4 py-2 border border-slate-200 text-slate-600 font-medium text-xs rounded-xl hover:bg-slate-50 transition-all cursor-pointer">
+                    Hủy bỏ
+                </button>
+                <button type="submit" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs rounded-xl shadow-sm hover:shadow transition-all cursor-pointer">
+                    Xác nhận bỏ qua
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openSkipModal(nodeId, title) {
+        document.getElementById('skipNodeId').value = nodeId;
+        document.getElementById('skipTaskTitle').innerText = title;
+        
+        const modal = document.getElementById('skipModal');
+        modal.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function closeSkipModal() {
+        const modal = document.getElementById('skipModal');
+        modal.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+        document.getElementById('skipForm').reset();
+    }
+</script>

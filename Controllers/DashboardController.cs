@@ -1,156 +1,39 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Models;
-using DuAnTotNghiep.Models.ViewModels.AILearn;
+using DuAnTotNghiep.Services.Interfaces;
 
-namespace DuAnTotNghiep.Controllers;
-
-[Authorize]
-public class DashboardController : Controller
+namespace DuAnTotNghiep.Controllers
 {
-    private readonly ApplicationDbContext _context;
-
-    public DashboardController(ApplicationDbContext context)
+    [Authorize]
+    public class DashboardController : Controller
     {
-        _context = context;
-    }
+        private readonly IStudentDashboardService _dashboardService;
 
-    private int GetCurrentUserId()
-    {
-        var claim = User.FindFirst(ClaimTypes.NameIdentifier);
-        if (claim != null && int.TryParse(claim.Value, out int userId))
+        public DashboardController(IStudentDashboardService dashboardService)
         {
-            return userId;
+            _dashboardService = dashboardService;
         }
-        return 0;
-    }
 
-    public async Task<IActionResult> Index()
-    {
-        int userId = GetCurrentUserId();
-        if (userId == 0) return RedirectToAction("Login", "Account");
-
-        var user = await _context.Users
-            .Include(u => u.UserSetting)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-
-        if (user == null) return RedirectToAction("Login", "Account");
-
-        var profile = await _context.StudentLearningProfiles
-            .Include(p => p.CurrentLevel)
-            .Include(p => p.MainGoal)
-            .FirstOrDefaultAsync(p => p.UserId == userId);
-
-        // Fetch Stats
-        var studyLogs = await _context.StudyActivityLogs
-            .Where(log => log.StudentId == userId)
-            .ToListAsync();
-
-        int completedLessons = studyLogs.Count(l => l.ActivityType == "LESSON" || l.ActivityType == "ARTICLE");
-        int completedQuizzes = await _context.QuizAttempts
-            .CountAsync(a => a.StudentId == userId && a.SubmittedAt.HasValue);
-
-        var quizAttempts = await _context.QuizAttempts
-            .Where(a => a.StudentId == userId && a.Score.HasValue)
-            .Select(a => a.Score!.Value)
-            .ToListAsync();
-
-        decimal avgScore = quizAttempts.Any() ? quizAttempts.Average() : 0m;
-
-        // XP Calculation
-        int studyMinutes = studyLogs.Sum(l => l.DurationMinutes ?? 0);
-        int totalXp = studyMinutes * 10 + completedLessons * 50 + completedQuizzes * 100;
-        int level = (totalXp / 1000) + 1;
-
-        // Rank Tier
-        string rankTier = "Bronze";
-        if (totalXp >= 3000) rankTier = "Gold";
-        else if (totalXp >= 1000) rankTier = "Silver";
-
-        // Progress Percent
-        var activePath = await _context.StudentLearningPaths
-            .FirstOrDefaultAsync(p => p.StudentId == userId && p.Status == "ACTIVE");
-
-        double progressPercent = 0;
-        if (activePath != null)
+        private int GetCurrentUserId()
         {
-            var nodes = await _context.LearningPathNodes
-                .Where(n => n.LearningPathId == activePath.Id)
-                .ToListAsync();
-            if (nodes.Any())
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim != null && int.TryParse(claim.Value, out int userId))
             {
-                int completed = nodes.Count(n => n.Status == "COMPLETED");
-                progressPercent = Math.Round((double)completed / nodes.Count * 100, 1);
+                return userId;
             }
-        }
-        else
-        {
-            progressPercent = 35.0; // default indicator
+            return 0;
         }
 
-        // Today's Lesson and Continue Lesson
-        var lessons = await _context.OriginalLessons.Take(2).ToListAsync();
-        OriginalLesson? todayLesson = lessons.FirstOrDefault();
-        OriginalLesson? continueLesson = lessons.LastOrDefault() ?? todayLesson;
-
-        // Recent Activity Items mapping
-        var recentLogs = await _context.StudyActivityLogs
-            .Include(log => log.Topic)
-            .Where(log => log.StudentId == userId)
-            .OrderByDescending(log => log.CreatedAt)
-            .Take(5)
-            .ToListAsync();
-
-        var recentActivities = new List<ActivityItemViewModel>();
-        foreach (var log in recentLogs)
+        public async Task<IActionResult> Index()
         {
-            recentActivities.Add(new ActivityItemViewModel
-            {
-                Type = log.ActivityType ?? "LESSON",
-                Title = log.Topic?.Title ?? "Luyện tập bài học",
-                Time = log.CreatedAt,
-                Detail = $"Thời lượng: {log.DurationMinutes ?? 0} phút{(log.Score.HasValue ? $", Điểm: {log.Score.Value:0.0}" : "")}"
-            });
+            int userId = GetCurrentUserId();
+            if (userId == 0) return RedirectToAction("Login", "Account");
+
+            var vm = await _dashboardService.GetDashboardAsync(userId);
+            return View(vm);
         }
-
-        if (!recentActivities.Any())
-        {
-            recentActivities.Add(new ActivityItemViewModel
-            {
-                Type = "SYSTEM",
-                Title = "Bắt đầu hành trình học tập",
-                Time = DateTime.UtcNow.AddDays(-1),
-                Detail = "Chào mừng bạn gia nhập nền tảng học tập AI Learn."
-            });
-        }
-
-        var vm = new DashboardViewModel
-        {
-            StudentName = user.FullName,
-            AvatarUrl = user.AvatarUrl ?? "/default-images/avatar.png",
-            RankTier = rankTier,
-            LevelCode = profile?.CurrentLevel?.Code ?? "BEGINNER",
-            TargetLevelCode = profile?.MainGoal?.GoalName ?? "IELTS 6.5",
-            StreakDays = 4, // Seed placeholder
-            AverageQuizScore = avgScore,
-            CompletedLessonsCount = completedLessons,
-            CompletedQuizzesCount = completedQuizzes,
-            TotalXp = totalXp,
-            Level = level,
-            ProgressPercent = progressPercent,
-            TodayLesson = todayLesson,
-            ContinueLesson = continueLesson,
-            AiRecommendation = "Dựa trên kết quả Quiz gần đây của bạn, chúng tôi đề xuất bạn nên tập trung ôn tập phần <b>Ngữ pháp: Mệnh đề quan hệ</b> để cải thiện độ chuẩn xác khi viết luận.",
-            RecentActivities = recentActivities
-        };
-
-        return View(vm);
     }
 }

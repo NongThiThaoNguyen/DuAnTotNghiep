@@ -1,0 +1,131 @@
+@model DuAnTotNghiep.Models.ViewModels.StudyPlan.MonthlyStudyPlanViewModel
+
+@{
+    ViewData["Title"] = "Kế hoạch tháng";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+
+    var prevMonthYear = Model.Month == 1 ? Model.Year - 1 : Model.Year;
+    var prevMonthVal = Model.Month == 1 ? 12 : Model.Month - 1;
+    var nextMonthYear = Model.Month == 12 ? Model.Year + 1 : Model.Year;
+    var nextMonthVal = Model.Month == 12 ? 1 : Model.Month + 1;
+}
+
+<link rel="stylesheet" href="~/css/studyplan.css" asp-append-version="true" />
+
+<div class="container mx-auto">
+    <!-- Header Page & Tab navigation -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Kế Hoạch Học Tập</h1>
+            <p class="text-sm text-slate-500">Lộ trình: <span class="font-semibold text-slate-700">@Model.PathTitle</span></p>
+        </div>
+        
+        <!-- Tab Navigation -->
+        <div class="flex bg-slate-100 p-1.5 rounded-xl border border-slate-200 self-start md:self-center">
+            <a href="@Url.Action("Today", "StudyPlan", new { area = "Student" })" class="px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-800 hover:bg-slate-200/50">
+                <i class="fa-solid fa-calendar-day mr-1"></i> Hôm nay
+            </a>
+            <a href="@Url.Action("Week", "StudyPlan", new { area = "Student" })" class="px-4 py-2 text-xs font-semibold rounded-lg text-slate-600 hover:text-slate-800 hover:bg-slate-200/50">
+                <i class="fa-solid fa-calendar-week mr-1"></i> Tuần này
+            </a>
+            <a href="@Url.Action("Month", "StudyPlan", new { area = "Student" })" class="px-4 py-2 text-xs font-semibold rounded-lg bg-white text-slate-800 shadow-xs border border-slate-200">
+                <i class="fa-solid fa-calendar-days mr-1 text-blue-600"></i> Tháng này
+            </a>
+        </div>
+    </div>
+
+    <!-- Month Navigation & Progress Bar -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm mb-6 space-y-6">
+        <!-- Navigation Buttons -->
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+            <div class="flex items-center gap-2">
+                <a href="@Url.Action("Month", "StudyPlan", new { area = "Student", year = prevMonthYear, month = prevMonthVal })" class="px-3.5 py-2 border border-slate-200 text-slate-600 font-semibold text-xs rounded-xl hover:bg-slate-50 transition-all flex items-center gap-1 cursor-pointer">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i> Tháng trước
+                </a>
+                <a href="@Url.Action("Month", "StudyPlan", new { area = "Student", year = nextMonthYear, month = nextMonthVal })" class="px-3.5 py-2 border border-slate-200 text-slate-600 font-semibold text-xs rounded-xl hover:bg-slate-50 transition-all flex items-center gap-1 cursor-pointer">
+                    Tháng sau <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </a>
+            </div>
+            
+            <h2 class="text-base font-bold text-slate-800 text-center order-first sm:order-none w-full sm:w-auto">
+                @Model.MonthLabel
+            </h2>
+
+            <a href="@Url.Action("Month", "StudyPlan", new { area = "Student" })" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-all flex items-center gap-1 cursor-pointer">
+                Về tháng hiện tại
+            </a>
+        </div>
+
+        <hr class="border-slate-100" />
+
+        <!-- Monthly Progress Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-semibold text-slate-600">Tiến độ tháng này:</span>
+                    <span class="text-sm font-bold text-blue-600">@Model.CompletionPercent% (@Model.CompletedTasks/@Model.TotalTasks nhiệm vụ)</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-3">
+                    <div class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: @Model.CompletionPercent%"></div>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-end gap-6 text-sm text-slate-500">
+                <div>
+                    <span class="font-bold text-slate-700">@Model.TotalMinutes phút</span> thời gian dự kiến học
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Monthly Weeks Timeline List -->
+    <div class="space-y-4">
+        @if (!Model.WeekSummaries.Any())
+        {
+            <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-500">
+                <p class="text-sm italic">Chưa có kế hoạch cho tháng này.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var week in Model.WeekSummaries)
+            {
+                var completionRate = week.TaskCount > 0 ? (int)(week.CompletedCount * 100 / week.TaskCount) : 0;
+                
+                <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm hover:shadow transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 mb-1">
+                            Tuần @week.WeekNumber <span class="text-xs font-normal text-slate-400">(@week.WeekStart.ToString("dd/MM") – @week.WeekEnd.ToString("dd/MM"))</span>
+                        </h3>
+                        
+                        <div class="flex items-center gap-4 text-xs text-slate-500 mt-2 flex-wrap">
+                            <span class="flex items-center gap-1">
+                                <i class="fa-solid fa-list-check"></i> @week.TaskCount nhiệm vụ
+                            </span>
+                            <span class="flex items-center gap-1 text-emerald-600 font-medium">
+                                <i class="fa-solid fa-circle-check"></i> Đã hoàn thành @week.CompletedCount
+                            </span>
+                            <span class="flex items-center gap-1">
+                                <i class="fa-regular fa-clock"></i> @week.TotalMinutes phút học
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Progress and Navigation Link -->
+                    <div class="flex items-center gap-6 self-end md:self-center w-full md:w-auto justify-between md:justify-end">
+                        <div class="flex items-center gap-2">
+                            <div class="w-24 bg-slate-100 rounded-full h-2 hidden sm:block">
+                                <div class="bg-blue-600 h-2 rounded-full" style="width: @completionRate%"></div>
+                            </div>
+                            <span class="text-xs font-bold text-slate-600">@completionRate%</span>
+                        </div>
+
+                        <a href="@Url.Action("Week", "StudyPlan", new { area = "Student", weekStart = week.WeekStart.ToString("yyyy-MM-dd") })" class="px-4 py-2 bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-blue-600 font-semibold text-xs border border-slate-200 hover:border-blue-200 rounded-xl transition-all flex items-center gap-1 cursor-pointer">
+                            Xem chi tiết tuần <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

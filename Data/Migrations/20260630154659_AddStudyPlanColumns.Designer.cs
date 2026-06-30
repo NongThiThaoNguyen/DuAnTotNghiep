@@ -4,16 +4,19 @@ using DuAnTotNghiep.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DuAnTotNghiep.Migrations
+namespace DuAnTotNghiep.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260630154659_AddStudyPlanColumns")]
+    partial class AddStudyPlanColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -3152,57 +3155,6 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("student_learning_profiles", (string)null);
                 });
 
-            modelBuilder.Entity("DuAnTotNghiep.Models.StudentNote", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("id");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("content");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("created_at");
-
-                    b.Property<int?>("LessonId")
-                        .HasColumnType("int")
-                        .HasColumnName("lesson_id");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)")
-                        .HasColumnName("title");
-
-                    b.Property<int?>("TopicId")
-                        .HasColumnType("int")
-                        .HasColumnName("topic_id");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("updated_at");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId");
-
-                    b.HasIndex("TopicId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("student_notes", (string)null);
-                });
-
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentProgressSnapshot", b =>
                 {
                     b.Property<int>("Id")
@@ -4908,34 +4860,6 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("MainGoal");
 
                     b.Navigation("TargetLevel");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("DuAnTotNghiep.Models.StudentNote", b =>
-                {
-                    b.HasOne("DuAnTotNghiep.Models.OriginalLesson", "Lesson")
-                        .WithMany()
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("FK_student_notes_lessons");
-
-                    b.HasOne("DuAnTotNghiep.Models.LearningTopic", "Topic")
-                        .WithMany()
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("FK_student_notes_topics");
-
-                    b.HasOne("DuAnTotNghiep.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired()
-                        .HasConstraintName("FK_student_notes_users");
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("Topic");
 
                     b.Navigation("User");
                 });

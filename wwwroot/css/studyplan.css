@@ -1,0 +1,68 @@
+/* CSS for Study Plan Module (M10) */
+
+.task-card {
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.task-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-color: #cbd5e1;
+}
+
+/* Status specific borders */
+.task-completed {
+    border-left: 5px solid #22c55e !important;
+}
+
+.task-in-progress {
+    border-left: 5px solid #2563eb !important;
+    background-color: #f8fafc;
+}
+
+.task-overdue {
+    border-left: 5px solid #ef4444 !important;
+}
+
+.task-available {
+    border-left: 5px solid #f59e0b !important;
+}
+
+.task-need-review {
+    border-left: 5px solid #a855f7 !important;
+}
+
+.task-skipped {
+    border-left: 5px solid #94a3b8 !important;
+    opacity: 0.65;
+}
+
+.task-skipped h4 {
+    text-decoration: line-through;
+    color: #64748b;
+}
+
+.task-locked {
+    opacity: 0.5;
+    background-color: #f1f5f9;
+    border-left: 5px solid #cbd5e1 !important;
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes pulse-soft {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+.animate-pulse-soft {
+    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

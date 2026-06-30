@@ -1,4 +1,4 @@
-@model DuAnTotNghiep.Models.ViewModels.AILearn.DashboardViewModel
+@model DuAnTotNghiep.Models.ViewModels.Student.StudentDashboardViewModel
 @{
     Layout = "_AILearnLayout";
     ViewData["Title"] = "Tổng quan";
@@ -22,9 +22,9 @@
             <i class="fa-solid fa-clock"></i>
         </div>
         <div class="dashboard-stat-info">
-            <span class="dashboard-stat-label">Thời gian học hôm nay</span>
-            <span class="dashboard-stat-value">45 phút</span>
-            <span class="dashboard-stat-subtext green">+15 phút so với hôm qua</span>
+            <span class="dashboard-stat-label">Thời gian học tuần này</span>
+            <span class="dashboard-stat-value">@Model.StudyMinutesThisWeek phút</span>
+            <span class="dashboard-stat-subtext green">Tích lũy hoạt động</span>
         </div>
     </div>
 
@@ -35,8 +35,8 @@
         </div>
         <div class="dashboard-stat-info">
             <span class="dashboard-stat-label">Bài đã hoàn thành</span>
-            <span class="dashboard-stat-value">@Model.CompletedLessonsCount bài</span>
-            <span class="dashboard-stat-subtext green">+3 bài so với hôm qua</span>
+            <span class="dashboard-stat-value">@Model.CompletedLessons bài</span>
+            <span class="dashboard-stat-subtext green">Đã hoàn thành trên lộ trình</span>
         </div>
     </div>
 
@@ -47,8 +47,8 @@
         </div>
         <div class="dashboard-stat-info">
             <span class="dashboard-stat-label">Điểm trung bình</span>
-            <span class="dashboard-stat-value">@(Model.AverageQuizScore > 0 ? $"{(Model.AverageQuizScore * 10).ToString("0.0")}%" : "85%")</span>
-            <span class="dashboard-stat-subtext green">+5% so với tuần trước</span>
+            <span class="dashboard-stat-value">@(Model.AverageQuizScore > 0 ? $"{(Model.AverageQuizScore * 10).ToString("0.0")}%" : "0.0%")</span>
+            <span class="dashboard-stat-subtext green">Kiểm tra Quiz</span>
         </div>
     </div>
 
@@ -73,17 +73,15 @@
         <div class="dashboard-panel-card">
             <div class="path-timeline-header">
                 <h3>Lộ trình học tập của bạn</h3>
-                <span>60%</span>
+                <span>@Model.ProgressPercent%</span>
             </div>
             <div class="progress-bar-ailearn mb-4">
-                <div class="progress-bar-fill" style="width: 60%"></div>
+                <div class="progress-bar-fill" style="width: @Model.ProgressPercent%"></div>
             </div>
 
             <div class="path-timeline-list">
-                <div class="path-timeline-node completed">Listening Strategies</div>
-                <div class="path-timeline-node">Reading Practice</div>
-                <div class="path-timeline-node">Grammar for IELTS</div>
-                <div class="path-timeline-node">Writing Task 1</div>
+                <div class="path-timeline-node completed">Mục tiêu hiện tại: @Model.CurrentLevel</div>
+                <div class="path-timeline-node">Mục tiêu tiếp theo: @Model.TargetLevel</div>
             </div>
         </div>
 
@@ -92,16 +90,15 @@
             <h2><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>AI gợi ý cho bạn</h2>
             <div class="ai-recommendation-list">
                 <div class="ai-recommendation-card">
-                    <span class="ai-rec-title">Bài nghe nền tảng #12</span>
-                    <a href="/Courses" class="ai-rec-btn">Học ngay</a>
-                </div>
-                <div class="ai-recommendation-card">
-                    <span class="ai-rec-title">Ngữ pháp: Mệnh đề quan hệ</span>
-                    <a href="/Courses" class="ai-rec-btn">Học ngay</a>
-                </div>
-                <div class="ai-recommendation-card">
-                    <span class="ai-rec-title">Đề luyện IELTS Reading</span>
-                    <a href="/Courses" class="ai-rec-btn">Học ngay</a>
+                    <span class="ai-rec-title">@Html.Raw(Model.AiRecommendation)</span>
+                    @if (Model.NextTask != null)
+                    {
+                        <a href="@Model.NextTask.TargetUrl" class="ai-rec-btn">Học ngay</a>
+                    }
+                    else
+                    {
+                        <a href="/Courses" class="ai-rec-btn">Học ngay</a>
+                    }
                 </div>
             </div>
         </div>
@@ -123,15 +120,28 @@
         <div class="dashboard-panel-card">
             <h2>Hoạt động gần đây</h2>
             <div class="timeline-list">
-                @foreach (var act in Model.RecentActivities)
+                @if (!Model.RecentActivities.Any())
                 {
                     <div class="timeline-item">
                         <div class="timeline-dot"></div>
                         <div class="timeline-item-info">
-                            <span class="timeline-item-title">@act.Title</span>
-                            <span class="timeline-item-time">@act.Time.ToString("HH:mm") - @act.Detail</span>
+                            <span class="timeline-item-title">Bắt đầu hành trình học tập</span>
+                            <span class="timeline-item-time">Chào mừng bạn gia nhập nền tảng học tập AI Learn.</span>
                         </div>
                     </div>
+                }
+                else
+                {
+                    foreach (var act in Model.RecentActivities)
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-item-info">
+                                <span class="timeline-item-title">@act.Title</span>
+                                <span class="timeline-item-time">@act.CreatedAt.ToString("HH:mm dd/MM") - @act.ActivityTypeLabel</span>
+                            </div>
+                        </div>
+                    }
                 }
             </div>
         </div>

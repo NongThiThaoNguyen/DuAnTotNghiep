@@ -1,0 +1,127 @@
+<!-- Note Modal -->
+<div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" id="noteModalLabel">Ghi chú mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="noteForm">
+                    <input type="hidden" id="noteId" name="Id" value="" />
+                    <div class="mb-3">
+                        <label for="noteTitle" class="form-label fw-semibold">Tiêu đề</label>
+                        <input type="text" class="form-control rounded-3" id="noteTitle" name="Title" placeholder="Nhập tiêu đề..." required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="noteContent" class="form-label fw-semibold">Nội dung</label>
+                        <textarea class="form-control rounded-3" id="noteContent" name="Content" rows="6" placeholder="Viết nội dung ghi chú ở đây..." required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer border-top-0 pt-0">
+                <button type="button" class="btn btn-light rounded-pill px-4" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4" id="btnSaveNote" onclick="saveNote()">Lưu Ghi chú</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentNoteModal = null;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        currentNoteModal = new bootstrap.Modal(document.getElementById('noteModal'));
+    });
+
+    function openCreateNoteModal() {
+        document.getElementById('noteForm').reset();
+        document.getElementById('noteId').value = '';
+        document.getElementById('noteModalLabel').innerText = 'Tạo Ghi chú mới';
+        currentNoteModal.show();
+    }
+
+    function openEditNoteModal(id, title, content) {
+        document.getElementById('noteForm').reset();
+        document.getElementById('noteId').value = id;
+        document.getElementById('noteTitle').value = title;
+        document.getElementById('noteContent').value = content;
+        document.getElementById('noteModalLabel').innerText = 'Chỉnh sửa Ghi chú';
+        currentNoteModal.show();
+    }
+
+    async function saveNote() {
+        const form = document.getElementById('noteForm');
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        const btnSave = document.getElementById('btnSaveNote');
+        btnSave.disabled = true;
+        btnSave.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Đang lưu...';
+
+        const id = document.getElementById('noteId').value;
+        const title = document.getElementById('noteTitle').value;
+        const content = document.getElementById('noteContent').value;
+
+        const url = id ? '/Notes/Update' : '/Notes/Create';
+        const data = {
+            Id: id ? parseInt(id) : null,
+            Title: title,
+            Content: content
+        };
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi lưu ghi chú.');
+                btnSave.disabled = false;
+                btnSave.innerText = 'Lưu Ghi chú';
+            }
+        } catch (error) {
+            console.error('Error saving note:', error);
+            alert('Có lỗi xảy ra.');
+            btnSave.disabled = false;
+            btnSave.innerText = 'Lưu Ghi chú';
+        }
+    }
+
+    async function deleteNote(id) {
+        if (!confirm('Bạn có chắc chắn muốn xóa ghi chú này không?')) return;
+
+        try {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+            const formData = new FormData();
+            formData.append('id', id);
+
+            const response = await fetch('/Notes/Delete', {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                window.location.reload();
+            } else {
+                alert('Có lỗi xảy ra khi xóa ghi chú.');
+            }
+        } catch (error) {
+            console.error('Error deleting note:', error);
+            alert('Có lỗi xảy ra.');
+        }
+    }
+</script>

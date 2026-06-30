@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -38,6 +38,10 @@ public partial class LearningPathNode
     public DateTime? CompletedAt { get; set; }
 
     public int? RequiredNodeId { get; set; }
+
+    public DateOnly? RescheduledFrom { get; set; }
+
+    public string? SkippedReason { get; set; }
 
     public virtual ICollection<AiTutorConversation> AiTutorConversations { get; set; } = new List<AiTutorConversation>();
 

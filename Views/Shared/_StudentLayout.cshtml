@@ -36,6 +36,7 @@
         "Profile" => "Hồ sơ cá nhân",
         "Progress" => "Tiến độ học tập",
         "LearningPath" => "Learning Path",
+        "StudyPlan" => "Kế hoạch học",
         _ => controller ?? ""
     };
 
@@ -57,6 +58,9 @@
         "TopicDetail" => "Chi tiết chủ đề",
         "SkillDetail" => "Chi tiết kỹ năng",
         "OpenNode" => "Mở bài học",
+        "Today" => "Nhiệm vụ hôm nay",
+        "Week" => "Kế hoạch tuần",
+        "Month" => "Kế hoạch tháng",
         _ => action ?? ""
     };
 
@@ -137,6 +141,19 @@
             {
                 new SubMenuItem { Label = "Lộ trình học AI", Controller = "LearningPath", Action = "Index", Area = "Student" },
                 new SubMenuItem { Label = "Lộ trình hiện tại + tiến độ", Controller = "LearningPath", Action = "Index", Area = "Student" }
+            }
+        },
+        // 6b. Kế hoạch học (Study Plan)
+        new MenuItem
+        {
+            Label = "Kế hoạch học",
+            IsActive = (controller == "StudyPlan"),
+            IconSvg = "<svg class=\"w-5 h-5 shrink-0\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg>",
+            Children = new List<SubMenuItem>
+            {
+                new SubMenuItem { Label = "Nhiệm vụ hôm nay", Controller = "StudyPlan", Action = "Today", Area = "Student" },
+                new SubMenuItem { Label = "Kế hoạch Tuần", Controller = "StudyPlan", Action = "Week", Area = "Student" },
+                new SubMenuItem { Label = "Kế hoạch Tháng", Controller = "StudyPlan", Action = "Month", Area = "Student" }
             }
         },
         // 7. Bài học
