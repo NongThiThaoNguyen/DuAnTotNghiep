@@ -18,96 +18,89 @@
 </head>
 <body>
     <div class="login-wrapper">
-        <!-- Left Hero Section -->
-        <div class="login-left d-none d-lg-flex">
-            <!-- Floating UI Elements -->
-            <div class="floating-elements">
-                <div class="floating-icon i1"><i class="fa-solid fa-graduation-cap"></i></div>
-                <div class="floating-icon i2"><i class="fa-solid fa-music"></i></div>
-                <div class="floating-icon i3"><i class="fa-solid fa-star"></i></div>
-                <div class="floating-icon i4"><i class="fa-solid fa-language"></i></div>
-            </div>
-
-            <!-- Brand logo -->
-            <div class="left-brand">
-                <i class="fa-solid fa-robot"></i>
-                <span>AI Learn</span>
-            </div>
-            
-            <p class="left-subtitle-main">Học thông minh hơn mỗi ngày với AI Tutor</p>
-
-            <!-- Vector Illustration -->
-            <div class="robot-illustration-container d-flex flex-column align-items-center">
-                <svg class="robot-illustration" viewBox="0 0 200 200" width="180" height="180">
-                    <rect x="50" y="50" width="100" height="80" rx="25" fill="#FFFFFF" />
-                    <rect x="65" y="70" width="70" height="30" rx="12" fill="#08142E" />
-                    <circle cx="85" cy="85" r="8" fill="#6C63FF" />
-                    <circle cx="115" cy="85" r="8" fill="#6C63FF" />
-                    <rect x="90" y="112" width="20" height="6" rx="3" fill="#08142E" />
-                    <rect x="35" y="75" width="15" height="30" rx="6" fill="#7B6DFF" />
-                    <rect x="150" y="75" width="15" height="30" rx="6" fill="#7B6DFF" />
-                    <line x1="100" y1="50" x2="100" y2="25" stroke="#FFFFFF" stroke-width="6" />
-                    <circle cx="100" cy="20" r="10" fill="#7B6DFF" />
-                    <rect x="110" y="120" width="35" height="25" rx="4" fill="#08142E" transform="rotate(-15 110 120)" />
-                    <rect x="113" y="123" width="29" height="19" rx="2" fill="#6C63FF" transform="rotate(-15 110 120)" />
-                </svg>
-
-                <svg class="illustration-books" viewBox="0 0 200 80" width="130" height="52">
-                    <rect x="40" y="45" width="120" height="16" rx="3" fill="#7B6DFF" />
-                    <rect x="35" y="45" width="10" height="16" rx="2" fill="#FFFFFF" />
-                    <rect x="50" y="32" width="100" height="14" rx="3" fill="#FF5A5F" />
-                    <rect x="45" y="32" width="8" height="14" rx="2" fill="#FFFFFF" />
-                    <rect x="140" y="15" width="18" height="20" rx="3" fill="#E9ECF5" />
-                    <path d="M140 15 C135 5, 142 0, 145 10 Z" fill="#4ADE80" />
-                    <path d="M158 15 C163 5, 156 0, 153 10 Z" fill="#4ADE80" />
-                </svg>
-            </div>
+        <!-- Floating abstract UI decorations in background -->
+        <div class="floating-elements">
+            <div class="floating-icon i1"><i class="fa-solid fa-graduation-cap"></i></div>
+            <div class="floating-icon i2"><i class="fa-solid fa-music"></i></div>
+            <div class="floating-icon i3"><i class="fa-solid fa-star"></i></div>
+            <div class="floating-icon i4"><i class="fa-solid fa-language"></i></div>
         </div>
 
-        <!-- Right Form Section -->
-        <div class="login-right">
-            <div class="login-card">
+        <div class="login-container-center" style="max-w-md; width: 100%;">
+            <!-- Glassmorphic Register Card -->
+            <div class="login-card-glass">
+                
+                <!-- Brand logo at top of card -->
+                <div class="card-brand-header">
+                    <div class="brand-logo-circle">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <h2>AI Learn</h2>
+                    <p>Học thông minh hơn mỗi ngày với AI Tutor</p>
+                </div>
+                
                 <div class="login-card-header">
-                    <h2>Đăng ký tài khoản 🚀</h2>
+                    <h3>Đăng ký tài khoản 🚀</h3>
                     <p>Bắt đầu hành trình chinh phục tiếng Anh</p>
                 </div>
 
                 <!-- Validation Alerts -->
                 @if (!ViewData.ModelState.IsValid)
                 {
-                    <div class="alert alert-danger py-2 px-3 mb-3 text-sm rounded-3" role="alert">
-                        <div asp-validation-summary="All" class="text-danger small"></div>
+                    <div class="alert alert-danger py-2.5 px-3 mb-4 text-sm rounded-2xl" role="alert">
+                        <div asp-validation-summary="All" class="text-danger small font-medium"></div>
                     </div>
                 }
 
-                <form asp-controller="Account" asp-action="Register" method="post">
+                <!-- Social Login Buttons -->
+                <div class="social-login-row">
+                    <button class="social-login-btn google" type="button">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg" alt="Google" />
+                        <span>Google</span>
+                    </button>
+                    <button class="social-login-btn facebook" type="button">
+                        <i class="fa-brands fa-facebook"></i>
+                        <span>Facebook</span>
+                    </button>
+                </div>
+
+                <div class="form-divider">hoặc đăng ký bằng email</div>
+
+                <!-- Registration Form -->
+                <form asp-controller="Account" asp-action="Register" method="post" class="space-y-3">
                     @Html.AntiForgeryToken()
 
-                    <div class="form-group-ailearn">
-                        <div class="form-label-custom">Họ và tên của bạn</div>
+                    <div class="form-group-custom">
+                        <span class="form-label-custom">Họ và tên của bạn</span>
                         <div class="form-input-wrapper">
                             <input asp-for="FullName" placeholder="Nguyễn Văn A" required />
                         </div>
                     </div>
 
-                    <div class="form-group-ailearn">
-                        <div class="form-label-custom">Email của bạn</div>
+                    <div class="form-group-custom">
+                        <span class="form-label-custom">Email của bạn</span>
                         <div class="form-input-wrapper">
                             <input asp-for="Email" type="email" placeholder="example@gmail.com" required />
                         </div>
                     </div>
 
-                    <div class="form-group-ailearn">
-                        <div class="form-label-custom">Mật khẩu</div>
+                    <div class="form-group-custom">
+                        <span class="form-label-custom">Mật khẩu</span>
                         <div class="form-input-wrapper">
-                            <input asp-for="Password" type="password" placeholder="••••••••" required />
+                            <input asp-for="Password" type="password" id="passwordInputField" placeholder="••••••••" required />
+                            <button type="button" class="password-toggle-icon" id="togglePasswordBtn">
+                                <i class="fa-regular fa-eye-slash" id="togglePasswordIcon"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <div class="form-group-ailearn">
-                        <div class="form-label-custom">Xác nhận mật khẩu</div>
+                    <div class="form-group-custom">
+                        <span class="form-label-custom">Xác nhận mật khẩu</span>
                         <div class="form-input-wrapper">
-                            <input asp-for="ConfirmPassword" type="password" placeholder="••••••••" required />
+                            <input asp-for="ConfirmPassword" type="password" id="confirmPasswordInputField" placeholder="••••••••" required />
+                            <button type="button" class="password-toggle-icon" id="toggleConfirmPasswordBtn">
+                                <i class="fa-regular fa-eye-slash" id="toggleConfirmPasswordIcon"></i>
+                            </button>
                         </div>
                     </div>
 
@@ -123,5 +116,34 @@
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Password toggle logic
+            const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+            const passwordInputField = document.getElementById('passwordInputField');
+            const togglePasswordIcon = document.getElementById('togglePasswordIcon');
+
+            if (togglePasswordBtn && passwordInputField) {
+                togglePasswordBtn.addEventListener('click', function () {
+                    const type = passwordInputField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInputField.setAttribute('type', type);
+                    togglePasswordIcon.className = type === 'text' ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+                });
+            }
+
+            // Confirm password toggle logic
+            const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPasswordBtn');
+            const confirmPasswordInputField = document.getElementById('confirmPasswordInputField');
+            const toggleConfirmPasswordIcon = document.getElementById('toggleConfirmPasswordIcon');
+
+            if (toggleConfirmPasswordBtn && confirmPasswordInputField) {
+                toggleConfirmPasswordBtn.addEventListener('click', function () {
+                    const type = confirmPasswordInputField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    confirmPasswordInputField.setAttribute('type', type);
+                    toggleConfirmPasswordIcon.className = type === 'text' ? 'fa-regular fa-eye' : 'fa-regular fa-eye-slash';
+                });
+            }
+        });
+    </script>
 </body>
 </html>

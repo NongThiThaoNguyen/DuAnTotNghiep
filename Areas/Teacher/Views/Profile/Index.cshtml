@@ -4,78 +4,178 @@
     var avatar = string.IsNullOrEmpty(Model.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.FullName ?? "GV")}&background=6C63FF&color=fff" : Model.AvatarUrl;
 }
 
-<div class="max-w-4xl mx-auto py-8 px-4 font-sans space-y-8">
+<div class="max-w-5xl mx-auto px-4 font-sans space-y-6 animate-fadeIn" style="padding-top: 4px !important; margin-top: 0 !important;">
     
     <!-- Title Header -->
-    <div class="border-b border-slate-100 pb-4">
-        <h1 class="text-2xl font-black text-slate-900 leading-tight">Hồ sơ cá nhân</h1>
-        <p class="text-slate-500 text-sm mt-1">Quản lý và cập nhật thông tin cá nhân của bạn trên hệ thống.</p>
+    <div class="d-flex justify-content-between align-items-center border-b border-slate-100 pb-4">
+        <div>
+            <h1 class="text-2xl font-black text-slate-900 leading-tight">Hồ sơ cá nhân</h1>
+            <p class="text-slate-500 text-sm mt-1">Xem, cập nhật thông tin cá nhân và thay đổi ảnh đại diện của bạn.</p>
+        </div>
+        <span class="purple-badge">Giảng viên hệ thống</span>
     </div>
 
-    <!-- Main Profile Card -->
-    <div class="bg-white rounded-3xl border border-slate-200 shadow-md p-8 relative overflow-hidden">
-        <!-- Top decorative gradient line -->
-        <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 via-indigo-500 to-blue-500"></div>
+    <!-- Main Profile Form -->
+    <form asp-action="Update" method="post" enctype="multipart/form-data" class="row g-4">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="PasswordHash" />
+        <input type="hidden" asp-for="RoleId" />
+        <input type="hidden" asp-for="Status" />
 
-        <!-- Avatar & User Metadata Block -->
-        <div class="flex flex-col sm:flex-row items-center gap-6 pb-6 border-b border-slate-100 mb-6">
-            <div class="relative">
-                <img src="@avatar" alt="Avatar" class="w-24 h-24 rounded-full object-cover ring-4 ring-purple-100 shadow-md" onerror="this.src='https://ui-avatars.com/api/?name=GV&background=6C63FF&color=fff';" />
-                <span class="absolute bottom-1 right-1 w-5 h-5 bg-green-500 border-2 border-white rounded-full" title="Online"></span>
-            </div>
-            <div class="text-center sm:text-left space-y-1.5">
-                <h4 class="text-xl font-bold text-slate-800">@Model.FullName</h4>
-                <p class="text-slate-400 text-xs flex flex-wrap items-center justify-center sm:justify-start gap-2">
-                    <span class="px-2 py-0.5 rounded bg-purple-50 text-purple-600 font-bold">Giảng viên</span>
-                    <span class="text-slate-300">|</span>
-                    <span>Tài khoản: @Model.Email</span>
-                </p>
+        <!-- Left Column: Avatar Card & Brief Overview -->
+        <div class="col-lg-4">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 text-center space-y-6 relative overflow-hidden h-100">
+                <!-- Top gradient banner -->
+                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-500 to-indigo-500" style="background: linear-gradient(90deg, #6C63FF 0%, #8F8AFF 100%)"></div>
+                
+                <!-- Profile Image Upload Box -->
+                <div class="pt-4">
+                    <div class="position-relative d-inline-block mx-auto">
+                        <div class="avatar-container ring-4 ring-purple-100 shadow-md rounded-full overflow-hidden" style="width: 130px; height: 130px;">
+                            <img id="avatarPreviewImg" src="@avatar" alt="Avatar" class="w-100 h-100 object-cover" onerror="this.src='https://ui-avatars.com/api/?name=GV&background=6C63FF&color=fff';" style="width: 130px; height: 130px; object-fit: cover;" />
+                        </div>
+                        
+                        <!-- Upload Floating Camera Button -->
+                        <button type="button" onclick="document.getElementById('avatarFileInput').click()" class="position-absolute bottom-0 end-0 bg-purple-600 hover:bg-purple-700 text-white rounded-full border-3 border-white shadow-sm flex items-center justify-center p-2.5 transition-all" style="width: 38px; height: 38px; background-color: #6C63FF; border: 3px solid #FFFFFF; z-index: 10;" title="Tải ảnh lên">
+                            <i class="fa-solid fa-camera text-xs"></i>
+                        </button>
+                        
+                        <!-- Hidden File input -->
+                        <input type="file" id="avatarFileInput" name="avatarFile" accept="image/*" style="display: none;" />
+                    </div>
+                    
+                    <p class="text-xs text-slate-400 mt-3">Định dạng JPG, PNG hoặc GIF. Tối đa 2MB.</p>
+                </div>
+
+                <!-- Brief profile details -->
+                <div class="space-y-1">
+                    <h3 class="text-lg font-bold text-slate-800 m-0">@Model.FullName</h3>
+                    <p class="text-xs text-slate-500 m-0">@Model.Email</p>
+                </div>
+
+                <!-- Bio brief view -->
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 text-left">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Giới thiệu ngắn</span>
+                    <p class="text-xs text-slate-600 m-0 italic" id="bioPreview">
+                        @(string.IsNullOrEmpty(Model.UserProfile?.Bio) ? "Chưa có lời giới thiệu bản thân." : Model.UserProfile.Bio)
+                    </p>
+                </div>
             </div>
         </div>
 
-        <!-- Edit Form -->
-        <form asp-action="Update" method="post" class="space-y-6">
-            <input type="hidden" asp-for="Id" />
-            <input type="hidden" asp-for="PasswordHash" />
-            <input type="hidden" asp-for="RoleId" />
-            <input type="hidden" asp-for="Status" />
+        <!-- Right Column: Personal & Account Details Form Fields -->
+        <div class="col-lg-8">
+            <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 relative overflow-hidden h-100">
+                <!-- Top gradient banner -->
+                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-500 to-indigo-500" style="background: linear-gradient(90deg, #6C63FF 0%, #8F8AFF 100%)"></div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <!-- FullName -->
-                <div class="space-y-1.5">
-                    <label asp-for="FullName" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Họ và tên</label>
-                    <input asp-for="FullName" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập họ và tên..." required />
-                    <span asp-validation-for="FullName" class="text-xs text-red-500"></span>
+                <div class="row g-4 pt-2">
+                    <div class="col-12 border-b border-slate-100 pb-2">
+                        <h4 class="text-sm font-bold text-slate-800 m-0 uppercase tracking-wider">Thông tin tài khoản</h4>
+                    </div>
+
+                    <!-- FullName -->
+                    <div class="col-md-6 space-y-1.5">
+                        <label asp-for="FullName" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Họ và tên</label>
+                        <div class="relative">
+                            <input asp-for="FullName" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập họ và tên..." required />
+                        </div>
+                        <span asp-validation-for="FullName" class="text-xs text-red-500"></span>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="col-md-6 space-y-1.5">
+                        <label asp-for="Email" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email liên hệ</label>
+                        <div class="relative">
+                            <input asp-for="Email" type="email" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="example@domain.com" required />
+                        </div>
+                        <span asp-validation-for="Email" class="text-xs text-red-500"></span>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="col-md-6 space-y-1.5">
+                        <label asp-for="Phone" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Số điện thoại</label>
+                        <div class="relative">
+                            <input asp-for="Phone" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập số điện thoại..." />
+                        </div>
+                        <span asp-validation-for="Phone" class="text-xs text-red-500"></span>
+                    </div>
+
+                    <!-- DateOfBirth -->
+                    <div class="col-md-6 space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ngày sinh</label>
+                        <div class="relative">
+                            <input type="date" name="dateOfBirth" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" value="@(Model.UserProfile?.DateOfBirth?.ToString("yyyy-MM-dd"))" />
+                        </div>
+                    </div>
+
+                    <div class="col-12 border-b border-slate-100 pb-2 mt-5">
+                        <h4 class="text-sm font-bold text-slate-800 m-0 uppercase tracking-wider">Thông tin cá nhân nâng cao</h4>
+                    </div>
+
+                    <!-- Gender -->
+                    <div class="col-md-6 space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Giới tính</label>
+                        <select name="gender" class="form-select w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all bg-white">
+                            <option value="">-- Chọn giới tính --</option>
+                            <option value="Male" selected="@(Model.UserProfile?.Gender == "Male")">Nam</option>
+                            <option value="Female" selected="@(Model.UserProfile?.Gender == "Female")">Nữ</option>
+                            <option value="Other" selected="@(Model.UserProfile?.Gender == "Other")">Khác</option>
+                        </select>
+                    </div>
+
+                    <!-- Country -->
+                    <div class="col-md-6 space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Quốc tịch / Quốc gia</label>
+                        <div class="relative">
+                            <input type="text" name="country" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Việt Nam, USA, Japan..." value="@Model.UserProfile?.Country" />
+                        </div>
+                    </div>
+
+                    <!-- Bio -->
+                    <div class="col-12 space-y-1.5">
+                        <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Giới thiệu bản thân (Bio)</label>
+                        <textarea name="bio" id="bioTextarea" rows="4" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Chia sẻ thêm về bản thân, kinh nghiệm giảng dạy của bạn...">@Model.UserProfile?.Bio</textarea>
+                    </div>
                 </div>
 
-                <!-- Email -->
-                <div class="space-y-1.5">
-                    <label asp-for="Email" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email liên hệ</label>
-                    <input asp-for="Email" type="email" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="example@domain.com" required />
-                    <span asp-validation-for="Email" class="text-xs text-red-500"></span>
-                </div>
-
-                <!-- Phone -->
-                <div class="space-y-1.5">
-                    <label asp-for="Phone" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Số điện thoại</label>
-                    <input asp-for="Phone" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập số điện thoại..." />
-                    <span asp-validation-for="Phone" class="text-xs text-red-500"></span>
-                </div>
-
-                <!-- AvatarUrl -->
-                <div class="space-y-1.5">
-                    <label asp-for="AvatarUrl" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Đường dẫn ảnh đại diện (Avatar URL)</label>
-                    <input asp-for="AvatarUrl" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="http://example.com/avatar.jpg..." />
-                    <span asp-validation-for="AvatarUrl" class="text-xs text-red-500"></span>
+                <!-- Submit Button -->
+                <div class="flex items-center justify-end gap-3 pt-5 border-t border-slate-100">
+                    <button type="submit" class="btn btn-primary-ailearn" style="border-radius: 9999px !important; background: linear-gradient(135deg, #6C63FF 0%, #5A52E6 100%) !important; box-shadow: 0 4px 14px rgba(108, 99, 255, 0.25) !important;">
+                        <i class="fa-solid fa-floppy-disk me-1.5"></i>
+                        Lưu thông tin hồ sơ
+                    </button>
                 </div>
             </div>
-
-            <div class="flex items-center justify-end gap-3 pt-5 border-t border-slate-100">
-                <button type="submit" class="btn btn-primary-ailearn">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                    Cập nhật hồ sơ
-                </button>
-            </div>
-        </form>
-    </div>
+        </div>
+    </form>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Live file avatar preview
+            $('#avatarFileInput').on('change', function(e) {
+                if (e.target.files && e.target.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(eReader) {
+                        $('#avatarPreviewImg').attr('src', eReader.target.result);
+                    };
+                    reader.readAsDataURL(e.target.files[0]);
+                }
+            });
+
+            // Live bio preview synchronization
+            $('#bioTextarea').on('input', function() {
+                const val = $(this).val().trim();
+                if (val) {
+                    $('#bioPreview').text(val).removeClass('italic');
+                } else {
+                    $('#bioPreview').text('Chưa có lời giới thiệu bản thân.').addClass('italic');
+                }
+            });
+        });
+    </script>
+    <partial name="_ValidationScriptsPartial" />
+}
