@@ -23,7 +23,7 @@ builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<DuAnTotNghiep.Filters.RequireOnboardingFilter>();
     options.Filters.Add<DuAnTotNghiep.Filters.RequirePlacementTestFilter>();
-});
+}).AddRazorRuntimeCompilation();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 

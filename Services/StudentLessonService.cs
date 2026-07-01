@@ -55,10 +55,10 @@ namespace DuAnTotNghiep.Services
 
             var isCompleted = completedLessonIds.Contains(lessonId);
 
-            string? videoUrl = null;
-            if (lesson.ContentType == "VIDEO_LINK")
+            string? videoUrl = lesson.VideoUrl;
+            if (lesson.ContentType == "VIDEO_LINK" && string.IsNullOrEmpty(videoUrl))
             {
-                videoUrl = lesson.Content;
+                videoUrl = lesson.Content; // Fallback to old behavior
             }
 
             return new LessonViewModel

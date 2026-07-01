@@ -28,6 +28,18 @@
         </div>
 
         <div class="prose prose-slate max-w-none text-sm text-slate-800 leading-relaxed space-y-4 whitespace-pre-line bg-slate-50/50 p-6 rounded-xl border border-slate-150">
+            @if (!string.IsNullOrWhiteSpace(Model.VideoUrl))
+            {
+                <div class="mb-6 rounded-xl overflow-hidden border border-slate-200 bg-black aspect-video relative">
+                    <iframe class="absolute inset-0 w-full h-full"
+                            src="@Model.VideoUrl"
+                            title="Video bài học"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                </div>
+            }
+
             @Html.Raw(Model.Content)
         </div>
     </div>

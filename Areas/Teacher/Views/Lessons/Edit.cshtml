@@ -35,8 +35,24 @@
             </div>
 
             <div class="space-y-1.5">
-                <label asp-for="Content" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nội dung bài học</label>
-                <textarea asp-for="Content" rows="10" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" required></textarea>
+                <label asp-for="VideoUrl" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Video Bài giảng (URL - Tùy chọn)</label>
+                <input asp-for="VideoUrl" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" placeholder="Ví dụ: https://www.youtube.com/embed/..." />
+                <p class="text-[10px] text-slate-500 mt-1">Hỗ trợ link nhúng YouTube dạng iframe / embed.</p>
+            </div>
+
+            <div class="space-y-1.5">
+                <div class="flex items-center justify-between">
+                    <label asp-for="Content" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nội dung bài học</label>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="insertVocabTemplate()" class="px-2 py-1 text-[10px] font-bold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded border border-blue-200 transition-colors">
+                            <i class="fa-solid fa-layer-group me-1"></i>+ Mẫu Từ Vựng
+                        </button>
+                        <button type="button" onclick="insertQuizTemplate()" class="px-2 py-1 text-[10px] font-bold text-green-600 bg-green-50 hover:bg-green-100 rounded border border-green-200 transition-colors">
+                            <i class="fa-solid fa-list-check me-1"></i>+ Mẫu Trắc Nghiệm
+                        </button>
+                    </div>
+                </div>
+                <textarea asp-for="Content" rows="15" id="lessonContentEditor" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl"></textarea>
             </div>
 
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -46,3 +62,81 @@
         </form>
     </div>
 </div>
+
+@section Scripts {
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: '#lessonContentEditor',
+            plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking table emoticons template help',
+            toolbar: 'undo redo | blocks | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media | forecolor backcolor emoticons | code',
+            menubar: false,
+            height: 400,
+            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; }',
+            setup: function (editor) {
+                editor.on('change', function () {
+                    editor.save();
+                });
+            }
+        });
+
+        function insertVocabTemplate() {
+            const html = `
+<div class="lesson-intro mb-4">
+    <h3 class="text-primary mb-3">Tổng quan & Lý thuyết</h3>
+    <p>Nhập mô tả bài học tại đây...</p>
+</div>
+<div class="vocab-section mt-4">
+    <h4 class="mb-3 text-primary"><i class="fa-solid fa-layer-group me-2"></i>Từ vựng tham khảo</h4>
+    <div class="vocab-list">
+        <div class="vocab-card">
+            <div class="vocab-header">
+                <div class="vocab-word-info">
+                    <h5 class="vocab-word text-gradient">Example</h5>
+                    <span class="vocab-type">(noun)</span>
+                    <span class="vocab-ipa">/ɪɡˈzæm.pəl/</span>
+                </div>
+                <button type="button" class="btn btn-icon btn-pronounce" data-word="Example" title="Nghe phát âm">
+                    <i class="fa-solid fa-volume-high"></i>
+                </button>
+            </div>
+            <div class="vocab-meaning mt-2">
+                <p><strong>Nghĩa:</strong> Ví dụ</p>
+            </div>
+        </div>
+    </div>
+</div>`;
+            tinymce.get('lessonContentEditor').insertContent(html);
+        }
+
+        function insertQuizTemplate() {
+            const html = `
+<div class="lesson-intro mb-4">
+    <h3 class="text-primary mb-3">Bài Tập Thực Hành</h3>
+    <p>Hãy chọn đáp án đúng nhất.</p>
+</div>
+<div class="quiz-container bg-white p-4 rounded shadow-sm border">
+    <form id="practiceQuizForm">
+        <div class="mb-4">
+            <h5 class="mb-3">1. Câu hỏi số 1?</h5>
+            <div class="form-check mb-2"><input class="form-check-input" type="radio" name="q1" id="q1a" value="correct"><label class="form-check-label" for="q1a">Đáp án đúng</label></div>
+            <div class="form-check mb-2"><input class="form-check-input" type="radio" name="q1" id="q1b" value="wrong"><label class="form-check-label" for="q1b">Đáp án sai</label></div>
+        </div>
+        <button type="button" class="btn btn-primary px-4 py-2" onclick="checkQuiz()"><i class="fa-solid fa-paper-plane me-2"></i>Nộp bài</button>
+        <div id="quizResult" class="mt-3 fw-bold fs-5" style="display: none;"></div>
+    </form>
+</div>
+<script>
+    function checkQuiz() {
+        let score = 0; const total = 1; const form = document.getElementById('practiceQuizForm');
+        if (form.q1 && form.q1.value === 'correct') score++;
+        const resultDiv = document.getElementById('quizResult');
+        resultDiv.style.display = 'block';
+        if (score === total) { resultDiv.className = 'mt-3 fw-bold fs-5 text-success'; resultDiv.innerHTML = '🎉 Tuyệt vời! Bạn đã đúng ' + score + '/' + total + ' câu.'; }
+        else { resultDiv.className = 'mt-3 fw-bold fs-5 text-warning'; resultDiv.innerHTML = 'Bạn trả lời đúng ' + score + '/' + total + ' câu.'; }
+    }
+</script>`;
+            tinymce.get('lessonContentEditor').insertContent(html);
+        }
+    </script>
+}

@@ -22,7 +22,7 @@ public class TeacherCourseService : ITeacherCourseService
             .Include(t => t.Skill)
             .Include(t => t.Level)
             .Include(t => t.OriginalLessons)
-            .Where(t => t.CreatedBy == teacherId);
+            .Where(t => t.CreatedBy == teacherId && t.Status != "INACTIVE");
 
         if (!string.IsNullOrWhiteSpace(search))
         {

@@ -62,6 +62,7 @@ public class TeacherLessonService : ITeacherLessonService
             Content = lesson.Content,
             ContentType = lesson.ContentType,
             EstimatedMinutes = lesson.EstimatedMinutes,
+            VideoUrl = lesson.VideoUrl,
             Status = lesson.ReviewStatus,
             CreatedAt = lesson.CreatedAt,
             UpdatedAt = lesson.UpdatedAt
@@ -77,8 +78,9 @@ public class TeacherLessonService : ITeacherLessonService
             Title = model.Title,
             Summary = model.Summary,
             Content = model.Content,
-            ContentType = "HTML",
+            ContentType = !string.IsNullOrWhiteSpace(model.VideoUrl) ? "VIDEO_LINK" : "HTML",
             EstimatedMinutes = model.EstimatedMinutes,
+            VideoUrl = model.VideoUrl,
             SourceType = "TEACHER_CREATED",
             ReviewStatus = "APPROVED",
             IsAiGenerated = false,
@@ -104,7 +106,9 @@ public class TeacherLessonService : ITeacherLessonService
         lesson.Title = model.Title;
         lesson.Summary = model.Summary;
         lesson.Content = model.Content;
+        lesson.ContentType = !string.IsNullOrWhiteSpace(model.VideoUrl) ? "VIDEO_LINK" : "HTML";
         lesson.EstimatedMinutes = model.EstimatedMinutes;
+        lesson.VideoUrl = model.VideoUrl;
         lesson.UpdatedAt = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();

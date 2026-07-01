@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -18,6 +18,8 @@ public partial class OriginalLesson
     public string ContentType { get; set; } = null!;
 
     public int? EstimatedMinutes { get; set; }
+
+    public string? VideoUrl { get; set; }
 
     public string SourceType { get; set; } = null!;
 

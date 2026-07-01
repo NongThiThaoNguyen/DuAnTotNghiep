@@ -28,8 +28,9 @@ public class LessonDetailViewModel
     public string Title { get; set; } = string.Empty;
     public string? Summary { get; set; }
     public string? Content { get; set; }
-    public string ContentType { get; set; } = string.Empty;
+    public string? ContentType { get; set; } = string.Empty;
     public int? EstimatedMinutes { get; set; }
+    public string? VideoUrl { get; set; }
     public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
@@ -43,6 +44,7 @@ public class CreateLessonViewModel
     public string? Summary { get; set; }
     public string? Content { get; set; }
     public int? EstimatedMinutes { get; set; }
+    public string? VideoUrl { get; set; }
     public string DifficultyLevel { get; set; } = "BASIC";
 }
 

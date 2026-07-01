@@ -291,7 +291,7 @@ namespace DuAnTotNghiep.Services
             return true;
         }
 
-        public async Task<UserStatisticsViewModel> GetUserStatisticsAsync(int userId)
+        public async Task<UserStatisticsViewModel?> GetUserStatisticsAsync(int userId)
         {
             var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Id == userId);
             if (user == null) return null;

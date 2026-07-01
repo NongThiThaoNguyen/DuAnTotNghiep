@@ -1043,6 +1043,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.EstimatedMinutes).HasColumnName("estimated_minutes");
+            entity.Property(e => e.VideoUrl)
+                .HasMaxLength(2000)
+                .HasColumnName("video_url");
             entity.Property(e => e.IsAiGenerated).HasColumnName("is_ai_generated");
             entity.Property(e => e.ReviewStatus)
                 .HasMaxLength(50)
@@ -1560,7 +1563,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50)
                 .IsUnicode(false)
-                .HasDefaultValue(ReferenceReviewStatus.PENDING)
                 .HasColumnName("status");
             entity.Property(e => e.UsagePolicy)
                 .HasConversion<string>()
@@ -1905,9 +1907,9 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.StudentId).HasColumnName("student_id");
             entity.Property(e => e.TopicId).HasColumnName("topic_id");
 
-            entity.HasOne(d => d.LearningPathNode).WithMany(p => p.StudyActivityLogs)
-                .HasForeignKey(d => d.LearningPathNodeId)
-                .HasConstraintName("FK_sal_node");
+            // entity.HasOne(d => d.LearningPathNode).WithMany(p => p.StudyActivityLogs)
+            //    .HasForeignKey(d => d.LearningPathNodeId)
+            //    .HasConstraintName("FK_sal_node");
 
             entity.HasOne(d => d.Student).WithMany(p => p.StudyActivityLogs)
                 .HasForeignKey(d => d.StudentId)
@@ -1980,6 +1982,13 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.SelectedOption).WithMany(p => p.TestAnswers)
                 .HasForeignKey(d => d.SelectedOptionId)
                 .HasConstraintName("FK_ta_option");
+        });
+
+        modelBuilder.Entity<ReplanningRule>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.LowScoreThreshold).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.FastProgressScoreThreshold).HasColumnType("decimal(5, 2)");
         });
 
         modelBuilder.Entity<TestAttempt>(entity =>
