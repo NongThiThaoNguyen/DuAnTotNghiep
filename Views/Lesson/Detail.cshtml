@@ -12,12 +12,39 @@
     <!-- Left Column: Video and Tabs -->
     <div>
         <!-- Video Player -->
-        <div class="lesson-player-container">
-            <video controls poster="/images/lesson-poster.png">
-                <source src="@Model.VideoUrl" type="video/mp4" />
-                Trình duyệt của bạn không hỗ trợ tag video.
-            </video>
-        </div>
+        @if (Model.ContentType == "VIDEO_LINK" && !string.IsNullOrEmpty(Model.VideoUrl))
+        {
+            bool isYoutube = Model.VideoUrl.Contains("youtube.com") || Model.VideoUrl.Contains("youtu.be");
+            string embedUrl = Model.VideoUrl;
+            
+            if (isYoutube)
+            {
+                if (Model.VideoUrl.Contains("youtube.com/watch?v="))
+                {
+                    var videoId = Model.VideoUrl.Split("v=")[1].Split("&")[0];
+                    embedUrl = $"https://www.youtube.com/embed/{videoId}";
+                }
+                else if (Model.VideoUrl.Contains("youtu.be/"))
+                {
+                    var videoId = Model.VideoUrl.Split("youtu.be/")[1].Split("?")[0];
+                    embedUrl = $"https://www.youtube.com/embed/{videoId}";
+                }
+            }
+
+            <div class="lesson-player-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 12px; margin-bottom: 20px;">
+                @if (isYoutube)
+                {
+                    <iframe src="@embedUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+                }
+                else
+                {
+                    <video controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                        <source src="@Model.VideoUrl" type="video/mp4" />
+                        Trình duyệt của bạn không hỗ trợ tag video.
+                    </video>
+                }
+            </div>
+        }
 
         <!-- Lesson Header Actions -->
         <div class="lesson-header-section">

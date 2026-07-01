@@ -55,6 +55,12 @@ namespace DuAnTotNghiep.Services
 
             var isCompleted = completedLessonIds.Contains(lessonId);
 
+            string? videoUrl = null;
+            if (lesson.ContentType == "VIDEO_LINK")
+            {
+                videoUrl = lesson.Content;
+            }
+
             return new LessonViewModel
             {
                 CourseId = lesson.TopicId,
@@ -63,6 +69,8 @@ namespace DuAnTotNghiep.Services
                 LessonTitle = lesson.Title,
                 Summary = lesson.Summary ?? "Tóm tắt bài học tiếng Anh hữu ích dành cho bạn.",
                 Content = lesson.Content ?? "<p>Nội dung đang được cập nhật...</p>",
+                ContentType = lesson.ContentType,
+                VideoUrl = videoUrl,
                 EstimatedMinutes = lesson.EstimatedMinutes ?? 15,
                 IsCompleted = isCompleted,
                 LessonsInCourse = lessonNav,

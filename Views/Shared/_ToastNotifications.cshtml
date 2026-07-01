@@ -1,0 +1,49 @@
+@if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null || TempData["InfoMessage"] != null)
+{
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 4000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <text>
+                Toast.fire({
+                    icon: 'success',
+                    title: '@Html.Raw(TempData["SuccessMessage"]?.ToString()?.Replace("'", "\\'"))'
+                });
+                </text>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <text>
+                Toast.fire({
+                    icon: 'error',
+                    title: '@Html.Raw(TempData["ErrorMessage"]?.ToString()?.Replace("'", "\\'"))'
+                });
+                </text>
+            }
+
+            @if (TempData["InfoMessage"] != null)
+            {
+                <text>
+                Toast.fire({
+                    icon: 'info',
+                    title: '@Html.Raw(TempData["InfoMessage"]?.ToString()?.Replace("'", "\\'"))'
+                });
+                </text>
+            }
+        });
+    </script>
+}

@@ -47,10 +47,6 @@ namespace DuAnTotNghiep.Services
                     progressPercent = Math.Round((double)completedLogsCount / totalLessons * 100, 1);
                     if (progressPercent > 100) progressPercent = 100;
                 }
-                else
-                {
-                    progressPercent = (index % 3 == 0) ? 70 : (index % 3 == 1 ? 45 : 20);
-                }
 
                 courseList.Add(new CourseCardViewModel
                 {
@@ -60,7 +56,7 @@ namespace DuAnTotNghiep.Services
                     Difficulty = t.DifficultyLevel ?? "BEGINNER",
                     SkillCode = t.Skill?.SkillCode ?? "GENERAL",
                     SkillName = t.Skill?.SkillName ?? "Tổng quát",
-                    LessonCount = totalLessons > 0 ? totalLessons : 10,
+                    LessonCount = totalLessons,
                     ProgressPercent = progressPercent,
                     ThumbnailUrl = thumb
                 });
