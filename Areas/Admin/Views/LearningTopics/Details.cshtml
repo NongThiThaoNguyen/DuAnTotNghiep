@@ -1,337 +1,307 @@
 @model DuAnTotNghiep.Models.DTOs.Topic.TopicDetailDto
+@using DuAnTotNghiep.Models
 @{
-    ViewData["Title"] = "Topic Details";
+    ViewData["Title"] = "Chi tiết chủ đề học tập";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var statusCode = (Model.Status ?? string.Empty).ToUpperInvariant();
+    string StatusLabel(string? status) => (status ?? string.Empty).ToUpperInvariant() switch
+    {
+        "ACTIVE" => "Đang hoạt động",
+        "INACTIVE" => "Tạm dừng",
+        "ARCHIVED" => "Lưu trữ",
+        _ => status ?? "-"
+    };
+    string StatusClass(string? status) => (status ?? string.Empty).ToUpperInvariant() switch
+    {
+        "ACTIVE" => "bg-emerald-100 text-emerald-800 border-emerald-200",
+        "INACTIVE" => "bg-amber-100 text-amber-800 border-amber-200",
+        "ARCHIVED" => "bg-slate-100 text-slate-700 border-slate-200",
+        _ => "bg-blue-100 text-blue-800 border-blue-200"
+    };
+    var availableSources = (ViewBag.AvailableSources as IEnumerable<ReferenceSource>)?.ToList() ?? new List<ReferenceSource>();
 }
 
-<div class="container-fluid">
-    <h2 class="mt-4">Topic Details</h2>
-
-    <div class="card mt-4">
-        <div class="card-header">
-            <h4>@Model.Name (@Model.TopicCode)</h4>
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Chi tiết chủ đề học tập</h1>
+            <p class="mt-1 text-sm text-slate-500">@Model.Name (@Model.TopicCode)</p>
         </div>
-        <div class="card-body">
-            @if (Model.Status == "Inactive")
-            {
-                <div class="alert alert-warning" role="alert">
-                    <i class="fas fa-exclamation-triangle"></i> <strong>Cảnh báo:</strong> Topic này đang ở trạng thái KHÔNG HOẠT ĐỘNG (Inactive).
-                </div>
-            }
-            @if (!Model.CanArchive && !string.IsNullOrEmpty(Model.Reason))
-            {
-                <div class="alert alert-danger" role="alert">
-                    <i class="fas fa-ban"></i> <strong>Không thể khóa/lưu trữ:</strong> @Model.Reason
-                </div>
-            }
-
-            <dl class="row">
-                <dt class="col-sm-3">Description</dt>
-                <dd class="col-sm-9">@Model.Description</dd>
-
-                <dt class="col-sm-3">Skill</dt>
-                <dd class="col-sm-9">@Model.SkillName</dd>
-
-                <dt class="col-sm-3">Level</dt>
-                <dd class="col-sm-9">@Model.LevelName</dd>
-
-                <dt class="col-sm-3">Difficulty</dt>
-                <dd class="col-sm-9">@Model.DifficultyLevel</dd>
-
-                <dt class="col-sm-3">Parent Topic</dt>
-                <dd class="col-sm-9">@Model.ParentTopicName</dd>
-
-                <dt class="col-sm-3">Status</dt>
-                <dd class="col-sm-9">@Model.Status</dd>
-
-                <dt class="col-sm-3">Số lượng Objective</dt>
-                <dd class="col-sm-9">@Model.ObjectiveCount</dd>
-
-                <dt class="col-sm-3">Số lượng Lesson</dt>
-                <dd class="col-sm-9">@Model.LessonCount</dd>
-
-                <dt class="col-sm-3">Số lượng Quiz</dt>
-                <dd class="col-sm-9">@Model.QuizCount</dd>
-
-                <dt class="col-sm-3">Số lượng Learning Path</dt>
-                <dd class="col-sm-9">@Model.PathCount</dd>
-            </dl>
-
-            <hr />
-            <h5>Prerequisites</h5>
-            @await Html.PartialAsync("_PrerequisitesPartial", Model.Prerequisites)
-
-            <hr />
-            <h5>Learning Objectives</h5>
-            @await Html.PartialAsync("_ObjectivesPartial", Model.Objectives)
-
-            <hr />
-            <h5>Lessons liên quan (@Model.LessonCount)</h5>
-            <table class="table table-sm table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tiêu đề</th>
-                        <th>Loại nội dung</th>
-                        <th>Thời lượng (phút)</th>
-                        <th>Trạng thái Review</th>
-                        <th>Tạo bởi AI</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var l in Model.Lessons)
-                    {
-                        <tr>
-                            <td>@l.Title</td>
-                            <td>@l.ContentType</td>
-                            <td>@(l.EstimatedMinutes.HasValue ? l.EstimatedMinutes.Value.ToString() : "-")</td>
-                            <td>@l.ReviewStatus</td>
-                            <td>@(l.IsAiGenerated ? "Có" : "Không")</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            @if (!Model.Lessons.Any())
-            {
-                <p class="text-muted">Không có Lesson nào liên quan.</p>
-            }
-
-            <hr />
-            <h5>Quizzes liên quan (@Model.QuizCount)</h5>
-            <table class="table table-sm table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tiêu đề</th>
-                        <th>Loại</th>
-                        <th>Giới hạn thời gian (phút)</th>
-                        <th>Điểm đạt</th>
-                        <th>Trạng thái</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var q in Model.Quizzes)
-                    {
-                        <tr>
-                            <td>@q.Title</td>
-                            <td>@q.QuizType</td>
-                            <td>@(q.TimeLimitMinutes.HasValue ? q.TimeLimitMinutes.Value.ToString() : "-")</td>
-                            <td>@(q.PassingScore.HasValue ? q.PassingScore.Value.ToString() : "-")</td>
-                            <td>@q.Status</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            @if (!Model.Quizzes.Any())
-            {
-                <p class="text-muted">Không có Quiz nào liên quan.</p>
-            }
-
-            <hr />
-            <h5>Learning Paths liên quan (@Model.PathCount)</h5>
-            <table class="table table-sm table-bordered">
-                <thead>
-                    <tr>
-                        <th>Tiêu đề</th>
-                        <th>Tên Học viên</th>
-                        <th>Mô tả</th>
-                        <th>Trạng thái</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var p in Model.LearningPaths)
-                    {
-                        <tr>
-                            <td>@p.Title</td>
-                            <td>@p.StudentName</td>
-                            <td>@p.Description</td>
-                            <td>@p.Status</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            @if (!Model.LearningPaths.Any())
-            {
-                <p class="text-muted">Không có Learning Path nào liên quan.</p>
-            }
-
-            <hr />
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">Nguồn tham khảo liên kết (@(Model.References?.Count() ?? 0))</h5>
-                @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
-                {
-                    <button type="button" class="btn btn-sm btn-primary px-3 rounded-pill" data-bs-toggle="modal" data-bs-target="#linkSourceModal">
-                        <i class="fas fa-plus me-1"></i> Thêm nguồn liên kết
-                    </button>
-                }
-            </div>
-
-            @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
-            {
-                var invalidSources = Model.References?.Where(r => !r.IsValid || r.ValidationLevel != "OK").ToList();
-                if (invalidSources != null && invalidSources.Any())
-                {
-                    <div class="alert alert-danger shadow-sm border-start border-4 border-danger mb-3" role="alert">
-                        <h6 class="alert-heading fw-bold"><i class="fas fa-exclamation-triangle me-2"></i>Cảnh báo: Có nguồn tham khảo không hợp lệ được liên kết!</h6>
-                        <p class="mb-2 fs-7">Hệ thống phát hiện các nguồn tham khảo sau đây đã bị thay đổi trạng thái kiểm duyệt (từ chối hoặc lưu trữ) sau khi liên kết. AI Context sẽ tự động bỏ qua các nguồn này.</p>
-                        <hr class="my-2">
-                        <ul class="mb-0 fs-7 ps-3">
-                            @foreach (var invalid in invalidSources)
-                            {
-                                <li>
-                                    <strong>@invalid.SourceName</strong>: 
-                                    <span class="text-danger fw-bold">@invalid.ValidationMessage</span> 
-                                    (Trạng thái hiện tại: <span class="badge bg-secondary">@invalid.SourceStatus</span>)
-                                </li>
-                            }
-                        </ul>
-                    </div>
-                }
-            }
-            
-            <table class="table table-sm table-bordered">
-                <thead class="table-light text-secondary fs-7 text-uppercase">
-                    <tr>
-                        <th style="width: 35%">Tên nguồn tham khảo</th>
-                        <th style="width: 15%">Loại nguồn</th>
-                        <th style="width: 20%">Bản quyền</th>
-                        <th style="width: 20%">Ghi chú liên kết</th>
-                        @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
-                        {
-                            <th class="text-center" style="width: 10%">Thao tác</th>
-                        }
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Model.References != null && Model.References.Any())
-                    {
-                        foreach (var r in Model.References)
-                        {
-                            <tr class="@(!r.IsValid ? "table-danger" : (r.ValidationLevel == "WARNING" ? "table-warning" : ""))">
-                                <td>
-                                    <strong>@r.SourceName</strong>
-                                    @if (!r.IsValid)
-                                    {
-                                        <span class="badge bg-danger text-white ms-1" title="@r.ValidationMessage">
-                                            <i class="fas fa-ban me-1"></i>@r.SourceStatus
-                                        </span>
-                                    }
-                                    else if (r.ValidationLevel == "WARNING")
-                                     {
-                                         <span class="badge bg-warning text-dark ms-1" title="@r.ValidationMessage">
-                                             <i class="fas fa-exclamation-circle me-1"></i>Chờ duyệt
-                                         </span>
-                                     }
-                                    @if (!string.IsNullOrEmpty(r.SourceUrl))
-                                    {
-                                        <br />
-                                        <small><a href="@r.SourceUrl" target="_blank" class="text-decoration-none text-break">@r.SourceUrl</a></small>
-                                    }
-                                </td>
-                                <td><span class="badge bg-light text-dark border">@r.SourceType</span></td>
-                                <td>@r.LicenseNote</td>
-                                <td>@r.Note</td>
-                                @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
-                                {
-                                    <td class="text-center">
-                                        <form asp-action="UnlinkSource" asp-controller="LearningTopics" asp-area="Admin" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn hủy liên kết nguồn tham khảo này?');">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="topicId" value="@Model.Id" />
-                                            <input type="hidden" name="sourceId" value="@r.ReferenceSourceId" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger border-0" title="Hủy liên kết"><i class="fas fa-trash-alt"></i></button>
-                                        </form>
-                                    </td>
-                                }
-                            </tr>
-                        }
-                    }
-                    else
-                    {
-                        <tr>
-                            <td colspan="@(User.IsInRole("ADMIN") || User.IsInRole("TEACHER") ? 5 : 4)" class="text-center text-muted p-3">Chưa có nguồn tham khảo nào liên kết.</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-
-        </div>
-        <div class="card-footer">
+        <div class="flex flex-wrap gap-2">
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
             @if (User.IsInRole("ADMIN"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-
-                @if (Model.Status != "Archived")
-                {
-                    <form asp-action="Archive" asp-route-id="@Model.Id" method="post" style="display:inline;" 
-                          onsubmit="return confirm('XÁC NHẬN ARCHIVE TOPIC:\n\nTopic này hiện đang được sử dụng bởi:\n- @Model.LessonCount bài học (Lesson)\n- @Model.QuizCount bài kiểm tra (Quiz)\n- @Model.PathCount lộ trình học (Learning Path)\n- @Model.QuestionCount câu hỏi ngân hàng (Question)\n- @Model.PlacementTestCount bài thi Placement Test\n\nBạn có chắc chắn muốn Archive Topic này không?');">
-                        <button type="submit" class="btn btn-secondary" @(Model.CanArchive ? "" : "disabled")>Archive</button>
-                    </form>
-                }
-                @if (Model.Status == "Active")
-                {
-                    <form asp-action="Deactivate" asp-route-id="@Model.Id" method="post" style="display:inline;" 
-                          onsubmit="return confirm('XÁC NHẬN DEACTIVATE TOPIC:\n\nTopic này hiện đang được sử dụng bởi:\n- @Model.LessonCount bài học (Lesson)\n- @Model.QuizCount bài kiểm tra (Quiz)\n- @Model.PathCount lộ trình học (Learning Path)\n- @Model.QuestionCount câu hỏi ngân hàng (Question)\n- @Model.PlacementTestCount bài thi Placement Test\n\nBạn có chắc chắn muốn Deactivate Topic này không?');">
-                        <button type="submit" class="btn btn-danger" @(Model.CanDeactivate ? "" : "disabled")>Deactivate</button>
-                    </form>
-                }
-                @if (Model.Status == "Archived" || Model.Status == "Inactive")
-                {
-                    <form asp-action="Restore" asp-route-id="@Model.Id" method="post" style="display:inline;">
-                        <button type="submit" class="btn btn-success">Restore (Hoạt động lại)</button>
-                    </form>
-                }
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Chỉnh sửa</a>
             }
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
         </div>
     </div>
-</div>
 
-@if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
-{
-    <!-- Modal Chọn nguồn phê duyệt -->
-    <div class="modal fade" id="linkSourceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="linkSourceModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="linkSourceModalLabel"><i class="fas fa-plus"></i> Chọn nguồn tham khảo liên kết</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+    @if (statusCode == "INACTIVE")
+    {
+        <div class="alert alert-warning">Chủ đề này đang tạm dừng, học viên sẽ không thấy nội dung mới từ chủ đề này.</div>
+    }
+    @if (!Model.CanArchive && !string.IsNullOrWhiteSpace(Model.Reason))
+    {
+        <div class="alert alert-danger">Không thể khóa/lưu trữ: @Model.Reason</div>
+    }
+
+    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div class="border-b border-slate-200 px-5 py-4">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">@Model.Name</h2>
+                    <p class="mt-1 text-sm text-slate-500">Mã chủ đề: @Model.TopicCode</p>
                 </div>
-                <form asp-action="LinkSource" asp-controller="LearningTopics" asp-area="Admin" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="topicId" value="@Model.Id" />
-                    
-                    <div class="modal-body text-dark">
-                        @if (ViewBag.AvailableSources != null && ((IEnumerable<DuAnTotNghiep.Models.ReferenceSource>)ViewBag.AvailableSources).Any())
-                        {
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Danh sách nguồn tham khảo (Đã phê duyệt)</label>
+                <span class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-bold @StatusClass(Model.Status)">
+                    @StatusLabel(Model.Status)
+                </span>
+            </div>
+        </div>
+        <dl class="grid gap-0 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="border-b border-slate-100 px-5 py-4 lg:border-r">
+                <dt class="text-xs font-bold uppercase text-slate-500">Kỹ năng</dt>
+                <dd class="mt-1 font-semibold text-slate-900">@Model.SkillName</dd>
+            </div>
+            <div class="border-b border-slate-100 px-5 py-4 lg:border-r">
+                <dt class="text-xs font-bold uppercase text-slate-500">Trình độ</dt>
+                <dd class="mt-1 font-semibold text-slate-900">@Model.LevelName</dd>
+            </div>
+            <div class="border-b border-slate-100 px-5 py-4 lg:border-r">
+                <dt class="text-xs font-bold uppercase text-slate-500">Độ khó</dt>
+                <dd class="mt-1 font-semibold text-slate-900">@Model.DifficultyLevel</dd>
+            </div>
+            <div class="border-b border-slate-100 px-5 py-4">
+                <dt class="text-xs font-bold uppercase text-slate-500">Chủ đề cha</dt>
+                <dd class="mt-1 font-semibold text-slate-900">@(string.IsNullOrWhiteSpace(Model.ParentTopicName) ? "-" : Model.ParentTopicName)</dd>
+            </div>
+            <div class="px-5 py-4 sm:col-span-2 lg:col-span-4">
+                <dt class="text-xs font-bold uppercase text-slate-500">Mô tả</dt>
+                <dd class="mt-1 text-sm text-slate-700 whitespace-pre-line">@(string.IsNullOrWhiteSpace(Model.Description) ? "Chưa có mô tả." : Model.Description)</dd>
+            </div>
+        </dl>
+    </section>
+
+    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-500">Mục tiêu</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">@Model.ObjectiveCount</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-500">Bài học</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">@Model.LessonCount</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-500">Quiz</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">@Model.QuizCount</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <p class="text-xs font-bold uppercase text-slate-500">Lộ trình</p>
+            <p class="mt-2 text-2xl font-bold text-slate-900">@Model.PathCount</p>
+        </div>
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <section class="lg:col-span-2 space-y-6">
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-base font-bold text-slate-900">Điều kiện tiên quyết</h2>
+                <div class="mt-4">
+                    @await Html.PartialAsync("_PrerequisitesPartial", Model.Prerequisites)
+                </div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h2 class="text-base font-bold text-slate-900">Mục tiêu học tập</h2>
+                <div class="mt-4">
+                    @await Html.PartialAsync("_ObjectivesPartial", Model.Objectives)
+                </div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                <div class="border-b border-slate-200 px-5 py-4">
+                    <h2 class="text-base font-bold text-slate-900">Nguồn tham khảo liên kết (@(Model.References?.Count() ?? 0))</h2>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Tên nguồn</th>
+                                <th>Loại</th>
+                                <th>Bản quyền</th>
+                                <th>Ghi chú</th>
+                                @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+                                {
+                                    <th class="text-right">Thao tác</th>
+                                }
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (Model.References != null && Model.References.Any())
+                            {
+                                foreach (var r in Model.References)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="font-semibold text-slate-900">@r.SourceName</div>
+                                            @if (!r.IsValid)
+                                            {
+                                                <span class="mt-1 inline-flex rounded-md bg-red-50 px-2 py-0.5 text-xs font-bold text-red-700">@r.SourceStatus</span>
+                                            }
+                                            else if (r.ValidationLevel == "WARNING")
+                                            {
+                                                <span class="mt-1 inline-flex rounded-md bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700">Chờ duyệt</span>
+                                            }
+                                            @if (!string.IsNullOrWhiteSpace(r.SourceUrl))
+                                            {
+                                                <div class="mt-1 text-xs"><a href="@r.SourceUrl" target="_blank" class="text-blue-600 break-all">@r.SourceUrl</a></div>
+                                            }
+                                        </td>
+                                        <td>@r.SourceType</td>
+                                        <td>@r.LicenseNote</td>
+                                        <td>@r.Note</td>
+                                        @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+                                        {
+                                            <td class="text-right">
+                                                <form asp-action="UnlinkSource" asp-controller="LearningTopics" asp-area="Admin" asp-route-topicId="@Model.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc chắn muốn hủy liên kết nguồn tham khảo này?');">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="sourceId" value="@r.ReferenceSourceId" />
+                                                    <button type="submit" class="admin-icon-btn admin-icon-delete" title="Hủy liên kết" aria-label="Hủy liên kết">
+                                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="@(User.IsInRole("ADMIN") || User.IsInRole("TEACHER") ? 5 : 4)" class="text-center text-muted p-4">Chưa có nguồn tham khảo nào liên kết.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            @if (Model.Lessons.Any())
+            {
+                <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-200 px-5 py-4"><h2 class="text-base font-bold text-slate-900">Bài học liên quan (@Model.LessonCount)</h2></div>
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead><tr><th>Tiêu đề</th><th>Loại nội dung</th><th>Thời lượng</th><th>Review</th><th>AI</th></tr></thead>
+                            <tbody>
+                                @foreach (var l in Model.Lessons)
+                                {
+                                    <tr><td>@l.Title</td><td>@l.ContentType</td><td>@(l.EstimatedMinutes?.ToString() ?? "-") phút</td><td>@l.ReviewStatus</td><td>@(l.IsAiGenerated ? "Có" : "Không")</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Quizzes.Any())
+            {
+                <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-200 px-5 py-4"><h2 class="text-base font-bold text-slate-900">Quiz liên quan (@Model.QuizCount)</h2></div>
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead><tr><th>Tiêu đề</th><th>Loại</th><th>Thời gian</th><th>Điểm đạt</th><th>Trạng thái</th></tr></thead>
+                            <tbody>
+                                @foreach (var q in Model.Quizzes)
+                                {
+                                    <tr><td>@q.Title</td><td>@q.QuizType</td><td>@(q.TimeLimitMinutes?.ToString() ?? "-") phút</td><td>@(q.PassingScore?.ToString() ?? "-")</td><td>@q.Status</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+
+            @if (Model.LearningPaths.Any())
+            {
+                <div class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+                    <div class="border-b border-slate-200 px-5 py-4"><h2 class="text-base font-bold text-slate-900">Lộ trình liên quan (@Model.PathCount)</h2></div>
+                    <div class="table-responsive">
+                        <table class="table mb-0">
+                            <thead><tr><th>Tiêu đề</th><th>Học viên</th><th>Mô tả</th><th>Trạng thái</th></tr></thead>
+                            <tbody>
+                                @foreach (var p in Model.LearningPaths)
+                                {
+                                    <tr><td>@p.Title</td><td>@p.StudentName</td><td>@p.Description</td><td>@p.Status</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+        </section>
+
+        <aside class="space-y-6">
+            @if (User.IsInRole("ADMIN") || User.IsInRole("TEACHER"))
+            {
+                <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h2 class="text-sm font-bold uppercase tracking-wide text-slate-500">Liên kết nguồn tham khảo</h2>
+                    @if (availableSources.Any())
+                    {
+                        <form asp-action="LinkSource" asp-controller="LearningTopics" asp-area="Admin" asp-route-topicId="@Model.Id" method="post" class="mt-4 space-y-3">
+                            @Html.AntiForgeryToken()
+                            <div>
+                                <label class="form-label">Nguồn đã phê duyệt</label>
                                 <select name="sourceId" class="form-select" required>
                                     <option value="">-- Chọn nguồn tham khảo --</option>
-                                    @foreach (var s in (IEnumerable<DuAnTotNghiep.Models.ReferenceSource>)ViewBag.AvailableSources)
+                                    @foreach (var source in availableSources)
                                     {
-                                        <option value="@s.Id">@s.SourceName (@(s.SourceUrl ?? "Không có URL"))</option>
+                                        <option value="@source.Id">@source.SourceName (@(source.SourceUrl ?? "Không có URL"))</option>
                                     }
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Ghi chú liên kết (Optional)</label>
+                            <div>
+                                <label class="form-label">Ghi chú liên kết</label>
                                 <textarea name="note" class="form-control" rows="3" placeholder="Ví dụ: Đọc chương 1, bài 2..."></textarea>
                             </div>
-                        }
-                        else
+                            <button type="submit" class="btn btn-primary w-100">Thêm nguồn liên kết</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p class="mt-4 text-sm text-slate-500">Không có nguồn tham khảo đã phê duyệt khả dụng để liên kết.</p>
+                    }
+                </section>
+            }
+
+            @if (User.IsInRole("ADMIN"))
+            {
+                <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                    <h2 class="text-sm font-bold uppercase tracking-wide text-slate-500">Thao tác quản trị</h2>
+                    <div class="mt-4 space-y-3">
+                        @if (statusCode != "ARCHIVED")
                         {
-                            <div class="alert alert-warning mb-0">
-                                <i class="fas fa-info-circle"></i> Không có nguồn tham khảo nào đã được phê duyệt khả dụng để liên kết. Vui lòng thêm nguồn mới hoặc phê duyệt các nguồn hiện tại trước.
-                            </div>
+                            <form asp-action="Archive" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn lưu trữ chủ đề này?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="admin-action-primary admin-action-lock" @(Model.CanArchive ? "" : "disabled")>Lưu trữ chủ đề</button>
+                            </form>
+                        }
+                        @if (statusCode == "ACTIVE")
+                        {
+                            <form asp-action="Deactivate" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn tạm dừng chủ đề này?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="admin-action-primary admin-action-reset" @(Model.CanDeactivate ? "" : "disabled")>Tạm dừng chủ đề</button>
+                            </form>
+                        }
+                        @if (statusCode == "ARCHIVED" || statusCode == "INACTIVE")
+                        {
+                            <form asp-action="Restore" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn khôi phục chủ đề này?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="admin-action-primary admin-action-unlock">Khôi phục chủ đề</button>
+                            </form>
                         }
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                        @if (ViewBag.AvailableSources != null && ((IEnumerable<DuAnTotNghiep.Models.ReferenceSource>)ViewBag.AvailableSources).Any())
-                        {
-                            <button type="submit" class="btn btn-primary">Xác nhận liên kết</button>
-                        }
-                    </div>
-                </form>
-            </div>
-        </div>
+                </section>
+            }
+        </aside>
     </div>
-}
+</div>

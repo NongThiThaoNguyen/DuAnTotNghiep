@@ -246,7 +246,7 @@ public class AILearnSeeder
                         QuestionText = $"Đây là câu hỏi trắc nghiệm số {q + 1} của khóa học {course.Title}. Hãy chọn đáp án chính xác nhất?",
                         CorrectAnswer = "A",
                         Explanation = $"Giải thích chi tiết tại sao đáp án A là chính xác cho câu hỏi số {q + 1}. Cấu trúc ngữ pháp và từ vựng áp dụng ở đây rất thông dụng.",
-                        DifficultyLevel = "INTERMEDIATE",
+                        DifficultyLevel = "MEDIUM",
                         SourceType = "SYSTEM",
                         ReviewStatus = "APPROVED",
                         CreatedAt = DateTime.UtcNow,

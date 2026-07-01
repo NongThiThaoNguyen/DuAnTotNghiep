@@ -1,12 +1,12 @@
 @model DuAnTotNghiep.Models.DTOs.PagedResult<DuAnTotNghiep.Models.ViewModels.Admin.PlacementAttemptListItemViewModel>
 @{
-    ViewData["Title"] = "Placement Attempts";
+    ViewData["Title"] = "Lượt thi đầu vào";
     var filter = ViewBag.Filter as DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementAttemptFilter;
 }
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Placement Attempts</h2>
+        <h2>Lượt thi đầu vào</h2>
     </div>
 
     <!-- Filter Form -->
@@ -14,28 +14,28 @@
         <div class="card-body">
             <form method="get" asp-action="Index" class="row g-3 align-items-end">
                 <div class="col-md-3">
-                    <label class="form-label">Search (Name, Email)</label>
-                    <input type="text" name="Keyword" class="form-control" value="@filter?.Keyword" placeholder="Search..." />
+                    <label class="form-label">Tìm kiếm học viên</label>
+                    <input type="text" name="Keyword" class="form-control" value="@filter?.Keyword" placeholder="Tên hoặc email..." />
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">Status</label>
+                    <label class="form-label">Trạng thái</label>
                     <select name="Status" class="form-select">
-                        <option value="">All Statuses</option>
-                        <option value="IN_PROGRESS" selected="@(filter?.Status == "IN_PROGRESS")">In Progress</option>
-                        <option value="SUBMITTED" selected="@(filter?.Status == "SUBMITTED")">Submitted</option>
-                        <option value="GRADED" selected="@(filter?.Status == "GRADED")">Graded</option>
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="IN_PROGRESS" selected="@(filter?.Status == "IN_PROGRESS")">Đang làm</option>
+                        <option value="SUBMITTED" selected="@(filter?.Status == "SUBMITTED")">Đã nộp</option>
+                        <option value="GRADED" selected="@(filter?.Status == "GRADED")">Đã chấm</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">From Date</label>
+                    <label class="form-label">Từ ngày</label>
                     <input type="date" name="FromDate" class="form-control" value="@filter?.FromDate?.ToString("yyyy-MM-dd")" />
                 </div>
                 <div class="col-md-2">
-                    <label class="form-label">To Date</label>
+                    <label class="form-label">Đến ngày</label>
                     <input type="date" name="ToDate" class="form-control" value="@filter?.ToDate?.ToString("yyyy-MM-dd")" />
                 </div>
                 <div class="col-md-3">
-                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    <button type="submit" class="btn btn-primary w-100">Lọc</button>
                 </div>
             </form>
         </div>
@@ -49,13 +49,13 @@
                     <thead class="table-light">
                         <tr>
                             <th>ID</th>
-                            <th>Student</th>
-                            <th>Test</th>
-                            <th>Score</th>
-                            <th>Level</th>
-                            <th>Status</th>
-                            <th>Submitted At</th>
-                            <th>Actions</th>
+                            <th>Học viên</th>
+                            <th>Đề thi</th>
+                            <th>Điểm</th>
+                            <th>Trình độ</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày nộp</th>
+                            <th class="text-right">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -87,10 +87,12 @@
                                         </span>
                                     </td>
                                     <td>@(item.SubmittedAt?.ToString("dd/MM/yyyy HH:mm") ?? "-")</td>
-                                    <td>
-                                        <a asp-action="Details" asp-route-id="@item.AttemptId" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-eye"></i> View
-                                        </a>
+                                    <td class="text-right">
+                                        <div class="admin-icon-actions">
+                                            <a asp-action="Details" asp-route-id="@item.AttemptId" class="admin-icon-btn admin-icon-view" title="Chi tiết lượt thi" aria-label="Chi tiết lượt thi">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -98,7 +100,7 @@
                         else
                         {
                             <tr>
-                                <td colspan="8" class="text-center py-4">No attempts found matching the criteria.</td>
+                                <td colspan="8" class="text-center py-4">Không có lượt thi phù hợp.</td>
                             </tr>
                         }
                     </tbody>
@@ -111,14 +113,14 @@
         {
             var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
             <div class="card-footer d-flex justify-content-between align-items-center">
-                <small class="text-muted">Showing @((Model.PageIndex - 1) * Model.PageSize + 1) to @Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount) of @Model.TotalCount attempts</small>
+                <small class="text-muted">Hiển thị @((Model.PageIndex - 1) * Model.PageSize + 1) đến @Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount) trên @Model.TotalCount lượt thi</small>
                 
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
                         @if (Model.PageIndex > 1)
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = Model.PageIndex - 1 })">Previous</a>
+                                <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = Model.PageIndex - 1 })">Trước</a>
                             </li>
                         }
                         
@@ -132,7 +134,7 @@
                         @if (Model.PageIndex < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
                         {
                             <li class="page-item">
-                                <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = Model.PageIndex + 1 })">Next</a>
+                                <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = Model.PageIndex + 1 })">Sau</a>
                             </li>
                         }
                     </ul>

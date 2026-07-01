@@ -9,7 +9,7 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mt-4 mb-3">
         <h2>Chi tiết nguồn tham khảo</h2>
-        <a asp-action="Index" asp-controller="ReferenceSources" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a>
+        <a asp-action="Index" asp-controller="ReferenceSources" class="btn btn-secondary">Quay lại danh sách</a>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -27,7 +27,7 @@
             <!-- Khối 1: Thông tin nguồn -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="fas fa-book"></i> @Model.SourceName</h5>
+                    <h5 class="mb-0">@Model.SourceName</h5>
                 </div>
                 <div class="card-body">
                     <div class="row mb-3">
@@ -35,8 +35,8 @@
                         <div class="col-sm-8">
                             @if (!string.IsNullOrEmpty(Model.SourceUrl))
                             {
-                                <a href="@Model.SourceUrl" target="_blank" class="text-break"><i class="fas fa-external-link-alt"></i> @Model.SourceUrl</a>
-                                <div class="mt-1 text-muted"><small><i class="fas fa-info-circle text-warning"></i> Nếu liên kết nguồn hiện không khả dụng, vui lòng kiểm tra lại đường dẫn thủ công.</small></div>
+                                <a href="@Model.SourceUrl" target="_blank" class="text-break">@Model.SourceUrl</a>
+                                <div class="mt-1 text-muted"><small>Nếu liên kết nguồn hiện không khả dụng, vui lòng kiểm tra lại đường dẫn thủ công.</small></div>
                             }
                             else
                             {
@@ -66,7 +66,7 @@
             <!-- Khối 2: Pháp lý & Bản quyền (Compliance) -->
             <div class="card shadow-sm mb-4 border-warning">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0 text-warning-emphasis"><i class="fas fa-shield-alt"></i> Pháp lý & Bản quyền (Compliance)</h5>
+                    <h5 class="mb-0 text-warning-emphasis">Pháp lý & Bản quyền</h5>
                 </div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -83,7 +83,7 @@
             <!-- Khối 3: Các Học phần (Topic) đang sử dụng -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-folder-open"></i> Học phần (Topic) đang sử dụng nguồn này (@Model.LinkedTopics.Count)</h5>
+                    <h5 class="mb-0">Học phần đang sử dụng nguồn này (@Model.LinkedTopics.Count)</h5>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-striped table-bordered mb-0">
@@ -117,7 +117,7 @@
             <!-- Khối 4: Các Bài học (Lesson) liên quan -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-graduation-cap"></i> Bài học (Lesson) liên đới sử dụng nguồn (@Model.LinkedLessons.Count)</h5>
+                    <h5 class="mb-0">Bài học liên đới sử dụng nguồn (@Model.LinkedLessons.Count)</h5>
                 </div>
                 <div class="card-body p-0">
                     <table class="table table-striped table-bordered mb-0">
@@ -149,7 +149,7 @@
             <!-- Khối 5: Lịch sử Audit Log gần nhất -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-history"></i> Lịch sử tác động gần nhất (Audit Logs)</h5>
+                    <h5 class="mb-0">Lịch sử tác động gần nhất</h5>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
@@ -208,7 +208,7 @@
             <!-- Khối thông tin Quy trình phê duyệt (Workflow Status) -->
             <div class="card shadow-sm mb-4">
                 <div class="card-header bg-light">
-                    <h5 class="mb-0"><i class="fas fa-stream"></i> Trạng thái quy trình</h5>
+                    <h5 class="mb-0">Trạng thái quy trình</h5>
                 </div>
                 <div class="card-body">
                     <div class="text-center my-3">
@@ -244,27 +244,28 @@
             {
                 <div class="card shadow-sm mb-4 border-info">
                     <div class="card-header bg-info-subtle">
-                        <h5 class="mb-0"><i class="fas fa-tools"></i> Thao tác quản trị</h5>
+                        <h5 class="mb-0">Thao tác quản trị</h5>
                     </div>
                     <div class="card-body">
                         <!-- Nút Gửi duyệt -->
                         @if (Model.CanSubmit)
                         {
-                            <button type="button" class="btn btn-primary w-100 mb-3" data-bs-toggle="modal" data-bs-target="#submitReviewModal">
-                                <i class="fas fa-paper-plane"></i> Gửi kiểm duyệt
-                            </button>
+                            <form asp-action="SubmitReview" asp-controller="ReferenceSources" asp-area="Admin" asp-route-id="@Model.Id" method="post" class="mb-3" onsubmit="return confirm('Bạn có chắc chắn muốn gửi nguồn tham khảo này tới Ban kiểm duyệt không?');">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-primary w-100">Gửi kiểm duyệt</button>
+                            </form>
                         }
 
                         @if (Model.CanEdit)
                         {
-                            <a asp-action="Edit" asp-controller="ReferenceSources" asp-route-id="@Model.Id" class="btn btn-warning w-100 mb-3"><i class="fas fa-edit"></i> Chỉnh sửa nguồn</a>
+                            <a asp-action="Edit" asp-controller="ReferenceSources" asp-route-id="@Model.Id" class="btn btn-warning w-100 mb-3">Chỉnh sửa nguồn</a>
                         }
 
                         <!-- Form kiểm duyệt dành cho Admin -->
                         @if (Model.CanReview)
                         {
                             <div class="bg-light p-3 rounded border mb-3">
-                                <h6 class="text-primary mb-3"><i class="fas fa-stamp"></i> Ra quyết định kiểm duyệt</h6>
+                                <h6 class="text-primary mb-3">Ra quyết định kiểm duyệt</h6>
                                 <form asp-action="Review" asp-controller="ReferenceSources" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@Model.Id" />
@@ -292,37 +293,12 @@
                         {
                             <form asp-action="Archive" asp-controller="ReferenceSources" asp-route-id="@Model.Id" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn Lưu trữ (Archive) nguồn tham khảo này?\nHành động này cũng sẽ tắt trạng thái hoạt động của học liệu.');">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-dark w-100"><i class="fas fa-archive"></i> Lưu trữ (Archive)</button>
+                                <button type="submit" class="btn btn-dark w-100">Lưu trữ</button>
                             </form>
                         }
                     </div>
                 </div>
             }
-        </div>
-    </div>
-</div>
-
-<!-- Modal Xác nhận Gửi duyệt -->
-<div class="modal fade" id="submitReviewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="submitReviewModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title" id="submitReviewModalLabel"><i class="fas fa-paper-plane"></i> Xác nhận gửi duyệt nguồn</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <form asp-action="SubmitReview" asp-controller="ReferenceSources" asp-area="Admin" asp-route-id="@Model.Id" method="post">
-                @Html.AntiForgeryToken()
-                <div class="modal-body">
-                    <p class="mb-0">Bạn có chắc chắn muốn gửi nguồn tham khảo <strong>@Model.SourceName</strong> này tới Ban kiểm duyệt để đánh giá không?</p>
-                    <div class="alert alert-info mt-3 py-2 mb-0">
-                        <small><i class="fas fa-info-circle"></i> Sau khi gửi, trạng thái sẽ chuyển thành <strong>Chờ duyệt (Pending Review)</strong> và bạn sẽ không thể chỉnh sửa thông tin cho tới khi được Reviewer đánh giá xong.</small>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy bỏ</button>
-                    <button type="submit" class="btn btn-primary">Xác nhận gửi</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

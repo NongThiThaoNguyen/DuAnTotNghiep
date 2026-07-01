@@ -1,11 +1,11 @@
 @model DuAnTotNghiep.Models.ViewModels.Admin.Levels.LevelEditViewModel
 @{
-    ViewData["Title"] = "Edit Level";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Sửa cấp độ";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container-fluid">
-    <h2 class="mt-4">Edit Proficiency Level</h2>
+    <h2 class="mt-4">Sửa cấp độ tiếng Anh</h2>
 
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
@@ -13,36 +13,36 @@
         <input type="hidden" asp-for="Id" />
         
         <div class="mb-3">
-            <label asp-for="Code" class="form-label"></label>
+            <label asp-for="Code" class="form-label">Mã cấp độ</label>
             <input asp-for="Code" class="form-control" />
             <span asp-validation-for="Code" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Name" class="form-label"></label>
+            <label asp-for="Name" class="form-label">Tên cấp độ</label>
             <input asp-for="Name" class="form-control" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="Description" class="form-label"></label>
+            <label asp-for="Description" class="form-label">Mô tả</label>
             <textarea asp-for="Description" class="form-control"></textarea>
             <span asp-validation-for="Description" class="text-danger"></span>
         </div>
 
         <div class="mb-3">
-            <label asp-for="OrderIndex" class="form-label"></label>
+            <label asp-for="OrderIndex" class="form-label">Thứ tự hiển thị</label>
             <input asp-for="OrderIndex" class="form-control" type="number" min="0" />
             <span asp-validation-for="OrderIndex" class="text-danger"></span>
         </div>
 
         <div class="form-check mb-3">
             <input asp-for="IsActive" class="form-check-input" />
-            <label asp-for="IsActive" class="form-check-label"></label>
+            <label asp-for="IsActive" class="form-check-label">Đang hoạt động</label>
         </div>
 
-        <button type="submit" class="btn btn-success">Save</button>
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
     </form>
 </div>
 

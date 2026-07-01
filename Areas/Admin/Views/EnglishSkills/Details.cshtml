@@ -1,11 +1,11 @@
 @model DuAnTotNghiep.Models.DTOs.Skill.SkillDetailDto
 @{
-    ViewData["Title"] = "Skill Details";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chi tiết kỹ năng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container-fluid">
-    <h2 class="mt-4">Skill Details</h2>
+    <h2 class="mt-4">Chi tiết kỹ năng</h2>
 
     <div class="card mt-4">
         <div class="card-header">
@@ -16,31 +16,31 @@
                 <dt class="col-sm-3">ID</dt>
                 <dd class="col-sm-9">@Model.Id</dd>
 
-                <dt class="col-sm-3">Code</dt>
+                <dt class="col-sm-3">Mã kỹ năng</dt>
                 <dd class="col-sm-9">@Model.Code</dd>
 
-                <dt class="col-sm-3">Description</dt>
+                <dt class="col-sm-3">Mô tả</dt>
                 <dd class="col-sm-9">@Model.Description</dd>
 
-                <dt class="col-sm-3">Status</dt>
+                <dt class="col-sm-3">Trạng thái</dt>
                 <dd class="col-sm-9">
                     @if (Model.IsActive)
                     {
-                        <span class="badge bg-success">Active</span>
+                        <span class="badge bg-success">Đang hoạt động</span>
                     }
                     else
                     {
-                        <span class="badge bg-secondary">Inactive</span>
+                        <span class="badge bg-secondary">Tạm dừng</span>
                     }
                 </dd>
             </dl>
         </div>
         <div class="card-footer">
-            @if (User.IsInRole("Admin"))
+            @if (User.IsInRole("ADMIN"))
             {
-                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Sửa</a>
             }
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
         </div>
     </div>
 </div>

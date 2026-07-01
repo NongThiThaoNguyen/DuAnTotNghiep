@@ -1,11 +1,37 @@
 @model IEnumerable<DuAnTotNghiep.Models.ViewModels.Admin.Topics.TopicListViewModel>
 @{
-    ViewData["Title"] = "Learning Topics";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Chủ đề học tập";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    string DifficultyLabel(string? difficulty) => (difficulty ?? string.Empty).ToUpperInvariant() switch
+    {
+        "BEGINNER" => "Cơ bản",
+        "ELEMENTARY" => "Sơ cấp",
+        "INTERMEDIATE" => "Trung cấp",
+        "UPPER_INTERMEDIATE" => "Trên trung cấp",
+        "ADVANCED" => "Nâng cao",
+        _ => difficulty ?? "-"
+    };
+
+    string StatusLabel(string? status) => (status ?? string.Empty).ToUpperInvariant() switch
+    {
+        "ACTIVE" => "Đang hoạt động",
+        "INACTIVE" => "Tạm dừng",
+        "ARCHIVED" => "Lưu trữ",
+        _ => status ?? "-"
+    };
+
+    string StatusBadgeClass(string? status) => (status ?? string.Empty).ToUpperInvariant() switch
+    {
+        "ACTIVE" => "bg-success",
+        "INACTIVE" => "bg-warning",
+        "ARCHIVED" => "bg-secondary",
+        _ => "bg-info"
+    };
 }
 
 <div class="container-fluid">
-    <h2 class="mt-4">Learning Topics</h2>
+    <h2 class="mt-4">Chủ đề học tập</h2>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -19,109 +45,130 @@
     <!-- Filter Form -->
     <div class="card mb-3">
         <div class="card-body">
-            <form method="get" asp-action="Index" class="row g-3">
-                <div class="col-md-3">
-                    <input type="text" name="keyword" class="form-control" placeholder="Search by Code/Name" value="@ViewBag.Keyword" />
+            <form method="get" asp-action="Index" class="grid gap-3 md:grid-cols-12 md:items-end">
+                <div class="md:col-span-3">
+                    <input type="text" name="keyword" class="form-control" placeholder="Tìm theo mã hoặc tên" value="@ViewBag.Keyword" />
                 </div>
-                <div class="col-md-2">
+                <div class="md:col-span-2">
                     <select name="skillId" class="form-select" asp-items="ViewBag.Skills">
-                        <option value="">-- All Skills --</option>
+                        <option value="">-- Tất cả kỹ năng --</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="md:col-span-2">
                     <select name="levelId" class="form-select" asp-items="ViewBag.Levels">
-                        <option value="">-- All Levels --</option>
+                        <option value="">-- Tất cả trình độ --</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="md:col-span-2">
                     <select name="difficulty" class="form-select">
-                        <option value="">-- Difficulty --</option>
-                        <option value="BEGINNER">BEGINNER</option>
-                        <option value="ELEMENTARY">ELEMENTARY</option>
-                        <option value="INTERMEDIATE">INTERMEDIATE</option>
-                        <option value="UPPER_INTERMEDIATE">UPPER_INTERMEDIATE</option>
-                        <option value="ADVANCED">ADVANCED</option>
+                        <option value="">-- Độ khó --</option>
+                        <option value="BEGINNER" selected="@(ViewBag.Difficulty == "BEGINNER")">BEGINNER</option>
+                        <option value="ELEMENTARY" selected="@(ViewBag.Difficulty == "ELEMENTARY")">ELEMENTARY</option>
+                        <option value="INTERMEDIATE" selected="@(ViewBag.Difficulty == "INTERMEDIATE")">INTERMEDIATE</option>
+                        <option value="UPPER_INTERMEDIATE" selected="@(ViewBag.Difficulty == "UPPER_INTERMEDIATE")">UPPER_INTERMEDIATE</option>
+                        <option value="ADVANCED" selected="@(ViewBag.Difficulty == "ADVANCED")">ADVANCED</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="md:col-span-2">
                     <select name="status" class="form-select">
-                        <option value="">-- Status --</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                        <option value="Archived">Archived</option>
+                        <option value="">-- Trạng thái --</option>
+                        <option value="Active" selected="@(ViewBag.Status == "Active")">Đang hoạt động</option>
+                        <option value="Inactive" selected="@(ViewBag.Status == "Inactive")">Tạm dừng</option>
+                        <option value="Archived" selected="@(ViewBag.Status == "Archived")">Lưu trữ</option>
                     </select>
                 </div>
-                <div class="col-md-1">
-                    <button type="submit" class="btn btn-secondary w-100">Filter</button>
+                <div class="md:col-span-1">
+                    <button type="submit" class="btn btn-secondary w-100">Lọc</button>
                 </div>
             </form>
         </div>
     </div>
 
-    @if (User.IsInRole("Admin"))
+    @if (User.IsInRole("ADMIN"))
     {
         <div class="mb-3">
-            <a asp-action="Create" class="btn btn-primary">Create New Topic</a>
-            <a asp-action="Tree" class="btn btn-info">View Tree</a>
-            <a asp-action="Index" asp-controller="ReferenceSources" class="btn btn-dark"><i class="fas fa-gavel"></i> Quản lý nguồn tham khảo</a>
+            <a asp-action="Create" class="btn btn-primary">Tạo chủ đề</a>
+            <a asp-action="Tree" class="btn btn-info">Xem cây chủ đề</a>
+            <a asp-action="Index" asp-controller="ReferenceSources" class="btn btn-dark">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                Quản lý nguồn tham khảo
+            </a>
         </div>
     }
 
-    <table class="table table-bordered table-striped">
-        <thead>
-            <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Skill</th>
-                <th>Level</th>
-                <th>Parent</th>
-                <th>Difficulty</th>
-                <th>Status</th>
-                <th>Objectives</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped learning-topics-table">
+            <thead>
                 <tr>
-                    <td>@item.TopicCode</td>
-                    <td>@item.Name</td>
-                    <td>@item.SkillName</td>
-                    <td>@item.LevelName</td>
-                    <td>@item.ParentTopicName</td>
-                    <td>@item.Difficulty</td>
-                    <td>@item.Status</td>
-                    <td>@item.ObjectiveCount</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
-                            @if (item.Status != "Archived")
-                            {
-                                <form asp-action="Archive" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn lưu trữ (Archive) Topic này?');">
-                                    <button type="submit" class="btn btn-sm btn-secondary">Archive</button>
-                                </form>
-                            }
-                            @if (item.Status == "Active")
-                            {
-                                <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc chắn muốn khóa (Deactivate) Topic này?');">
-                                    <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
-                                </form>
-                            }
-                            @if (item.Status == "Archived" || item.Status == "Inactive")
-                            {
-                                <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline;">
-                                    <button type="submit" class="btn btn-sm btn-success">Restore</button>
-                                </form>
-                            }
-                        }
-                    </td>
+                    <th>Mã</th>
+                    <th>Tên</th>
+                    <th>Kỹ năng</th>
+                    <th>Trình độ</th>
+                    <th>Chủ đề cha</th>
+                    <th>Độ khó</th>
+                    <th>Trạng thái</th>
+                    <th>Mục tiêu</th>
+                    <th>Thao tác</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var normalizedStatus = (item.Status ?? string.Empty).ToUpperInvariant();
+                    <tr>
+                        <td>@item.TopicCode</td>
+                        <td>@item.Name</td>
+                        <td>@item.SkillName</td>
+                        <td>@item.LevelName</td>
+                        <td>@item.ParentTopicName</td>
+                        <td>@DifficultyLabel(item.Difficulty)</td>
+                        <td><span class="badge @StatusBadgeClass(item.Status)">@StatusLabel(item.Status)</span></td>
+                        <td>@item.ObjectiveCount</td>
+                        <td class="admin-actions-cell">
+                            <div class="admin-icon-actions">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="admin-icon-btn admin-icon-view" title="Chi tiết chủ đề" aria-label="Chi tiết chủ đề">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                </a>
+                                @if (User.IsInRole("ADMIN"))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="admin-icon-btn admin-icon-edit" title="Chỉnh sửa chủ đề" aria-label="Chỉnh sửa chủ đề">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </a>
+                                    @if (normalizedStatus != "ARCHIVED")
+                                    {
+                                        <form asp-action="Archive" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc chắn muốn lưu trữ chủ đề này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="admin-icon-btn admin-icon-archive" title="Lưu trữ chủ đề" aria-label="Lưu trữ chủ đề">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v1a2 2 0 01-2 2M5 8v11a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (normalizedStatus == "ACTIVE")
+                                    {
+                                        <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc chắn muốn tạm dừng chủ đề này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="admin-icon-btn admin-icon-disable" title="Tạm dừng chủ đề" aria-label="Tạm dừng chủ đề">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636A9 9 0 105.636 18.364 9 9 0 0018.364 5.636zM6.343 6.343l11.314 11.314"></path></svg>
+                                            </button>
+                                        </form>
+                                    }
+                                    @if (normalizedStatus == "ARCHIVED" || normalizedStatus == "INACTIVE")
+                                    {
+                                        <form asp-action="Restore" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc chắn muốn khôi phục chủ đề này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="admin-icon-btn admin-icon-restore" title="Khôi phục chủ đề" aria-label="Khôi phục chủ đề">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                            </button>
+                                        </form>
+                                    }
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
     
     <!-- Paging omitted for brevity or implement standard bootstrap paging using ViewBag.CurrentPage / ViewBag.TotalPages -->
 </div>

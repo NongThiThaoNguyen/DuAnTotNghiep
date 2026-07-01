@@ -1,171 +1,159 @@
 @model DuAnTotNghiep.Services.Interfaces.SchemaHealthStatusDto
 @{
-    ViewData["Title"] = "M4 Schema Status";
-    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Trạng thái hệ thống";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    var missingSkillCount = Model.TopicsMissingSkill?.Count ?? 0;
+    var missingLevelCount = Model.TopicsMissingLevel?.Count ?? 0;
+    var missingObjectiveCount = Model.TopicsMissingObjective?.Count ?? 0;
+    var circularDependencyCount = Model.CircularDependencies?.Count ?? 0;
+    var totalIssues = missingSkillCount + missingLevelCount + missingObjectiveCount + circularDependencyCount;
+    var isReady = totalIssues == 0;
 }
 
-<div class="container-fluid py-4">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">M4 Schema Health Status</h2>
+<section class="space-y-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-900">Trạng thái dữ liệu hệ thống</h2>
+            <p class="mt-2 max-w-3xl text-sm text-slate-500">
+                Kiểm tra nhanh dữ liệu nền dùng cho phần học tập: kỹ năng, trình độ, chủ đề, mục tiêu và quan hệ phụ thuộc.
+            </p>
+        </div>
+        <span class="inline-flex w-fit items-center rounded-full px-3 py-1 text-sm font-bold @(isReady ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700")">
+            @(isReady ? "Sẵn sàng demo" : $"{totalIssues} mục cần xem lại")
+        </span>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Kỹ năng</p>
+            <div class="mt-3 text-3xl font-bold text-slate-900">@Model.TotalSkills</div>
+            <p class="mt-1 text-sm text-slate-500">Nhóm kỹ năng tiếng Anh</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Trình độ</p>
+            <div class="mt-3 text-3xl font-bold text-slate-900">@Model.TotalLevels</div>
+            <p class="mt-1 text-sm text-slate-500">Cấp độ học tập</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Chủ đề</p>
+            <div class="mt-3 text-3xl font-bold text-slate-900">@Model.TotalTopics</div>
+            <p class="mt-1 text-sm text-slate-500">Bài/chủ điểm đang quản lý</p>
+        </div>
+        <div class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase tracking-wide text-slate-500">Mục tiêu</p>
+            <div class="mt-3 text-3xl font-bold text-slate-900">@Model.TotalObjectives</div>
+            <p class="mt-1 text-sm text-slate-500">Mục tiêu gắn với chủ đề</p>
         </div>
     </div>
 
-    <div class="row mb-4">
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Skills</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    @Model.TotalSkills
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
+    <div class="grid gap-4 lg:grid-cols-2">
+        <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                    <h3 class="font-bold text-slate-900">Liên kết kỹ năng</h3>
+                    <p class="mt-1 text-sm text-slate-500">Mỗi chủ đề cần thuộc một kỹ năng.</p>
                 </div>
+                <span class="badge @(missingSkillCount == 0 ? "bg-success" : "bg-danger")">
+                    @(missingSkillCount == 0 ? "Đạt" : $"{missingSkillCount} lỗi")
+                </span>
+            </div>
+            <div class="p-5">
+                @if (missingSkillCount > 0)
+                {
+                    <ul class="space-y-2 text-sm text-rose-700">
+                        @foreach (var item in Model.TopicsMissingSkill)
+                        {
+                            <li class="rounded-lg bg-rose-50 px-3 py-2 font-medium">@item</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-sm font-medium text-emerald-700">Tất cả chủ đề đã có kỹ năng hợp lệ.</p>
+                }
             </div>
         </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Levels</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    @Model.TotalLevels
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Topics</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    @Model.TotalTopics
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
-            <div class="card">
-                <div class="card-body p-3">
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="numbers">
-                                <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Objectives</p>
-                                <h5 class="font-weight-bolder mb-0">
-                                    @Model.TotalObjectives
-                                </h5>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header pb-0">
-                    <h6>Topics Missing Skill</h6>
+        <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                    <h3 class="font-bold text-slate-900">Liên kết trình độ</h3>
+                    <p class="mt-1 text-sm text-slate-500">Mỗi chủ đề cần có cấp độ phù hợp.</p>
                 </div>
-                <div class="card-body p-3">
-                    @if (Model.TopicsMissingSkill.Any())
-                    {
-                        <ul class="list-group">
-                            @foreach (var item in Model.TopicsMissingSkill)
-                            {
-                                <li class="list-group-item text-danger">@item</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p class="text-success mb-0">All topics have a valid skill mapped.</p>
-                    }
-                </div>
+                <span class="badge @(missingLevelCount == 0 ? "bg-success" : "bg-danger")">
+                    @(missingLevelCount == 0 ? "Đạt" : $"{missingLevelCount} lỗi")
+                </span>
+            </div>
+            <div class="p-5">
+                @if (missingLevelCount > 0)
+                {
+                    <ul class="space-y-2 text-sm text-rose-700">
+                        @foreach (var item in Model.TopicsMissingLevel)
+                        {
+                            <li class="rounded-lg bg-rose-50 px-3 py-2 font-medium">@item</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-sm font-medium text-emerald-700">Tất cả chủ đề đã có trình độ hợp lệ.</p>
+                }
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header pb-0">
-                    <h6>Topics Missing Level</h6>
+
+        <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                    <h3 class="font-bold text-slate-900">Mục tiêu học tập</h3>
+                    <p class="mt-1 text-sm text-slate-500">Chủ đề nên có ít nhất một mục tiêu để định hướng bài học.</p>
                 </div>
-                <div class="card-body p-3">
-                    @if (Model.TopicsMissingLevel.Any())
-                    {
-                        <ul class="list-group">
-                            @foreach (var item in Model.TopicsMissingLevel)
-                            {
-                                <li class="list-group-item text-danger">@item</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p class="text-success mb-0">All topics have a valid level mapped.</p>
-                    }
-                </div>
+                <span class="badge @(missingObjectiveCount == 0 ? "bg-success" : "bg-warning")">
+                    @(missingObjectiveCount == 0 ? "Đạt" : $"{missingObjectiveCount} thiếu")
+                </span>
+            </div>
+            <div class="p-5">
+                @if (missingObjectiveCount > 0)
+                {
+                    <ul class="space-y-2 text-sm text-amber-700">
+                        @foreach (var item in Model.TopicsMissingObjective)
+                        {
+                            <li class="rounded-lg bg-amber-50 px-3 py-2 font-medium">@item</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-sm font-medium text-emerald-700">Tất cả chủ đề đã có mục tiêu học tập.</p>
+                }
             </div>
         </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header pb-0">
-                    <h6>Topics Missing Objective</h6>
+
+        <div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                    <h3 class="font-bold text-slate-900">Quan hệ phụ thuộc</h3>
+                    <p class="mt-1 text-sm text-slate-500">Kiểm tra vòng lặp trong điều kiện học trước.</p>
                 </div>
-                <div class="card-body p-3">
-                    @if (Model.TopicsMissingObjective.Any())
-                    {
-                        <ul class="list-group">
-                            @foreach (var item in Model.TopicsMissingObjective)
-                            {
-                                <li class="list-group-item text-warning">@item</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p class="text-success mb-0">All topics have at least one objective.</p>
-                    }
-                </div>
+                <span class="badge @(circularDependencyCount == 0 ? "bg-success" : "bg-danger")">
+                    @(circularDependencyCount == 0 ? "Đạt" : $"{circularDependencyCount} vòng lặp")
+                </span>
             </div>
-        </div>
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header pb-0">
-                    <h6>Circular Dependencies Detected</h6>
-                </div>
-                <div class="card-body p-3">
-                    @if (Model.CircularDependencies.Any())
-                    {
-                        <ul class="list-group">
-                            @foreach (var item in Model.CircularDependencies)
-                            {
-                                <li class="list-group-item text-danger">@item</li>
-                            }
-                        </ul>
-                    }
-                    else
-                    {
-                        <p class="text-success mb-0">No circular dependencies detected in prerequisites.</p>
-                    }
-                </div>
+            <div class="p-5">
+                @if (circularDependencyCount > 0)
+                {
+                    <ul class="space-y-2 text-sm text-rose-700">
+                        @foreach (var item in Model.CircularDependencies)
+                        {
+                            <li class="rounded-lg bg-rose-50 px-3 py-2 font-medium">@item</li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="text-sm font-medium text-emerald-700">Không phát hiện vòng phụ thuộc giữa các chủ đề.</p>
+                }
             </div>
         </div>
     </div>
-</div>
+</section>

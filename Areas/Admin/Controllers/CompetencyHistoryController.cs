@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DuAnTotNghiep.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Teacher")]
+    [Authorize(Roles = "ADMIN,TEACHER")]
     public class CompetencyHistoryController : Controller
     {
         private readonly ICompetencyAnalysisOrchestrator _orchestrator;
@@ -134,7 +134,12 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 return Unauthorized();
             }
 
-            var role = User.FindFirstValue(ClaimTypes.Role) ?? "Admin";
+            var role = (User.FindFirstValue(ClaimTypes.Role) ?? "ADMIN").ToUpperInvariant() switch
+            {
+                "TEACHER" => "Teacher",
+                "STUDENT" => "Student",
+                _ => "Admin"
+            };
             var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
 
             try

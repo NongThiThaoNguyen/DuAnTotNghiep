@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace DuAnTotNghiep.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "ADMIN")]
     public class SchemaStatusController : Controller
     {
         private readonly IM4SchemaService _schemaService;

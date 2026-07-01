@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 namespace DuAnTotNghiep.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Teacher")]
+    [Authorize(Roles = "ADMIN,TEACHER")]
     public class LearningTopicsController : Controller
     {
         private readonly ILearningTopicService _topicService;
@@ -60,8 +60,18 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             // Load dropdowns for filter
             var skills = await _skillService.GetListAsync();
             var levels = await _levelService.GetListAsync();
-            ViewBag.Skills = skills.Select(s => new SelectListItem { Value = s.Id.ToString(), Text = s.Name }).ToList();
-            ViewBag.Levels = levels.Select(l => new SelectListItem { Value = l.Id.ToString(), Text = l.Name }).ToList();
+            ViewBag.Skills = skills.Select(s => new SelectListItem
+            {
+                Value = s.Id.ToString(),
+                Text = s.Name,
+                Selected = skillId.HasValue && s.Id == skillId.Value
+            }).ToList();
+            ViewBag.Levels = levels.Select(l => new SelectListItem
+            {
+                Value = l.Id.ToString(),
+                Text = l.Name,
+                Selected = levelId.HasValue && l.Id == levelId.Value
+            }).ToList();
 
             var listViewModel = pagedResult.Items.Select(t => new TopicListViewModel
             {
@@ -102,7 +112,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             return View(detailDto);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create()
         {
             var model = new CreateTopicViewModel();
@@ -112,7 +122,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create(CreateTopicViewModel model)
         {
             if (!ModelState.IsValid)
@@ -147,7 +157,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Edit(int id)
         {
             var detailDto = await _topicService.GetDetailAsync(id);
@@ -174,7 +184,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Edit(int id, EditTopicViewModel model)
         {
             if (id != model.Id) return BadRequest();
@@ -214,7 +224,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Deactivate(int id)
         {
             try
@@ -231,7 +241,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Archive(int id)
         {
             try
@@ -248,7 +258,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Restore(int id)
         {
             try
@@ -265,7 +275,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Reorder(List<int> orderedIds)
         {
             try

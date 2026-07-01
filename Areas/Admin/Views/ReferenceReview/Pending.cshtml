@@ -6,22 +6,20 @@
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800"><i class="fas fa-clipboard-check text-primary me-2"></i>Danh sách nguồn tham khảo chờ duyệt</h1>
+        <h1 class="h3 mb-0 text-gray-800">Danh sách nguồn tham khảo chờ duyệt</h1>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle me-1"></i> @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            @TempData["SuccessMessage"]
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle me-1"></i> @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            @TempData["ErrorMessage"]
         </div>
     }
 
@@ -36,7 +34,7 @@
                             <th style="width: 15%">Loại nguồn</th>
                             <th style="width: 15%">Người tạo</th>
                             <th style="width: 10%">Ngày gửi</th>
-                            <th class="text-center pe-4" style="width: 10%">Thao tác</th>
+                            <th class="text-right pe-4" style="width: 10%">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -52,7 +50,7 @@
                                         @if (!string.IsNullOrEmpty(item.SourceUrl))
                                         {
                                             <a href="@item.SourceUrl" target="_blank" class="text-decoration-none text-truncate d-inline-block" style="max-width: 250px;" title="@item.SourceUrl">
-                                                <i class="fas fa-external-link-alt me-1 fs-8"></i>@item.SourceUrl
+                                                @item.SourceUrl
                                             </a>
                                         }
                                         else
@@ -69,9 +67,9 @@
                                     <td>
                                         <span class="text-secondary fs-7">@item.CreatedAt.ToString("dd/MM/yyyy")</span>
                                     </td>
-                                    <td class="text-center pe-4">
-                                        <a href="/review/@item.Id" class="btn btn-sm btn-primary px-3 rounded-pill">
-                                            <i class="fas fa-search me-1"></i>Đánh giá
+                                    <td class="text-right pe-4">
+                                        <a asp-action="Details" asp-controller="ReferenceReview" asp-route-id="@item.Id" class="admin-icon-btn admin-icon-review" title="Đánh giá nguồn" aria-label="Đánh giá nguồn">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
                                         </a>
                                     </td>
                                 </tr>
@@ -81,7 +79,9 @@
                         {
                             <tr>
                                 <td colspan="6" class="text-center py-5 text-muted">
-                                    <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                    <svg class="mx-auto mb-2 h-8 w-8 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
                                     <p class="mb-0 fw-medium">Không có nguồn tham khảo nào đang chờ duyệt.</p>
                                 </td>
                             </tr>

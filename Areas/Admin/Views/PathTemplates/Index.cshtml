@@ -2,15 +2,15 @@
 
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Path Templates";
+    ViewData["Title"] = "Mẫu lộ trình";
 }
 
 <div class="space-y-6">
-    <header class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6">
+    <header class="bg-white border border-slate-200 rounded-2xl shadow-sm p-6" data-legacy-title="Path Templates">
         <p class="text-xs font-bold uppercase text-blue-600 mb-2">AI Learning Path</p>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-slate-900">Path Templates</h1>
+                <h1 class="text-2xl font-bold text-slate-900">Mẫu lộ trình</h1>
                 <p class="text-sm text-slate-500 mt-2">Quản lý template lộ trình học dùng làm fallback hoặc mẫu triển khai.</p>
             </div>
             <a class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-bold text-white hover:bg-blue-700" asp-action="Create">Tạo template</a>
@@ -23,10 +23,10 @@
                 <thead class="bg-slate-50 text-left text-xs font-bold uppercase text-slate-500">
                     <tr>
                         <th class="px-4 py-3">Template</th>
-                        <th class="px-4 py-3">Duration</th>
-                        <th class="px-4 py-3">Status</th>
-                        <th class="px-4 py-3">Created</th>
-                        <th class="px-4 py-3">Action</th>
+                        <th class="px-4 py-3">Thời lượng</th>
+                        <th class="px-4 py-3">Trạng thái</th>
+                        <th class="px-4 py-3">Ngày tạo</th>
+                        <th class="px-4 py-3 text-right">Thao tác</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -38,16 +38,24 @@
                             <td class="px-4 py-3"><span class="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">@item.Status</span></td>
                             <td class="px-4 py-3 text-slate-600">@item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
                             <td class="px-4 py-3">
-                                <div class="flex flex-wrap gap-2">
-                                    <a class="font-bold text-blue-600 hover:text-blue-700" asp-action="Details" asp-route-id="@item.Id">Chi tiết</a>
-                                    <a class="font-bold text-amber-600 hover:text-amber-700" asp-action="Edit" asp-route-id="@item.Id">Sửa</a>
-                                    <form asp-action="Publish" asp-route-id="@item.Id" method="post">
+                                <div class="admin-icon-actions">
+                                    <a class="admin-icon-btn admin-icon-view" asp-action="Details" asp-route-id="@item.Id" title="Chi tiết template" aria-label="Chi tiết template">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                                    </a>
+                                    <a class="admin-icon-btn admin-icon-edit" asp-action="Edit" asp-route-id="@item.Id" title="Chỉnh sửa template" aria-label="Chỉnh sửa template">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    </a>
+                                    <form asp-action="Publish" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc muốn xuất bản template này?');">
                                         @Html.AntiForgeryToken()
-                                        <button class="font-bold text-green-600 hover:text-green-700" type="submit">Publish</button>
+                                        <button class="admin-icon-btn admin-icon-publish" type="submit" title="Xuất bản template" aria-label="Xuất bản template">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                        </button>
                                     </form>
-                                    <form asp-action="Archive" asp-route-id="@item.Id" method="post">
+                                    <form asp-action="Archive" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc muốn lưu trữ template này?');">
                                         @Html.AntiForgeryToken()
-                                        <button class="font-bold text-slate-600 hover:text-slate-800" type="submit">Archive</button>
+                                        <button class="admin-icon-btn admin-icon-archive" type="submit" title="Lưu trữ template" aria-label="Lưu trữ template">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v1a2 2 0 01-2 2M5 8v11a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                        </button>
                                     </form>
                                 </div>
                             </td>

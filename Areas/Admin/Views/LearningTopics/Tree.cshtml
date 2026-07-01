@@ -1,25 +1,25 @@
 @model List<DuAnTotNghiep.Models.DTOs.Topic.TopicTreeDto>
 @{
-    ViewData["Title"] = "Topic Tree";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cây chủ đề học tập";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container-fluid">
-    <h2 class="mt-4">Learning Topic Tree</h2>
+    <h2 class="mt-4">Cây chủ đề học tập</h2>
 
     <div class="mb-3">
-        @if (User.IsInRole("Admin"))
+        @if (User.IsInRole("ADMIN"))
         {
-            <a asp-action="Create" class="btn btn-primary">Create New Topic</a>
+            <a asp-action="Create" class="btn btn-primary">Tạo chủ đề</a>
         }
-        <a asp-action="Index" class="btn btn-secondary">List View</a>
+        <a asp-action="Index" class="btn btn-secondary">Xem danh sách</a>
     </div>
 
     <div class="card">
         <div class="card-body">
             @if (Model != null && Model.Any())
             {
-                <ul class="list-group">
+                <ul class="space-y-3">
                     @foreach (var topic in Model)
                     {
                         @await Html.PartialAsync("_TopicTreeNode", topic)
@@ -28,7 +28,7 @@
             }
             else
             {
-                <p>No topics found.</p>
+                <p>Chưa có chủ đề nào.</p>
             }
         </div>
     </div>

@@ -1,191 +1,195 @@
 @model DuAnTotNghiep.Areas.Admin.ViewModels.AdminUserProfileViewModel
 @{
     ViewData["Title"] = "Chi tiết tài khoản";
+
+    var roleCode = (Model.RoleName ?? string.Empty).ToUpperInvariant();
+    var statusCode = (Model.Status ?? string.Empty).ToUpperInvariant();
+    var roleLabel = roleCode switch
+    {
+        "ADMIN" => "Quản trị viên",
+        "TEACHER" => "Giáo viên",
+        "STUDENT" => "Học viên",
+        _ => Model.RoleName
+    };
+    var roleClass = roleCode switch
+    {
+        "ADMIN" => "bg-purple-100 text-purple-800 border-purple-200",
+        "TEACHER" => "bg-blue-100 text-blue-800 border-blue-200",
+        _ => "bg-slate-100 text-slate-800 border-slate-200"
+    };
+    var statusLabel = statusCode switch
+    {
+        "ACTIVE" => "Đang hoạt động",
+        "LOCKED" => "Đã khóa",
+        "DELETED" => "Đã xóa",
+        "PENDING" => "Chờ duyệt",
+        _ => Model.Status
+    };
+    var statusClass = statusCode switch
+    {
+        "ACTIVE" => "bg-emerald-100 text-emerald-800 border-emerald-200",
+        "LOCKED" => "bg-amber-100 text-amber-800 border-amber-200",
+        "DELETED" => "bg-red-100 text-red-800 border-red-200",
+        _ => "bg-slate-100 text-slate-800 border-slate-200"
+    };
+    var statusDotClass = statusCode switch
+    {
+        "ACTIVE" => "bg-emerald-500",
+        "LOCKED" => "bg-amber-500",
+        "DELETED" => "bg-red-500",
+        _ => "bg-slate-500"
+    };
+    var avatarUrl = !string.IsNullOrWhiteSpace(Model.AvatarUrl)
+        ? Model.AvatarUrl
+        : $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.FullName)}&background=F1F5F9&color=475569";
 }
 
-<div class="container-fluid py-4">
-    <!-- Breadcrumb & Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<div class="space-y-6">
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb bg-transparent p-0 mb-2">
-                    <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Quản lý Tài Khoản</a></li>
-                    <li class="breadcrumb-item active text-primary font-weight-bold" aria-current="page">Chi tiết</li>
-                </ol>
-            </nav>
-            <h2 class="h3 mb-0 text-gray-800 font-weight-bold">Chi tiết Tài Khoản</h2>
+            <h1 class="text-2xl font-bold text-slate-900">Chi tiết tài khoản</h1>
+            <p class="mt-1 text-sm text-slate-500">Xem hồ sơ, trạng thái đăng nhập và thao tác quản trị cho người dùng.</p>
         </div>
-        <div>
-            <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4 fw-medium">
-                <i class="bi bi-arrow-left me-2"></i> Quay lại
-            </a>
-        </div>
+        <a asp-action="Index" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            </svg>
+            Quay lại
+        </a>
     </div>
 
-    <div class="row">
-        <!-- Main Info Card -->
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow-sm border-0 rounded-3 h-100">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-person-badge me-2"></i> Thông tin cơ bản</h6>
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-center gap-4">
+                <img class="h-16 w-16 rounded-2xl border border-slate-100 object-cover shadow-sm" src="@avatarUrl" alt="@Model.FullName" />
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">@Model.FullName</h2>
+                    <p class="text-sm text-slate-500">@Model.Email</p>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <span class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-bold @roleClass">@roleLabel</span>
+                        <span class="inline-flex items-center rounded-md border px-2.5 py-1 text-xs font-bold @statusClass">
+                            <span class="mr-1.5 h-1.5 w-1.5 rounded-full @statusDotClass"></span>
+                            @statusLabel
+                        </span>
+                    </div>
                 </div>
-                <div class="card-body p-4">
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Họ và tên</div>
-                        <div class="col-sm-8 text-dark fw-medium">@Model.FullName</div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 text-sm sm:min-w-80">
+                <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-xs font-bold uppercase text-slate-500">Ngày tạo</p>
+                    <p class="mt-1 font-semibold text-slate-900">@Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                </div>
+                <div class="rounded-xl bg-slate-50 p-3">
+                    <p class="text-xs font-bold uppercase text-slate-500">Đăng nhập lỗi</p>
+                    <p class="mt-1 font-semibold text-slate-900">@Model.FailedLoginCount lần</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <section class="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="border-b border-slate-200 px-5 py-4">
+                <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500">Thông tin hồ sơ</h3>
+            </div>
+            <div class="divide-y divide-slate-100">
+                <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold text-slate-500">Họ và tên</dt>
+                    <dd class="text-sm font-semibold text-slate-900 sm:col-span-2">@Model.FullName</dd>
+                </div>
+                <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold text-slate-500">Email đăng nhập</dt>
+                    <dd class="text-sm font-semibold text-slate-900 sm:col-span-2">@Model.Email</dd>
+                </div>
+                <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold text-slate-500">Số điện thoại</dt>
+                    <dd class="text-sm text-slate-800 sm:col-span-2">@(string.IsNullOrWhiteSpace(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</dd>
+                </div>
+                <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold text-slate-500">Ngày sinh</dt>
+                    <dd class="text-sm text-slate-800 sm:col-span-2">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
+                </div>
+                <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold text-slate-500">Giới tính</dt>
+                    <dd class="text-sm text-slate-800 sm:col-span-2">@(string.IsNullOrWhiteSpace(Model.Gender) ? "Chưa cập nhật" : Model.Gender)</dd>
+                </div>
+                <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold text-slate-500">Quốc gia</dt>
+                    <dd class="text-sm text-slate-800 sm:col-span-2">@(string.IsNullOrWhiteSpace(Model.Country) ? "Chưa cập nhật" : Model.Country)</dd>
+                </div>
+                <div class="grid gap-1 px-5 py-4 sm:grid-cols-3 sm:gap-4">
+                    <dt class="text-sm font-bold text-slate-500">Tiểu sử</dt>
+                    <dd class="text-sm text-slate-800 sm:col-span-2">@(string.IsNullOrWhiteSpace(Model.Bio) ? "Chưa cập nhật" : Model.Bio)</dd>
+                </div>
+            </div>
+        </section>
+
+        <aside class="space-y-6">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500">Bảo mật đăng nhập</h3>
+                <dl class="mt-4 space-y-4 text-sm">
+                    <div>
+                        <dt class="font-bold text-slate-500">Ngày đăng ký</dt>
+                        <dd class="mt-1 font-semibold text-slate-900">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</dd>
                     </div>
-                    <hr class="text-muted opacity-25">
-                    
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Email đăng nhập</div>
-                        <div class="col-sm-8 text-dark fw-medium">@Model.Email</div>
+                    <div>
+                        <dt class="font-bold text-slate-500">Đăng nhập gần nhất</dt>
+                        <dd class="mt-1 font-semibold text-slate-900">@(Model.LastLoginAt.HasValue ? Model.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm:ss") : "Chưa từng đăng nhập")</dd>
                     </div>
-                    <hr class="text-muted opacity-25">
-                    
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Ngày đăng ký</div>
-                        <div class="col-sm-8 text-dark fw-medium">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm:ss")</div>
-                    </div>
-                    <hr class="text-muted opacity-25">
-                    
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Đăng nhập gần nhất</div>
-                        <div class="col-sm-8 text-dark fw-medium">
-                            @(Model.LastLoginAt.HasValue ? Model.LastLoginAt.Value.ToString("dd/MM/yyyy HH:mm:ss") : "Chưa từng đăng nhập")
-                        </div>
-                    </div>
-                    <hr class="text-muted opacity-25">
-                    
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Số lần đăng nhập sai</div>
-                        <div class="col-sm-8 text-dark fw-medium">
-                            <span class="badge @(Model.FailedLoginCount > 0 ? "bg-warning text-dark" : "bg-success text-white") rounded-pill px-3 py-1">
-                                @Model.FailedLoginCount lần
-                            </span>
-                        </div>
-                    </div>
-                    <hr class="text-muted opacity-25">
-                    
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Trạng thái khóa tạm thời</div>
-                        <div class="col-sm-8 text-dark fw-medium">
+                    <div>
+                        <dt class="font-bold text-slate-500">Khóa tạm thời</dt>
+                        <dd class="mt-1">
                             @if (Model.LockoutUntil.HasValue && Model.LockoutUntil.Value > DateTime.Now)
                             {
-                                <span class="badge bg-danger text-white rounded-pill px-3 py-1">
-                                    <i class="bi bi-clock-history me-1"></i> Bị khóa đến @Model.LockoutUntil.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                <span class="inline-flex rounded-md border border-red-200 bg-red-50 px-2.5 py-1 text-xs font-bold text-red-700">
+                                    Đến @Model.LockoutUntil.Value.ToString("dd/MM/yyyy HH:mm:ss")
                                 </span>
                             }
                             else
                             {
-                                <span class="badge bg-success text-white rounded-pill px-3 py-1">Không bị khóa</span>
+                                <span class="inline-flex rounded-md border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700">Không bị khóa tạm thời</span>
                             }
-                        </div>
+                        </dd>
                     </div>
+                </dl>
+            </section>
 
-                    <hr class="text-muted opacity-25">
-                    
-                    <h6 class="mt-4 mb-3 font-weight-bold text-primary"><i class="bi bi-person-lines-fill me-2"></i> Chi tiết Hồ sơ</h6>
-                    
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Số điện thoại</div>
-                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Phone) ? "Chưa cập nhật" : Model.Phone)</div>
-                    </div>
-                    <hr class="text-muted opacity-25">
-                    
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Ngày sinh</div>
-                        <div class="col-sm-8 text-dark fw-medium">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</div>
-                    </div>
-                    <hr class="text-muted opacity-25">
-
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Giới tính</div>
-                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Gender) ? "Chưa cập nhật" : Model.Gender)</div>
-                    </div>
-                    <hr class="text-muted opacity-25">
-
-                    <div class="row mb-4">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Quốc gia</div>
-                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Country) ? "Chưa cập nhật" : Model.Country)</div>
-                    </div>
-                    <hr class="text-muted opacity-25">
-
-                    <div class="row">
-                        <div class="col-sm-4 text-muted font-weight-bold small text-uppercase">Tiểu sử</div>
-                        <div class="col-sm-8 text-dark fw-medium">@(string.IsNullOrEmpty(Model.Bio) ? "Chưa cập nhật" : Model.Bio)</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Role & Status Card -->
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow-sm border-0 rounded-3 h-100">
-                <div class="card-header bg-white border-bottom py-3">
-                    <h6 class="m-0 font-weight-bold text-primary"><i class="bi bi-shield-check me-2"></i> Phân quyền & Trạng thái</h6>
-                </div>
-                <div class="card-body p-4 text-center">
-                    
-                    <div class="mb-5">
-                        <p class="text-muted font-weight-bold small text-uppercase mb-2">Vai trò hiện tại</p>
-                        @{
-                            var roleClass = Model.RoleName switch
-                            {
-                                "ADMIN" => "bg-danger text-white",
-                                "TEACHER" => "bg-info text-dark",
-                                _ => "bg-secondary text-white"
-                            };
-                        }
-                        <span class="badge @roleClass rounded-pill px-4 py-2 fs-6">@Model.RoleName</span>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <p class="text-muted font-weight-bold small text-uppercase mb-2">Trạng thái tài khoản</p>
-                        @{
-                            var statusClass = Model.Status switch
-                            {
-                                "ACTIVE" => "bg-success text-white",
-                                "LOCKED" => "bg-warning text-dark",
-                                "DELETED" => "bg-danger text-white",
-                                _ => "bg-secondary text-white"
-                            };
-                        }
-                        <span class="badge @statusClass rounded-pill px-4 py-2 fs-6 mb-4 d-inline-block">@Model.Status</span>
-                    </div>
-
-                    <hr class="text-muted opacity-25">
-                    
-                    <div class="d-grid gap-2 mt-4">
-                        @if (Model.Status == "ACTIVE")
-                        {
-                            <form asp-action="Lock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này không?');">
-                                <input type="hidden" name="id" value="@Model.UserId" />
-                                <button type="submit" class="btn btn-warning rounded-pill w-100 fw-medium text-white">
-                                    <i class="bi bi-lock-fill me-2"></i> Khóa tài khoản
-                                </button>
-                            </form>
-                        }
-                        else if (Model.Status == "LOCKED")
-                        {
-                            <form asp-action="Unlock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn MỞ KHÓA tài khoản này không?');">
-                                <input type="hidden" name="id" value="@Model.UserId" />
-                                <button type="submit" class="btn btn-success rounded-pill w-100 fw-medium">
-                                    <i class="bi bi-unlock-fill me-2"></i> Mở khóa tài khoản
-                                </button>
-                            </form>
-                        }
-                        
-                        <form asp-action="ResetPassword" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? (Gửi mật khẩu mới qua email)');">
+            <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <h3 class="text-sm font-bold uppercase tracking-wide text-slate-500">Thao tác quản trị</h3>
+                <div class="mt-4 space-y-3">
+                    @if (statusCode == "ACTIVE")
+                    {
+                        <form asp-action="Lock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn KHÓA tài khoản này không? Người dùng sẽ bị chặn đăng nhập ngay lập tức.');">
+                            @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@Model.UserId" />
-                            <button type="submit" class="btn btn-danger rounded-pill w-100 fw-medium">
-                                <i class="bi bi-key-fill me-2"></i> Reset Password
+                            <button type="submit" class="admin-action-primary admin-action-lock">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                                Khóa tài khoản
                             </button>
                         </form>
-                    </div>
+                    }
+                    else if (statusCode == "LOCKED")
+                    {
+                        <form asp-action="Unlock" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn MỞ KHÓA tài khoản này không? Người dùng sẽ được phép đăng nhập lại.');">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.UserId" />
+                            <button type="submit" class="admin-action-primary admin-action-unlock">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
+                                Mở khóa tài khoản
+                            </button>
+                        </form>
+                    }
 
+                    <form asp-action="ResetPassword" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? Một mật khẩu mới sẽ được tạo và gửi qua email.');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.UserId" />
+                        <button type="submit" class="admin-action-primary admin-action-reset">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+                            Reset mật khẩu
+                        </button>
+                    </form>
                 </div>
-            </div>
-        </div>
+            </section>
+        </aside>
     </div>
 </div>
-

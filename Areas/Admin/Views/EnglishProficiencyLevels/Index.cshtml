@@ -1,11 +1,11 @@
 @model IEnumerable<DuAnTotNghiep.Models.DTOs.Level.LevelListItemDto>
 @{
-    ViewData["Title"] = "English Proficiency Levels";
-    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Cấp độ tiếng Anh";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <div class="container-fluid">
-    <h2 class="mt-4">English Proficiency Levels</h2>
+    <h2 class="mt-4">Cấp độ tiếng Anh</h2>
 
     @if (TempData["SuccessMessage"] != null)
     {
@@ -23,21 +23,22 @@
         </div>
     }
 
-    @if (User.IsInRole("Admin"))
+    @if (User.IsInRole("ADMIN"))
     {
         <div class="mb-3">
-            <a asp-action="Create" class="btn btn-primary">Create New Level</a>
+            <a asp-action="Create" class="btn btn-primary">Thêm cấp độ</a>
         </div>
     }
 
+    <div class="table-responsive">
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>Code</th>
-                <th>Name</th>
-                <th>Order Index</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>Mã</th>
+                <th>Tên cấp độ</th>
+                <th>Thứ tự</th>
+                <th>Trạng thái</th>
+                <th class="text-right">Thao tác</th>
             </tr>
         </thead>
         <tbody>
@@ -50,37 +51,53 @@
                     <td>
                         @if (item.IsActive)
                         {
-                            <span class="badge bg-success">Active</span>
+                            <span class="badge bg-success">Đang hoạt động</span>
                         }
                         else
                         {
-                            <span class="badge bg-secondary">Inactive</span>
+                            <span class="badge bg-secondary">Tạm dừng</span>
                         }
                     </td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-info">Details</a>
-                        @if (User.IsInRole("Admin"))
+                    <td class="admin-actions-cell">
+                        <div class="admin-icon-actions">
+                        <a asp-action="Details" asp-route-id="@item.Id" class="admin-icon-btn admin-icon-view" title="Chi tiết cấp độ" aria-label="Chi tiết cấp độ">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        </a>
+                        @if (User.IsInRole("ADMIN"))
                         {
-                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-warning">Edit</a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="admin-icon-btn admin-icon-edit" title="Chỉnh sửa cấp độ" aria-label="Chỉnh sửa cấp độ">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                            </a>
                              @if (item.IsActive)
                              {
-                                 <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn ngừng hoạt động (Deactivate) Level này?');">
-                                     <button type="submit" class="btn btn-sm btn-danger">Deactivate</button>
+                                 <form asp-action="Deactivate" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc muốn tạm dừng cấp độ này?');">
+                                     @Html.AntiForgeryToken()
+                                     <button type="submit" class="admin-icon-btn admin-icon-disable" title="Tạm dừng cấp độ" aria-label="Tạm dừng cấp độ">
+                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636A9 9 0 105.636 18.364 9 9 0 0018.364 5.636zM6.343 6.343l11.314 11.314"></path></svg>
+                                     </button>
                                  </form>
-                                 <form asp-action="Archive" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn lưu trữ (Archive) Level này?');">
-                                     <button type="submit" class="btn btn-sm btn-secondary">Archive</button>
+                                 <form asp-action="Archive" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc muốn lưu trữ cấp độ này?');">
+                                     @Html.AntiForgeryToken()
+                                     <button type="submit" class="admin-icon-btn admin-icon-archive" title="Lưu trữ cấp độ" aria-label="Lưu trữ cấp độ">
+                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 01-2-2V5a2 2 0 012-2h14a2 2 0 012 2v1a2 2 0 01-2 2M5 8v11a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path></svg>
+                                     </button>
                                  </form>
                              }
                              else
                              {
-                                 <form asp-action="Restore" asp-route-id="@item.Id" method="post" style="display:inline;" onsubmit="return confirm('Bạn có chắc muốn khôi phục (Restore) Level này?');">
-                                     <button type="submit" class="btn btn-sm btn-success">Restore</button>
+                                 <form asp-action="Restore" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc muốn khôi phục cấp độ này?');">
+                                     @Html.AntiForgeryToken()
+                                     <button type="submit" class="admin-icon-btn admin-icon-restore" title="Khôi phục cấp độ" aria-label="Khôi phục cấp độ">
+                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                     </button>
                                  </form>
                              }
                         }
+                        </div>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    </div>
 </div>

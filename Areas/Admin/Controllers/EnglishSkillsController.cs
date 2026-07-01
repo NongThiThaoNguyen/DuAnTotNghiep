@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace DuAnTotNghiep.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    [Authorize(Roles = "Admin,Teacher")]
+    [Authorize(Roles = "ADMIN,TEACHER")]
     public class EnglishSkillsController : Controller
     {
         private readonly IEnglishSkillService _service;
@@ -32,7 +32,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             return View(detailDto);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public IActionResult Create()
         {
             return View(new SkillCreateViewModel());
@@ -40,7 +40,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Create(SkillCreateViewModel model)
         {
             if (!ModelState.IsValid)
@@ -67,7 +67,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Edit(int id)
         {
             var skill = await _service.GetByIdAsync(id);
@@ -88,7 +88,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Edit(int id, SkillEditViewModel model)
         {
             if (id != model.Id)
@@ -121,7 +121,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Deactivate(int id)
         {
             try
@@ -139,7 +139,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Archive(int id)
         {
             try
@@ -157,7 +157,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<IActionResult> Restore(int id)
         {
             try

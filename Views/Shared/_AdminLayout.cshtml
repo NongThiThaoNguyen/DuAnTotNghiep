@@ -1,4 +1,55 @@
 @using System.Security.Claims
+@{
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? "";
+
+    string NavClass(string controller, string? action = null)
+    {
+        var isActive = string.Equals(currentController, controller, StringComparison.OrdinalIgnoreCase)
+            && (action == null || string.Equals(currentAction, action, StringComparison.OrdinalIgnoreCase));
+
+        return "admin-nav-link group flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all " +
+            (isActive
+                ? "bg-blue-50 text-blue-700 border border-blue-100 shadow-xs"
+                : "text-slate-700 hover:text-blue-600 hover:bg-slate-50");
+    }
+
+    var controllerLabel = currentController switch
+    {
+        "Home" => "Tổng quan",
+        "User" => "Quản lý tài khoản",
+        "PlacementTests" => "Đề thi đầu vào",
+        "PlacementAttempts" => "Lượt thi đầu vào",
+        "LearningTopics" => "Chủ đề học tập",
+        "ReferenceSources" => "Nguồn tham khảo",
+        "ReferenceReview" => "Duyệt nguồn",
+        "LearningPaths" => "Lộ trình học",
+        "PathTemplates" => "Mẫu lộ trình",
+        "AIContent" => "Nội dung AI",
+        "AiPrompts" => "Prompt AI",
+        "AiUsageLogs" => "Nhật ký AI",
+        "CompetencyHistory" => "Lịch sử năng lực",
+        "EnglishSkills" => "Kỹ năng tiếng Anh",
+        "EnglishProficiencyLevels" => "Trình độ tiếng Anh",
+        "SchemaStatus" => "Trạng thái hệ thống",
+        _ => currentController
+    };
+
+    var actionLabel = currentAction switch
+    {
+        "Index" => "Danh sách",
+        "Create" => "Tạo mới",
+        "Edit" => "Chỉnh sửa",
+        "Details" => "Chi tiết",
+        "Pending" => "Chờ duyệt",
+        "PathHistory" => "Lịch sử lộ trình",
+        "GenerationLogs" => "Nhật ký tạo",
+        "PathDetail" => "Chi tiết lộ trình",
+        "Preview" => "Xem trước",
+        "AuditLogs" => "Nhật ký kiểm tra",
+        _ => currentAction
+    };
+}
 <!DOCTYPE html>
 <html lang="vi" class="h-full bg-slate-50">
 <head>
@@ -12,6 +63,499 @@
     
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DuAnTotNghiep.styles.css" asp-append-version="true" />
+    <style>
+        .container-fluid {
+            width: 100%;
+        }
+
+        .admin-sidebar {
+            width: 17.25rem;
+        }
+
+        .admin-sidebar-body,
+        .admin-sidebar-footer {
+            padding: 1rem;
+        }
+
+        .admin-sidebar-footer {
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .admin-nav-link {
+            min-height: 2.55rem;
+            padding: 0.68rem 0.8rem !important;
+            gap: 0.65rem !important;
+            white-space: nowrap;
+            font-size: 0.85rem !important;
+            line-height: 1.1;
+        }
+
+        .admin-nav-link svg {
+            width: 1.05rem;
+            height: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .admin-nowrap,
+        .badge,
+        .btn,
+        .form-select {
+            white-space: nowrap;
+        }
+
+        .text-truncate {
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mt-4 { margin-top: 1.5rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-3 { margin-top: 1rem; }
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-3 { margin-bottom: 1rem; }
+        .mb-4 { margin-bottom: 1.5rem; }
+        .my-3 { margin-top: 1rem; margin-bottom: 1rem; }
+        .p-0 { padding: 0; }
+        .p-3 { padding: 1rem; }
+        .p-4 { padding: 1.5rem; }
+        .px-3 { padding-left: 1rem; padding-right: 1rem; }
+        .px-4 { padding-left: 1.5rem; padding-right: 1.5rem; }
+        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 1rem; padding-bottom: 1rem; }
+        .py-4 { padding-top: 1.5rem; padding-bottom: 1.5rem; }
+        .w-100 { width: 100%; }
+        .h-100 { height: 100%; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .d-flex { display: flex; }
+        .d-block { display: block; }
+        .d-inline-block { display: inline-block; }
+        .justify-content-between { justify-content: space-between; }
+        .justify-content-center { justify-content: center; }
+        .align-items-end { align-items: flex-end; }
+        .align-items-center { align-items: center; }
+        .gap-2 { gap: 0.5rem; }
+        .g-3 { gap: 1rem; }
+        .text-break { overflow-wrap: anywhere; }
+        .text-uppercase { text-transform: uppercase; }
+        .small { font-size: 0.875rem; }
+        .fw-medium { font-weight: 600; }
+        .fw-semibold { font-weight: 700; }
+        .font-weight-bold { font-weight: 700; }
+        .shadow-sm { box-shadow: 0 1px 2px rgb(15 23 42 / 0.06); }
+        .rounded { border-radius: 0.5rem; }
+        .rounded-3 { border-radius: 0.75rem; }
+        .rounded-pill { border-radius: 999px; }
+        .border { border: 1px solid #e2e8f0; }
+        .border-0 { border: 0 !important; }
+        .border-secondary { border-color: #cbd5e1; }
+        .border-warning { border-color: #fde68a; }
+        .border-success { border-color: #bbf7d0; }
+        .border-danger { border-color: #fecaca; }
+        .border-info { border-color: #bae6fd; }
+        .border-dark { border-color: #334155; }
+        .bg-light { background: #f8fafc; }
+        .bg-white { background: #fff; }
+        .bg-dark { background: #0f172a; }
+        .bg-info-subtle { background: #e0f2fe; }
+        .text-muted { color: #64748b; }
+        .text-dark { color: #0f172a; }
+        .text-primary { color: #2563eb; }
+        .text-secondary { color: #475569; }
+        .text-success { color: #047857; }
+        .text-danger { color: #b91c1c; }
+        .text-warning,
+        .text-warning-emphasis { color: #b45309; }
+        .text-white { color: #fff; }
+        .fs-5 { font-size: 1.25rem; }
+        .fs-6 { font-size: 1rem; }
+        .fs-7 { font-size: 0.8125rem; }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -0.5rem;
+            margin-left: -0.5rem;
+        }
+
+        .row > [class*="col-"] {
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+            width: 100%;
+        }
+
+        .row > .col {
+            flex: 1 0 0%;
+            padding-right: 0.5rem;
+            padding-left: 0.5rem;
+        }
+
+        .row-cols-1 > .col {
+            flex: 0 0 auto;
+            width: 100%;
+        }
+
+        @@media (min-width: 768px) {
+            .row-cols-sm-2 > .col { flex: 0 0 auto; width: 50%; }
+            .row-cols-md-3 > .col { flex: 0 0 auto; width: 33.333333%; }
+            .col-sm-4 { flex: 0 0 auto; width: 33.333333%; }
+            .col-sm-5 { flex: 0 0 auto; width: 41.666667%; }
+            .col-sm-7 { flex: 0 0 auto; width: 58.333333%; }
+            .col-sm-8 { flex: 0 0 auto; width: 66.666667%; }
+            .col-md-1 { flex: 0 0 auto; width: 8.333333%; }
+            .col-md-2 { flex: 0 0 auto; width: 16.666667%; }
+            .col-md-3 { flex: 0 0 auto; width: 25%; }
+            .col-md-4 { flex: 0 0 auto; width: 33.333333%; }
+            .col-md-6 { flex: 0 0 auto; width: 50%; }
+            .col-md-8 { flex: 0 0 auto; width: 66.666667%; }
+            .col-md-12 { flex: 0 0 auto; width: 100%; }
+        }
+
+        @@media (min-width: 1024px) {
+            .row-cols-lg-5 > .col { flex: 0 0 auto; width: 20%; }
+            .col-lg-4 { flex: 0 0 auto; width: 33.333333%; }
+            .col-lg-8 { flex: 0 0 auto; width: 66.666667%; }
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+        }
+
+        .card-body { padding: 1.25rem; }
+        .card-header,
+        .card-footer {
+            padding: 1rem 1.25rem;
+            border-color: #e2e8f0;
+        }
+        .card-header { border-bottom: 1px solid #e2e8f0; }
+        .card-footer { border-top: 1px solid #e2e8f0; background: #f8fafc; }
+        .card-title { color: #475569; font-weight: 700; }
+
+        .form-label {
+            display: inline-block;
+            margin-bottom: 0.35rem;
+            color: #475569;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .form-control,
+        .form-select {
+            display: block;
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.65rem;
+            background: #fff;
+            color: #0f172a;
+            padding: 0.52rem 0.68rem;
+            font-size: 0.875rem;
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.12);
+        }
+
+        textarea.form-control { min-height: 7rem; }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .form-check-input {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .admin-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        .admin-actions .btn,
+        .admin-actions form {
+            margin: 0;
+        }
+
+        .admin-actions form {
+            display: inline-flex !important;
+        }
+
+        .admin-actions-cell {
+            min-width: 10rem;
+            white-space: nowrap;
+        }
+
+        .admin-icon-actions {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+
+        .admin-icon-form {
+            display: inline-flex !important;
+            margin: 0;
+        }
+
+        .admin-icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid transparent;
+            border-radius: 0.5rem;
+            background: #f8fafc;
+            color: #64748b;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .admin-icon-btn:hover {
+            text-decoration: none;
+            box-shadow: 0 1px 2px rgb(15 23 42 / 0.08);
+        }
+
+        .admin-icon-btn svg {
+            width: 1rem;
+            height: 1rem;
+            flex-shrink: 0;
+        }
+
+        .admin-icon-view { background: #eff6ff; color: #2563eb; }
+        .admin-icon-view:hover { background: #dbeafe; color: #1d4ed8; }
+        .admin-icon-edit { background: #fffbeb; color: #d97706; }
+        .admin-icon-edit:hover { background: #fef3c7; color: #b45309; }
+        .admin-icon-lock { background: #fffbeb; color: #d97706; }
+        .admin-icon-lock:hover { background: #fef3c7; color: #b45309; }
+        .admin-icon-unlock,
+        .admin-icon-restore,
+        .admin-icon-publish { background: #ecfdf5; color: #059669; }
+        .admin-icon-unlock:hover,
+        .admin-icon-restore:hover,
+        .admin-icon-publish:hover { background: #d1fae5; color: #047857; }
+        .admin-icon-reset,
+        .admin-icon-disable,
+        .admin-icon-delete { background: #fef2f2; color: #dc2626; }
+        .admin-icon-reset:hover,
+        .admin-icon-disable:hover,
+        .admin-icon-delete:hover { background: #fee2e2; color: #b91c1c; }
+        .admin-icon-archive { background: #f1f5f9; color: #475569; }
+        .admin-icon-archive:hover { background: #e2e8f0; color: #334155; }
+        .admin-icon-submit,
+        .admin-icon-review { background: #eef2ff; color: #4f46e5; }
+        .admin-icon-submit:hover,
+        .admin-icon-review:hover { background: #e0e7ff; color: #4338ca; }
+
+        .admin-action-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            border: 1px solid transparent;
+            border-radius: 0.75rem;
+            padding: 0.7rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 800;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .admin-action-primary svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .admin-action-lock { background: #f59e0b; color: #fff; }
+        .admin-action-lock:hover { background: #d97706; }
+        .admin-action-unlock { background: #059669; color: #fff; }
+        .admin-action-unlock:hover { background: #047857; }
+        .admin-action-reset { background: #dc2626; color: #fff; }
+        .admin-action-reset:hover { background: #b91c1c; }
+
+        .table {
+            width: 100%;
+            margin-bottom: 1rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            overflow: hidden;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+        }
+
+        .table th,
+        .table td {
+            padding: 0.62rem 0.8rem;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+            color: #334155;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.72rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            border: 1px solid transparent;
+            border-radius: 0.65rem;
+            padding: 0.5rem 0.82rem;
+            color: #334155;
+            background: #fff;
+            font-size: 0.84rem;
+            font-weight: 700;
+            line-height: 1.2;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .btn:hover { text-decoration: none; }
+        .btn-sm {
+            padding: 0.4rem 0.65rem;
+            border-radius: 0.55rem;
+            font-size: 0.78rem;
+        }
+
+        td > .btn,
+        td > form {
+            margin: 0.15rem;
+        }
+
+        td > form {
+            display: inline-flex !important;
+        }
+
+        .btn-primary { background: #2563eb; color: #fff; border-color: #2563eb; }
+        .btn-primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+        .btn-secondary { background: #64748b; color: #fff; border-color: #64748b; }
+        .btn-secondary:hover { background: #475569; border-color: #475569; }
+        .btn-outline-secondary { background: #fff; color: #475569; border-color: #cbd5e1; }
+        .btn-outline-secondary:hover { background: #f8fafc; color: #334155; }
+        .btn-outline-primary { background: #fff; color: #2563eb; border-color: #bfdbfe; }
+        .btn-outline-primary:hover { background: #eff6ff; color: #1d4ed8; }
+        .btn-outline-info { background: #fff; color: #0369a1; border-color: #bae6fd; }
+        .btn-outline-info:hover { background: #e0f2fe; color: #075985; }
+        .btn-info { background: #e0f2fe; color: #0369a1; border-color: #bae6fd; }
+        .btn-info:hover { background: #bae6fd; color: #075985; }
+        .btn-warning { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+        .btn-warning:hover { background: #fde68a; color: #78350f; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; border-color: #fecaca; }
+        .btn-danger:hover { background: #fecaca; color: #991b1b; }
+        .btn-success { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .btn-success:hover { background: #bbf7d0; color: #14532d; }
+        .btn-dark { background: #0f172a; color: #fff; border-color: #0f172a; }
+        .btn-dark:hover { background: #1e293b; border-color: #1e293b; }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        .admin-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .admin-modal.hidden {
+            display: none !important;
+        }
+
+        .admin-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+            background: rgb(15 23 42 / 0.46);
+        }
+
+        .admin-modal-panel {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 30rem;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            border-radius: 1rem;
+            background: #fff;
+            box-shadow: 0 24px 60px rgb(15 23 42 / 0.28);
+        }
+
+        .admin-modal-open {
+            overflow: hidden;
+        }
+
+        .bg-success { background-color: #dcfce7; color: #166534; }
+        .bg-secondary { background-color: #e2e8f0; color: #475569; }
+        .bg-danger { background-color: #fee2e2; color: #b91c1c; }
+        .bg-warning { background-color: #fef3c7; color: #92400e; }
+        .bg-info { background-color: #e0f2fe; color: #0369a1; }
+
+        .alert {
+            border-radius: 0.75rem;
+            border: 1px solid transparent;
+            padding: 0.85rem 1rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .alert-success { background: #dcfce7; border-color: #bbf7d0; color: #166534; }
+        .alert-danger { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+    </style>
 </head>
 <body class="h-full flex flex-col font-sans text-slate-900 bg-slate-50">
 
@@ -21,25 +565,25 @@
         
         <div id="sidebarOverlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-xs transition-opacity duration-300 lg:hidden"></div>
 
-        <aside id="mobileSidebar" class="fixed inset-y-0 left-0 z-50 w-70 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:h-[calc(100vh-4rem)] flex flex-col justify-between shrink-0 overflow-y-auto">
-            <div class="p-6">
+        <aside id="mobileSidebar" class="admin-sidebar fixed inset-y-0 left-0 z-50 bg-white border-r border-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:z-0 lg:h-[calc(100vh-4rem)] flex flex-col justify-between shrink-0 overflow-y-auto">
+            <div class="admin-sidebar-body">
                 <div class="lg:hidden flex items-center gap-2 mb-6">
                     <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">D</div>
                     <span class="font-bold text-lg text-slate-800">DuAn<span class="text-blue-600">TotNghiep</span></span>
                 </div>
                 
                 <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-4">Quản Trị Viên</span>
-                <ul class="space-y-1 mb-8">
+                <ul class="space-y-1 mb-6">
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="Home" asp-action="Index">
+                        <a class="@NavClass("Home")" asp-area="Admin" asp-controller="Home" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
                             </svg>
-                            Dashboard
+                            Tổng quan
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="User" asp-action="Index">
+                        <a class="@NavClass("User")" asp-area="Admin" asp-controller="User" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                             </svg>
@@ -47,7 +591,7 @@
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="PlacementTests" asp-action="Index">
+                        <a class="@NavClass("PlacementTests")" asp-area="Admin" asp-controller="PlacementTests" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
@@ -55,15 +599,15 @@
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                        <a class="@NavClass("LearningTopics")" asp-area="Admin" asp-controller="LearningTopics" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"></path>
                             </svg>
-                            Quản lý khóa học
+                            Chủ đề học tập
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="ReferenceSources" asp-action="Index">
+                        <a class="@NavClass("ReferenceSources")" asp-area="Admin" asp-controller="ReferenceSources" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                             </svg>
@@ -71,33 +615,33 @@
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="LearningPaths" asp-action="PathHistory">
+                        <a class="@NavClass("LearningPaths", "PathHistory")" asp-area="Admin" asp-controller="LearningPaths" asp-action="PathHistory" data-legacy-label="Path History">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6-3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 9m0 8V9m0 0L9 7"></path>
                             </svg>
-                            Path History
+                            Lịch sử lộ trình
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="PathTemplates" asp-action="Index">
+                        <a class="@NavClass("PathTemplates")" asp-area="Admin" asp-controller="PathTemplates" asp-action="Index" data-legacy-label="Path Templates">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
                             </svg>
-                            Path Templates
+                            Mẫu lộ trình
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="LearningPaths" asp-action="GenerationLogs">
+                        <a class="@NavClass("LearningPaths", "GenerationLogs")" asp-area="Admin" asp-controller="LearningPaths" asp-action="GenerationLogs" data-legacy-label="Generation Logs">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m4 6V7m4 10v-4M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                             </svg>
-                            Generation Logs
+                            Nhật ký tạo lộ trình
                         </a>
                     </li>
                     @if (User.IsInRole("ADMIN"))
                     {
                         <li>
-                            <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" asp-area="Admin" asp-controller="ReferenceReview" asp-action="Pending">
+                            <a class="@NavClass("ReferenceReview")" asp-area="Admin" asp-controller="ReferenceReview" asp-action="Pending">
                                 <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                 </svg>
@@ -106,27 +650,27 @@
                         </li>
                     }
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                        <a class="@NavClass("AiUsageLogs")" asp-area="Admin" asp-controller="AiUsageLogs" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            Báo cáo thống kê
+                            Nhật ký sử dụng AI
                         </a>
                     </li>
                     <li>
-                        <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-700 hover:text-blue-600 hover:bg-slate-50 rounded-xl transition-all" href="#">
+                        <a class="@NavClass("SchemaStatus")" asp-area="Admin" asp-controller="SchemaStatus" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            Cài đặt
+                            Trạng thái hệ thống
                         </a>
                     </li>
                 </ul>
             </div>
             
-            <div class="p-6 border-t border-slate-200">
-                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Logout">
+            <div class="admin-sidebar-footer">
+                <a class="admin-nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Logout">
                     <svg class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                     </svg>
@@ -138,6 +682,35 @@
         <!-- Content Area -->
         <main role="main" class="flex-1 overflow-y-auto min-h-0 flex flex-col bg-slate-50">
             <div class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
+                <nav class="flex mb-6" aria-label="Breadcrumb">
+                    <ol class="inline-flex items-center space-x-1 md:space-x-2 text-sm font-medium text-slate-500">
+                        <li class="inline-flex items-center">
+                            <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="inline-flex items-center text-slate-500 hover:text-blue-600 transition-colors">
+                                <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                                Admin
+                            </a>
+                        </li>
+                        @if (currentController != "Home" || currentAction != "Index")
+                        {
+                            <li>
+                                <div class="flex items-center">
+                                    <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                                    <span class="ml-1 md:ml-2">@controllerLabel</span>
+                                </div>
+                            </li>
+                            @if (currentAction != "Index")
+                            {
+                                <li>
+                                    <div class="flex items-center">
+                                        <svg class="w-5 h-5 text-slate-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
+                                        <span class="ml-1 text-slate-900 md:ml-2 font-semibold">@actionLabel</span>
+                                    </div>
+                                </li>
+                            }
+                        }
+                    </ol>
+                </nav>
+
                 @RenderBody()
             </div>
             

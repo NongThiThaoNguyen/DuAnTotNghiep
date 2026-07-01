@@ -1,9 +1,9 @@
 @model IEnumerable<dynamic>
 @{
-    ViewData["Title"] = "AI Usage Logs";
+    ViewData["Title"] = "Nhật ký sử dụng AI";
 }
 
-<h2>AI Usage Logs</h2>
+<h2>Nhật ký sử dụng AI</h2>
 
 <form method="get" class="row g-3 mb-4">
     <div class="col-md-2">
@@ -15,17 +15,17 @@
         <input name="model" value="@ViewBag.Model" class="form-control" />
     </div>
     <div class="col-md-2">
-        <label class="form-label">From</label>
+        <label class="form-label">Từ ngày</label>
         <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control" />
     </div>
     <div class="col-md-2">
-        <label class="form-label">To</label>
+        <label class="form-label">Đến ngày</label>
         <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control" />
     </div>
     <div class="col-md-2">
-        <label class="form-label">Status</label>
+        <label class="form-label">Trạng thái</label>
         <select name="status" class="form-select">
-            <option value="">All</option>
+            <option value="">Tất cả</option>
             <option value="SUCCESS" selected="@(ViewBag.Status == "SUCCESS")">SUCCESS</option>
             <option value="TIMEOUT" selected="@(ViewBag.Status == "TIMEOUT")">TIMEOUT</option>
             <option value="SCHEMA_ERROR" selected="@(ViewBag.Status == "SCHEMA_ERROR")">SCHEMA_ERROR</option>
@@ -33,7 +33,7 @@
         </select>
     </div>
     <div class="col-md-2 d-flex align-items-end">
-        <button class="btn btn-primary w-100">Filter</button>
+        <button class="btn btn-primary w-100">Lọc</button>
     </div>
 </form>
 
@@ -41,7 +41,7 @@
     <div class="col-md-4">
         <div class="card border-info">
             <div class="card-body">
-                <h6 class="card-title">Total Tokens</h6>
+                <h6 class="card-title">Tổng token</h6>
                 <h4 class="mb-0">@ViewBag.TotalTokens</h4>
             </div>
         </div>
@@ -49,7 +49,7 @@
     <div class="col-md-4">
         <div class="card border-success">
             <div class="card-body">
-                <h6 class="card-title">Total Cost</h6>
+                <h6 class="card-title">Tổng chi phí</h6>
                 <h4 class="mb-0">@String.Format("{0:C}", ViewBag.TotalCost)</h4>
             </div>
         </div>
@@ -62,19 +62,19 @@
             <th>#</th>
             <th>Module</th>
             <th>Model</th>
-            <th>Status</th>
+            <th>Trạng thái</th>
             <th>Input</th>
             <th>Output</th>
-            <th>Cost</th>
-            <th>Duration</th>
-            <th>Created</th>
-            <th>Error</th>
+            <th>Chi phí</th>
+            <th>Thời gian</th>
+            <th>Ngày tạo</th>
+            <th>Lỗi</th>
         </tr>
     </thead>
     <tbody>
         @if (!Model.Any())
         {
-            <tr><td colspan="10" class="text-center">No records found.</td></tr>
+            <tr><td colspan="10" class="text-center">Chưa có dữ liệu.</td></tr>
         }
         else
         {
