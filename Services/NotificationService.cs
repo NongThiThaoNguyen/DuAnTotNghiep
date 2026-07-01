@@ -64,5 +64,81 @@ namespace DuAnTotNghiep.Services
 
             return true;
         }
+
+        // Admin Methods
+        public async Task<List<Notification>> GetAllAsync(int page, int pageSize)
+        {
+            return await _context.Notifications
+                .AsNoTracking()
+                .Include(n => n.CreatedByNavigation)
+                .Include(n => n.TargetUser)
+                .OrderByDescending(n => n.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+        }
+
+        public async Task<Notification?> GetByIdAsync(int id)
+        {
+            return await _context.Notifications
+                .AsNoTracking()
+                .Include(n => n.CreatedByNavigation)
+                .Include(n => n.TargetUser)
+                .Include(n => n.NotificationReads)
+                .ThenInclude(r => r.User)
+                .FirstOrDefaultAsync(n => n.Id == id);
+        }
+
+        public async Task<int> GetTotalCountAsync()
+        {
+            return await _context.Notifications.CountAsync();
+        }
+
+        public async Task CreateAsync(Notification notification)
+        {
+            notification.CreatedAt = DateTime.UtcNow;
+            await _context.Notifications.AddAsync(notification);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DeleteAsync(int id)
+        {
+            var notification = await _context.Notifications.FindAsync(id);
+            if (notification != null)
+            {
+                _context.Notifications.Remove(notification);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task SendToAllStudentsAsync(string title, string content, string type, int createdBy)
+        {
+            var notification = new Notification
+            {
+                Title = title,
+                Content = content,
+                NotificationType = type,
+                TargetUserId = null,
+                CreatedBy = createdBy,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _context.Notifications.AddAsync(notification);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task SendToUserAsync(string title, string content, string type, int targetUserId, int createdBy)
+        {
+            var notification = new Notification
+            {
+                Title = title,
+                Content = content,
+                NotificationType = type,
+                TargetUserId = targetUserId,
+                CreatedBy = createdBy,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _context.Notifications.AddAsync(notification);
+            await _context.SaveChangesAsync();
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace DuAnTotNghiep.Services
             viewModel.TotalUsers = await _context.Users.CountAsync();
             viewModel.TotalStudents = await _context.Users.CountAsync(u => u.Role.RoleCode == "STUDENT");
             viewModel.TotalTeachers = await _context.Users.CountAsync(u => u.Role.RoleCode == "TEACHER");
-            
+
             var courseCount = await _context.LearningTopics.CountAsync(t => t.ParentTopicId == null);
             viewModel.TotalCourses = courseCount > 0 ? courseCount : await _context.LearningTopics.CountAsync();
 
@@ -130,6 +130,14 @@ namespace DuAnTotNghiep.Services
                 .Include(a => a.Topic)
                 .OrderByDescending(a => a.CreatedAt)
                 .Take(5)
+                .Select(a => new RecentActivityViewModel
+                {
+                    Id = a.Id,
+                    UserName = a.Student != null ? a.Student.FullName : "System",
+                    ActivityType = a.ActivityType,
+                    Description = a.Topic != null ? a.Topic.Title : "N/A",
+                    CreatedAt = a.CreatedAt
+                })
                 .ToListAsync();
 
             viewModel.RecentPlacementTests = await _context.TestAttempts
@@ -161,6 +169,76 @@ namespace DuAnTotNghiep.Services
                 .Include(p => p.Student)
                 .OrderByDescending(p => p.CreatedAt)
                 .Take(5)
+                .ToListAsync();
+
+            return viewModel;
+        }
+
+        public async Task<AdminDashboardViewModel> GetAdminOverviewAsync()
+        {
+            var viewModel = new AdminDashboardViewModel();
+            var today = DateTime.UtcNow.Date;
+            var weekAgo = today.AddDays(-7);
+            var monthAgo = today.AddDays(-30);
+
+            viewModel.TotalUsers = await _context.Users.AsNoTracking().CountAsync();
+            viewModel.TotalStudents = await _context.Users.AsNoTracking().CountAsync(u => u.Role.RoleCode == "STUDENT");
+            viewModel.TotalTeachers = await _context.Users.AsNoTracking().CountAsync(u => u.Role.RoleCode == "TEACHER");
+
+            viewModel.ActiveUsersToday = await _context.Users.AsNoTracking()
+                .CountAsync(u => u.LastLoginAt != null && u.LastLoginAt.Value.Date == today);
+
+            viewModel.TotalTopics = await _context.LearningTopics.AsNoTracking()
+                .CountAsync(t => t.Status == "PUBLISHED" || t.Status == "ACTIVE");
+
+            viewModel.TotalQuizzes = await _context.Quizzes.AsNoTracking().CountAsync();
+
+            viewModel.TotalLessons = await _context.OriginalLessons.AsNoTracking().CountAsync();
+
+            viewModel.PendingAiContents = await _context.AiGeneratedContents.AsNoTracking()
+                .CountAsync(a => a.ReviewStatus == "PENDING");
+
+            viewModel.TotalPlacementAttempts = await _context.TestAttempts.AsNoTracking().CountAsync();
+
+            var attempts = await _context.TestAttempts.AsNoTracking()
+                .Where(a => a.TotalScore != null)
+                .Select(a => (double)a.TotalScore)
+                .ToListAsync();
+            viewModel.AveragePlacementScore = attempts.Any() ? Math.Round(attempts.Average(), 2) : 0;
+
+            viewModel.NewUsersThisWeek = await _context.Users.AsNoTracking()
+                .CountAsync(u => u.CreatedAt >= weekAgo);
+
+            viewModel.NewUsersThisMonth = await _context.Users.AsNoTracking()
+                .CountAsync(u => u.CreatedAt >= monthAgo);
+
+            viewModel.RecentUsers = await _context.Users.AsNoTracking()
+                .Include(u => u.Role)
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(5)
+                .Select(u => new RecentUserViewModel
+                {
+                    Id = u.Id,
+                    FullName = u.FullName,
+                    Email = u.Email,
+                    RoleName = u.Role != null ? u.Role.RoleName : "Unknown",
+                    CreatedAt = u.CreatedAt,
+                    AvatarUrl = u.AvatarUrl
+                })
+                .ToListAsync();
+
+            viewModel.RecentActivities = await _context.AuditLogs.AsNoTracking()
+                .Include(a => a.User)
+                .OrderByDescending(a => a.CreatedAt)
+                .Take(10)
+                .Select(a => new RecentActivityViewModel
+                {
+                    Id = a.Id,
+                    UserName = a.User != null ? a.User.FullName : "System",
+                    ActivityType = a.Action,
+                    Description = $"{a.Action} on {a.EntityName}",
+                    CreatedAt = a.CreatedAt
+                })
                 .ToListAsync();
 
             return viewModel;

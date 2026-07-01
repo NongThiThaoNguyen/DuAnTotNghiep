@@ -1,11 +1,6 @@
-@model IEnumerable<DuAnTotNghiep.Models.OriginalLesson>
+@model DuAnTotNghiep.Models.ViewModels.Teacher.LessonIndexViewModel
 @{
-    ViewData["Title"] = "Quản lý Bài học";
-    var keyword = ViewBag.Keyword as string;
-    var topicId = ViewBag.TopicId as int?;
-    var contentType = ViewBag.ContentType as string;
-    int currentPage = ViewBag.CurrentPage ?? 1;
-    int totalPages = ViewBag.TotalPages ?? 1;
+    ViewData["Title"] = "Bài học - " + Model.CourseTitle;
 }
 
 @section Styles {
@@ -14,101 +9,66 @@
 
 <div class="courses-header mb-4">
     <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Quản lý Bài học</h1>
-        <p class="text-muted m-0 small">Soạn thảo bài giảng và phân phối bài giảng vào các khóa học tương ứng.</p>
+        <h1 class="text-dark m-0 fs-3 font-weight-bold">Bài học trong khóa</h1>
+        <p class="text-muted m-0 small">@Model.CourseTitle</p>
     </div>
-    <a href="/Teacher/Lessons/Create@(topicId.HasValue ? "?topicId=" + topicId.Value : "")" class="btn btn-primary-ailearn">
-        <i class="fa-solid fa-plus me-1"></i> Thêm bài học mới
-    </a>
+    <div class="d-flex gap-2">
+        <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.CourseId" class="btn btn-secondary-ailearn">
+            <i class="fa-solid fa-arrow-left me-1"></i> Khóa học
+        </a>
+        <a asp-action="Create" asp-route-courseId="@Model.CourseId" class="btn btn-primary-ailearn">
+            <i class="fa-solid fa-plus me-1"></i> Thêm bài học mới
+        </a>
+    </div>
 </div>
 
-<!-- Filters Section -->
-<div class="card-ailearn mb-4">
-    <form method="get" class="row g-3 align-items-end">
-        <!-- Keyword Search -->
-        <div class="col-md-4">
-            <label class="form-label text-muted small uppercase font-weight-bold">Tìm kiếm</label>
-            <div class="search-box w-100">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="keyword" value="@keyword" placeholder="Nhập tên bài học, từ khóa..." />
-            </div>
-        </div>
-
-        <!-- Topic Filter -->
-        <div class="col-md-3">
-            <label class="form-label text-muted small uppercase font-weight-bold">Khóa học</label>
-            <select name="topicId" asp-items="ViewBag.Topics" class="form-select border-1 rounded-3">
-                <option value="">Tất cả khóa học</option>
-            </select>
-        </div>
-
-        <!-- Content Type Filter -->
-        <div class="col-md-3">
-            <label class="form-label text-muted small uppercase font-weight-bold">Dạng bài</label>
-            <select name="contentType" class="form-select border-1 rounded-3">
-                <option value="">Tất cả</option>
-                <option value="TEXT">Văn bản (TEXT)</option>
-                <option value="AUDIO_LINK">Âm thanh (AUDIO)</option>
-                <option value="VIDEO_LINK">Video bài giảng</option>
-                <option value="REFERENCE_LINK">Tài liệu tham khảo</option>
-            </select>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="col-md-2 d-flex gap-2">
-            <button type="submit" class="btn btn-primary-ailearn flex-grow-1 btn-sm">Lọc</button>
-            <a href="/Teacher/Lessons" class="btn btn-secondary-ailearn btn-sm" title="Làm mới">
-                <i class="fa-solid fa-rotate"></i>
-            </a>
-        </div>
-    </form>
-</div>
-
-<!-- Table List Card -->
 <div class="card-ailearn p-0 overflow-hidden">
     <div class="table-responsive">
         <table class="table table-hover align-middle mb-0">
             <thead>
                 <tr class="text-muted small font-weight-bold uppercase bg-light">
+                    <th class="py-3 px-4 text-center">#</th>
                     <th class="py-3 px-4">Bài học</th>
-                    <th class="py-3 px-4">Khóa học</th>
-                    <th class="py-3 px-4 text-center">Dạng nội dung</th>
                     <th class="py-3 px-4 text-center">Thời lượng</th>
+                    <th class="py-3 px-4 text-center">Trạng thái</th>
                     <th class="py-3 px-4 text-end">Thao tác</th>
                 </tr>
             </thead>
             <tbody>
-                @if (!Model.Any())
+                @if (!Model.Lessons.Any())
                 {
                     <tr>
-                        <td colspan="5" class="py-4 text-center text-muted small">Không tìm thấy bài học nào khớp với bộ lọc.</td>
+                        <td colspan="5" class="py-4 text-center text-muted small">Khóa học này chưa có bài học nào.</td>
                     </tr>
                 }
-                @foreach (var item in Model)
+                @foreach (var item in Model.Lessons)
                 {
                     <tr>
+                        <td class="py-3 px-4 text-center text-muted">@item.OrderIndex</td>
                         <td class="py-3 px-4">
                             <div class="d-flex flex-col">
                                 <span class="font-weight-bold text-dark">@item.Title</span>
                                 <span class="text-muted small line-clamp-1">@(item.Summary ?? "Không có tóm tắt.")</span>
                             </div>
                         </td>
-                        <td class="py-3 px-4 text-muted">@item.Topic.Title</td>
+                        <td class="py-3 px-4 text-center text-dark font-weight-semibold">@(item.EstimatedMinutes ?? 0) phút</td>
                         <td class="py-3 px-4 text-center">
-                            <span class="purple-badge">@item.ContentType</span>
+                            <span class="purple-badge">@item.Status</span>
                         </td>
-                        <td class="py-3 px-4 text-center text-dark font-weight-semibold">@item.EstimatedMinutes phút</td>
                         <td class="py-3 px-4 text-end">
                             <div class="d-flex justify-content-end gap-2">
-                                <a href="/Teacher/Lessons/Edit/@item.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
-                                <a href="/Teacher/Lessons/Details/@item.Id" class="btn btn-outline-primary btn-sm p-1 px-2" title="Chi tiết">
+                                <a asp-action="Detail" asp-route-id="@item.Id" class="btn btn-outline-primary btn-sm p-1 px-2" title="Chi tiết">
                                     <i class="fa-solid fa-eye"></i>
                                 </a>
-                                <a href="/Teacher/Lessons/Delete/@item.Id" class="btn btn-outline-danger btn-sm p-1 px-2" title="Xóa">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" asp-route-courseId="@Model.CourseId" method="post" class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-outline-danger btn-sm p-1 px-2" title="Xóa">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
                             </div>
                         </td>
                     </tr>
@@ -117,16 +77,3 @@
         </table>
     </div>
 </div>
-
-<!-- Pagination -->
-@if (totalPages > 1)
-{
-    <div class="d-flex justify-content-center gap-2 mt-4">
-        @for (int p = 1; p <= totalPages; p++)
-        {
-            <a href="/Teacher/Lessons?page=@p&keyword=@keyword&topicId=@topicId&contentType=@contentType" class="btn @(currentPage == p ? "btn-primary-ailearn" : "btn-secondary-ailearn") btn-sm px-3">
-                @p
-            </a>
-        }
-    </div>
-}
