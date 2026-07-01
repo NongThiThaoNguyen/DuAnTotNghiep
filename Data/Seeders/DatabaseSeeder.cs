@@ -918,7 +918,7 @@ namespace DuAnTotNghiep.Data.Seeders
             var path = new StudentLearningPath
             {
                 StudentId = student.Id,
-                Title = "Lộ trình học tập AI mẫu",
+                Title = "M9 Demo Learning Path",
                 Description = "Lộ trình học tập thông minh gợi ý bởi AI theo phong cách Duolingo.",
                 StartDate = today.AddDays(-2),
                 TargetEndDate = today.AddDays(21),
