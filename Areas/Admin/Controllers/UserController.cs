@@ -16,7 +16,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         private readonly DuAnTotNghiep.Models.Repositories.Interfaces.IAuditLogRepository _auditRepository;
 
         public UserController(
-            IUserService userService, 
+            IUserService userService,
             IUserProfileService profileService,
             ILearningProfileService learningProfileService,
             DuAnTotNghiep.Models.Repositories.Interfaces.IAuditLogRepository auditRepository)
@@ -90,16 +90,71 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(int id)
+        public async Task<IActionResult> ToggleLock(int id)
         {
             var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
             int.TryParse(adminIdString, out int adminId);
             string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
 
-            var result = await _userService.ResetPasswordAsync(id, adminId, ipAddress);
+            var result = await _userService.ToggleLockAsync(id, adminId, ipAddress);
             if (result)
             {
-                TempData["SuccessMessage"] = "Mật khẩu mới đã được tạo và gửi qua email cho người dùng.";
+                TempData["SuccessMessage"] = "Đã thay đổi trạng thái khóa tài khoản thành công.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể thay đổi trạng thái khóa tài khoản này.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangeRole(ChangeRoleViewModel model)
+        {
+            var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int.TryParse(adminIdString, out int adminId);
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+            var result = await _userService.ChangeRoleAsync(model.UserId, model.NewRoleId, adminId, ipAddress);
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Đã thay đổi phân quyền thành công.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Không thể thay đổi phân quyền cho tài khoản này.";
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(int id)
+        {
+            ViewBag.UserId = id;
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(int id, string newPassword)
+        {
+            var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int.TryParse(adminIdString, out int adminId);
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+            if (string.IsNullOrWhiteSpace(newPassword))
+            {
+                TempData["ErrorMessage"] = "Mật khẩu không được để trống.";
+                return RedirectToAction("ResetPassword", new { id });
+            }
+
+            var result = await _userService.AdminResetPasswordAsync(id, newPassword, adminId, ipAddress);
+            if (result)
+            {
+                TempData["SuccessMessage"] = "Mật khẩu mới đã được thiết lập.";
             }
             else
             {
@@ -107,6 +162,31 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
 
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Statistics(int id)
+        {
+            var adminIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            int.TryParse(adminIdString, out int adminId);
+            string ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown";
+
+            var stats = await _userService.GetUserStatisticsAsync(id);
+            if (stats == null) return NotFound();
+
+            await _auditRepository.AddAsync(new DuAnTotNghiep.Models.AuditLog
+            {
+                UserId = id,
+                Action = "ADMIN_VIEW_USER_STATISTICS",
+                EntityName = "User",
+                EntityId = id,
+                NewValue = $"Viewed by Admin ID {adminId}",
+                IpAddress = ipAddress,
+                CreatedAt = System.DateTime.UtcNow
+            });
+            await _auditRepository.SaveChangesAsync();
+
+            return View(stats);
         }
 
         public async Task<IActionResult> LearningProfile(int id)

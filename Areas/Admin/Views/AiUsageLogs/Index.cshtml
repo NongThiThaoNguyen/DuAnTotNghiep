@@ -3,7 +3,12 @@
     ViewData["Title"] = "AI Usage Logs";
 }
 
-<h2>AI Usage Logs</h2>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>AI Usage Logs</h2>
+    <a asp-controller="Export" asp-action="ExportAiUsageLogs" class="btn btn-success">
+        <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+    </a>
+</div>
 
 <form method="get" class="row g-3 mb-4">
     <div class="col-md-2">
