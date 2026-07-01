@@ -1,9 +1,6 @@
-@model IEnumerable<DuAnTotNghiep.Areas.Teacher.Controllers.GradesController.StudentGradeRow>
+@model List<DuAnTotNghiep.Models.ViewModels.Teacher.GradeOverviewViewModel>
 @{
     ViewData["Title"] = "Sổ điểm học viên";
-    var keyword = ViewBag.Keyword as string;
-    int currentPage = ViewBag.CurrentPage ?? 1;
-    int totalPages = ViewBag.TotalPages ?? 1;
 }
 
 @section Styles {
@@ -13,96 +10,37 @@
 <div class="courses-header mb-4">
     <div>
         <h1 class="text-dark m-0 fs-3 font-weight-bold">Sổ điểm học viên</h1>
-        <p class="text-muted m-0 small">Theo dõi chi tiết kết quả làm Quiz và bài tập thực hành của từng học viên.</p>
+        <p class="text-muted m-0 small">Tổng hợp điểm Quiz và bài tập thực hành.</p>
     </div>
+    <a asp-action="Pending" class="btn btn-primary-ailearn">Bài chờ chấm</a>
 </div>
 
-<!-- Filters Section -->
-<div class="card-ailearn mb-4">
-    <form method="get" class="row g-3 align-items-end">
-        <!-- Keyword Search -->
-        <div class="col-md-9">
-            <label class="form-label text-muted small uppercase font-weight-bold">Tìm kiếm học viên</label>
-            <div class="search-box w-100">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="keyword" value="@keyword" placeholder="Nhập tên học viên hoặc email..." />
-            </div>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="col-md-3 d-flex gap-2">
-            <button type="submit" class="btn btn-primary-ailearn flex-grow-1 btn-sm">Lọc</button>
-            <a href="/Teacher/Grades" class="btn btn-secondary-ailearn btn-sm" title="Làm mới">
-                <i class="fa-solid fa-rotate"></i>
-            </a>
-        </div>
-    </form>
-</div>
-
-<!-- Grades Table Matrix Card -->
 <div class="card-ailearn p-0 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr class="text-muted small font-weight-bold uppercase bg-light">
-                    <th class="py-3 px-4">Học viên</th>
-                    <th class="py-3 px-4 text-center">Bài tập đã nộp</th>
-                    <th class="py-3 px-4 text-center">Điểm TB Bài tập</th>
-                    <th class="py-3 px-4 text-center">Quiz đã tham gia</th>
-                    <th class="py-3 px-4 text-center">Điểm TB Quiz</th>
-                    <th class="py-3 px-4 text-center">Điểm TB chung</th>
-                    <th class="py-3 px-4 text-end">Chi tiết</th>
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr class="text-muted small font-weight-bold uppercase bg-light">
+                <th class="py-3 px-4">Học viên</th>
+                <th class="py-3 px-4">Khóa học</th>
+                <th class="py-3 px-4 text-center">Điểm Quiz</th>
+                <th class="py-3 px-4 text-center">Điểm bài tập</th>
+                <th class="py-3 px-4 text-end">Tổng hợp</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr><td colspan="5" class="py-4 text-center text-muted small">Chưa có dữ liệu điểm.</td></tr>
+            }
+            @foreach (var row in Model)
+            {
+                <tr>
+                    <td class="py-3 px-4 font-weight-bold">@row.StudentName</td>
+                    <td class="py-3 px-4 text-muted">@row.TopicName</td>
+                    <td class="py-3 px-4 text-center">@row.QuizScore.ToString("0.0")</td>
+                    <td class="py-3 px-4 text-center">@row.PracticeScore.ToString("0.0")</td>
+                    <td class="py-3 px-4 text-end font-weight-bold">@row.TotalScore.ToString("0.0")</td>
                 </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="7" class="py-4 text-center text-muted small">Không tìm thấy dữ liệu điểm học viên.</td>
-                    </tr>
-                }
-                @foreach (var row in Model)
-                {
-                    var borderVal = row.CombinedAverageScore;
-                    var textClass = borderVal >= 8m ? "text-success" : (borderVal >= 5m ? "text-primary" : "text-danger");
-                    var avatar = string.IsNullOrEmpty(row.StudentAvatar) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(row.StudentName ?? "HV")}&background=6C63FF&color=fff" : row.StudentAvatar;
-
-                    <tr>
-                        <td class="py-3 px-4">
-                            <div class="d-flex align-items-center gap-3">
-                                <img src="@avatar" alt="Avatar" class="user-avatar-sidebar border border-2 border-primary" style="width: 40px; height: 40px;" onerror="this.src='https://ui-avatars.com/api/?name=HV&background=6C63FF&color=fff';" />
-                                <div class="d-flex flex-column">
-                                    <span class="font-weight-bold text-dark">@row.StudentName</span>
-                                    <span class="text-muted small">@row.StudentEmail</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4 text-center text-muted">@row.TotalAssignmentsSubmitted bài</td>
-                        <td class="py-3 px-4 text-center text-dark font-weight-semibold">@row.AverageAssignmentScore.ToString("0.0")đ</td>
-                        <td class="py-3 px-4 text-center text-muted">@row.TotalQuizzesAttempted lần</td>
-                        <td class="py-3 px-4 text-center text-dark font-weight-semibold">@row.AverageQuizScore.ToString("0.0")đ</td>
-                        <td class="py-3 px-4 text-center font-weight-bold @textClass">
-                            @row.CombinedAverageScore.ToString("0.0")đ
-                        </td>
-                        <td class="py-3 px-4 text-end">
-                            <a href="/Teacher/Students/Details/@row.StudentId" class="btn btn-outline-secondary btn-sm py-1 px-3 fs-7">Xem học trình</a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+            }
+        </tbody>
+    </table>
 </div>
-
-<!-- Pagination -->
-@if (totalPages > 1)
-{
-    <div class="d-flex justify-content-center gap-2 mt-4">
-        @for (int p = 1; p <= totalPages; p++)
-        {
-            <a href="/Teacher/Grades?page=@p&keyword=@keyword" class="btn @(currentPage == p ? "btn-primary-ailearn" : "btn-secondary-ailearn") btn-sm px-3">
-                @p
-            </a>
-        }
-    </div>
-}

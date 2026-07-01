@@ -1,13 +1,8 @@
+using DuAnTotNghiep.Models.ViewModels.Teacher;
+using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace DuAnTotNghiep.Areas.Teacher.Controllers
 {
@@ -15,80 +10,39 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
     [Authorize(Roles = "TEACHER")]
     public class CoursesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITeacherCourseService _courseService;
+        private readonly IEnglishSkillService _skillService;
+        private readonly IEnglishProficiencyLevelService _levelService;
 
-        public CoursesController(ApplicationDbContext context)
+        public CoursesController(
+            ITeacherCourseService courseService,
+            IEnglishSkillService skillService,
+            IEnglishProficiencyLevelService levelService)
         {
-            _context = context;
+            _courseService = courseService;
+            _skillService = skillService;
+            _levelService = levelService;
         }
 
-        // GET: Teacher/Courses
-        public async Task<IActionResult> Index(string? keyword, int? skillId, int? levelId, string? difficulty, string? status, int page = 1, int pageSize = 6)
+        public async Task<IActionResult> Index(string? search, string? skill)
         {
-            var query = _context.LearningTopics
-                .Include(t => t.Skill)
-                .Include(t => t.Level)
-                .Include(t => t.OriginalLessons)
-                .AsNoTracking();
+            var teacherId = GetCurrentUserId();
+            if (teacherId == 0) return RedirectToAction("Login", "Account", new { area = "" });
 
-            // Search
-            if (!string.IsNullOrEmpty(keyword))
+            var model = new CourseIndexViewModel
             {
-                query = query.Where(t => t.Title.Contains(keyword) || (t.Description != null && t.Description.Contains(keyword)) || (t.TopicCode != null && t.TopicCode.Contains(keyword)));
-            }
+                Search = search,
+                Skill = skill,
+                Courses = await _courseService.GetCoursesAsync(teacherId, search, skill),
+                SkillOptions = await _skillService.GetOptionsAsync()
+            };
 
-            // Filters
-            if (skillId.HasValue)
-            {
-                query = query.Where(t => t.SkillId == skillId);
-            }
-            if (levelId.HasValue)
-            {
-                query = query.Where(t => t.LevelId == levelId);
-            }
-            if (!string.IsNullOrEmpty(difficulty))
-            {
-                query = query.Where(t => t.DifficultyLevel == difficulty);
-            }
-            if (!string.IsNullOrEmpty(status))
-            {
-                query = query.Where(t => t.Status == status);
-            }
-
-            int totalItems = await query.CountAsync();
-            var items = await query
-                .OrderBy(t => t.OrderIndex)
-                .ThenByDescending(t => t.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            ViewBag.Keyword = keyword;
-            ViewBag.SkillId = skillId;
-            ViewBag.LevelId = levelId;
-            ViewBag.Difficulty = difficulty;
-            ViewBag.Status = status;
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
-
-            // Dropdowns
-            ViewBag.Skills = new SelectList(await _context.EnglishSkills.Where(s => s.IsActive).ToListAsync(), "Id", "SkillName");
-            ViewBag.Levels = new SelectList(await _context.EnglishProficiencyLevels.OrderBy(l => l.OrderIndex).ToListAsync(), "Id", "Name");
-
-            return View(items);
+            return View(model);
         }
 
-        // GET: Teacher/Courses/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var course = await _context.LearningTopics
-                .Include(t => t.Skill)
-                .Include(t => t.Level)
-                .Include(t => t.OriginalLessons)
-                .Include(t => t.Quizzes)
-                .Include(t => t.PracticeTasks)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
+            var course = await _courseService.GetCourseDetailAsync(id);
             if (course == null)
             {
                 return NotFound();
@@ -97,133 +51,101 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             return View(course);
         }
 
-        // GET: Teacher/Courses/Create
         public async Task<IActionResult> Create()
         {
-            ViewBag.SkillId = new SelectList(await _context.EnglishSkills.Where(s => s.IsActive).ToListAsync(), "Id", "SkillName");
-            ViewBag.LevelId = new SelectList(await _context.EnglishProficiencyLevels.OrderBy(l => l.OrderIndex).ToListAsync(), "Id", "Name");
-            return View();
+            var model = new CreateCourseViewModel
+            {
+                SkillOptions = await _skillService.GetOptionsAsync(),
+                LevelOptions = await _levelService.GetOptionsAsync()
+            };
+
+            return View(model);
         }
 
-        // POST: Teacher/Courses/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(LearningTopic topic)
+        public async Task<IActionResult> Create(CreateCourseViewModel model)
         {
-            if (ModelState.IsValid)
+            var teacherId = GetCurrentUserId();
+            if (teacherId == 0) return RedirectToAction("Login", "Account", new { area = "" });
+
+            if (!ModelState.IsValid)
             {
-                topic.CreatedAt = DateTime.UtcNow;
-                topic.UpdatedAt = DateTime.UtcNow;
-                topic.Status = "ACTIVE";
-                _context.Add(topic);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Khóa học đã được tạo thành công!";
-                return RedirectToAction(nameof(Index));
+                await PopulateCourseOptionsAsync(model);
+                return View(model);
             }
 
-            ViewBag.SkillId = new SelectList(await _context.EnglishSkills.Where(s => s.IsActive).ToListAsync(), "Id", "SkillName", topic.SkillId);
-            ViewBag.LevelId = new SelectList(await _context.EnglishProficiencyLevels.OrderBy(l => l.OrderIndex).ToListAsync(), "Id", "Name", topic.LevelId);
-            return View(topic);
-        }
-
-        // GET: Teacher/Courses/Edit/5
-        public async Task<IActionResult> Edit(int id)
-        {
-            var course = await _context.LearningTopics.FindAsync(id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-
-            ViewBag.SkillId = new SelectList(await _context.EnglishSkills.Where(s => s.IsActive).ToListAsync(), "Id", "SkillName", course.SkillId);
-            ViewBag.LevelId = new SelectList(await _context.EnglishProficiencyLevels.OrderBy(l => l.OrderIndex).ToListAsync(), "Id", "Name", course.LevelId);
-            return View(course);
-        }
-
-        // POST: Teacher/Courses/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, LearningTopic topic)
-        {
-            if (id != topic.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    var existing = await _context.LearningTopics.FindAsync(id);
-                    if (existing == null) return NotFound();
-
-                    existing.Title = topic.Title;
-                    existing.Description = topic.Description;
-                    existing.SkillId = topic.SkillId;
-                    existing.LevelId = topic.LevelId;
-                    existing.TopicCode = topic.TopicCode;
-                    existing.DifficultyLevel = topic.DifficultyLevel;
-                    existing.OrderIndex = topic.OrderIndex;
-                    existing.EstimatedMinutes = topic.EstimatedMinutes;
-                    existing.Status = topic.Status;
-                    existing.UpdatedAt = DateTime.UtcNow;
-
-                    _context.Update(existing);
-                    await _context.SaveChangesAsync();
-                    TempData["SuccessMessage"] = "Cập nhật khóa học thành công!";
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CourseExists(topic.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewBag.SkillId = new SelectList(await _context.EnglishSkills.Where(s => s.IsActive).ToListAsync(), "Id", "SkillName", topic.SkillId);
-            ViewBag.LevelId = new SelectList(await _context.EnglishProficiencyLevels.OrderBy(l => l.OrderIndex).ToListAsync(), "Id", "Name", topic.LevelId);
-            return View(topic);
-        }
-
-        // GET: Teacher/Courses/Delete/5
-        public async Task<IActionResult> Delete(int id)
-        {
-            var course = await _context.LearningTopics
-                .Include(t => t.Skill)
-                .Include(t => t.Level)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (course == null)
-            {
-                return NotFound();
-            }
-
-            return View(course);
-        }
-
-        // POST: Teacher/Courses/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var course = await _context.LearningTopics.FindAsync(id);
-            if (course != null)
-            {
-                _context.LearningTopics.Remove(course);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Xóa khóa học thành công!";
-            }
+            await _courseService.CreateCourseAsync(model, teacherId);
+            TempData["SuccessMessage"] = "Khóa học đã được tạo thành công!";
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CourseExists(int id)
+        public async Task<IActionResult> Edit(int id)
         {
-            return _context.LearningTopics.Any(e => e.Id == id);
+            var course = await _courseService.GetCourseDetailAsync(id);
+            if (course == null)
+            {
+                return NotFound();
+            }
+
+            var model = new EditCourseViewModel
+            {
+                Id = course.Id,
+                Title = course.Title,
+                Description = course.Description,
+                TopicCode = course.TopicCode,
+                SkillId = course.SkillId,
+                ProficiencyLevelId = course.ProficiencyLevelId,
+                DifficultyLevel = course.DifficultyLevel,
+                EstimatedMinutes = course.EstimatedMinutes,
+                OrderIndex = course.OrderIndex,
+                IsActive = course.Status == "ACTIVE",
+                SkillOptions = await _skillService.GetOptionsAsync(),
+                LevelOptions = await _levelService.GetOptionsAsync()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, EditCourseViewModel model)
+        {
+            if (id != model.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                await PopulateCourseOptionsAsync(model);
+                return View(model);
+            }
+
+            await _courseService.UpdateCourseAsync(model);
+            TempData["SuccessMessage"] = "Cập nhật khóa học thành công!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            await _courseService.DeleteCourseAsync(id);
+            TempData["SuccessMessage"] = "Xóa khóa học thành công!";
+            return RedirectToAction(nameof(Index));
+        }
+
+        private int GetCurrentUserId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null && int.TryParse(claim.Value, out var userId) ? userId : 0;
+        }
+
+        private async Task PopulateCourseOptionsAsync(CreateCourseViewModel model)
+        {
+            model.SkillOptions = await _skillService.GetOptionsAsync();
+            model.LevelOptions = await _levelService.GetOptionsAsync();
         }
     }
 }

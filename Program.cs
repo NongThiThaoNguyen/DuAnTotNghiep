@@ -63,6 +63,7 @@ builder.Services.AddScoped<DuAnTotNghiep.Models.Repositories.Interfaces.ITopicPr
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IStudentCourseService, StudentCourseService>();
 builder.Services.AddScoped<IAuditLogManagementService, AuditLogManagementService>();
 builder.Services.AddScoped<ISystemSettingService, SystemSettingService>();
 builder.Services.AddScoped<IAchievementService, AchievementService>();
@@ -118,6 +119,20 @@ builder.Services.AddScoped<IResponseValidator, ResponseValidator>();
 builder.Services.AddScoped<IAssessmentAIService, AssessmentAIService>();
 builder.Services.AddScoped<ICompetencyPersistenceService, CompetencyPersistenceService>();
 builder.Services.AddScoped<ITestResultAggregatorService, TestResultAggregatorService>();
+builder.Services.AddScoped<ITeacherDashboardService, TeacherDashboardService>();
+builder.Services.AddScoped<ITeacherCourseService, TeacherCourseService>();
+builder.Services.AddScoped<ITeacherLessonService, TeacherLessonService>();
+builder.Services.AddScoped<ITeacherQuizService, TeacherQuizService>();
+builder.Services.AddScoped<ITeacherGradingService, TeacherGradingService>();
+builder.Services.AddScoped<ITeacherScheduleService, TeacherScheduleService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<ITeacherResourceService, TeacherResourceService>();
+builder.Services.AddScoped<ITeacherMessageService, TeacherMessageService>();
+builder.Services.AddScoped<ITeacherAssignmentService, TeacherAssignmentService>();
+builder.Services.AddScoped<ITeacherProfileService, TeacherProfileService>();
+builder.Services.AddScoped<ITeacherReportService, TeacherReportService>();
+builder.Services.AddScoped<ITeacherStudentService, TeacherStudentService>();
+builder.Services.AddScoped<ITeacherSettingsService, TeacherSettingsService>();
 // AI services
 builder.Services.AddHttpClient<IAIProvider, OpenAIProvider>();
 builder.Services.AddScoped<AIQuizGenerationService>();

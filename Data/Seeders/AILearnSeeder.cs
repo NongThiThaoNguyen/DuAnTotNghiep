@@ -37,6 +37,7 @@ public class AILearnSeeder
         var readingSkill = skills.FirstOrDefault(s => s.SkillCode == "READING") ?? skills.First();
         var intermediateLevel = levels.FirstOrDefault(l => l.Code == "INTERMEDIATE") ?? levels.First();
         var beginnerLevel = levels.FirstOrDefault(l => l.Code == "BEGINNER") ?? levels.First();
+        var teacherUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "teacher@aistudyenglish.com");
 
         // 3. Seed 10 Courses (LearningTopics)
         var courses = new List<LearningTopic>();
@@ -56,9 +57,9 @@ public class AILearnSeeder
 
         string[] courseCodes = new string[]
         {
-            "COURSE_IELTS_65", "COURSE_TOEIC_500", "COURSE_COMM_DAILY", 
-            "COURSE_GRAM_FOUND", "COURSE_LIST_PRO", "COURSE_READ_ADV", 
-            "COURSE_PRON_IPA", "COURSE_VOCAB_IELTS", "COURSE_COMM_OFFICE", 
+            "COURSE_IELTS_65", "COURSE_TOEIC_500", "COURSE_COMM_DAILY",
+            "COURSE_GRAM_FOUND", "COURSE_LIST_PRO", "COURSE_READ_ADV",
+            "COURSE_PRON_IPA", "COURSE_VOCAB_IELTS", "COURSE_COMM_OFFICE",
             "COURSE_WRITE_ACAD"
         };
 
@@ -78,10 +79,19 @@ public class AILearnSeeder
                     DifficultyLevel = (i % 3 == 0) ? "INTERMEDIATE" : "BEGINNER",
                     Status = "ACTIVE",
                     OrderIndex = i + 1,
+                    CreatedBy = teacherUser?.Id,
+                    UpdatedBy = teacherUser?.Id,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
                 _context.LearningTopics.Add(topic);
+                await _context.SaveChangesAsync();
+            }
+            else if (teacherUser != null && topic.CreatedBy == null)
+            {
+                topic.CreatedBy = teacherUser.Id;
+                topic.UpdatedBy = teacherUser.Id;
+                topic.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
             courses.Add(topic);
@@ -109,6 +119,7 @@ public class AILearnSeeder
                         SourceType = "SYSTEM",
                         ReviewStatus = "APPROVED",
                         IsAiGenerated = false,
+                        CreatedBy = teacherUser?.Id,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
@@ -117,6 +128,23 @@ public class AILearnSeeder
                 }
             }
             await _context.SaveChangesAsync();
+        }
+
+        if (teacherUser != null)
+        {
+            var courseIds = courses.Select(c => c.Id).ToList();
+            var ownerlessLessons = await _context.OriginalLessons
+                .Where(l => courseIds.Contains(l.TopicId) && l.CreatedBy == null)
+                .ToListAsync();
+            foreach (var lesson in ownerlessLessons)
+            {
+                lesson.CreatedBy = teacherUser.Id;
+                lesson.UpdatedAt = DateTime.UtcNow;
+            }
+            if (ownerlessLessons.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
         // 5. Seed 30 Achievements
@@ -228,9 +256,15 @@ public class AILearnSeeder
                         TimeLimitMinutes = 15,
                         PassingScore = 7.0m,
                         Status = "ACTIVE",
+                        CreatedBy = teacherUser?.Id,
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.Quizzes.Add(quiz);
+                    await _context.SaveChangesAsync();
+                }
+                else if (teacherUser != null && quiz.CreatedBy == null)
+                {
+                    quiz.CreatedBy = teacherUser.Id;
                     await _context.SaveChangesAsync();
                 }
 
@@ -259,7 +293,7 @@ public class AILearnSeeder
                     var optB = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án B (Không chính xác)", IsCorrect = false, OrderIndex = 2 };
                     var optC = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án C (Sai cấu trúc)", IsCorrect = false, OrderIndex = 3 };
                     var optD = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án D (Thiếu từ)", IsCorrect = false, OrderIndex = 4 };
-                    
+
                     _context.QuestionOptions.AddRange(optA, optB, optC, optD);
                     await _context.SaveChangesAsync();
 
