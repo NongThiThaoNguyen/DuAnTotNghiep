@@ -6,5 +6,6 @@ namespace DuAnTotNghiep.Services.Interfaces
     public interface IDashboardService
     {
         Task<AdminDashboardViewModel> GetDashboardDataAsync();
+        Task<AdminDashboardViewModel> GetAdminOverviewAsync();
     }
 }

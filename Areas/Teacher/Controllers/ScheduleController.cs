@@ -1,12 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
+using DuAnTotNghiep.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 
@@ -16,11 +13,11 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
     [Authorize(Roles = "TEACHER")]
     public class ScheduleController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITeacherScheduleService _scheduleService;
 
-        public ScheduleController(ApplicationDbContext context)
+        public ScheduleController(ITeacherScheduleService scheduleService)
         {
-            _context = context;
+            _scheduleService = scheduleService;
         }
 
         private int GetCurrentUserId()
@@ -39,22 +36,8 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             int teacherId = GetCurrentUserId();
             if (teacherId == 0) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var query = _context.Schedules
-                .Include(s => s.Topic)
-                .Where(s => s.TeacherId == teacherId)
-                .AsNoTracking();
-
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                query = query.Where(s => s.Title.Contains(keyword) || (s.Description != null && s.Description.Contains(keyword)) || (s.Classroom != null && s.Classroom.Contains(keyword)));
-            }
-
-            int totalItems = await query.CountAsync();
-            var items = await query
-                .OrderBy(s => s.StartTime)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            int totalItems = await _scheduleService.GetTotalSchedulesCountAsync(teacherId, keyword);
+            var items = await _scheduleService.GetSchedulesAsync(teacherId, keyword, page, pageSize);
 
             ViewBag.Keyword = keyword;
             ViewBag.CurrentPage = page;
@@ -66,7 +49,8 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
         // GET: Teacher/Schedule/Create
         public async Task<IActionResult> Create()
         {
-            ViewBag.TopicId = new SelectList(await _context.LearningTopics.Where(t => t.Status == "ACTIVE").ToListAsync(), "Id", "Title");
+            var activeTopics = await _scheduleService.GetActiveTopicsAsync();
+            ViewBag.TopicId = new SelectList(activeTopics, "Id", "Title");
             return View();
         }
 
@@ -82,13 +66,13 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             {
                 schedule.TeacherId = teacherId;
                 schedule.CreatedAt = DateTime.UtcNow;
-                _context.Add(schedule);
-                await _context.SaveChangesAsync();
+                await _scheduleService.CreateAsync(schedule);
                 TempData["SuccessMessage"] = "Lịch giảng dạy đã được thêm thành công!";
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.TopicId = new SelectList(await _context.LearningTopics.Where(t => t.Status == "ACTIVE").ToListAsync(), "Id", "Title", schedule.TopicId);
+            var activeTopics = await _scheduleService.GetActiveTopicsAsync();
+            ViewBag.TopicId = new SelectList(activeTopics, "Id", "Title", schedule.TopicId);
             return View(schedule);
         }
 
@@ -96,13 +80,14 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             int teacherId = GetCurrentUserId();
-            var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == id && s.TeacherId == teacherId);
+            var schedule = await _scheduleService.GetByIdAsync(id, teacherId);
             if (schedule == null)
             {
                 return NotFound();
             }
 
-            ViewBag.TopicId = new SelectList(await _context.LearningTopics.Where(t => t.Status == "ACTIVE").ToListAsync(), "Id", "Title", schedule.TopicId);
+            var activeTopics = await _scheduleService.GetActiveTopicsAsync();
+            ViewBag.TopicId = new SelectList(activeTopics, "Id", "Title", schedule.TopicId);
             return View(schedule);
         }
 
@@ -121,7 +106,7 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             {
                 try
                 {
-                    var existing = await _context.Schedules.FindAsync(id);
+                    var existing = await _scheduleService.GetByIdAsync(id, teacherId);
                     if (existing == null) return NotFound();
 
                     existing.Title = schedule.Title;
@@ -131,13 +116,13 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
                     existing.EndTime = schedule.EndTime;
                     existing.Classroom = schedule.Classroom;
 
-                    _context.Update(existing);
-                    await _context.SaveChangesAsync();
+                    await _scheduleService.UpdateAsync(existing);
                     TempData["SuccessMessage"] = "Cập nhật lịch giảng dạy thành công!";
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception)
                 {
-                    if (!ScheduleExists(schedule.Id))
+                    var existingCheck = await _scheduleService.GetByIdAsync(id, teacherId);
+                    if (existingCheck == null)
                     {
                         return NotFound();
                     }
@@ -149,7 +134,8 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            ViewBag.TopicId = new SelectList(await _context.LearningTopics.Where(t => t.Status == "ACTIVE").ToListAsync(), "Id", "Title", schedule.TopicId);
+            var activeTopics = await _scheduleService.GetActiveTopicsAsync();
+            ViewBag.TopicId = new SelectList(activeTopics, "Id", "Title", schedule.TopicId);
             return View(schedule);
         }
 
@@ -157,9 +143,7 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             int teacherId = GetCurrentUserId();
-            var schedule = await _context.Schedules
-                .Include(s => s.Topic)
-                .FirstOrDefaultAsync(m => m.Id == id && m.TeacherId == teacherId);
+            var schedule = await _scheduleService.GetByIdAsync(id, teacherId);
             if (schedule == null)
             {
                 return NotFound();
@@ -174,19 +158,13 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             int teacherId = GetCurrentUserId();
-            var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == id && s.TeacherId == teacherId);
+            var schedule = await _scheduleService.GetByIdAsync(id, teacherId);
             if (schedule != null)
             {
-                _context.Schedules.Remove(schedule);
-                await _context.SaveChangesAsync();
+                await _scheduleService.DeleteAsync(schedule);
                 TempData["SuccessMessage"] = "Xóa lịch giảng dạy thành công!";
             }
             return RedirectToAction(nameof(Index));
-        }
-
-        private bool ScheduleExists(int id)
-        {
-            return _context.Schedules.Any(e => e.Id == id);
         }
     }
 }

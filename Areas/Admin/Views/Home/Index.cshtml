@@ -296,23 +296,17 @@
                         <div class="py-3 flex items-start justify-between gap-4">
                             <div class="flex gap-3">
                                 <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
-                                    @act.Student.FullName.Substring(0, Math.Min(2, act.Student.FullName.Length)).ToUpper()
+                                    @(string.IsNullOrEmpty(act.UserName) ? "?" : act.UserName.Substring(0, Math.Min(2, act.UserName.Length)).ToUpper())
                                 </div>
                                 <div>
-                                    <span class="text-sm font-bold text-slate-800 block">@act.Student.FullName</span>
+                                    <span class="text-sm font-bold text-slate-800 block">@act.UserName</span>
                                     <span class="text-xs text-slate-500">
-                                        @act.ActivityType: Topic <strong class="text-slate-700">@(act.Topic?.Title ?? "N/A")</strong>
+                                        @act.ActivityType: <strong class="text-slate-700">@act.Description</strong>
                                     </span>
                                 </div>
                             </div>
                             <div class="text-right">
                                 <span class="text-xs text-slate-400 block">@act.CreatedAt.ToString("HH:mm dd/MM")</span>
-                                @if (act.Score.HasValue)
-                                {
-                                    <span class="inline-flex items-center text-xs font-semibold text-emerald-600">
-                                        Điểm: @act.Score.Value
-                                    </span>
-                                }
                             </div>
                         </div>
                     }
@@ -549,7 +543,7 @@
             const borderGray = '#E2E8F0';
             const textPrimary = '#0F172A';
             const textSecondary = '#64748B';
-            
+
             const successColor = '#22C55E';
             const warningColor = '#F59E0B';
             const dangerColor = '#EF4444';

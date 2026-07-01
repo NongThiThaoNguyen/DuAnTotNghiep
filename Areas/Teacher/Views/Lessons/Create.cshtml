@@ -1,84 +1,178 @@
-@model DuAnTotNghiep.Models.OriginalLesson
+@model DuAnTotNghiep.Models.ViewModels.Teacher.CreateLessonViewModel
 @{
     ViewData["Title"] = "Thêm bài học mới";
 }
 
-<div class="max-w-2xl mx-auto py-6 px-4 font-sans space-y-6">
-    
-    <!-- Breadcrumb back -->
-    <div class="flex items-center gap-2">
-        <a href="/Teacher/Lessons" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-            Quay lại danh sách
-        </a>
-    </div>
-
-    <!-- Title Header -->
+<div class="w-full mx-auto py-6 px-4 font-sans space-y-6">
     <div>
-        <h1 class="text-2xl font-black text-slate-900 leading-tight">Thêm bài học mới</h1>
-        <p class="text-slate-500 text-sm">Điền đầy đủ thông tin bài học và đính kèm vào khóa học tương ứng.</p>
+        <a asp-action="Index" asp-route-courseId="@Model.TopicId" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors">Quay lại danh sách</a>
+        <h1 class="text-2xl font-black text-slate-900 leading-tight mt-3">Thêm bài học mới</h1>
+        <p class="text-slate-500 text-sm">@Model.TopicTitle</p>
     </div>
 
-    <!-- Form card -->
     <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
-        <form asp-action="Create" method="post" class="space-y-5">
+        <form asp-action="Create" method="post" enctype="multipart/form-data" class="space-y-5">
             <div asp-validation-summary="ModelOnly" class="text-xs text-red-500"></div>
+            <input type="hidden" asp-for="TopicId" />
+            <input type="hidden" asp-for="TopicTitle" />
+            <input type="hidden" asp-for="DifficultyLevel" />
 
-            <!-- Title -->
-            <div class="space-y-1.5">
-                <label asp-for="Title" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tên bài học</label>
-                <input asp-for="Title" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" placeholder="Nhập tiêu đề bài học..." required />
-                <span asp-validation-for="Title" class="text-xs text-red-500"></span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <!-- TopicId -->
-                <div class="sm:col-span-2 space-y-1.5">
-                    <label asp-for="TopicId" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Thuộc khóa học</label>
-                    <select asp-for="TopicId" asp-items="ViewBag.TopicId" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white" required></select>
-                    <span asp-validation-for="TopicId" class="text-xs text-red-500"></span>
-                </div>
-
-                <!-- EstimatedMinutes -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div class="space-y-1.5">
-                    <label asp-for="EstimatedMinutes" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Thời lượng (Phút)</label>
-                    <input asp-for="EstimatedMinutes" type="number" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" value="15" required />
-                    <span asp-validation-for="EstimatedMinutes" class="text-xs text-red-500"></span>
+                    <label asp-for="Title" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tên bài học</label>
+                    <input asp-for="Title" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" required />
+                    <span asp-validation-for="Title" class="text-xs text-red-500"></span>
+                </div>
+
+                <div class="space-y-1.5">
+                    <label asp-for="EstimatedMinutes" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Thời lượng (phút)</label>
+                    <input asp-for="EstimatedMinutes" type="number" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" required />
                 </div>
             </div>
 
-            <!-- ContentType -->
-            <div class="space-y-1.5">
-                <label asp-for="ContentType" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Dạng tài liệu bài giảng</label>
-                <select asp-for="ContentType" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all bg-white" required>
-                    <option value="TEXT">Bài đọc văn bản (TEXT)</option>
-                    <option value="AUDIO_LINK">Link âm thanh/Podcast (AUDIO_LINK)</option>
-                    <option value="VIDEO_LINK">Link video bài giảng (VIDEO_LINK)</option>
-                    <option value="REFERENCE_LINK">Tài liệu tham khảo mở (REFERENCE_LINK)</option>
-                </select>
-                <span asp-validation-for="ContentType" class="text-xs text-red-500"></span>
-            </div>
-
-            <!-- Summary -->
             <div class="space-y-1.5">
                 <label asp-for="Summary" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tóm tắt bài học</label>
-                <input asp-for="Summary" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" placeholder="Tóm tắt ngắn gọn mục tiêu, nội dung..." />
-                <span asp-validation-for="Summary" class="text-xs text-red-500"></span>
+                <input asp-for="Summary" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" />
             </div>
 
-            <!-- Content -->
-            <div class="space-y-1.5">
-                <label asp-for="Content" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nội dung bài học / Link đính kèm</label>
-                <textarea asp-for="Content" rows="8" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all" placeholder="Nhập nội dung bài giảng chi tiết hoặc dán URL bài giảng ở đây..." required></textarea>
-                <span asp-validation-for="Content" class="text-xs text-red-500"></span>
+            <div class="space-y-1.5 p-4 border border-slate-200 rounded-xl bg-slate-50">
+                <label class="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-2"><i class="fa-solid fa-video me-2"></i>Nguồn Video Bài Giảng</label>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label asp-for="VideoUrl" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Cách 1: Nhúng link YouTube</label>
+                        <input asp-for="VideoUrl" class="w-full px-4 py-2 text-sm border border-slate-200 rounded-lg bg-white" placeholder="https://www.youtube.com/embed/..." />
+                        <p class="text-[10px] text-slate-400 mt-1">Dán link Youtube hoặc Vimeo.</p>
+                    </div>
+                    
+                    <div>
+                        <label asp-for="UploadVideo" class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Cách 2: Tải lên tệp Video</label>
+                        <input type="file" asp-for="UploadVideo" accept=".mp4,.webm,.avi" class="block w-full text-sm text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 bg-white border border-slate-200 rounded-lg" />
+                        <p class="text-[10px] text-slate-400 mt-1">Hỗ trợ .mp4, .webm (Tối đa 100MB).</p>
+                    </div>
+                </div>
             </div>
 
-            <!-- Submit buttons -->
+            <div class="space-y-3">
+                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Nội dung bài học</label>
+                
+                <!-- Khung Chọn Phương Thức -->
+                <div class="flex bg-slate-100 p-1 rounded-xl w-fit">
+                    <label class="cursor-pointer relative m-0">
+                        <input type="radio" asp-for="InputMethod" value="EDITOR" class="peer hidden" checked onchange="switchMethod('EDITOR')" />
+                        <div class="px-4 py-2 text-xs font-bold text-slate-500 rounded-lg peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all">
+                            <i class="fa-solid fa-pen-nib me-1"></i>Biên soạn thủ công
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative m-0">
+                        <input type="radio" asp-for="InputMethod" value="UPLOAD" class="peer hidden" onchange="switchMethod('UPLOAD')" />
+                        <div class="px-4 py-2 text-xs font-bold text-slate-500 rounded-lg peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all">
+                            <i class="fa-solid fa-cloud-arrow-up me-1"></i>Tải lên tài liệu
+                        </div>
+                    </label>
+                    <label class="cursor-pointer relative m-0">
+                        <input type="radio" asp-for="InputMethod" value="AI" class="peer hidden" onchange="switchMethod('AI')" />
+                        <div class="px-4 py-2 text-xs font-bold text-slate-500 rounded-lg peer-checked:bg-white peer-checked:text-blue-600 peer-checked:shadow-sm transition-all">
+                            <i class="fa-solid fa-wand-magic-sparkles me-1"></i>Trợ lý AI
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Tab 3: AI Prompt (placed above Editor so it appears logically) -->
+                <div id="method-AI" class="method-panel mt-3 hidden">
+                    <div class="bg-slate-50 border border-slate-200 p-6 rounded-2xl shadow-sm">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600">
+                                <i class="fa-solid fa-wand-magic-sparkles text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-bold text-slate-800">Trợ lý AI tạo giáo án</h3>
+                                <p class="text-xs text-slate-500">Nhập từ khóa và AI sẽ tự động sinh nội dung bài học chuyên nghiệp cho bạn.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <input type="text" id="aiPrompt" placeholder="Ví dụ: Soạn bài giảng về cách chia động từ thì Hiện tại đơn..." class="flex-1 px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-none focus:border-blue-400 bg-white" />
+                            <button type="button" onclick="generateAiContent()" id="btnGenerateAi" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold rounded-xl transition-colors flex items-center">
+                                <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Tạo nội dung
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 1: Editor -->
+                <div id="method-EDITOR" class="method-panel mt-3">
+                    <textarea asp-for="Content" rows="12" id="lessonContentEditor" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl"></textarea>
+                </div>
+
+                <!-- Tab 2: Upload -->
+                <div id="method-UPLOAD" class="method-panel mt-3 hidden">
+                    <div class="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center hover:bg-slate-50 transition-colors">
+                        <div class="text-4xl text-slate-300 mb-3"><i class="fa-solid fa-file-arrow-up"></i></div>
+                        <h3 class="text-sm font-bold text-slate-700 mb-1">Tải lên tệp tài liệu</h3>
+                        <p class="text-xs text-slate-500 mb-4">Hỗ trợ định dạng: .pdf, .doc, .docx (Tối đa 10MB)</p>
+                        <input type="file" asp-for="UploadFile" accept=".pdf,.doc,.docx" class="block w-full max-w-xs mx-auto text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                    </div>
+                </div>
+            </div>
+
             <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <a href="/Teacher/Lessons" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-770 hover:bg-slate-50 font-bold transition-all text-xs cursor-pointer">Hủy</a>
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold transition-all text-xs shadow-sm shadow-blue-600/10 cursor-pointer">Lưu bài học</button>
+                <a asp-action="Index" asp-route-courseId="@Model.TopicId" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs">Hủy</a>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs">Lưu bài học</button>
             </div>
+            
+            <script>
+                function switchMethod(method) {
+                    document.querySelectorAll('.method-panel').forEach(el => el.classList.add('hidden'));
+                    document.getElementById('method-' + method).classList.remove('hidden');
+                    
+                    // If AI is selected, we still show the editor below the AI prompt so they can see the result
+                    if(method === 'AI') {
+                        document.getElementById('method-EDITOR').classList.remove('hidden');
+                    }
+                }
+
+                function generateAiContent() {
+                    const prompt = document.getElementById('aiPrompt').value;
+                    if(!prompt) {
+                        alert("Vui lòng nhập chủ đề cho AI!");
+                        return;
+                    }
+                    
+                    const btn = document.getElementById('btnGenerateAi');
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang xử lý...';
+                    btn.disabled = true;
+
+                    $.post('@Url.Action("GenerateAiContent", "Lessons", new { area = "Teacher" })', { prompt: prompt }, function(res) {
+                        if(res.success && typeof tinymce !== 'undefined') {
+                            tinymce.get('lessonContentEditor').setContent(res.content);
+                            alert("Đã tạo nội dung thành công! Bạn có thể chỉnh sửa thêm bên dưới.");
+                        }
+                    }).always(function() {
+                        btn.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Tạo nội dung';
+                        btn.disabled = false;
+                    });
+                }
+
+                setTimeout(function() {
+                    if (typeof tinymce !== 'undefined') {
+                        tinymce.remove('#lessonContentEditor');
+                        tinymce.init({
+                            selector: '#lessonContentEditor',
+                            plugins: 'advlist autolink lists link image charmap preview anchor pagebreak searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media table emoticons help',
+                            toolbar: 'undo redo | blocks | bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | forecolor backcolor emoticons | code',
+                            menubar: false,
+                            height: 400,
+                            content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; font-size: 14px; }',
+                            setup: function (editor) {
+                                editor.on('change', function () {
+                                    editor.save();
+                                });
+                            }
+                        });
+                    }
+                }, 100);
+            </script>
         </form>
     </div>
-
 </div>

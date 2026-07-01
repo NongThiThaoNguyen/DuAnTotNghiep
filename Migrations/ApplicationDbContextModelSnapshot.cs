@@ -1265,9 +1265,18 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int")
                         .HasColumnName("required_node_id");
 
+                    b.Property<DateOnly?>("RescheduledFrom")
+                        .HasColumnType("date")
+                        .HasColumnName("rescheduled_from");
+
                     b.Property<DateOnly?>("ScheduledDate")
                         .HasColumnType("date")
                         .HasColumnName("scheduled_date");
+
+                    b.Property<string>("SkippedReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("skipped_reason");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -1294,6 +1303,8 @@ namespace DuAnTotNghiep.Migrations
                     b.HasIndex("RequiredNodeId");
 
                     b.HasIndex("TopicId");
+
+                    b.HasIndex(new[] { "LearningPathId", "ScheduledDate", "Status" }, "IX_LPN_PathId_ScheduledDate_Status");
 
                     b.HasIndex(new[] { "LearningPathId", "Status", "OrderIndex" }, "IX_learning_nodes_path_status");
 
@@ -3141,6 +3152,57 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("student_learning_profiles", (string)null);
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.StudentNote", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at");
+
+                    b.Property<int?>("LessonId")
+                        .HasColumnType("int")
+                        .HasColumnName("lesson_id");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("title");
+
+                    b.Property<int?>("TopicId")
+                        .HasColumnType("int")
+                        .HasColumnName("topic_id");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LessonId");
+
+                    b.HasIndex("TopicId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("student_notes", (string)null);
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.StudentProgressSnapshot", b =>
                 {
                     b.Property<int>("Id")
@@ -4846,6 +4908,34 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("MainGoal");
 
                     b.Navigation("TargetLevel");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DuAnTotNghiep.Models.StudentNote", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.OriginalLesson", "Lesson")
+                        .WithMany()
+                        .HasForeignKey("LessonId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_student_notes_lessons");
+
+                    b.HasOne("DuAnTotNghiep.Models.LearningTopic", "Topic")
+                        .WithMany()
+                        .HasForeignKey("TopicId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_student_notes_topics");
+
+                    b.HasOne("DuAnTotNghiep.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_student_notes_users");
+
+                    b.Navigation("Lesson");
+
+                    b.Navigation("Topic");
 
                     b.Navigation("User");
                 });

@@ -99,6 +99,8 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<StudentLearningProfile> StudentLearningProfiles { get; set; }
 
+    public virtual DbSet<StudentNote> StudentNotes { get; set; }
+
     public virtual DbSet<StudentProgressSnapshot> StudentProgressSnapshots { get; set; }
 
     public virtual DbSet<StudentSkillPreference> StudentSkillPreferences { get; set; }
@@ -750,6 +752,8 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => new { e.LearningPathId, e.Status, e.OrderIndex }, "IX_learning_nodes_path_status");
 
+            entity.HasIndex(e => new { e.LearningPathId, e.ScheduledDate, e.Status }, "IX_LPN_PathId_ScheduledDate_Status");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AiReason).HasColumnName("ai_reason");
             entity.Property(e => e.CompletedAt).HasColumnName("completed_at");
@@ -773,6 +777,10 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.QuizId).HasColumnName("quiz_id");
             entity.Property(e => e.RequiredNodeId).HasColumnName("required_node_id");
             entity.Property(e => e.ScheduledDate).HasColumnName("scheduled_date");
+            entity.Property(e => e.RescheduledFrom).HasColumnName("rescheduled_from");
+            entity.Property(e => e.SkippedReason)
+                .HasMaxLength(500)
+                .HasColumnName("skipped_reason");
             entity.Property(e => e.Status)
                 .HasMaxLength(50)
                 .IsUnicode(false)
@@ -1035,6 +1043,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("created_at");
             entity.Property(e => e.CreatedBy).HasColumnName("created_by");
             entity.Property(e => e.EstimatedMinutes).HasColumnName("estimated_minutes");
+            entity.Property(e => e.VideoUrl)
+                .HasMaxLength(2000)
+                .HasColumnName("video_url");
             entity.Property(e => e.IsAiGenerated).HasColumnName("is_ai_generated");
             entity.Property(e => e.ReviewStatus)
                 .HasMaxLength(50)
@@ -1552,7 +1563,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasConversion<string>()
                 .HasMaxLength(50)
                 .IsUnicode(false)
-                .HasDefaultValue(ReferenceReviewStatus.PENDING)
                 .HasColumnName("status");
             entity.Property(e => e.UsagePolicy)
                 .HasConversion<string>()
@@ -1897,9 +1907,9 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.StudentId).HasColumnName("student_id");
             entity.Property(e => e.TopicId).HasColumnName("topic_id");
 
-            entity.HasOne(d => d.LearningPathNode).WithMany(p => p.StudyActivityLogs)
-                .HasForeignKey(d => d.LearningPathNodeId)
-                .HasConstraintName("FK_sal_node");
+            // entity.HasOne(d => d.LearningPathNode).WithMany(p => p.StudyActivityLogs)
+            //    .HasForeignKey(d => d.LearningPathNodeId)
+            //    .HasConstraintName("FK_sal_node");
 
             entity.HasOne(d => d.Student).WithMany(p => p.StudyActivityLogs)
                 .HasForeignKey(d => d.StudentId)
@@ -1972,6 +1982,13 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.SelectedOption).WithMany(p => p.TestAnswers)
                 .HasForeignKey(d => d.SelectedOptionId)
                 .HasConstraintName("FK_ta_option");
+        });
+
+        modelBuilder.Entity<ReplanningRule>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.LowScoreThreshold).HasColumnType("decimal(5, 2)");
+            entity.Property(e => e.FastProgressScoreThreshold).HasColumnType("decimal(5, 2)");
         });
 
         modelBuilder.Entity<TestAttempt>(entity =>
@@ -2389,6 +2406,27 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.TopicId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_schedules_learning_topics");
+        });
+
+        modelBuilder.Entity<StudentNote>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("student_notes");
+
+            entity.HasOne(d => d.User).WithMany()
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_student_notes_users");
+
+            entity.HasOne(d => d.Topic).WithMany()
+                .HasForeignKey(d => d.TopicId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_student_notes_topics");
+
+            entity.HasOne(d => d.Lesson).WithMany()
+                .HasForeignKey(d => d.LessonId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_student_notes_lessons");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,0 +1,98 @@
+@model DuAnTotNghiep.Areas.Admin.ViewModels.UserStatisticsViewModel
+@{
+    ViewData["Title"] = "Thống kê người dùng";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb bg-transparent p-0 mb-4">
+            <li class="breadcrumb-item"><a asp-action="Index" class="text-decoration-none text-muted">Quản lý Tài Khoản</a></li>
+            <li class="breadcrumb-item"><a asp-action="Details" asp-route-id="@Model.UserId" class="text-decoration-none text-muted">Chi tiết</a></li>
+            <li class="breadcrumb-item active text-primary font-weight-bold" aria-current="page">Thống kê</li>
+        </ol>
+    </nav>
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="h3 mb-0 text-gray-800 font-weight-bold">Thống kê Tài Khoản</h2>
+            <p class="text-muted">@Model.FullName (@Model.Email)</p>
+        </div>
+        <div>
+            <a asp-action="Details" asp-route-id="@Model.UserId" class="btn btn-outline-secondary rounded-pill px-4 fw-medium">
+                <i class="bi bi-arrow-left me-2"></i> Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-4 border-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Số ngày hoạt động</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.ActiveDays ngày</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-calendar-check fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-4 border-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Tổng thời gian học</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalStudyMinutes phút</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-clock fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-4 border-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Bài học hoàn thành</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.LessonsCompleted bài</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-book fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-start border-4 border-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Quizzes đã làm</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.QuizzesCompleted bài</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="bi bi-ui-checks fs-2 text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

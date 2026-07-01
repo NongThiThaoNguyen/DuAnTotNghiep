@@ -37,6 +37,7 @@ public class AILearnSeeder
         var readingSkill = skills.FirstOrDefault(s => s.SkillCode == "READING") ?? skills.First();
         var intermediateLevel = levels.FirstOrDefault(l => l.Code == "INTERMEDIATE") ?? levels.First();
         var beginnerLevel = levels.FirstOrDefault(l => l.Code == "BEGINNER") ?? levels.First();
+        var teacherUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == "teacher@aistudyenglish.com");
 
         // 3. Seed 10 Courses (LearningTopics)
         var courses = new List<LearningTopic>();
@@ -56,9 +57,9 @@ public class AILearnSeeder
 
         string[] courseCodes = new string[]
         {
-            "COURSE_IELTS_65", "COURSE_TOEIC_500", "COURSE_COMM_DAILY", 
-            "COURSE_GRAM_FOUND", "COURSE_LIST_PRO", "COURSE_READ_ADV", 
-            "COURSE_PRON_IPA", "COURSE_VOCAB_IELTS", "COURSE_COMM_OFFICE", 
+            "COURSE_IELTS_65", "COURSE_TOEIC_500", "COURSE_COMM_DAILY",
+            "COURSE_GRAM_FOUND", "COURSE_LIST_PRO", "COURSE_READ_ADV",
+            "COURSE_PRON_IPA", "COURSE_VOCAB_IELTS", "COURSE_COMM_OFFICE",
             "COURSE_WRITE_ACAD"
         };
 
@@ -78,10 +79,19 @@ public class AILearnSeeder
                     DifficultyLevel = (i % 3 == 0) ? "INTERMEDIATE" : "BEGINNER",
                     Status = "ACTIVE",
                     OrderIndex = i + 1,
+                    CreatedBy = teacherUser?.Id,
+                    UpdatedBy = teacherUser?.Id,
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow
                 };
                 _context.LearningTopics.Add(topic);
+                await _context.SaveChangesAsync();
+            }
+            else if (teacherUser != null && topic.CreatedBy == null)
+            {
+                topic.CreatedBy = teacherUser.Id;
+                topic.UpdatedBy = teacherUser.Id;
+                topic.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
             }
             courses.Add(topic);
@@ -109,6 +119,7 @@ public class AILearnSeeder
                         SourceType = "SYSTEM",
                         ReviewStatus = "APPROVED",
                         IsAiGenerated = false,
+                        CreatedBy = teacherUser?.Id,
                         CreatedAt = DateTime.UtcNow,
                         UpdatedAt = DateTime.UtcNow
                     };
@@ -117,6 +128,23 @@ public class AILearnSeeder
                 }
             }
             await _context.SaveChangesAsync();
+        }
+
+        if (teacherUser != null)
+        {
+            var courseIds = courses.Select(c => c.Id).ToList();
+            var ownerlessLessons = await _context.OriginalLessons
+                .Where(l => courseIds.Contains(l.TopicId) && l.CreatedBy == null)
+                .ToListAsync();
+            foreach (var lesson in ownerlessLessons)
+            {
+                lesson.CreatedBy = teacherUser.Id;
+                lesson.UpdatedAt = DateTime.UtcNow;
+            }
+            if (ownerlessLessons.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
         // 5. Seed 30 Achievements
@@ -228,9 +256,15 @@ public class AILearnSeeder
                         TimeLimitMinutes = 15,
                         PassingScore = 7.0m,
                         Status = "ACTIVE",
+                        CreatedBy = teacherUser?.Id,
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.Quizzes.Add(quiz);
+                    await _context.SaveChangesAsync();
+                }
+                else if (teacherUser != null && quiz.CreatedBy == null)
+                {
+                    quiz.CreatedBy = teacherUser.Id;
                     await _context.SaveChangesAsync();
                 }
 
@@ -259,7 +293,7 @@ public class AILearnSeeder
                     var optB = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án B (Không chính xác)", IsCorrect = false, OrderIndex = 2 };
                     var optC = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án C (Sai cấu trúc)", IsCorrect = false, OrderIndex = 3 };
                     var optD = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án D (Thiếu từ)", IsCorrect = false, OrderIndex = 4 };
-                    
+
                     _context.QuestionOptions.AddRange(optA, optB, optC, optD);
                     await _context.SaveChangesAsync();
 
@@ -347,6 +381,100 @@ public class AILearnSeeder
                     });
                 }
                 await _context.SaveChangesAsync();
+            }
+        }
+
+        // 9. Seed Teacher Profile and Settings
+        if (teacherUser != null)
+        {
+            if (!await _context.UserProfiles.AnyAsync(p => p.UserId == teacherUser.Id))
+            {
+                _context.UserProfiles.Add(new UserProfile
+                {
+                    UserId = teacherUser.Id,
+                    DateOfBirth = new DateOnly(1985, 10, 20),
+                    Gender = "Male",
+                    Country = "Vietnam",
+                    Bio = "Giảng viên tiếng Anh với 10 năm kinh nghiệm luyện thi IELTS và TOEIC.",
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+
+            if (!await _context.UserSettings.AnyAsync(s => s.UserId == teacherUser.Id))
+            {
+                _context.UserSettings.Add(new UserSetting
+                {
+                    UserId = teacherUser.Id,
+                    Language = "vi-VN",
+                    Timezone = "Asia/Ho_Chi_Minh",
+                    Theme = "light"
+                });
+            }
+            await _context.SaveChangesAsync();
+
+            // 10. Seed Dashboard Data for Teacher (Schedules, Practice Tasks, Submissions, Quiz Attempts)
+            var course = courses.FirstOrDefault();
+            if (course != null && student1 != null)
+            {
+                if (!await _context.Schedules.AnyAsync(s => s.TeacherId == teacherUser.Id))
+                {
+                    var today = DateTime.Today;
+                    _context.Schedules.AddRange(
+                        new Schedule { TeacherId = teacherUser.Id, TopicId = course.Id, Title = "Lớp Giao Tiếp Cơ Bản", StartTime = today.AddHours(9), EndTime = today.AddHours(11), Classroom = "Phòng 101", CreatedAt = DateTime.UtcNow },
+                        new Schedule { TeacherId = teacherUser.Id, TopicId = course.Id, Title = "Lớp IELTS Nâng Cao", StartTime = today.AddHours(14), EndTime = today.AddHours(16), Classroom = "Phòng 205", CreatedAt = DateTime.UtcNow },
+                        new Schedule { TeacherId = teacherUser.Id, TopicId = course.Id, Title = "Chữa bài TOEIC", StartTime = today.AddDays(1).AddHours(9), EndTime = today.AddDays(1).AddHours(11), Classroom = "Online", CreatedAt = DateTime.UtcNow }
+                    );
+                    await _context.SaveChangesAsync();
+                }
+
+                var task = await _context.PracticeTasks.FirstOrDefaultAsync(t => t.TopicId == course.Id);
+                if (task == null)
+                {
+                    task = new PracticeTask { TopicId = course.Id, SkillId = grammarSkill.Id, Title = "Bài tập: Viết email", Instruction = "Viết email ứng tuyển", TaskType = "WRITING", DifficultyLevel = "BEGINNER", CreatedBy = teacherUser.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow };
+                    _context.PracticeTasks.Add(task);
+                    await _context.SaveChangesAsync();
+                }
+
+                if (!await _context.PracticeSubmissions.AnyAsync(s => s.PracticeTaskId == task.Id))
+                {
+                    _context.PracticeSubmissions.AddRange(
+                        new PracticeSubmission { PracticeTaskId = task.Id, StudentId = student1.Id, SubmissionText = "Dear Sir...", Status = "SUBMITTED", SubmittedAt = DateTime.UtcNow.AddHours(-2) },
+                        new PracticeSubmission { PracticeTaskId = task.Id, StudentId = student1.Id, SubmissionText = "To whom it may concern...", Status = "GRADED", Score = 8.5m, SubmittedAt = DateTime.UtcNow.AddDays(-1) }
+                    );
+                    await _context.SaveChangesAsync();
+                }
+
+                var quiz = await _context.Quizzes.FirstOrDefaultAsync(q => q.CreatedBy == teacherUser.Id);
+                if (quiz != null && !await _context.QuizAttempts.AnyAsync(qa => qa.QuizId == quiz.Id))
+                {
+                    _context.QuizAttempts.AddRange(
+                        new QuizAttempt { QuizId = quiz.Id, StudentId = student1.Id, Status = "COMPLETED", Score = 8.5m, StartedAt = DateTime.UtcNow.AddDays(-1), SubmittedAt = DateTime.UtcNow.AddDays(-1).AddMinutes(15) },
+                        new QuizAttempt { QuizId = quiz.Id, StudentId = student1.Id, Status = "COMPLETED", Score = 9.0m, StartedAt = DateTime.UtcNow.AddHours(-5), SubmittedAt = DateTime.UtcNow.AddHours(-5).AddMinutes(12) }
+                    );
+                    await _context.SaveChangesAsync();
+                }
+
+                // 11. Seed Chat Messages and Attendances
+                if (!await _context.ChatMessages.AnyAsync(m => m.SenderId == teacherUser.Id || m.ReceiverId == teacherUser.Id))
+                {
+                    _context.ChatMessages.AddRange(
+                        new ChatMessage { SenderId = student1.Id, ReceiverId = teacherUser.Id, MessageText = "Thưa thầy, em có câu hỏi về bài học hôm nay ạ.", IsRead = false, CreatedAt = DateTime.UtcNow.AddHours(-3) },
+                        new ChatMessage { SenderId = student1.Id, ReceiverId = teacherUser.Id, MessageText = "Phần ngữ pháp câu điều kiện loại 2 em chưa hiểu rõ.", IsRead = false, CreatedAt = DateTime.UtcNow.AddHours(-2) },
+                        new ChatMessage { SenderId = teacherUser.Id, ReceiverId = student1.Id, MessageText = "Chào em, lát nữa thầy sẽ giải đáp nhé.", IsRead = true, CreatedAt = DateTime.UtcNow.AddHours(-1) }
+                    );
+                    await _context.SaveChangesAsync();
+                }
+
+                if (!await _context.Attendances.AnyAsync(a => a.TopicId == course.Id))
+                {
+                    var todayDate = DateOnly.FromDateTime(DateTime.Today);
+                    _context.Attendances.AddRange(
+                        new Attendance { StudentId = student1.Id, TopicId = course.Id, AttendanceDate = todayDate.AddDays(-2), Status = "PRESENT", Remarks = "Tham gia đầy đủ", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+                        new Attendance { StudentId = student1.Id, TopicId = course.Id, AttendanceDate = todayDate.AddDays(-1), Status = "LATE", Remarks = "Muộn 15 phút", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+                    );
+                    await _context.SaveChangesAsync();
+                }
             }
         }
     }

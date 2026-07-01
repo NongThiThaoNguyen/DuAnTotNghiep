@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    
+    <!-- TinyMCE -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.3/tinymce.min.js" referrerpolicy="origin"></script>
 
     <!-- Style overrides to support collapsible submenus and responsive drawer -->
     <style>
@@ -834,24 +837,6 @@
                             <span>Khóa học giảng dạy</span>
                         </a>
                     </li>
-                    <li class="menu-item @(controller == "Lessons" ? "active" : "")">
-                        <a href="/Teacher/Lessons">
-                            <i class="fa-solid fa-book-open"></i>
-                            <span>Quản lý Bài học</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Assignments" ? "active" : "")">
-                        <a href="/Teacher/Assignments">
-                            <i class="fa-solid fa-clipboard-list"></i>
-                            <span>Quản lý Bài tập</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Quizzes" ? "active" : "")">
-                        <a href="/Teacher/Quizzes">
-                            <i class="fa-solid fa-lightbulb"></i>
-                            <span>Quản lý Quiz</span>
-                        </a>
-                    </li>
                     <li class="menu-item @(controller == "Students" ? "active" : "")">
                         <a href="/Teacher/Students">
                             <i class="fa-solid fa-users"></i>
@@ -960,7 +945,7 @@
 
     <!-- Global AJAX Modal -->
     <div class="modal fade" id="globalAjaxModal" tabindex="-1" aria-labelledby="globalAjaxModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
             <div class="modal-content border-0 rounded-2xl shadow-lg">
                 <div class="modal-header border-bottom-0 pb-0">
                     <h5 class="modal-title font-weight-bold text-dark px-4 pt-3" id="globalAjaxModalLabel">Thao tác</h5>
@@ -1109,9 +1094,9 @@
                 
                 const $dialog = $('#globalAjaxModal .modal-dialog');
                 if (isDelete) {
-                    $dialog.removeClass('modal-lg').addClass('modal-md');
+                    $dialog.removeClass('modal-xl').addClass('modal-md');
                 } else {
-                    $dialog.removeClass('modal-md').addClass('modal-lg');
+                    $dialog.removeClass('modal-md').addClass('modal-xl');
                 }
                 
                 $('#globalAjaxModalLabel').text(title);
@@ -1214,6 +1199,7 @@
             });
         });
     </script>
+    <partial name="_ToastNotifications" />
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

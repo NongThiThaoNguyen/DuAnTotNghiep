@@ -48,6 +48,7 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedM8LearningPathAssetsAsync();
             await SeedLearningPathDemoAsync();
             await SeedReferenceSourcesAsync();
+            await SeedOriginalLessonsAsync();
         }
 
         private async Task SeedRolesAsync()
@@ -967,6 +968,48 @@ namespace DuAnTotNghiep.Data.Seeders
 
             _context.LearningPathNodes.AddRange(nodes);
             await _context.SaveChangesAsync();
+        }
+        private async Task SeedOriginalLessonsAsync()
+        {
+            var teacherRole = await _roleRepository.GetByCodeAsync("TEACHER");
+            var teacher = await _context.Users.FirstOrDefaultAsync(u => u.RoleId == teacherRole.Id);
+            
+            var topics = await _context.LearningTopics
+                .Include(t => t.OriginalLessons)
+                .ToListAsync();
+
+            bool changesMade = false;
+            foreach (var topic in topics)
+            {
+                if (topic.OriginalLessons == null || !topic.OriginalLessons.Any())
+                {
+                    for (int i = 1; i <= 3; i++)
+                    {
+                        var lesson = new OriginalLesson
+                        {
+                            TopicId = topic.Id,
+                            Title = $"Bài học {i}: Hướng dẫn cơ bản về {topic.Title}",
+                            Summary = $"Nội dung bài học {i} cung cấp kiến thức nền tảng giúp bạn hiểu rõ hơn về {topic.Title}.",
+                            Content = $"<h3>Mục tiêu bài học</h3><p>Trong bài học này, chúng ta sẽ tìm hiểu về {topic.Title} qua các ví dụ thực tế.</p><h4>Ví dụ</h4><p>Hãy chú ý các tình huống sử dụng trong đời sống hàng ngày.</p>",
+                            ContentType = "ARTICLE",
+                            EstimatedMinutes = 15,
+                            SourceType = "SYSTEM",
+                            ReviewStatus = "APPROVED",
+                            IsAiGenerated = false,
+                            CreatedBy = teacher?.Id,
+                            CreatedAt = DateTime.UtcNow,
+                            UpdatedAt = DateTime.UtcNow
+                        };
+                        _context.OriginalLessons.Add(lesson);
+                        changesMade = true;
+                    }
+                }
+            }
+
+            if (changesMade)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

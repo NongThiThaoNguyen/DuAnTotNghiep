@@ -36,6 +36,7 @@
         "Profile" => "Hồ sơ cá nhân",
         "Progress" => "Tiến độ học tập",
         "LearningPath" => "Learning Path",
+        "StudyPlan" => "Kế hoạch học",
         _ => controller ?? ""
     };
 
@@ -57,6 +58,9 @@
         "TopicDetail" => "Chi tiết chủ đề",
         "SkillDetail" => "Chi tiết kỹ năng",
         "OpenNode" => "Mở bài học",
+        "Today" => "Nhiệm vụ hôm nay",
+        "Week" => "Kế hoạch tuần",
+        "Month" => "Kế hoạch tháng",
         _ => action ?? ""
     };
 
@@ -137,6 +141,19 @@
             {
                 new SubMenuItem { Label = "Lộ trình học AI", Controller = "LearningPath", Action = "Index", Area = "Student" },
                 new SubMenuItem { Label = "Lộ trình hiện tại + tiến độ", Controller = "LearningPath", Action = "Index", Area = "Student" }
+            }
+        },
+        // 6b. Kế hoạch học (Study Plan)
+        new MenuItem
+        {
+            Label = "Kế hoạch học",
+            IsActive = (controller == "StudyPlan"),
+            IconSvg = "<svg class=\"w-5 h-5 shrink-0\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z\"></path></svg>",
+            Children = new List<SubMenuItem>
+            {
+                new SubMenuItem { Label = "Nhiệm vụ hôm nay", Controller = "StudyPlan", Action = "Today", Area = "Student" },
+                new SubMenuItem { Label = "Kế hoạch Tuần", Controller = "StudyPlan", Action = "Week", Area = "Student" },
+                new SubMenuItem { Label = "Kế hoạch Tháng", Controller = "StudyPlan", Action = "Month", Area = "Student" }
             }
         },
         // 7. Bài học
@@ -311,11 +328,11 @@
             <div>
                 <!-- Sidebar Header (Logo and Desktop Collapse Button) -->
                 <div class="px-6 py-4 flex items-center justify-between border-b border-slate-100 mb-4">
-                    <div class="flex items-center gap-2 logo-container">
+                    <div class="flex items-center gap-2 logo-container lg:hidden">
                         <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shrink-0">D</div>
                         <span class="font-bold text-base text-slate-800 logo-text">DuAn<span class="text-blue-600">TotNghiep</span></span>
                     </div>
-                    <button id="desktopSidebarCollapseBtn" type="button" class="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer" title="Thu gọn/Mở rộng Sidebar">
+                    <button id="desktopSidebarCollapseBtn" type="button" class="ml-auto hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-all cursor-pointer" title="Thu gọn/Mở rộng Sidebar">
                         <svg id="collapseIcon" class="w-5 h-5 transform transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"></path>
                         </svg>
@@ -382,8 +399,8 @@
             
             <!-- ĐĂNG XUẤT -->
             <div class="p-4 border-t border-slate-100">
-                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Logout" title="Đăng xuất">
-                    <svg class="w-5 h-5 text-red-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <a class="flex items-center gap-3 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-xl transition-all" asp-area="" asp-controller="Account" asp-action="Logout" title="Đăng xuất">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
                     </svg>
                     <span class="menu-text">Đăng xuất</span>
@@ -519,6 +536,7 @@
         });
     </script>
     
+    <partial name="_ToastNotifications" />
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

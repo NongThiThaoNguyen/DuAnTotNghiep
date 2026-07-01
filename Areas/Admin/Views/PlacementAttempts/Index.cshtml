@@ -7,6 +7,9 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Lượt thi đầu vào</h2>
+        <a asp-controller="Export" asp-action="ExportPlacementResults" class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+        </a>
     </div>
 
     <!-- Filter Form -->
@@ -107,14 +110,14 @@
                 </table>
             </div>
         </div>
-        
+
         <!-- Paging -->
         @if (Model.TotalCount > 0)
         {
             var totalPages = (int)Math.Ceiling(Model.TotalCount / (double)Model.PageSize);
             <div class="card-footer d-flex justify-content-between align-items-center">
                 <small class="text-muted">Hiển thị @((Model.PageIndex - 1) * Model.PageSize + 1) đến @Math.Min(Model.PageIndex * Model.PageSize, Model.TotalCount) trên @Model.TotalCount lượt thi</small>
-                
+
                 <nav>
                     <ul class="pagination pagination-sm mb-0">
                         @if (Model.PageIndex > 1)
@@ -123,14 +126,14 @@
                                 <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = Model.PageIndex - 1 })">Trước</a>
                             </li>
                         }
-                        
+
                         @for (int i = 1; i <= Math.Ceiling((double)Model.TotalCount / Model.PageSize); i++)
                         {
                             <li class="page-item @(i == Model.PageIndex ? "active" : "")">
                                 <a class="page-link" href="@Url.Action("Index", new { keyword = filter?.Keyword, status = filter?.Status, fromDate = filter?.FromDate?.ToString("yyyy-MM-dd"), toDate = filter?.ToDate?.ToString("yyyy-MM-dd"), pageIndex = i })">@i</a>
                             </li>
                         }
-                        
+
                         @if (Model.PageIndex < Math.Ceiling((double)Model.TotalCount / Model.PageSize))
                         {
                             <li class="page-item">

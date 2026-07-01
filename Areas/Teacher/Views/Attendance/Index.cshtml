@@ -1,4 +1,4 @@
-@model List<DuAnTotNghiep.Areas.Teacher.Controllers.AttendanceController.StudentAttendanceViewModel>
+@model List<DuAnTotNghiep.Models.ViewModels.Teacher.StudentAttendanceViewModel>
 @{
     ViewData["Title"] = "Điểm danh học viên";
     var topicId = ViewBag.TopicId as int?;
@@ -28,7 +28,7 @@
                 <option value="">-- Chọn khóa học --</option>
             </select>
         </div>
-        
+
         <div class="col-md-4">
             <label class="form-label text-muted small uppercase font-weight-bold">Ngày điểm danh</label>
             <input type="date" name="date" value="@selectedDate" class="form-control border-1 rounded-3" required />

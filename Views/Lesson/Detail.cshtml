@@ -12,12 +12,73 @@
     <!-- Left Column: Video and Tabs -->
     <div>
         <!-- Video Player -->
-        <div class="lesson-player-container">
-            <video controls poster="/images/lesson-poster.png">
-                <source src="@Model.VideoUrl" type="video/mp4" />
-                Trình duyệt của bạn không hỗ trợ tag video.
-            </video>
-        </div>
+        @if (Model.ContentType == "VIDEO_LINK" && !string.IsNullOrEmpty(Model.VideoUrl))
+        {
+            bool isYoutube = Model.VideoUrl.Contains("youtube.com") || Model.VideoUrl.Contains("youtu.be");
+            string embedUrl = Model.VideoUrl;
+            
+            if (isYoutube)
+            {
+                if (Model.VideoUrl == "https://www.youtube.com/embed/...")
+                {
+                    // Ignore placeholder
+                    isYoutube = false;
+                }
+                else if (Model.VideoUrl.Contains("youtube.com/watch?v="))
+                {
+                    var videoId = Model.VideoUrl.Split("v=")[1].Split("&")[0].Trim(' ', '`', '\'', '"');
+                    embedUrl = $"https://www.youtube.com/embed/{videoId}?enablejsapi=1";
+                }
+                else if (Model.VideoUrl.Contains("youtu.be/"))
+                {
+                    var videoId = Model.VideoUrl.Split("youtu.be/")[1].Split("?")[0].Trim(' ', '`', '\'', '"');
+                    embedUrl = $"https://www.youtube.com/embed/{videoId}?enablejsapi=1";
+                }
+                else if (Model.VideoUrl.Contains("youtube.com/embed/"))
+                {
+                    var videoId = Model.VideoUrl.Split("embed/")[1].Split("?")[0].Trim(' ', '`', '\'', '"');
+                    embedUrl = $"https://www.youtube.com/embed/{videoId}?enablejsapi=1";
+                }
+            }
+
+            @if (Model.VideoUrl != "https://www.youtube.com/embed/...")
+            {
+                <div class="lesson-player-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 12px; margin-bottom: 10px;">
+                    @if (isYoutube)
+                    {
+                        <iframe id="youtubePlayer" src="@embedUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+                    }
+                    else
+                    {
+                        <video id="html5Player" controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                            <source src="@Model.VideoUrl" type="video/mp4" />
+                            Trình duyệt của bạn không hỗ trợ tag video.
+                        </video>
+                    }
+                </div>
+            }
+
+            <!-- Transcript Section -->
+            @if (Model.LessonId == 125) 
+            {
+                <div class="transcript-wrapper mb-4">
+                    <button class="btn btn-outline-primary btn-sm w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#transcriptBox" aria-expanded="true" aria-controls="transcriptBox" style="border-radius: 8px;">
+                        <span class="fw-bold"><i class="fa-solid fa-closed-captioning me-2"></i>Lời thoại (Transcript)</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <div class="collapse show mt-2" id="transcriptBox">
+                        <div class="card card-body bg-light border-0" style="max-height: 250px; overflow-y: auto; border-radius: 8px; font-size: 0.95rem; line-height: 1.8;">
+                            <!-- Mẫu dữ liệu Transcript (sẽ được gen bằng DB hoặc Hardcode mẫu ở đây) -->
+                            <div class="transcript-line" data-time="0">Welcome back to another English lesson!</div>
+                            <div class="transcript-line" data-time="4">Today, we are talking about <strong>Continuous</strong> and <strong>Perfect</strong> tenses.</div>
+                            <div class="transcript-line" data-time="9">It's very important to understand them <strong>simultaneously</strong>.</div>
+                            <div class="transcript-line" data-time="14">Let's look at the first example on the board...</div>
+                            <div class="transcript-line" data-time="20">When you say "I am doing", it means the action is happening right now.</div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
 
         <!-- Lesson Header Actions -->
         <div class="lesson-header-section">

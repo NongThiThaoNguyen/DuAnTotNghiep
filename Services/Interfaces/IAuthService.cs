@@ -6,9 +6,6 @@ namespace DuAnTotNghiep.Services.Interfaces
     {
         Task<bool> RegisterAsync(RegisterViewModel request);
         Task<LoginResultDto> LoginAsync(string email, string password, string ipAddress, string userAgent);
-        Task LogoutAsync(int userId, string sessionToken);
-        Task<bool> ForgotPasswordAsync(string email);
-        Task<bool> ResetPasswordAsync(string token, string newPassword);
         Task<(bool IsSuccess, string ErrorMessage)> ChangePasswordAsync(int userId, string oldPassword, string newPassword, string ipAddress);
     }
 }

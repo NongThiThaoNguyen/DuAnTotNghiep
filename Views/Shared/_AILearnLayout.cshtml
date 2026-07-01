@@ -1,4 +1,5 @@
 @using System.Security.Claims
+@inject DuAnTotNghiep.Services.Interfaces.INotificationService NotificationService
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -55,8 +56,8 @@
                             <span>Khóa học</span>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a href="/Courses">
+                    <li class="menu-item @(controller == "Quiz" ? "active" : "")">
+                        <a href="/Quiz">
                             <i class="fa-solid fa-clipboard-list"></i>
                             <span>Bài tập</span>
                         </a>
@@ -79,8 +80,8 @@
                             <span>Thành tích</span>
                         </a>
                     </li>
-                    <li class="menu-item">
-                        <a href="#">
+                    <li class="menu-item @(controller == "Notes" ? "active" : "")">
+                        <a href="/Notes">
                             <i class="fa-solid fa-note-sticky"></i>
                             <span>Ghi chú</span>
                         </a>
@@ -89,6 +90,12 @@
                         <a href="/Profile">
                             <i class="fa-solid fa-gear"></i>
                             <span>Cài đặt</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="/Account/Logout">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Đăng xuất</span>
                         </a>
                     </li>
                 </ul>
@@ -117,9 +124,20 @@
                 <!-- Header Actions -->
                 <div class="header-actions">
                     <!-- Notification -->
-                    <button class="notification-btn" title="Thông báo">
+                    @{
+                        int unreadNotifCount = 0;
+                        var claimNameId = User.FindFirst(ClaimTypes.NameIdentifier);
+                        if (claimNameId != null && int.TryParse(claimNameId.Value, out int currentUserId))
+                        {
+                            unreadNotifCount = await NotificationService.GetUnreadCountAsync(currentUserId);
+                        }
+                    }
+                    <button class="notification-btn" title="Thông báo" onclick="window.location.href='/Profile#notifications'">
                         <i class="fa-regular fa-bell"></i>
-                        <span class="notification-badge"></span>
+                        @if (unreadNotifCount > 0)
+                        {
+                            <span class="notification-badge"></span>
+                        }
                     </button>
 
                     <!-- User Profile Dropdown -->
@@ -128,19 +146,17 @@
                         <span class="d-none d-md-inline">@User.Identity?.Name</span>
                     </a>
 
-                    <!-- Logout link -->
-                    <a href="/Account/Logout" class="text-danger ms-2" title="Đăng xuất">
-                        <i class="fa-solid fa-right-from-bracket"></i>
-                    </a>
                 </div>
             </header>
 
             <!-- Render Main View Content -->
-            <div class="container-fluid p-0 flex-grow-1">
+            <div class="container-fluid p-0 flex-grow-1 relative">
                 @RenderBody()
             </div>
         </main>
     </div>
+
+    <partial name="_ToastNotifications" />
 
     <!-- Bootstrap 5.3 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

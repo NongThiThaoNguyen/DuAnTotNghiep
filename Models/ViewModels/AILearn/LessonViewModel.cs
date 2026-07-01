@@ -13,7 +13,8 @@ public class LessonViewModel
     public string Summary { get; set; } = "";
     public string Content { get; set; } = "";
     public int EstimatedMinutes { get; set; }
-    public string VideoUrl { get; set; } = "https://www.w3schools.com/html/mov_bbb.mp4"; // Sample HTML5 video
+    public string? ContentType { get; set; }
+    public string? VideoUrl { get; set; }
 
     public bool IsCompleted { get; set; }
 

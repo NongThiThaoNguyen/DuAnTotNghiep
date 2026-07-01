@@ -83,10 +83,7 @@ namespace DuAnTotNghiep.Services
             return (true, string.Empty);
         }
 
-        public Task<bool> ForgotPasswordAsync(string email)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public async Task<LoginResultDto> LoginAsync(string email, string password, string ipAddress, string userAgent)
         {
@@ -233,10 +230,7 @@ namespace DuAnTotNghiep.Services
             return new LoginResultDto { IsSuccess = true, User = user };
         }
 
-        public Task LogoutAsync(int userId, string sessionToken)
-        {
-            throw new NotImplementedException();
-        }
+
 
         public async Task<bool> RegisterAsync(RegisterViewModel request)
         {
@@ -285,9 +279,6 @@ namespace DuAnTotNghiep.Services
             return true;
         }
 
-        public Task<bool> ResetPasswordAsync(string token, string newPassword)
-        {
-            throw new NotImplementedException();
-        }
+
     }
 }

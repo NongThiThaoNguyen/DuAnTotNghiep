@@ -1,12 +1,7 @@
+using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace DuAnTotNghiep.Areas.Teacher.Controllers
 {
@@ -14,104 +9,54 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
     [Authorize(Roles = "TEACHER")]
     public class GradesController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITeacherGradingService _gradingService;
 
-        public GradesController(ApplicationDbContext context)
+        public GradesController(ITeacherGradingService gradingService)
         {
-            _context = context;
+            _gradingService = gradingService;
         }
 
-        public class StudentGradeRow
+        public async Task<IActionResult> Index(int? topicId)
         {
-            public int StudentId { get; set; }
-            public string StudentName { get; set; } = "";
-            public string StudentEmail { get; set; } = "";
-            public string StudentAvatar { get; set; } = "";
-            
-            public int TotalAssignmentsSubmitted { get; set; }
-            public decimal AverageAssignmentScore { get; set; }
-            
-            public int TotalQuizzesAttempted { get; set; }
-            public decimal AverageQuizScore { get; set; }
-            
-            public decimal CombinedAverageScore { get; set; }
+            ViewBag.TopicId = topicId;
+            return View(await _gradingService.GetGradesOverviewAsync(topicId));
         }
 
-        // GET: Teacher/Grades
-        public async Task<IActionResult> Index(string? keyword, int page = 1, int pageSize = 15)
+        public async Task<IActionResult> Pending()
         {
-            var studentQuery = _context.Users
-                .Include(u => u.Role)
-                .Where(u => u.Role.RoleCode == "STUDENT" && u.Status == "ACTIVE");
+            var teacherId = GetCurrentUserId();
+            if (teacherId == 0) return RedirectToAction("Login", "Account", new { area = "" });
 
-            if (!string.IsNullOrEmpty(keyword))
+            return View(await _gradingService.GetPendingSubmissionsAsync(teacherId));
+        }
+
+        public async Task<IActionResult> Grade(int id)
+        {
+            var submission = await _gradingService.GetSubmissionDetailAsync(id);
+            if (submission == null)
             {
-                studentQuery = studentQuery.Where(u => u.FullName.Contains(keyword) || u.Email.Contains(keyword));
+                return NotFound();
             }
 
-            int totalStudents = await studentQuery.CountAsync();
-            var studentsList = await studentQuery
-                .OrderBy(u => u.FullName)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            return View(submission);
+        }
 
-            var gradeRows = new List<StudentGradeRow>();
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Grade(int id, decimal score, string? feedback)
+        {
+            var teacherId = GetCurrentUserId();
+            if (teacherId == 0) return RedirectToAction("Login", "Account", new { area = "" });
 
-            foreach (var student in studentsList)
-            {
-                // 1. Get assignments data
-                var subs = await _context.PracticeSubmissions
-                    .Where(s => s.StudentId == student.Id && s.Score.HasValue)
-                    .Select(s => s.Score!.Value)
-                    .ToListAsync();
-                
-                int assignmentsCount = subs.Count;
-                decimal avgAssignment = assignmentsCount > 0 ? subs.Average() : 0;
+            await _gradingService.GradeSubmissionAsync(id, score, feedback, teacherId);
+            TempData["SuccessMessage"] = "Chấm bài thành công!";
+            return RedirectToAction(nameof(Pending));
+        }
 
-                // 2. Get quiz attempts data
-                var quizAttempts = await _context.QuizAttempts
-                    .Where(q => q.StudentId == student.Id && q.Score.HasValue)
-                    .Select(q => q.Score!.Value)
-                    .ToListAsync();
-                
-                int quizAttemptsCount = quizAttempts.Count;
-                decimal avgQuiz = quizAttemptsCount > 0 ? (decimal)quizAttempts.Average() : 0;
-
-                // 3. Combined Average
-                decimal combinedAvg = 0;
-                if (assignmentsCount > 0 && quizAttemptsCount > 0)
-                {
-                    combinedAvg = (avgAssignment + avgQuiz) / 2;
-                }
-                else if (assignmentsCount > 0)
-                {
-                    combinedAvg = avgAssignment;
-                }
-                else if (quizAttemptsCount > 0)
-                {
-                    combinedAvg = avgQuiz;
-                }
-
-                gradeRows.Add(new StudentGradeRow
-                {
-                    StudentId = student.Id,
-                    StudentName = student.FullName,
-                    StudentEmail = student.Email,
-                    StudentAvatar = student.AvatarUrl ?? "/default-images/avatar.png",
-                    TotalAssignmentsSubmitted = assignmentsCount,
-                    AverageAssignmentScore = avgAssignment,
-                    TotalQuizzesAttempted = quizAttemptsCount,
-                    AverageQuizScore = avgQuiz,
-                    CombinedAverageScore = combinedAvg
-                });
-            }
-
-            ViewBag.Keyword = keyword;
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling(totalStudents / (double)pageSize);
-
-            return View(gradeRows);
+        private int GetCurrentUserId()
+        {
+            var claim = User.FindFirst(ClaimTypes.NameIdentifier);
+            return claim != null && int.TryParse(claim.Value, out var userId) ? userId : 0;
         }
     }
 }

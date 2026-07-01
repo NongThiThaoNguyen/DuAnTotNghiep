@@ -23,7 +23,7 @@ builder.Services.AddControllersWithViews(options =>
 {
     options.Filters.Add<DuAnTotNghiep.Filters.RequireOnboardingFilter>();
     options.Filters.Add<DuAnTotNghiep.Filters.RequirePlacementTestFilter>();
-});
+}).AddRazorRuntimeCompilation();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
@@ -63,6 +63,11 @@ builder.Services.AddScoped<DuAnTotNghiep.Models.Repositories.Interfaces.ITopicPr
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IStudentCourseService, StudentCourseService>();
+builder.Services.AddScoped<IAuditLogManagementService, AuditLogManagementService>();
+builder.Services.AddScoped<ISystemSettingService, SystemSettingService>();
+builder.Services.AddScoped<IAchievementService, AchievementService>();
+builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IUserSessionService, UserSessionService>();
@@ -91,6 +96,16 @@ builder.Services.AddScoped<IStudentProgressService, StudentProgressService>();
 builder.Services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IPathViewService, PathViewService>();
+builder.Services.AddScoped<IStudyPlanService, StudyPlanService>();
+builder.Services.AddScoped<IStudentDashboardService, StudentDashboardService>();
+builder.Services.AddScoped<IAiTutorService, AiTutorService>();
+builder.Services.AddScoped<IStudentCourseService, StudentCourseService>();
+builder.Services.AddScoped<IStudentLessonService, StudentLessonService>();
+builder.Services.AddScoped<IStudentQuizService, StudentQuizService>();
+builder.Services.AddScoped<IGamificationService, GamificationService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IStudentSettingService, StudentSettingService>();
+builder.Services.AddScoped<INotesService, NotesService>();
 builder.Services.AddScoped<ILearningPathEngineService, LearningPathEngineService>();
 builder.Services.AddScoped<ILearningPathAiService, LearningPathAiService>();
 builder.Services.AddScoped<ILearningPathComplianceService, LearningPathComplianceService>();
@@ -104,7 +119,20 @@ builder.Services.AddScoped<IResponseValidator, ResponseValidator>();
 builder.Services.AddScoped<IAssessmentAIService, AssessmentAIService>();
 builder.Services.AddScoped<ICompetencyPersistenceService, CompetencyPersistenceService>();
 builder.Services.AddScoped<ITestResultAggregatorService, TestResultAggregatorService>();
-
+builder.Services.AddScoped<ITeacherDashboardService, TeacherDashboardService>();
+builder.Services.AddScoped<ITeacherCourseService, TeacherCourseService>();
+builder.Services.AddScoped<ITeacherLessonService, TeacherLessonService>();
+builder.Services.AddScoped<ITeacherQuizService, TeacherQuizService>();
+builder.Services.AddScoped<ITeacherGradingService, TeacherGradingService>();
+builder.Services.AddScoped<ITeacherScheduleService, TeacherScheduleService>();
+builder.Services.AddScoped<IAttendanceService, AttendanceService>();
+builder.Services.AddScoped<ITeacherResourceService, TeacherResourceService>();
+builder.Services.AddScoped<ITeacherMessageService, TeacherMessageService>();
+builder.Services.AddScoped<ITeacherAssignmentService, TeacherAssignmentService>();
+builder.Services.AddScoped<ITeacherProfileService, TeacherProfileService>();
+builder.Services.AddScoped<ITeacherReportService, TeacherReportService>();
+builder.Services.AddScoped<ITeacherStudentService, TeacherStudentService>();
+builder.Services.AddScoped<ITeacherSettingsService, TeacherSettingsService>();
 // AI services
 builder.Services.AddHttpClient<IAIProvider, OpenAIProvider>();
 builder.Services.AddScoped<AIQuizGenerationService>();
