@@ -1,11 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DuAnTotNghiep.Data;
-using DuAnTotNghiep.Models;
+using DuAnTotNghiep.Services.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace DuAnTotNghiep.Areas.Teacher.Controllers
@@ -14,32 +10,18 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
     [Authorize(Roles = "TEACHER")]
     public class StudentsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ITeacherStudentService _studentService;
 
-        public StudentsController(ApplicationDbContext context)
+        public StudentsController(ITeacherStudentService studentService)
         {
-            _context = context;
+            _studentService = studentService;
         }
 
         // GET: Teacher/Students
         public async Task<IActionResult> Index(string? keyword, int page = 1, int pageSize = 12)
         {
-            var query = _context.Users
-                .Include(u => u.Role)
-                .Where(u => u.Role.RoleCode == "STUDENT")
-                .AsNoTracking();
-
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                query = query.Where(u => u.FullName.Contains(keyword) || u.Email.Contains(keyword) || (u.Phone != null && u.Phone.Contains(keyword)));
-            }
-
-            int totalItems = await query.CountAsync();
-            var items = await query
-                .OrderByDescending(u => u.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            int totalItems = await _studentService.GetTotalStudentsAsync(keyword);
+            var items = await _studentService.GetStudentsAsync(keyword, page, pageSize);
 
             ViewBag.Keyword = keyword;
             ViewBag.CurrentPage = page;
@@ -51,9 +33,7 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
         // GET: Teacher/Students/Details/5
         public async Task<IActionResult> Details(int id)
         {
-            var student = await _context.Users
-                .Include(u => u.Role)
-                .FirstOrDefaultAsync(u => u.Id == id && u.Role.RoleCode == "STUDENT");
+            var student = await _studentService.GetStudentByIdAsync(id);
 
             if (student == null)
             {
@@ -61,34 +41,13 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             }
 
             // 1. Get student progress snapshots
-            var snapshots = await _context.StudentProgressSnapshots
-                .Include(s => s.Skill)
-                .Include(s => s.Topic)
-                .Where(s => s.StudentId == id)
-                .OrderByDescending(s => s.SnapshotDate)
-                .Take(10)
-                .ToListAsync();
-            ViewBag.ProgressSnapshots = snapshots;
+            ViewBag.ProgressSnapshots = await _studentService.GetStudentProgressSnapshotsAsync(id);
 
             // 2. Get student learning path nodes status
-            var pathNodes = await _context.LearningPathNodes
-                .Include(n => n.Topic)
-                .Where(n => _context.StudentLearningPaths
-                    .Where(p => p.StudentId == id && p.Status == "ACTIVE")
-                    .Select(p => p.Id)
-                    .Contains(n.LearningPathId))
-                .OrderBy(n => n.OrderIndex)
-                .ToListAsync();
-            ViewBag.PathNodes = pathNodes;
+            ViewBag.PathNodes = await _studentService.GetStudentLearningPathNodesAsync(id);
 
             // 3. Get recent study activity logs
-            var activities = await _context.StudyActivityLogs
-                .Include(a => a.Topic)
-                .Where(a => a.StudentId == id)
-                .OrderByDescending(a => a.CreatedAt)
-                .Take(10)
-                .ToListAsync();
-            ViewBag.StudyActivities = activities;
+            ViewBag.StudyActivities = await _studentService.GetStudentStudyActivitiesAsync(id);
 
             return View(student);
         }

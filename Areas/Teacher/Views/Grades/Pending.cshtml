@@ -1,0 +1,42 @@
+@model List<DuAnTotNghiep.Models.ViewModels.Teacher.PendingSubmissionViewModel>
+@{
+    ViewData["Title"] = "Bài chờ chấm";
+}
+
+<div class="courses-header mb-4">
+    <div>
+        <h1 class="text-dark m-0 fs-3 font-weight-bold">Bài chờ chấm</h1>
+        <p class="text-muted m-0 small">Các bài thực hành học viên đã nộp và đang chờ giáo viên phản hồi.</p>
+    </div>
+    <a asp-action="Index" class="btn btn-secondary-ailearn">Sổ điểm</a>
+</div>
+
+<div class="card-ailearn p-0 overflow-hidden">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr class="text-muted small font-weight-bold uppercase bg-light">
+                <th class="py-3 px-4">Học viên</th>
+                <th class="py-3 px-4">Bài tập</th>
+                <th class="py-3 px-4 text-center">Ngày nộp</th>
+                <th class="py-3 px-4 text-end">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr><td colspan="4" class="py-4 text-center text-muted small">Không có bài chờ chấm.</td></tr>
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="py-3 px-4 font-weight-bold">@item.StudentName</td>
+                    <td class="py-3 px-4">@item.TaskTitle</td>
+                    <td class="py-3 px-4 text-center">@item.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                    <td class="py-3 px-4 text-end">
+                        <a asp-action="Grade" asp-route-id="@item.Id" class="btn btn-primary-ailearn btn-sm">Chấm điểm</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
