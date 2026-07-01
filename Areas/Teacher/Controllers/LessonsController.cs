@@ -12,13 +12,16 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
     {
         private readonly ITeacherLessonService _lessonService;
         private readonly ITeacherCourseService _courseService;
+        private readonly Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env;
 
         public LessonsController(
             ITeacherLessonService lessonService,
-            ITeacherCourseService courseService)
+            ITeacherCourseService courseService,
+            Microsoft.AspNetCore.Hosting.IWebHostEnvironment env)
         {
             _lessonService = lessonService;
             _courseService = courseService;
+            _env = env;
         }
 
         public async Task<IActionResult> Index(int courseId)
@@ -79,6 +82,38 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
                 return View(model);
             }
 
+            if (model.InputMethod == "UPLOAD" && model.UploadFile != null && model.UploadFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "lessons");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.UploadFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.UploadFile.CopyToAsync(fileStream);
+                }
+                model.Content = "/uploads/lessons/" + uniqueFileName;
+            }
+
+            if (model.UploadVideo != null && model.UploadVideo.Length > 0)
+            {
+                string videoFolder = Path.Combine(_env.WebRootPath, "uploads", "lessons", "videos");
+                if (!Directory.Exists(videoFolder))
+                {
+                    Directory.CreateDirectory(videoFolder);
+                }
+                string uniqueVideoName = Guid.NewGuid().ToString() + "_" + model.UploadVideo.FileName;
+                string videoPath = Path.Combine(videoFolder, uniqueVideoName);
+                using (var stream = new FileStream(videoPath, FileMode.Create))
+                {
+                    await model.UploadVideo.CopyToAsync(stream);
+                }
+                model.VideoUrl = "/uploads/lessons/videos/" + uniqueVideoName;
+            }
+
             await _lessonService.CreateLessonAsync(model, teacherId);
             TempData["SuccessMessage"] = "Bài học đã được tạo thành công!";
             return RedirectToAction(nameof(Index), new { courseId = model.TopicId });
@@ -101,7 +136,9 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
                 Summary = lesson.Summary,
                 Content = lesson.Content,
                 EstimatedMinutes = lesson.EstimatedMinutes,
-                DifficultyLevel = "BASIC"
+                DifficultyLevel = "BASIC",
+                VideoUrl = lesson.VideoUrl,
+                InputMethod = lesson.ContentType == "FILE" ? "UPLOAD" : "EDITOR"
             });
         }
 
@@ -118,6 +155,38 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             {
                 await PopulateTopicTitleAsync(model);
                 return View(model);
+            }
+
+            if (model.InputMethod == "UPLOAD" && model.UploadFile != null && model.UploadFile.Length > 0)
+            {
+                string uploadsFolder = Path.Combine(_env.WebRootPath, "uploads", "lessons");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                string uniqueFileName = Guid.NewGuid().ToString() + "_" + model.UploadFile.FileName;
+                string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await model.UploadFile.CopyToAsync(fileStream);
+                }
+                model.Content = "/uploads/lessons/" + uniqueFileName;
+            }
+
+            if (model.UploadVideo != null && model.UploadVideo.Length > 0)
+            {
+                string videoFolder = Path.Combine(_env.WebRootPath, "uploads", "lessons", "videos");
+                if (!Directory.Exists(videoFolder))
+                {
+                    Directory.CreateDirectory(videoFolder);
+                }
+                string uniqueVideoName = Guid.NewGuid().ToString() + "_" + model.UploadVideo.FileName;
+                string videoPath = Path.Combine(videoFolder, uniqueVideoName);
+                using (var stream = new FileStream(videoPath, FileMode.Create))
+                {
+                    await model.UploadVideo.CopyToAsync(stream);
+                }
+                model.VideoUrl = "/uploads/lessons/videos/" + uniqueVideoName;
             }
 
             await _lessonService.UpdateLessonAsync(model);
@@ -160,6 +229,28 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
         {
             var course = await _courseService.GetCourseDetailAsync(model.TopicId);
             model.TopicTitle = course?.Title ?? string.Empty;
+        }
+
+        [HttpPost]
+        [AllowAnonymous] // Assuming it's called via AJAX, we could restrict it if needed
+        public IActionResult GenerateAiContent(string prompt)
+        {
+            // Simulate AI content generation for the prompt
+            string htmlContent = $@"
+<div class='ai-generated-content p-4 bg-slate-50 rounded border border-slate-200'>
+    <h3 class='text-primary mb-3'>Nội dung sinh tự động bởi AI</h3>
+    <p><strong>Chủ đề yêu cầu:</strong> {prompt}</p>
+    <p>Chào mừng bạn đến với bài học này. Dưới đây là những nội dung trọng tâm bạn cần nắm vững.</p>
+    <div class='alert alert-info shadow-sm mb-4'>
+        <h5><i class='fa-solid fa-lightbulb text-warning me-2'></i>Điểm cần lưu ý</h5>
+        <ul class='mb-0 mt-2'>
+            <li>Hiểu rõ định nghĩa và cách sử dụng cơ bản.</li>
+            <li>Ghi nhớ các từ vựng cốt lõi thường xuất hiện.</li>
+            <li>Áp dụng vào giao tiếp thực tế.</li>
+        </ul>
+    </div>
+</div>";
+            return Json(new { success = true, content = htmlContent });
         }
     }
 }

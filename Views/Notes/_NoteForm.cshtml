@@ -1,6 +1,6 @@
 <!-- Note Modal -->
 <div class="modal fade" id="noteModal" tabindex="-1" aria-labelledby="noteModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl">
         <div class="modal-content border-0 shadow-lg rounded-4">
             <div class="modal-header border-bottom-0 pb-0">
                 <h5 class="modal-title fw-bold" id="noteModalLabel">Ghi chú mới</h5>
@@ -8,6 +8,7 @@
             </div>
             <div class="modal-body">
                 <form id="noteForm">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" id="noteId" name="Id" value="" />
                     <div class="mb-3">
                         <label for="noteTitle" class="form-label fw-semibold">Tiêu đề</label>

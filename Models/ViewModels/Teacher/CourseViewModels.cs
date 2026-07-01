@@ -1,5 +1,6 @@
 using DuAnTotNghiep.Models.DTOs.Level;
 using DuAnTotNghiep.Models.DTOs.Skill;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace DuAnTotNghiep.Models.ViewModels.Teacher;
 
@@ -53,7 +54,9 @@ public class CreateCourseViewModel
     public int? ProficiencyLevelId { get; set; }
     public string DifficultyLevel { get; set; } = "BASIC";
     public int? EstimatedMinutes { get; set; }
+    [ValidateNever]
     public List<SkillOptionDto> SkillOptions { get; set; } = new();
+    [ValidateNever]
     public List<LevelOptionDto> LevelOptions { get; set; } = new();
 }
 

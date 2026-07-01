@@ -56,6 +56,9 @@
                         <td class="py-3 px-4 text-end">
                             <div class="d-flex justify-content-end gap-2 align-items-center">
                                 <a asp-action="Results" asp-route-id="@quiz.Id" class="btn btn-outline-primary btn-sm py-1 px-2 fs-7">Kết quả</a>
+                                <a asp-action="ManageQuestions" asp-route-id="@quiz.Id" class="btn btn-outline-info btn-sm p-1 px-2" title="Quản lý câu hỏi">
+                                    <i class="fa-solid fa-list-check"></i> Câu hỏi
+                                </a>
                                 <a asp-action="Edit" asp-route-id="@quiz.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>

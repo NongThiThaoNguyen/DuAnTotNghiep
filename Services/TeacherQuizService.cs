@@ -1,3 +1,5 @@
+using System.IO;
+using ClosedXML.Excel;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Models.ViewModels.Teacher;
@@ -197,5 +199,140 @@ public class TeacherQuizService : ITeacherQuizService
                 TimeTaken = a.SubmittedAt.HasValue ? a.SubmittedAt.Value - a.StartedAt : null
             })
             .ToListAsync();
+    }
+
+    public async Task AddQuestionAsync(int quizId, QuizQuestionFormViewModel formQuestion, int teacherId)
+    {
+        var now = DateTime.UtcNow;
+        var question = new QuestionBank
+        {
+            SkillId = (await _context.Quizzes.FindAsync(quizId))?.SkillId ?? 1,
+            QuestionType = formQuestion.QuestionType ?? "MCQ",
+            QuestionText = formQuestion.QuestionText,
+            CorrectAnswer = formQuestion.CorrectAnswer,
+            DifficultyLevel = "INTERMEDIATE",
+            SourceType = "TEACHER_CREATED",
+            ReviewStatus = "APPROVED",
+            CreatedBy = teacherId,
+            ApprovedBy = teacherId,
+            ApprovedAt = now,
+            CreatedAt = now,
+            UpdatedAt = now
+        };
+
+        foreach (var option in formQuestion.Options.Where(o => !string.IsNullOrWhiteSpace(o)).Select((value, index) => new { value, index }))
+        {
+            question.QuestionOptions.Add(new QuestionOption
+            {
+                OptionText = option.value,
+                IsCorrect = string.Equals(option.value, formQuestion.CorrectAnswer, StringComparison.OrdinalIgnoreCase),
+                OrderIndex = option.index + 1
+            });
+        }
+
+        _context.QuestionBanks.Add(question);
+        await _context.SaveChangesAsync();
+
+        var maxOrder = await _context.QuizQuestions.Where(q => q.QuizId == quizId).MaxAsync(q => (int?)q.OrderIndex) ?? 0;
+
+        _context.QuizQuestions.Add(new QuizQuestion
+        {
+            QuizId = quizId,
+            QuestionId = question.Id,
+            Points = formQuestion.Points > 0 ? formQuestion.Points : 1,
+            OrderIndex = maxOrder + 1
+        });
+        
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task DeleteQuestionAsync(int quizId, int questionId)
+    {
+        var quizQuestion = await _context.QuizQuestions
+            .FirstOrDefaultAsync(q => q.QuizId == quizId && q.QuestionId == questionId);
+            
+        if (quizQuestion != null)
+        {
+            _context.QuizQuestions.Remove(quizQuestion);
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task AddQuestionsFromAiAsync(int quizId, List<DuAnTotNghiep.Models.ViewModels.GeneratedQuestionPreviewViewModel> items, int teacherId)
+    {
+        foreach(var item in items)
+        {
+            var formModel = new QuizQuestionFormViewModel
+            {
+                QuestionText = item.QuestionText ?? "",
+                QuestionType = "MCQ",
+                Options = item.Options ?? new List<string>(),
+                CorrectAnswer = item.Options != null && item.CorrectAnswerIndex >= 0 && item.CorrectAnswerIndex < item.Options.Count 
+                    ? item.Options[item.CorrectAnswerIndex] : "",
+                Points = 1
+            };
+            await AddQuestionAsync(quizId, formModel, teacherId);
+        }
+    }
+
+    public async Task AddQuestionsFromFileAsync(int quizId, Stream fileStream, string fileName, int teacherId)
+    {
+        if (fileName.EndsWith(".xlsx", StringComparison.OrdinalIgnoreCase))
+        {
+            using var workbook = new XLWorkbook(fileStream);
+            var worksheet = workbook.Worksheet(1);
+            var rows = worksheet.RangeUsed().RowsUsed().Skip(1); // Skip header
+
+            foreach (var row in rows)
+            {
+                string qText = row.Cell(1).GetString();
+                if (string.IsNullOrWhiteSpace(qText)) continue;
+                
+                var options = new List<string>();
+                for(int i = 2; i <= 5; i++)
+                {
+                    var opt = row.Cell(i).GetString();
+                    if(!string.IsNullOrWhiteSpace(opt)) options.Add(opt);
+                }
+                
+                string correctOpt = row.Cell(6).GetString();
+                
+                var formModel = new QuizQuestionFormViewModel
+                {
+                    QuestionText = qText,
+                    QuestionType = "MCQ",
+                    Options = options,
+                    CorrectAnswer = correctOpt,
+                    Points = 1
+                };
+                await AddQuestionAsync(quizId, formModel, teacherId);
+            }
+        }
+        else if (fileName.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
+        {
+            using var wordDoc = DocumentFormat.OpenXml.Packaging.WordprocessingDocument.Open(fileStream, false);
+            var body = wordDoc.MainDocumentPart?.Document.Body;
+            if (body == null) return;
+            
+            var paragraphs = body.Elements<DocumentFormat.OpenXml.Wordprocessing.Paragraph>()
+                .Select(p => p.InnerText.Trim())
+                .Where(t => !string.IsNullOrWhiteSpace(t))
+                .ToList();
+                
+            for (int i = 0; i < paragraphs.Count; i += 6)
+            {
+                if (i + 5 >= paragraphs.Count) break; // Not enough lines for a full question
+                
+                var formModel = new QuizQuestionFormViewModel
+                {
+                    QuestionText = paragraphs[i],
+                    QuestionType = "MCQ",
+                    Options = new List<string> { paragraphs[i+1], paragraphs[i+2], paragraphs[i+3], paragraphs[i+4] },
+                    CorrectAnswer = paragraphs[i+5],
+                    Points = 1
+                };
+                await AddQuestionAsync(quizId, formModel, teacherId);
+            }
+        }
     }
 }

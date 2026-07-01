@@ -2,17 +2,19 @@
     ViewData["Title"] = "Chào mừng bạn đến với AI Study English";
 }
 
-<div class="container py-5 mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 text-center">
-            <h1 class="display-4 fw-bold text-primary mb-4">Chào mừng đến với hệ thống!</h1>
-            <p class="lead text-muted mb-5">Để AI có thể thiết kế lộ trình học cá nhân hóa tốt nhất cho bạn, chúng ta hãy cùng nhau hoàn thiện hồ sơ học tập nhé. Sẽ chỉ mất khoảng 2 phút thôi!</p>
-            
-            <img src="/images/illustrations/onboarding-start.svg" alt="Welcome Illustration" class="img-fluid mb-5" style="max-height: 300px; object-fit: contain;" onerror="this.src='https://placehold.co/600x300/e9ecef/495057?text=Welcome+to+AI+Study+English'" />
+<div class="max-w-3xl mx-auto py-16 px-4 sm:px-6 lg:px-8 mt-10">
+    <div class="text-center">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-blue-600 mb-6">Chào mừng đến với hệ thống!</h1>
+        <p class="text-lg text-slate-500 mb-10 leading-relaxed">
+            Để AI có thể thiết kế lộ trình học cá nhân hóa tốt nhất cho bạn, chúng ta hãy cùng nhau hoàn thiện hồ sơ học tập nhé. Sẽ chỉ mất khoảng 2 phút thôi!
+        </p>
+        
+        <img src="/images/illustrations/onboarding-start.svg" alt="Welcome Illustration" class="w-full max-w-md mx-auto mb-10 object-contain" style="max-height: 300px;" onerror="this.src='https://placehold.co/600x300/eff6ff/1e40af?text=Welcome+to+AI+Study+English'" />
 
-            <div>
-                <a asp-area="Student" asp-controller="Onboarding" asp-action="Goal" class="btn btn-primary btn-lg px-5 rounded-pill shadow-sm">Bắt đầu ngay <i class="bi bi-arrow-right ms-2"></i></a>
-            </div>
+        <div>
+            <a asp-area="Student" asp-controller="Onboarding" asp-action="Goal" class="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 ease-in-out transform hover:-translate-y-1">
+                Bắt đầu ngay <i class="fa-solid fa-arrow-right ml-3"></i>
+            </a>
         </div>
     </div>
 </div>

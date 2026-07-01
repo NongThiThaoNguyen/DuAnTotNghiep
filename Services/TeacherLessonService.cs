@@ -78,12 +78,12 @@ public class TeacherLessonService : ITeacherLessonService
             Title = model.Title,
             Summary = model.Summary,
             Content = model.Content,
-            ContentType = !string.IsNullOrWhiteSpace(model.VideoUrl) ? "VIDEO_LINK" : "HTML",
+            ContentType = model.InputMethod == "UPLOAD" ? "FILE" : (!string.IsNullOrWhiteSpace(model.VideoUrl) ? "VIDEO_LINK" : "HTML"),
             EstimatedMinutes = model.EstimatedMinutes,
             VideoUrl = model.VideoUrl,
             SourceType = "TEACHER_CREATED",
             ReviewStatus = "APPROVED",
-            IsAiGenerated = false,
+            IsAiGenerated = model.InputMethod == "AI",
             CreatedBy = teacherId,
             CreatedAt = now,
             UpdatedAt = now
@@ -106,7 +106,8 @@ public class TeacherLessonService : ITeacherLessonService
         lesson.Title = model.Title;
         lesson.Summary = model.Summary;
         lesson.Content = model.Content;
-        lesson.ContentType = !string.IsNullOrWhiteSpace(model.VideoUrl) ? "VIDEO_LINK" : "HTML";
+        lesson.ContentType = model.InputMethod == "UPLOAD" ? "FILE" : (!string.IsNullOrWhiteSpace(model.VideoUrl) ? "VIDEO_LINK" : "HTML");
+        if (model.InputMethod == "AI") lesson.IsAiGenerated = true;
         lesson.EstimatedMinutes = model.EstimatedMinutes;
         lesson.VideoUrl = model.VideoUrl;
         lesson.UpdatedAt = DateTime.UtcNow;

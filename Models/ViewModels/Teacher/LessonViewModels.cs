@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Http;
+
 namespace DuAnTotNghiep.Models.ViewModels.Teacher;
 
 public class LessonIndexViewModel
@@ -46,6 +48,9 @@ public class CreateLessonViewModel
     public int? EstimatedMinutes { get; set; }
     public string? VideoUrl { get; set; }
     public string DifficultyLevel { get; set; } = "BASIC";
+    public string InputMethod { get; set; } = "EDITOR";
+    public IFormFile? UploadFile { get; set; }
+    public IFormFile? UploadVideo { get; set; }
 }
 
 public class EditLessonViewModel : CreateLessonViewModel
