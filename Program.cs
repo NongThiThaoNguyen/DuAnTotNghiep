@@ -63,6 +63,10 @@ builder.Services.AddScoped<DuAnTotNghiep.Models.Repositories.Interfaces.ITopicPr
 // Đăng ký Services
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IAuditLogManagementService, AuditLogManagementService>();
+builder.Services.AddScoped<ISystemSettingService, SystemSettingService>();
+builder.Services.AddScoped<IAchievementService, AchievementService>();
+builder.Services.AddScoped<IExportService, ExportService>();
 builder.Services.AddScoped<IAuditService, AuditService>();
 builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
 builder.Services.AddScoped<IUserSessionService, UserSessionService>();
@@ -114,7 +118,6 @@ builder.Services.AddScoped<IResponseValidator, ResponseValidator>();
 builder.Services.AddScoped<IAssessmentAIService, AssessmentAIService>();
 builder.Services.AddScoped<ICompetencyPersistenceService, CompetencyPersistenceService>();
 builder.Services.AddScoped<ITestResultAggregatorService, TestResultAggregatorService>();
-
 // AI services
 builder.Services.AddHttpClient<IAIProvider, OpenAIProvider>();
 builder.Services.AddScoped<AIQuizGenerationService>();

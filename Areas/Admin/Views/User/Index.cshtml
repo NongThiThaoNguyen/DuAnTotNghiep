@@ -28,6 +28,14 @@
             <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Quản lý Tài Khoản</h2>
             <p class="text-sm text-slate-500 mt-1">Quản trị danh sách người dùng, phân quyền và trạng thái hoạt động.</p>
         </div>
+        <div class="flex gap-2">
+            <a asp-controller="Export" asp-action="ExportUsers" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-medium hover:bg-emerald-700 transition-colors shadow-sm shadow-emerald-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                </svg>
+                Xuất Excel
+            </a>
+        </div>
     </div>
 
     <!-- Filter Card -->
@@ -159,7 +167,7 @@
                                         <a asp-action="Details" asp-route-id="@user.Id" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition-colors" title="Chi tiết">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                         </a>
-                                        
+
                                         @if (user.Status == "ACTIVE")
                                         {
                                             <button type="button" onclick="showActionModal('Lock', @user.Id, 'Khóa tài khoản', 'Bạn có chắc chắn muốn KHÓA tài khoản này không? Người dùng sẽ bị chặn đăng nhập ngay lập tức.')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 hover:text-amber-700 transition-colors" title="Khóa tài khoản">
@@ -172,7 +180,7 @@
                                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path></svg>
                                             </button>
                                         }
-                                        
+
                                         <button type="button" onclick="showActionModal('ResetPassword', @user.Id, 'Reset Mật Khẩu', 'Bạn có chắc chắn muốn RESET MẬT KHẨU tài khoản này? Một mật khẩu mới sẽ được tạo và gửi qua email của họ.')" class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition-colors" title="Reset Password">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
                                         </button>
@@ -185,7 +193,7 @@
                 </tbody>
             </table>
         </div>
-        
+
         <!-- Pagination -->
         @if (Model.TotalPages > 1)
         {
@@ -198,32 +206,32 @@
                     </div>
                     <div>
                         <nav class="relative z-0 inline-flex rounded-lg shadow-xs -space-x-px" aria-label="Pagination">
-                            <a asp-action="Index" 
-                               asp-route-Keyword="@Model.Filter.Keyword" 
-                               asp-route-Role="@Model.Filter.Role" 
-                               asp-route-Status="@Model.Filter.Status" 
+                            <a asp-action="Index"
+                               asp-route-Keyword="@Model.Filter.Keyword"
+                               asp-route-Role="@Model.Filter.Role"
+                               asp-route-Status="@Model.Filter.Status"
                                asp-route-Page="@(Model.Filter.Page - 1)"
                                class="relative inline-flex items-center px-2 py-2 rounded-l-lg border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 @(Model.Filter.Page == 1 ? "pointer-events-none opacity-50" : "")">
                                 <span class="sr-only">Trước</span>
                                 <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
                             </a>
-                            
+
                             @for (int i = 1; i <= Model.TotalPages; i++)
                             {
-                                <a asp-action="Index" 
-                                   asp-route-Keyword="@Model.Filter.Keyword" 
-                                   asp-route-Role="@Model.Filter.Role" 
-                                   asp-route-Status="@Model.Filter.Status" 
+                                <a asp-action="Index"
+                                   asp-route-Keyword="@Model.Filter.Keyword"
+                                   asp-route-Role="@Model.Filter.Role"
+                                   asp-route-Status="@Model.Filter.Status"
                                    asp-route-Page="@i"
                                    class="relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium @(Model.Filter.Page == i ? "z-10 bg-blue-50 border-blue-500 text-blue-600" : "bg-white text-slate-500 hover:bg-slate-50")">
                                     @i
                                 </a>
                             }
-                            
-                            <a asp-action="Index" 
-                               asp-route-Keyword="@Model.Filter.Keyword" 
-                               asp-route-Role="@Model.Filter.Role" 
-                               asp-route-Status="@Model.Filter.Status" 
+
+                            <a asp-action="Index"
+                               asp-route-Keyword="@Model.Filter.Keyword"
+                               asp-route-Role="@Model.Filter.Role"
+                               asp-route-Status="@Model.Filter.Status"
                                asp-route-Page="@(Model.Filter.Page + 1)"
                                class="relative inline-flex items-center px-2 py-2 rounded-r-lg border border-slate-300 bg-white text-sm font-medium text-slate-500 hover:bg-slate-50 @(Model.Filter.Page == Model.TotalPages ? "pointer-events-none opacity-50" : "")">
                                 <span class="sr-only">Tiếp</span>
@@ -243,7 +251,7 @@
         <!-- Background overlay -->
         <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeActionModal()"></div>
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        
+
         <!-- Modal panel -->
         <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-100">
             <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -283,16 +291,16 @@
             document.getElementById('actionModalLabel').innerText = title;
             document.getElementById('actionModalMessage').innerText = message;
             document.getElementById('actionForm').action = '/Admin/User/' + action;
-            
+
             const submitBtn = document.getElementById('actionSubmitBtn');
             const iconContainer = document.getElementById('modalIconContainer');
-            
+
             // Reset classes
             submitBtn.className = 'w-full inline-flex justify-center rounded-xl border border-transparent px-4 py-2 text-base font-medium text-white shadow-sm focus:outline-hidden focus:ring-2 focus:ring-offset-2 sm:w-auto sm:text-sm transition-colors';
             iconContainer.className = 'mx-auto shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:mx-0 sm:h-10 sm:w-10';
-            
+
             let svgIcon = '';
-            
+
             if (action === 'Lock') {
                 submitBtn.classList.add('bg-amber-600', 'hover:bg-amber-700', 'focus:ring-amber-500');
                 iconContainer.classList.add('bg-amber-100', 'text-amber-600');
@@ -313,9 +321,9 @@
                 iconContainer.classList.add('bg-blue-100', 'text-blue-600');
                 svgIcon = '<svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
             }
-            
+
             iconContainer.innerHTML = svgIcon;
-            
+
             // Show modal
             document.getElementById('actionModal').classList.remove('hidden');
         }
