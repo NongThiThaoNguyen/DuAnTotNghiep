@@ -125,6 +125,11 @@ builder.Services.AddScoped<ITeacherLessonService, TeacherLessonService>();
 builder.Services.AddScoped<ITeacherQuizService, TeacherQuizService>();
 builder.Services.AddScoped<ITeacherGradingService, TeacherGradingService>();
 builder.Services.AddScoped<ITeacherScheduleService, TeacherScheduleService>();
+builder.Services.AddScoped<IAdminTeacherScheduleService, AdminTeacherScheduleService>();
+builder.Services.AddHttpClient<IAdminTeacherScheduleAiService, AdminTeacherScheduleAiService>(client =>
+{
+    client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+});
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<ITeacherResourceService, TeacherResourceService>();
 builder.Services.AddScoped<ITeacherMessageService, TeacherMessageService>();

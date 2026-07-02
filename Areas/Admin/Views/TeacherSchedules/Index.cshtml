@@ -1,0 +1,356 @@
+@model DuAnTotNghiep.Areas.Admin.ViewModels.AdminTeacherScheduleListViewModel
+@{
+    ViewData["Title"] = "Lịch giáo viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var filter = Model.Filter;
+
+    string NextDirection(string sortBy)
+    {
+        return string.Equals(filter.SortBy, sortBy, StringComparison.OrdinalIgnoreCase)
+            && string.Equals(filter.SortDirection, "asc", StringComparison.OrdinalIgnoreCase)
+                ? "desc"
+                : "asc";
+    }
+
+    string SortIndicator(string sortBy)
+    {
+        if (!string.Equals(filter.SortBy, sortBy, StringComparison.OrdinalIgnoreCase))
+        {
+            return "";
+        }
+
+        return string.Equals(filter.SortDirection, "desc", StringComparison.OrdinalIgnoreCase) ? "↓" : "↑";
+    }
+}
+
+<div class="w-full">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="p-4 mb-6 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 flex items-center gap-3 shadow-sm">
+            <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            <span class="font-medium text-sm">@TempData["SuccessMessage"]</span>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="p-4 mb-6 rounded-xl bg-red-50 text-red-800 border border-red-200 flex items-center gap-3 shadow-sm">
+            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+            <span class="font-medium text-sm">@TempData["ErrorMessage"]</span>
+        </div>
+    }
+
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Lịch giáo viên</h2>
+            <p class="text-sm text-slate-500 mt-1">Sắp xếp thời khóa biểu, lớp học và phòng học cho đội ngũ giáo viên.</p>
+        </div>
+        <a asp-action="Create" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Thêm lịch
+        </a>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200 mb-6 overflow-hidden">
+        <div class="p-5 border-b border-slate-200 bg-slate-50/50">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+                <div>
+                    <h3 class="text-base font-bold text-slate-800">Gợi ý lịch bằng AI</h3>
+                    <p class="text-sm text-slate-500 mt-1">Gemini sẽ đề xuất các khung giờ phù hợp dựa trên giáo viên, chủ đề và lịch đã có.</p>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border bg-emerald-50 text-emerald-800 border-emerald-100">
+                    Google Gemini
+                </span>
+            </div>
+        </div>
+        <div class="p-5">
+            <form asp-action="GenerateAiSuggestions" method="post">
+                @Html.AntiForgeryToken()
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-3">
+                        <label asp-for="AiRequest.TeacherId" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Giáo viên</label>
+                        <select asp-for="AiRequest.TeacherId" name="TeacherId" asp-items="Model.AvailableTeachers" class="block w-full py-2.5 pl-3 pr-10 border border-slate-300 bg-white rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                            <option value="">AI tự chọn</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-3">
+                        <label asp-for="AiRequest.TopicId" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chủ đề</label>
+                        <select asp-for="AiRequest.TopicId" name="TopicId" asp-items="Model.AvailableTopics" class="block w-full py-2.5 pl-3 pr-10 border border-slate-300 bg-white rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                            <option value="">Không bắt buộc</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="AiRequest.FromDate" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Từ ngày</label>
+                        <input asp-for="AiRequest.FromDate" name="FromDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="AiRequest.ToDate" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Đến ngày</label>
+                        <input asp-for="AiRequest.ToDate" name="ToDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="AiRequest.SessionsCount" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Số buổi</label>
+                        <input asp-for="AiRequest.SessionsCount" name="SessionsCount" type="number" min="1" max="20" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="AiRequest.DurationMinutes" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phút/buổi</label>
+                        <input asp-for="AiRequest.DurationMinutes" name="DurationMinutes" type="number" min="15" max="240" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="AiRequest.PreferredStartHour" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Từ giờ</label>
+                        <input asp-for="AiRequest.PreferredStartHour" name="PreferredStartHour" type="number" min="0" max="23" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label asp-for="AiRequest.PreferredEndHour" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Đến giờ</label>
+                        <input asp-for="AiRequest.PreferredEndHour" name="PreferredEndHour" type="number" min="1" max="24" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-3">
+                        <label asp-for="AiRequest.Classroom" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phòng ưu tiên</label>
+                        <input asp-for="AiRequest.Classroom" name="Classroom" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" placeholder="A101, Zoom, Meet..." />
+                    </div>
+                    <div class="md:col-span-3">
+                        <label asp-for="AiRequest.Notes" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Yêu cầu thêm</label>
+                        <input asp-for="AiRequest.Notes" name="Notes" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" placeholder="Ưu tiên buổi sáng, tránh thứ 7..." />
+                    </div>
+                    <div class="md:col-span-12 flex justify-end">
+                        <button type="submit" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-600 text-white text-sm font-semibold rounded-xl hover:bg-emerald-700 focus:ring-4 focus:ring-emerald-500/20 transition-all shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Gợi ý bằng AI
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            @if (!string.IsNullOrWhiteSpace(Model.AiErrorMessage))
+            {
+                <div class="mt-4 p-4 rounded-xl bg-red-50 text-red-800 border border-red-200 text-sm font-medium">
+                    @Model.AiErrorMessage
+                </div>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.AiSummary))
+            {
+                <div class="mt-4 p-4 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-sm font-medium">
+                    @Model.AiSummary
+                </div>
+            }
+
+            @if (Model.AiSuggestions.Any())
+            {
+                <div class="mt-5 grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    @foreach (var suggestion in Model.AiSuggestions)
+                    {
+                        <div class="border border-slate-200 rounded-xl p-4 bg-white shadow-sm">
+                            <div class="flex items-start justify-between gap-3">
+                                <div>
+                                    <h4 class="text-sm font-bold text-slate-900">@suggestion.Title</h4>
+                                    <p class="text-xs text-slate-500 mt-1">@suggestion.TeacherName</p>
+                                </div>
+                                <span class="inline-flex items-center px-2 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                                    AI
+                                </span>
+                            </div>
+                            <div class="mt-4 space-y-2 text-sm text-slate-600">
+                                <div class="font-semibold text-slate-800">@suggestion.StartTime.ToString("dd/MM/yyyy HH:mm") - @suggestion.EndTime.ToString("HH:mm")</div>
+                                <div>@suggestion.TopicName</div>
+                                <div>@(string.IsNullOrWhiteSpace(suggestion.Classroom) ? "Online" : suggestion.Classroom)</div>
+                                <p class="text-xs text-slate-500 leading-5">@suggestion.Reason</p>
+                            </div>
+                            <form asp-action="ApplyAiSuggestion" method="post" class="mt-4">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="Title" value="@suggestion.Title" />
+                                <input type="hidden" name="TeacherId" value="@suggestion.TeacherId" />
+                                <input type="hidden" name="TopicId" value="@suggestion.TopicId" />
+                                <input type="hidden" name="StartTime" value='@suggestion.StartTime.ToString("yyyy-MM-ddTHH:mm:ss")' />
+                                <input type="hidden" name="EndTime" value='@suggestion.EndTime.ToString("yyyy-MM-ddTHH:mm:ss")' />
+                                <input type="hidden" name="Classroom" value="@suggestion.Classroom" />
+                                <input type="hidden" name="Description" value="@suggestion.Description" />
+                                <input type="hidden" name="Reason" value="@suggestion.Reason" />
+                                <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-colors">
+                                    Áp dụng gợi ý
+                                </button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200 mb-6 overflow-hidden">
+        <div class="p-5 bg-slate-50/50">
+            <form method="get" asp-action="Index">
+                <input asp-for="Filter.SortBy" name="SortBy" type="hidden" />
+                <input asp-for="Filter.SortDirection" name="SortDirection" type="hidden" />
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-3">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tìm kiếm</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            </div>
+                            <input asp-for="Filter.Keyword" name="Keyword" class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" placeholder="Tiêu đề, giáo viên, phòng..." />
+                        </div>
+                    </div>
+                    <div class="md:col-span-3">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Giáo viên</label>
+                        <select asp-for="Filter.TeacherId" name="TeacherId" asp-items="Model.AvailableTeachers" class="block w-full py-2.5 pl-3 pr-10 border border-slate-300 bg-white rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                            <option value="">Tất cả giáo viên</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Từ ngày</label>
+                        <input asp-for="Filter.FromDate" name="FromDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Đến ngày</label>
+                        <input asp-for="Filter.ToDate" name="ToDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                    </div>
+                    <div class="md:col-span-2 flex items-end gap-2">
+                        <button type="submit" class="flex-1 inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            Lọc
+                        </button>
+                        <a asp-action="Index" class="inline-flex items-center justify-center w-10 h-10 border border-slate-300 rounded-xl text-slate-500 hover:bg-slate-50" title="Làm mới" aria-label="Làm mới">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H12V4"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            <a asp-action="Index"
+                               asp-route-Keyword="@filter.Keyword"
+                               asp-route-TeacherId="@filter.TeacherId"
+                               asp-route-FromDate='@(filter.FromDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-ToDate='@(filter.ToDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-SortBy="startTime"
+                               asp-route-SortDirection="@NextDirection("startTime")"
+                               class="inline-flex items-center gap-1 text-slate-600 hover:text-blue-600">
+                                Thời gian @SortIndicator("startTime")
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Lớp học</th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            <a asp-action="Index"
+                               asp-route-Keyword="@filter.Keyword"
+                               asp-route-TeacherId="@filter.TeacherId"
+                               asp-route-FromDate='@(filter.FromDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-ToDate='@(filter.ToDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-SortBy="teacher"
+                               asp-route-SortDirection="@NextDirection("teacher")"
+                               class="inline-flex items-center gap-1 text-slate-600 hover:text-blue-600">
+                                Giáo viên @SortIndicator("teacher")
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            <a asp-action="Index"
+                               asp-route-Keyword="@filter.Keyword"
+                               asp-route-TeacherId="@filter.TeacherId"
+                               asp-route-FromDate='@(filter.FromDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-ToDate='@(filter.ToDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-SortBy="topic"
+                               asp-route-SortDirection="@NextDirection("topic")"
+                               class="inline-flex items-center gap-1 text-slate-600 hover:text-blue-600">
+                                Chủ đề @SortIndicator("topic")
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">
+                            <a asp-action="Index"
+                               asp-route-Keyword="@filter.Keyword"
+                               asp-route-TeacherId="@filter.TeacherId"
+                               asp-route-FromDate='@(filter.FromDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-ToDate='@(filter.ToDate?.ToString("yyyy-MM-dd"))'
+                               asp-route-SortBy="classroom"
+                               asp-route-SortDirection="@NextDirection("classroom")"
+                               class="inline-flex items-center gap-1 text-slate-600 hover:text-blue-600">
+                                Phòng học @SortIndicator("classroom")
+                            </a>
+                        </th>
+                        <th scope="col" class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-100">
+                    @if (!Model.Items.Any())
+                    {
+                        <tr>
+                            <td colspan="6" class="px-6 py-12 text-center">
+                                <svg class="mx-auto h-12 w-12 text-slate-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3M5 11h14M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <p class="text-sm text-slate-500 font-medium">Không có lịch phù hợp.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        foreach (var item in Model.Items)
+                        {
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                    <div class="font-semibold text-slate-900">@item.StartTime.ToString("dd/MM/yyyy")</div>
+                                    <div class="text-xs text-slate-500">@item.StartTime.ToString("HH:mm") - @item.EndTime.ToString("HH:mm")</div>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm font-semibold text-slate-900">@item.Title</div>
+                                    <div class="text-xs text-slate-500 max-w-xs truncate">@(item.Description ?? "Không có ghi chú")</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-semibold text-slate-900">@item.TeacherName</div>
+                                    <div class="text-xs text-slate-500">@item.TeacherEmail</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">@item.TopicName</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold border bg-blue-50 text-blue-800 border-blue-100">
+                                        @(string.IsNullOrWhiteSpace(item.Classroom) ? "Online" : item.Classroom)
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                    <div class="admin-icon-actions">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="admin-icon-btn admin-icon-edit" title="Chỉnh sửa lịch" aria-label="Chỉnh sửa lịch">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="admin-icon-form" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch này?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="admin-icon-btn admin-icon-delete" title="Xóa lịch" aria-label="Xóa lịch">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7m3-3h4a1 1 0 011 1v2H9V5a1 1 0 011-1z"></path></svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="px-6 py-4 border-t border-slate-200 bg-white flex items-center justify-between">
+                <p class="text-sm text-slate-700">
+                    Trang <span class="font-medium text-slate-900">@filter.Page</span> / <span class="font-medium text-slate-900">@Model.TotalPages</span>
+                </p>
+                <nav class="relative z-0 inline-flex rounded-lg shadow-xs -space-x-px" aria-label="Pagination">
+                    @for (int pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                    {
+                        <a asp-action="Index"
+                           asp-route-Keyword="@filter.Keyword"
+                           asp-route-TeacherId="@filter.TeacherId"
+                           asp-route-FromDate='@(filter.FromDate?.ToString("yyyy-MM-dd"))'
+                           asp-route-ToDate='@(filter.ToDate?.ToString("yyyy-MM-dd"))'
+                           asp-route-SortBy="@filter.SortBy"
+                           asp-route-SortDirection="@filter.SortDirection"
+                           asp-route-Page="@pageNumber"
+                           class="relative inline-flex items-center px-4 py-2 border border-slate-300 text-sm font-medium @(filter.Page == pageNumber ? "z-10 bg-blue-50 border-blue-500 text-blue-600" : "bg-white text-slate-500 hover:bg-slate-50")">
+                            @pageNumber
+                        </a>
+                    }
+                </nav>
+            </div>
+        }
+    </div>
+</div>

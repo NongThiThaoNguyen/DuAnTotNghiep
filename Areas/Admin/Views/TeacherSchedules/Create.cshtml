@@ -1,0 +1,84 @@
+@model DuAnTotNghiep.Areas.Admin.ViewModels.AdminTeacherScheduleFormViewModel
+@{
+    ViewData["Title"] = "Thêm lịch giáo viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="w-full max-w-5xl">
+    <div class="mb-6">
+        <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="mb-6">
+        <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Thêm lịch giáo viên</h2>
+        <p class="text-sm text-slate-500 mt-1">Chọn giáo viên, chủ đề học tập và thời gian tổ chức lớp.</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-xs border border-slate-200 overflow-hidden">
+        <form asp-action="Create" method="post">
+            @Html.AntiForgeryToken()
+            <div class="p-6 space-y-5">
+                <div asp-validation-summary="ModelOnly" class="text-sm text-red-600 font-medium"></div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label asp-for="TeacherId" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Giáo viên</label>
+                        <select asp-for="TeacherId" asp-items="Model.AvailableTeachers" class="block w-full py-2.5 pl-3 pr-10 border border-slate-300 bg-white rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                            <option value="">Chọn giáo viên</option>
+                        </select>
+                        <span asp-validation-for="TeacherId" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="TopicId" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Chủ đề học tập</label>
+                        <select asp-for="TopicId" asp-items="Model.AvailableTopics" class="block w-full py-2.5 pl-3 pr-10 border border-slate-300 bg-white rounded-xl focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all">
+                            <option value="">Không đính kèm</option>
+                        </select>
+                        <span asp-validation-for="TopicId" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <label asp-for="Title" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Tiêu đề lịch</label>
+                    <input asp-for="Title" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" placeholder="Ví dụ: Speaking practice - Nhóm A" />
+                    <span asp-validation-for="Title" class="text-xs text-red-600"></span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label asp-for="StartTime" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Bắt đầu</label>
+                        <input asp-for="StartTime" type="datetime-local" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                        <span asp-validation-for="StartTime" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="EndTime" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Kết thúc</label>
+                        <input asp-for="EndTime" type="datetime-local" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                        <span asp-validation-for="EndTime" class="text-xs text-red-600"></span>
+                    </div>
+                    <div>
+                        <label asp-for="Classroom" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phòng học</label>
+                        <input asp-for="Classroom" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" placeholder="A101, Zoom, Google Meet..." />
+                        <span asp-validation-for="Classroom" class="text-xs text-red-600"></span>
+                    </div>
+                </div>
+
+                <div>
+                    <label asp-for="Description" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Ghi chú</label>
+                    <textarea asp-for="Description" rows="4" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" placeholder="Nội dung buổi học, tài liệu cần chuẩn bị..."></textarea>
+                    <span asp-validation-for="Description" class="text-xs text-red-600"></span>
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
+                <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                <button type="submit" class="btn btn-primary">Lưu lịch</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
