@@ -5,6 +5,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using DuAnTotNghiep.Services.Interfaces;
 using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Models.ViewModels.Profile;
@@ -170,6 +172,21 @@ public class ProfileController : Controller
             string newAvatarUrl = $"/uploads/avatars/{fileName}";
 
             await _profileService.UpdateAvatarAsync(userId, newAvatarUrl);
+            
+            // Refresh authentication cookie so the layout can see the new avatar immediately
+            if (User.Identity is ClaimsIdentity identity)
+            {
+                var existingClaim = identity.FindFirst("AvatarUrl");
+                if (existingClaim != null)
+                {
+                    identity.RemoveClaim(existingClaim);
+                }
+                identity.AddClaim(new Claim("AvatarUrl", newAvatarUrl));
+                
+                await HttpContext.SignInAsync(
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    new ClaimsPrincipal(identity));
+            }
             
             TempData["SuccessMessage"] = "Cập nhật ảnh đại diện thành công!";
         }

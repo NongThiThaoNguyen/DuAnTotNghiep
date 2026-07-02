@@ -115,6 +115,11 @@ namespace DuAnTotNghiep.Controllers
                 new Claim("SessionToken", sessionToken)
             };
 
+            if (!string.IsNullOrEmpty(user.AvatarUrl))
+            {
+                claims.Add(new Claim("AvatarUrl", user.AvatarUrl));
+            }
+
             var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme, ClaimTypes.Name, ClaimTypes.Role);
 
             // Cấu hình properties cho Cookie
