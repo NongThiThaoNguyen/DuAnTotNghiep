@@ -29,10 +29,11 @@ namespace DuAnTotNghiep.Services.AI
             _usageLogService = usageLogService;
             _apiKey = config["AI:ApiKey"] ?? config["OpenAI:ApiKey"] ?? "";
             
-            string baseAddress = "https://api.openai.com/";
+            string baseAddress = "https://api.openai.com/v1/";
             if (!string.IsNullOrEmpty(config["AI:Endpoint"]))
             {
                 baseAddress = config["AI:Endpoint"];
+                if (!baseAddress.EndsWith("/")) baseAddress += "/";
             }
             else if (_apiKey.StartsWith("AIzaSy"))
             {
@@ -56,8 +57,10 @@ namespace DuAnTotNghiep.Services.AI
             
             var model = aiModel ?? "gpt-4o-mini";
             
-            bool isGemini = _apiKey.StartsWith("AIzaSy");
-            if (isGemini)
+            bool isGemini = _apiKey.StartsWith("AIzaSy") || 
+                            (!string.IsNullOrEmpty(_config["AI:Endpoint"]) && _config["AI:Endpoint"].Contains("generativelanguage"));
+            
+            if (isGemini || !string.IsNullOrEmpty(_config["AI:Model"]))
             {
                 if (!string.IsNullOrEmpty(_config["AI:Model"]))
                 {
@@ -65,11 +68,11 @@ namespace DuAnTotNghiep.Services.AI
                 }
                 else if (model.Contains("gpt-4o-mini") || model.Contains("gpt-3.5"))
                 {
-                    model = "gemini-1.5-flash";
+                    model = "gemini-2.5-flash";
                 }
                 else if (model.Contains("gpt-4"))
                 {
-                    model = "gemini-1.5-pro";
+                    model = "gemini-2.5-pro";
                 }
             }
 
@@ -89,7 +92,7 @@ namespace DuAnTotNghiep.Services.AI
                 var json = JsonSerializer.Serialize(request);
                 using var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                using var resp = await _http.PostAsync("v1/chat/completions", content, cancellationToken);
+                using var resp = await _http.PostAsync("chat/completions", content, cancellationToken);
                 resp.EnsureSuccessStatusCode();
                 var respText = await resp.Content.ReadAsStringAsync(cancellationToken);
 

@@ -135,7 +135,7 @@
                 function generateAiContent() {
                     const prompt = document.getElementById('aiPrompt').value;
                     if(!prompt) {
-                        alert("Vui lòng nhập chủ đề cho AI!");
+                        window.showToast('warning', 'Vui lòng nhập chủ đề cho AI!');
                         return;
                     }
                     
@@ -146,8 +146,12 @@
                     $.post('@Url.Action("GenerateAiContent", "Lessons", new { area = "Teacher" })', { prompt: prompt }, function(res) {
                         if(res.success && typeof tinymce !== 'undefined') {
                             tinymce.get('lessonContentEditor').setContent(res.content);
-                            alert("Đã tạo nội dung thành công! Bạn có thể chỉnh sửa thêm bên dưới.");
+                            window.showToast('success', 'Đã tạo nội dung thành công! Bạn có thể chỉnh sửa thêm bên dưới.');
+                        } else {
+                            window.showToast('error', res.message || 'Đã xảy ra lỗi khi tạo nội dung với AI.');
                         }
+                    }).fail(function() {
+                        window.showToast('error', 'Không thể kết nối đến máy chủ AI.');
                     }).always(function() {
                         btn.innerHTML = '<i class="fa-solid fa-bolt me-2"></i>Tạo nội dung';
                         btn.disabled = false;

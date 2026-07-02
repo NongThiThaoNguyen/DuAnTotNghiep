@@ -113,8 +113,9 @@ namespace DuAnTotNghiep.Services
             bool isFallback = false;
 
             var apiKey = _config["AI:ApiKey"] ?? _config["OpenAI:ApiKey"];
-            var isGemini = apiKey?.StartsWith("AIzaSy") == true;
-            var targetModel = isGemini ? (_config["AI:Model"] ?? "gemini-1.5-flash") : "gpt-4o-mini";
+            var isGemini = apiKey?.StartsWith("AIzaSy") == true || 
+                           (_config["AI:Endpoint"]?.Contains("generativelanguage") == true);
+            var targetModel = isGemini ? (_config["AI:Model"] ?? "gemini-2.5-flash") : (_config["AI:Model"] ?? "gpt-4o-mini");
 
             if (!string.IsNullOrWhiteSpace(apiKey))
             {
