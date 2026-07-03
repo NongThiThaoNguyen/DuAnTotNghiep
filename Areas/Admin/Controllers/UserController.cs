@@ -1,7 +1,9 @@
 using DuAnTotNghiep.Areas.Admin.ViewModels;
+using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace DuAnTotNghiep.Areas.Admin.Controllers
@@ -14,22 +16,111 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         private readonly IUserProfileService _profileService;
         private readonly ILearningProfileService _learningProfileService;
         private readonly DuAnTotNghiep.Models.Repositories.Interfaces.IAuditLogRepository _auditRepository;
+        private readonly ApplicationDbContext _context;
 
         public UserController(
             IUserService userService,
             IUserProfileService profileService,
             ILearningProfileService learningProfileService,
-            DuAnTotNghiep.Models.Repositories.Interfaces.IAuditLogRepository auditRepository)
+            DuAnTotNghiep.Models.Repositories.Interfaces.IAuditLogRepository auditRepository,
+            ApplicationDbContext context)
         {
             _userService = userService;
             _profileService = profileService;
             _learningProfileService = learningProfileService;
             _auditRepository = auditRepository;
+            _context = context;
         }
 
         public async Task<IActionResult> Index([FromQuery] UserFilterViewModel filter)
         {
             var model = await _userService.GetPagedUsersAsync(filter);
+            return View(model);
+        }
+
+        public async Task<IActionResult> StudentList(string? keyword, string? pathStatus, int? levelId, decimal? minAttendanceRate, int page = 1)
+        {
+            const int pageSize = 20;
+            page = Math.Max(1, page);
+
+            var query = _context.Users.AsNoTracking()
+                .Include(u => u.Role)
+                .Include(u => u.StudentLearningProfile)
+                    .ThenInclude(p => p!.CurrentLevel)
+                .Include(u => u.StudentLearningPaths)
+                .Where(u => u.Role.RoleCode == "STUDENT");
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(u => u.FullName.Contains(keyword) || u.Email.Contains(keyword));
+            }
+
+            if (levelId.HasValue)
+            {
+                query = query.Where(u => u.StudentLearningProfile != null && u.StudentLearningProfile.CurrentLevelId == levelId.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(pathStatus))
+            {
+                query = query.Where(u => u.StudentLearningPaths.Any(p => p.Status == pathStatus));
+            }
+
+            var students = await query.OrderByDescending(u => u.CreatedAt).ToListAsync();
+            var attendanceGroups = await _context.Attendances.AsNoTracking()
+                .GroupBy(a => a.StudentId)
+                .Select(g => new
+                {
+                    StudentId = g.Key,
+                    Total = g.Count(),
+                    Present = g.Count(a => a.Status == "PRESENT" || a.Status == "LATE")
+                })
+                .ToDictionaryAsync(x => x.StudentId);
+
+            var rows = students.Select(student =>
+            {
+                attendanceGroups.TryGetValue(student.Id, out var attendance);
+                var total = attendance?.Total ?? 0;
+                var rate = total == 0 ? 0 : Math.Round(attendance!.Present * 100m / total, 2);
+                var latestPath = student.StudentLearningPaths.OrderByDescending(p => p.UpdatedAt).FirstOrDefault();
+
+                return new StudentListItemViewModel
+                {
+                    Id = student.Id,
+                    FullName = student.FullName,
+                    Email = student.Email,
+                    Status = student.Status,
+                    LevelName = student.StudentLearningProfile?.CurrentLevel?.Name ?? "Chưa có",
+                    PathStatus = latestPath?.Status ?? "Chưa có",
+                    AttendanceRate = rate,
+                    CreatedAt = student.CreatedAt
+                };
+            });
+
+            if (minAttendanceRate.HasValue)
+            {
+                rows = rows.Where(row => row.AttendanceRate >= minAttendanceRate.Value);
+            }
+
+            var materializedRows = rows.ToList();
+            var model = new StudentManagementListViewModel
+            {
+                Keyword = keyword,
+                PathStatus = pathStatus,
+                LevelId = levelId,
+                MinAttendanceRate = minAttendanceRate,
+                CurrentPage = page,
+                PageSize = pageSize,
+                TotalItems = materializedRows.Count,
+                Levels = await _context.EnglishProficiencyLevels.AsNoTracking()
+                    .OrderBy(l => l.OrderIndex)
+                    .Select(l => new AdminOptionViewModel { Id = l.Id, Text = l.Name })
+                    .ToListAsync(),
+                Items = materializedRows
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList()
+            };
+
             return View(model);
         }
 

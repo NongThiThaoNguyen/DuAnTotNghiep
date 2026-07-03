@@ -1,0 +1,27 @@
+@model AssignmentManagementIndexViewModel
+@{
+    ViewData["Title"] = "Quản lý bài tập";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Quản lý bài tập toàn hệ thống</h1>
+    <form method="get" class="flex gap-3 bg-white border border-slate-200 rounded-xl p-4">
+        <select name="topicId" class="rounded-lg border-slate-300 text-sm"><option value="">Tất cả topic</option>@foreach (var topic in Model.Topics){<option value="@topic.Id">@topic.Text</option>}</select>
+        <button class="rounded-lg bg-blue-600 px-4 text-white text-sm font-semibold">Lọc</button>
+    </form>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Bài tập</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Submission</th><th class="px-4 py-3">Trạng thái</th><th></th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="px-4 py-3">@item.Title</td><td class="px-4 py-3">@item.TopicTitle</td><td class="px-4 py-3">@item.TeacherName</td><td class="px-4 py-3">@item.SubmissionCount</td><td class="px-4 py-3">@item.Status</td>
+                        <td class="px-4 py-3 text-right space-x-3"><a asp-action="Submissions" asp-route-assignmentId="@item.AssignmentId" class="text-blue-600 font-semibold">Submissions</a><form asp-action="Delete" method="post" class="inline"><input type="hidden" name="assignmentId" value="@item.AssignmentId" /><button class="text-red-600 font-semibold">Xóa</button></form></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

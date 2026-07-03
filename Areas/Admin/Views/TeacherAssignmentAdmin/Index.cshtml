@@ -1,0 +1,34 @@
+@model TeacherAssignmentIndexViewModel
+@{
+    ViewData["Title"] = "Phân công giáo viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-slate-900">Phân công giáo viên</h1>
+        <a asp-action="Create" class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-semibold">Tạo phân công</a>
+    </div>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Thời gian</th><th class="px-4 py-3">Lớp</th><th></th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="px-4 py-3">@item.TeacherName</td>
+                        <td class="px-4 py-3">@item.TopicTitle</td>
+                        <td class="px-4 py-3">@item.StartTime.ToString("dd/MM HH:mm") - @item.EndTime.ToString("HH:mm")</td>
+                        <td class="px-4 py-3">@item.Classroom</td>
+                        <td class="px-4 py-3 text-right">
+                            <form asp-action="Unassign" method="post">
+                                <input type="hidden" name="assignmentId" value="@item.AssignmentId" />
+                                <button class="text-red-600 font-semibold">Hủy</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -9,5 +9,8 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task<byte[]> ExportPlacementResultsToExcelAsync();
         Task<byte[]> ExportAuditLogsToExcelAsync(DateTime? from, DateTime? to);
         Task<byte[]> ExportAiUsageLogsToExcelAsync();
+        Task<byte[]> ExportStudentReportAsync(int? studentId);
+        Task<byte[]> ExportTeacherReportAsync(int? teacherId);
+        Task<byte[]> ExportAttendanceReportAsync();
     }
 }

@@ -12,10 +12,12 @@ namespace DuAnTotNghiep.Services
     public class ExportService : IExportService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IAdminReportService _reportService;
 
-        public ExportService(ApplicationDbContext context)
+        public ExportService(ApplicationDbContext context, IAdminReportService reportService)
         {
             _context = context;
+            _reportService = reportService;
         }
 
         public async Task<byte[]> ExportUsersToExcelAsync()
@@ -201,6 +203,114 @@ namespace DuAnTotNghiep.Services
 
             worksheet.Columns().AdjustToContents();
 
+            using var stream = new MemoryStream();
+            workbook.SaveAs(stream);
+            return stream.ToArray();
+        }
+
+        public async Task<byte[]> ExportStudentReportAsync(int? studentId)
+        {
+            var report = await _reportService.GetStudentProgressReportAsync();
+            var rows = studentId.HasValue
+                ? report.Items.Where(item => item.StudentId == studentId.Value).ToList()
+                : report.Items;
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Student Progress");
+            worksheet.Cell(1, 1).Value = "ID";
+            worksheet.Cell(1, 2).Value = "Học viên";
+            worksheet.Cell(1, 3).Value = "Email";
+            worksheet.Cell(1, 4).Value = "Trình độ";
+            worksheet.Cell(1, 5).Value = "Số lộ trình";
+            worksheet.Cell(1, 6).Value = "Đã hoàn thành";
+            worksheet.Cell(1, 7).Value = "Tiến độ TB";
+            StyleHeader(worksheet);
+
+            var row = 2;
+            foreach (var item in rows)
+            {
+                worksheet.Cell(row, 1).Value = item.StudentId;
+                worksheet.Cell(row, 2).Value = item.StudentName;
+                worksheet.Cell(row, 3).Value = item.Email;
+                worksheet.Cell(row, 4).Value = item.LevelName;
+                worksheet.Cell(row, 5).Value = item.LearningPathCount;
+                worksheet.Cell(row, 6).Value = item.CompletedPathCount;
+                worksheet.Cell(row, 7).Value = item.AverageProgress;
+                row++;
+            }
+
+            return SaveWorkbook(workbook, worksheet);
+        }
+
+        public async Task<byte[]> ExportTeacherReportAsync(int? teacherId)
+        {
+            var report = await _reportService.GetTeacherActivityReportAsync();
+            var rows = teacherId.HasValue
+                ? report.Items.Where(item => item.TeacherId == teacherId.Value).ToList()
+                : report.Items;
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Teacher Activity");
+            worksheet.Cell(1, 1).Value = "ID";
+            worksheet.Cell(1, 2).Value = "Giáo viên";
+            worksheet.Cell(1, 3).Value = "Topic";
+            worksheet.Cell(1, 4).Value = "Quiz";
+            worksheet.Cell(1, 5).Value = "Bài tập";
+            worksheet.Cell(1, 6).Value = "Tài liệu";
+            StyleHeader(worksheet);
+
+            var row = 2;
+            foreach (var item in rows)
+            {
+                worksheet.Cell(row, 1).Value = item.TeacherId;
+                worksheet.Cell(row, 2).Value = item.TeacherName;
+                worksheet.Cell(row, 3).Value = item.TopicCount;
+                worksheet.Cell(row, 4).Value = item.QuizCount;
+                worksheet.Cell(row, 5).Value = item.AssignmentCount;
+                worksheet.Cell(row, 6).Value = item.ResourceCount;
+                row++;
+            }
+
+            return SaveWorkbook(workbook, worksheet);
+        }
+
+        public async Task<byte[]> ExportAttendanceReportAsync()
+        {
+            var report = await _reportService.GetAttendanceSummaryAsync();
+
+            using var workbook = new XLWorkbook();
+            var worksheet = workbook.Worksheets.Add("Attendance Summary");
+            worksheet.Cell(1, 1).Value = "Topic";
+            worksheet.Cell(1, 2).Value = "Có mặt";
+            worksheet.Cell(1, 3).Value = "Vắng";
+            worksheet.Cell(1, 4).Value = "Đi muộn";
+            worksheet.Cell(1, 5).Value = "Tỷ lệ tham gia";
+            StyleHeader(worksheet);
+
+            var row = 2;
+            foreach (var item in report.Items)
+            {
+                worksheet.Cell(row, 1).Value = item.TopicTitle;
+                worksheet.Cell(row, 2).Value = item.PresentCount;
+                worksheet.Cell(row, 3).Value = item.AbsentCount;
+                worksheet.Cell(row, 4).Value = item.LateCount;
+                worksheet.Cell(row, 5).Value = item.AttendanceRate;
+                row++;
+            }
+
+            return SaveWorkbook(workbook, worksheet);
+        }
+
+        private static void StyleHeader(IXLWorksheet worksheet)
+        {
+            var headerRow = worksheet.Row(1);
+            headerRow.Style.Font.Bold = true;
+            headerRow.Style.Fill.BackgroundColor = XLColor.LightGray;
+        }
+
+        private static byte[] SaveWorkbook(XLWorkbook workbook, IXLWorksheet worksheet)
+        {
+            worksheet.Columns().AdjustToContents();
             using var stream = new MemoryStream();
             workbook.SaveAs(stream);
             return stream.ToArray();

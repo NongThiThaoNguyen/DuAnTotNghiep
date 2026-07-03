@@ -1,0 +1,15 @@
+@model QuizPerformanceReportViewModel
+@{
+    ViewData["Title"] = "Báo cáo quiz";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Báo cáo hiệu suất quiz</h1>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Quiz</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Attempts</th><th class="px-4 py-3">Điểm TB</th><th class="px-4 py-3">Pass rate</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">@foreach (var item in Model.Items){<tr><td class="px-4 py-3">@item.QuizTitle</td><td class="px-4 py-3">@item.TopicTitle</td><td class="px-4 py-3">@item.AttemptCount</td><td class="px-4 py-3">@item.AverageScore.ToString("0.##")</td><td class="px-4 py-3">@item.PassRate.ToString("0.##")%</td></tr>}</tbody>
+        </table>
+    </div>
+</div>

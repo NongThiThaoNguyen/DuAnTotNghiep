@@ -1,0 +1,68 @@
+@model StudentManagementListViewModel
+@{
+    ViewData["Title"] = "Quản lý học viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Quản lý học viên</h1>
+            <p class="text-sm text-slate-500">Theo dõi trạng thái lộ trình, trình độ và tỷ lệ điểm danh.</p>
+        </div>
+        <a asp-controller="Export" asp-action="ExportStudentReport" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">Xuất báo cáo</a>
+    </div>
+
+    <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-3 bg-white border border-slate-200 rounded-xl p-4">
+        <input name="keyword" value="@Model.Keyword" class="rounded-lg border-slate-300 text-sm" placeholder="Tên hoặc email" />
+        <select name="pathStatus" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Tất cả lộ trình</option>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="COMPLETED">COMPLETED</option>
+            <option value="PAUSED">PAUSED</option>
+        </select>
+        <select name="levelId" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Tất cả trình độ</option>
+            @foreach (var level in Model.Levels)
+            {
+                <option value="@level.Id">@level.Text</option>
+            }
+        </select>
+        <input name="minAttendanceRate" value="@Model.MinAttendanceRate" type="number" min="0" max="100" class="rounded-lg border-slate-300 text-sm" placeholder="Điểm danh tối thiểu %" />
+        <button class="rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+    </form>
+
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+                <tr>
+                    <th class="px-4 py-3">Học viên</th>
+                    <th class="px-4 py-3">Trình độ</th>
+                    <th class="px-4 py-3">Lộ trình</th>
+                    <th class="px-4 py-3">Điểm danh</th>
+                    <th class="px-4 py-3">Trạng thái</th>
+                    <th class="px-4 py-3"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="px-4 py-3">
+                            <div class="font-semibold text-slate-900">@item.FullName</div>
+                            <div class="text-xs text-slate-500">@item.Email</div>
+                        </td>
+                        <td class="px-4 py-3">@item.LevelName</td>
+                        <td class="px-4 py-3">@item.PathStatus</td>
+                        <td class="px-4 py-3">@item.AttendanceRate.ToString("0.##")%</td>
+                        <td class="px-4 py-3">@item.Status</td>
+                        <td class="px-4 py-3 text-right">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="text-blue-600 font-semibold">Chi tiết</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

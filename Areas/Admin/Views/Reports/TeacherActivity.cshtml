@@ -1,0 +1,15 @@
+@model TeacherActivityReportViewModel
+@{
+    ViewData["Title"] = "Báo cáo hoạt động giáo viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <div class="flex justify-between items-center"><h1 class="text-2xl font-bold text-slate-900">Báo cáo hoạt động giáo viên</h1><a asp-controller="Export" asp-action="ExportTeacherReport" class="px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold">Xuất Excel</a></div>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Quiz</th><th class="px-4 py-3">Bài tập</th><th class="px-4 py-3">Tài liệu</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">@foreach (var item in Model.Items){<tr><td class="px-4 py-3">@item.TeacherName</td><td class="px-4 py-3">@item.TopicCount</td><td class="px-4 py-3">@item.QuizCount</td><td class="px-4 py-3">@item.AssignmentCount</td><td class="px-4 py-3">@item.ResourceCount</td></tr>}</tbody>
+        </table>
+    </div>
+</div>

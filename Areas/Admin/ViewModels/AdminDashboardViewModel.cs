@@ -10,7 +10,13 @@ namespace DuAnTotNghiep.Areas.Admin.ViewModels
         public int TotalUsers { get; set; }
         public int TotalStudents { get; set; }
         public int TotalTeachers { get; set; }
+        public int TotalAdmins { get; set; }
         public int ActiveUsersToday { get; set; }
+        public int ActiveLearningStudents { get; set; }
+        public int CompletedLearningPaths { get; set; }
+        public int PlacementAttemptsLast30Days { get; set; }
+        public int UnreadNotifications { get; set; }
+        public decimal LearningPathCompletionRate { get; set; }
         public int TotalTopics { get; set; }
         public int TotalQuizzes { get; set; }
         public int TotalLessons { get; set; }
@@ -33,6 +39,7 @@ namespace DuAnTotNghiep.Areas.Admin.ViewModels
         public List<ChartItem> PlacementTestsOverTime { get; set; } = new();
         public List<ChartItem> AiAnalysisData { get; set; } = new();
         public List<ChartItem> LearningProgressData { get; set; } = new();
+        public List<ChartItem> LearningPathCompletionData { get; set; } = new();
         public List<ChartItem> RoleDistribution { get; set; } = new();
         public List<ChartItem> LevelDistribution { get; set; } = new();
 
@@ -70,5 +77,13 @@ namespace DuAnTotNghiep.Areas.Admin.ViewModels
     {
         public string Label { get; set; } = string.Empty;
         public double Value { get; set; }
+    }
+
+    public class LearningPathCompletionStatsViewModel
+    {
+        public int TotalPaths { get; set; }
+        public int CompletedPaths { get; set; }
+        public decimal CompletionRate { get; set; }
+        public List<ChartItem> Items { get; set; } = new();
     }
 }
