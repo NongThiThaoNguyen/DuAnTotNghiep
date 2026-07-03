@@ -1,0 +1,66 @@
+@model StudentAttendanceListViewModel
+@{
+    ViewData["Title"] = "Điểm danh học viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">Điểm danh học viên</h1>
+        <p class="text-sm text-slate-500">Xem lịch sử điểm danh theo học viên, topic và khoảng ngày.</p>
+    </div>
+
+    <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-3 bg-white border border-slate-200 rounded-xl p-4">
+        <select name="studentId" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Tất cả học viên</option>
+            @foreach (var student in Model.Students)
+            {
+                <option value="@student.Id">@student.Text</option>
+            }
+        </select>
+        <select name="topicId" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Tất cả topic</option>
+            @foreach (var topic in Model.Topics)
+            {
+                <option value="@topic.Id">@topic.Text</option>
+            }
+        </select>
+        <input type="date" name="from" value="@(Model.From?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
+        <input type="date" name="to" value="@(Model.To?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
+        <button class="rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+    </form>
+
+    @if (Model.StudentId.HasValue)
+    {
+        <a asp-action="Export" asp-route-studentId="@Model.StudentId" class="inline-flex px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">Xuất CSV học viên</a>
+    }
+
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+                <tr>
+                    <th class="px-4 py-3">Học viên</th>
+                    <th class="px-4 py-3">Topic</th>
+                    <th class="px-4 py-3">Ngày</th>
+                    <th class="px-4 py-3">Trạng thái</th>
+                    <th class="px-4 py-3">Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var row in Model.Items)
+                {
+                    <tr>
+                        <td class="px-4 py-3">
+                            <div class="font-semibold text-slate-900">@row.StudentName</div>
+                            <div class="text-xs text-slate-500">@row.StudentEmail</div>
+                        </td>
+                        <td class="px-4 py-3">@row.TopicTitle</td>
+                        <td class="px-4 py-3">@row.AttendanceDate.ToString("dd/MM/yyyy")</td>
+                        <td class="px-4 py-3"><span class="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold">@row.Status</span></td>
+                        <td class="px-4 py-3">@row.Remarks</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

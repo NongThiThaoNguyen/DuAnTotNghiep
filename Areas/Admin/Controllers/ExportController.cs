@@ -76,5 +76,50 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 return RedirectToAction("Index", "AiUsageLogs");
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportStudentReport(int? studentId)
+        {
+            try
+            {
+                var content = await _exportService.ExportStudentReportAsync(studentId);
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"StudentReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi xuất dữ liệu: " + ex.Message;
+                return RedirectToAction("StudentProgress", "Reports");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportTeacherReport(int? teacherId)
+        {
+            try
+            {
+                var content = await _exportService.ExportTeacherReportAsync(teacherId);
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"TeacherReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi xuất dữ liệu: " + ex.Message;
+                return RedirectToAction("TeacherActivity", "Reports");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportAttendanceReport()
+        {
+            try
+            {
+                var content = await _exportService.ExportAttendanceReportAsync();
+                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"AttendanceReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi xuất dữ liệu: " + ex.Message;
+                return RedirectToAction("AttendanceSummary", "Reports");
+            }
+        }
     }
 }

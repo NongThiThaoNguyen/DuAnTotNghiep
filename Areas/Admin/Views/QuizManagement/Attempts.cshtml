@@ -1,0 +1,21 @@
+@model QuizAttemptsAdminViewModel
+@{
+    ViewData["Title"] = "Lượt làm quiz";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <a asp-action="Index" class="text-sm font-semibold text-blue-600">Quay lại</a>
+    <h1 class="text-2xl font-bold text-slate-900">Attempts: @Model.QuizTitle</h1>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Học viên</th><th class="px-4 py-3">Điểm</th><th class="px-4 py-3">Trạng thái</th><th class="px-4 py-3">Bắt đầu</th><th class="px-4 py-3">Nộp</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var item in Model.Attempts)
+                {
+                    <tr><td class="px-4 py-3">@item.StudentName</td><td class="px-4 py-3">@(item.Score?.ToString("0.##") ?? "N/A")</td><td class="px-4 py-3">@item.Status</td><td class="px-4 py-3">@item.StartedAt.ToString("dd/MM/yyyy HH:mm")</td><td class="px-4 py-3">@(item.SubmittedAt?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

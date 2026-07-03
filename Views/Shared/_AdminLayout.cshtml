@@ -18,6 +18,16 @@
     {
         "Home" => "Tổng quan",
         "User" => "Quản lý tài khoản",
+        "StudentAttendance" => "Điểm danh học viên",
+        "StudentQuiz" => "Quiz học viên",
+        "StudentAssignment" => "Bài tập học viên",
+        "TeacherManagement" => "Quản lý giáo viên",
+        "TeacherAssignmentAdmin" => "Phân công giáo viên",
+        "TeacherResourceAdmin" => "Tài liệu giáo viên",
+        "QuizManagement" => "Quản lý quiz",
+        "AssignmentManagement" => "Quản lý bài tập",
+        "Reports" => "Báo cáo",
+        "ChatMonitor" => "Giám sát chat",
         "PlacementTests" => "Đề thi đầu vào",
         "PlacementAttempts" => "Lượt thi đầu vào",
         "LearningTopics" => "Chủ đề học tập",
@@ -593,6 +603,94 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                             </svg>
                             Quản lý tài khoản
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("User", "StudentList")" asp-area="Admin" asp-controller="User" asp-action="StudentList">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-4-4h-1M9 20H4v-2a4 4 0 014-4h1m0-4a4 4 0 100-8 4 4 0 000 8zm8 0a4 4 0 100-8 4 4 0 000 8z"></path>
+                            </svg>
+                            Học viên nâng cao
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("StudentAttendance")" asp-area="Admin" asp-controller="StudentAttendance" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v14H5V6a2 2 0 012-2z"></path>
+                            </svg>
+                            Điểm danh học viên
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("StudentQuiz")" asp-area="Admin" asp-controller="StudentQuiz" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5h6m-6 4h6m-6 4h3m-7 8h14a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            Quiz học viên
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("StudentAssignment")" asp-area="Admin" asp-controller="StudentAssignment" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 20h9M12 4h9M4 9h16M4 15h16M4 4h.01M4 20h.01"></path>
+                            </svg>
+                            Bài tập học viên
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("TeacherManagement")" asp-area="Admin" asp-controller="TeacherManagement" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0v6"></path>
+                            </svg>
+                            Quản lý giáo viên
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("TeacherAssignmentAdmin")" asp-area="Admin" asp-controller="TeacherAssignmentAdmin" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h8m-8 4h8m-8 4h5M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z"></path>
+                            </svg>
+                            Phân công giáo viên
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("TeacherResourceAdmin")" asp-area="Admin" asp-controller="TeacherResourceAdmin" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13"></path>
+                            </svg>
+                            Tài liệu giáo viên
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("QuizManagement")" asp-area="Admin" asp-controller="QuizManagement" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8M8 14h5m-8 7h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            Quản lý quiz
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("AssignmentManagement")" asp-area="Admin" asp-controller="AssignmentManagement" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M7 4h10a2 2 0 012 2v12a2 2 0 01-2 2H7a2 2 0 01-2-2V6a2 2 0 012-2z"></path>
+                            </svg>
+                            Quản lý bài tập
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("Reports")" asp-area="Admin" asp-controller="Reports" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-6m4 6V7m4 10v-4M5 20h14"></path>
+                            </svg>
+                            Báo cáo tổng hợp
+                        </a>
+                    </li>
+                    <li>
+                        <a class="@NavClass("ChatMonitor")" asp-area="Admin" asp-controller="ChatMonitor" asp-action="Index">
+                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h8m-8 4h5m-9 6l2-4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2"></path>
+                            </svg>
+                            Giám sát chat
                         </a>
                     </li>
                     <li>

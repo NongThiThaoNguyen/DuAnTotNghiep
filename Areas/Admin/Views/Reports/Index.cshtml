@@ -1,0 +1,15 @@
+@model AdminReportsIndexViewModel
+@{
+    ViewData["Title"] = "Báo cáo Admin";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Báo cáo Admin</h1>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <a asp-action="StudentProgress" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300"><div class="text-sm text-slate-500">Học viên</div><div class="text-2xl font-bold">@Model.StudentCount</div></a>
+        <a asp-action="TeacherActivity" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300"><div class="text-sm text-slate-500">Giáo viên</div><div class="text-2xl font-bold">@Model.TeacherCount</div></a>
+        <a asp-action="AttendanceSummary" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300"><div class="text-sm text-slate-500">Điểm danh</div><div class="text-2xl font-bold">@Model.AttendanceCount</div></a>
+        <a asp-action="QuizPerformance" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300"><div class="text-sm text-slate-500">Quiz attempts</div><div class="text-2xl font-bold">@Model.QuizAttemptCount</div></a>
+    </div>
+</div>

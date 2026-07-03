@@ -1,0 +1,37 @@
+@model QuizManagementIndexViewModel
+@{
+    ViewData["Title"] = "Quản lý quiz";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Quản lý quiz toàn hệ thống</h1>
+    <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white border border-slate-200 rounded-xl p-4">
+        <select name="topicId" class="rounded-lg border-slate-300 text-sm"><option value="">Tất cả topic</option>@foreach (var topic in Model.Topics){<option value="@topic.Id">@topic.Text</option>}</select>
+        <select name="teacherId" class="rounded-lg border-slate-300 text-sm"><option value="">Tất cả giáo viên</option>@foreach (var teacher in Model.Teachers){<option value="@teacher.Id">@teacher.Text</option>}</select>
+        <button class="rounded-lg bg-blue-600 text-white text-sm font-semibold">Lọc</button>
+    </form>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Quiz</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Câu hỏi</th><th class="px-4 py-3">Attempts</th><th class="px-4 py-3">Điểm TB</th><th></th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="px-4 py-3"><div class="font-semibold">@item.Title</div><div class="text-xs text-slate-500">@item.Status</div></td>
+                        <td class="px-4 py-3">@item.TopicTitle</td>
+                        <td class="px-4 py-3">@item.TeacherName</td>
+                        <td class="px-4 py-3">@item.QuestionCount</td>
+                        <td class="px-4 py-3">@item.AttemptCount</td>
+                        <td class="px-4 py-3">@item.AverageScore.ToString("0.##")</td>
+                        <td class="px-4 py-3 text-right space-x-3">
+                            <a asp-action="Details" asp-route-quizId="@item.QuizId" class="text-blue-600 font-semibold">Chi tiết</a>
+                            <a asp-action="Attempts" asp-route-quizId="@item.QuizId" class="text-emerald-600 font-semibold">Attempts</a>
+                            <form asp-action="Delete" method="post" class="inline"><input type="hidden" name="quizId" value="@item.QuizId" /><button class="text-red-600 font-semibold">Xóa</button></form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

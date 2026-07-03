@@ -95,6 +95,11 @@ builder.Services.AddScoped<IEnglishProficiencyLevelService, EnglishProficiencyLe
 builder.Services.AddScoped<IStudentProgressService, StudentProgressService>();
 builder.Services.AddScoped<IProgressTrackingService, ProgressTrackingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IAdminDashboardService, AdminDashboardService>();
+builder.Services.AddScoped<IAdminTeacherManagementService, AdminTeacherManagementService>();
+builder.Services.AddScoped<IAdminQuizManagementService, AdminQuizManagementService>();
+builder.Services.AddScoped<IAdminReportService, AdminReportService>();
+builder.Services.AddScoped<IAdminChatMonitorService, AdminChatMonitorService>();
 builder.Services.AddScoped<IPathViewService, PathViewService>();
 builder.Services.AddScoped<IStudyPlanService, StudyPlanService>();
 builder.Services.AddScoped<IStudentDashboardService, StudentDashboardService>();

@@ -9,16 +9,16 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
     [Authorize(Roles = "ADMIN")]
     public class HomeController : Controller
     {
-        private readonly IDashboardService _dashboardService;
+        private readonly IAdminDashboardService _dashboardService;
 
-        public HomeController(IDashboardService dashboardService)
+        public HomeController(IAdminDashboardService dashboardService)
         {
             _dashboardService = dashboardService;
         }
 
         public async Task<IActionResult> Index()
         {
-            var viewModel = await _dashboardService.GetDashboardDataAsync();
+            var viewModel = await _dashboardService.GetSystemOverviewAsync();
             return View(viewModel);
         }
     }

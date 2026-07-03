@@ -1,0 +1,16 @@
+@model List<TeacherStudentChatRowViewModel>
+@{
+    ViewData["Title"] = "Chat giáo viên - học viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <a asp-action="Index" class="text-sm font-semibold text-blue-600">Quay lại</a>
+    <h1 class="text-2xl font-bold text-slate-900">Chat giáo viên - học viên</h1>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Học viên</th><th class="px-4 py-3">Số tin</th><th class="px-4 py-3">Lần cuối</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">@foreach (var item in Model){<tr><td class="px-4 py-3">@item.TeacherName</td><td class="px-4 py-3">@item.StudentName</td><td class="px-4 py-3">@item.MessageCount</td><td class="px-4 py-3">@item.LastMessageAt.ToString("dd/MM/yyyy HH:mm")</td></tr>}</tbody>
+        </table>
+    </div>
+</div>

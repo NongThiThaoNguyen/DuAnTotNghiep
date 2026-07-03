@@ -1,0 +1,32 @@
+@model TeacherManagementIndexViewModel
+@{
+    ViewData["Title"] = "Quản lý giáo viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Quản lý giáo viên</h1>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+                <tr><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Quiz</th><th class="px-4 py-3">Tài liệu</th><th class="px-4 py-3">Trạng thái</th><th></th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var teacher in Model.Items)
+                {
+                    <tr>
+                        <td class="px-4 py-3"><div class="font-semibold">@teacher.FullName</div><div class="text-xs text-slate-500">@teacher.Email</div></td>
+                        <td class="px-4 py-3">@teacher.AssignedTopicCount</td>
+                        <td class="px-4 py-3">@teacher.QuizCount</td>
+                        <td class="px-4 py-3">@teacher.ResourceCount</td>
+                        <td class="px-4 py-3">@teacher.Status</td>
+                        <td class="px-4 py-3 text-right space-x-3">
+                            <a asp-action="Profile" asp-route-teacherId="@teacher.TeacherId" class="text-blue-600 font-semibold">Hồ sơ</a>
+                            <a asp-action="Performance" asp-route-teacherId="@teacher.TeacherId" class="text-emerald-600 font-semibold">Hiệu suất</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

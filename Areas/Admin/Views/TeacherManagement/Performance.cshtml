@@ -1,0 +1,19 @@
+@model TeacherPerformanceAdminViewModel
+@{
+    ViewData["Title"] = "Hiệu suất giáo viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <a asp-action="Index" class="text-sm font-semibold text-blue-600">Quay lại</a>
+    <h1 class="text-2xl font-bold text-slate-900">Hiệu suất @Model.TeacherName</h1>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-5"><div class="text-sm text-slate-500">Học viên</div><div class="text-2xl font-bold">@Model.StudentCount</div></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5"><div class="text-sm text-slate-500">Topic</div><div class="text-2xl font-bold">@Model.AssignedTopicCount</div></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5"><div class="text-sm text-slate-500">Quiz</div><div class="text-2xl font-bold">@Model.QuizCount</div></div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5"><div class="text-sm text-slate-500">Điểm TB submission</div><div class="text-2xl font-bold">@Model.AverageSubmissionScore.ToString("0.##")</div></div>
+    </div>
+    <div class="bg-white border border-slate-200 rounded-xl p-5 text-sm">
+        Bài tập: <strong>@Model.AssignmentCount</strong> | Submission đã chấm: <strong>@Model.GradedSubmissionCount</strong> | Lộ trình hoàn thành của học viên liên quan: <strong>@Model.CompletedLearningPaths</strong>
+    </div>
+</div>

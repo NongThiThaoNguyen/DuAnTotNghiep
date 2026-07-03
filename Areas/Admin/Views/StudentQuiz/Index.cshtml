@@ -1,0 +1,39 @@
+@model StudentQuizListViewModel
+@{
+    ViewData["Title"] = "Quiz attempts học viên";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Quiz attempts học viên</h1>
+    <form method="get" class="flex gap-3 bg-white border border-slate-200 rounded-xl p-4">
+        <select name="studentId" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Tất cả học viên</option>
+            @foreach (var student in Model.Students)
+            {
+                <option value="@student.Id">@student.Text</option>
+            }
+        </select>
+        <button class="rounded-lg bg-blue-600 px-4 text-white text-sm font-semibold">Lọc</button>
+    </form>
+    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
+                <tr><th class="px-4 py-3">Học viên</th><th class="px-4 py-3">Quiz</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Điểm</th><th class="px-4 py-3">Trạng thái</th><th></th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td class="px-4 py-3">@item.StudentName</td>
+                        <td class="px-4 py-3">@item.QuizTitle</td>
+                        <td class="px-4 py-3">@item.TopicTitle</td>
+                        <td class="px-4 py-3">@(item.Score?.ToString("0.##") ?? "N/A")</td>
+                        <td class="px-4 py-3">@item.Status</td>
+                        <td class="px-4 py-3 text-right"><a asp-action="Details" asp-route-attemptId="@item.Id" class="text-blue-600 font-semibold">Chi tiết</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

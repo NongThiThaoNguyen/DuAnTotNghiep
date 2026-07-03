@@ -1,0 +1,15 @@
+@model ChatStatsViewModel
+@{
+    ViewData["Title"] = "Giám sát chat";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6">
+    <h1 class="text-2xl font-bold text-slate-900">Giám sát chat</h1>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <a asp-action="TeacherChats" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300"><div class="text-sm text-slate-500">Teacher-Student chats</div><div class="text-2xl font-bold">@Model.TeacherStudentConversationCount</div></a>
+        <div class="bg-white border border-slate-200 rounded-xl p-5"><div class="text-sm text-slate-500">Tin nhắn lớp học</div><div class="text-2xl font-bold">@Model.TeacherStudentMessageCount</div></div>
+        <a asp-action="AiTutorSessions" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300"><div class="text-sm text-slate-500">AI Tutor sessions</div><div class="text-2xl font-bold">@Model.AiTutorSessionCount</div></a>
+        <div class="bg-white border border-slate-200 rounded-xl p-5"><div class="text-sm text-slate-500">AI messages</div><div class="text-2xl font-bold">@Model.AiTutorMessageCount</div></div>
+    </div>
+</div>
