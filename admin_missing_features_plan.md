@@ -153,11 +153,11 @@
   - `GetTeacherListAsync()`: DS giáo viên với số liệu tóm tắt
   - `GetTeacherProfileAsync(int teacherId)`: Hồ sơ chuyên môn
   - `GetTeacherPerformanceAsync(int teacherId)`: Số liệu hiệu suất
-- [x] **3.4** Tạo `Areas/Admin/Controllers/TeacherAssignmentAdminController.cs`
-  - `Index()`: Xem các phân công hiện tại (giáo viên dạy topic nào)
-  - `Assign(int teacherId, int topicId)`: Giao topic cho giáo viên
-  - `Unassign(int assignmentId)`: Hủy phân công
-- [x] **3.5** Tạo `Areas/Admin/Views/TeacherAssignmentAdmin/` (Index, Create)
+- [x] **3.4** Hợp nhất phân công giáo viên vào `TeacherSchedulesController`
+  - Dùng `TeacherSchedules` làm màn quản lý duy nhất cho phân công/lịch dạy
+  - Tránh module `TeacherAssignmentAdmin` trùng chức năng, thao tác trực tiếp vào cùng bảng `Schedules`
+- [x] **3.5** Bỏ màn `TeacherAssignmentAdmin/` riêng
+  - Admin tạo/sửa/xóa phân công tại `Admin/TeacherSchedules`
 - [x] **3.6** Tạo `Areas/Admin/Controllers/TeacherResourceAdminController.cs`
   - `Index(int? teacherId)`: Xem tất cả tài liệu mà giáo viên đã upload
   - `Delete(int resourceId)`: Xóa tài liệu vi phạm

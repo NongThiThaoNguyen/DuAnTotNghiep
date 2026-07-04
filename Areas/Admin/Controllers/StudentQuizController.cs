@@ -10,6 +10,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers;
 [Authorize(Roles = "ADMIN")]
 public class StudentQuizController : Controller
 {
+    private const int PageSize = 20;
     private readonly ApplicationDbContext _context;
 
     public StudentQuizController(ApplicationDbContext context)
@@ -17,8 +18,9 @@ public class StudentQuizController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(int? studentId)
+    public async Task<IActionResult> Index(int? studentId, int page = 1)
     {
+        page = Math.Max(page, 1);
         var query = _context.QuizAttempts.AsNoTracking()
             .Include(a => a.Student)
             .Include(a => a.Quiz)
@@ -30,12 +32,21 @@ public class StudentQuizController : Controller
             query = query.Where(a => a.StudentId == studentId.Value);
         }
 
+        var totalItems = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)PageSize));
+        page = Math.Min(page, totalPages);
+
         var model = new StudentQuizListViewModel
         {
             StudentId = studentId,
+            CurrentPage = page,
+            PageSize = PageSize,
+            TotalItems = totalItems,
             Students = await GetStudentOptionsAsync(),
             Items = await query
                 .OrderByDescending(a => a.StartedAt)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
                 .Select(a => new StudentQuizAttemptRowViewModel
                 {
                     Id = a.Id,

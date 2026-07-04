@@ -2,6 +2,19 @@
 @{
     ViewData["Title"] = "Điểm danh học viên";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var firstItem = Model.TotalItems == 0 ? 0 : ((Model.CurrentPage - 1) * Model.PageSize) + 1;
+    var lastItem = Math.Min(Model.TotalItems, Model.CurrentPage * Model.PageSize);
+
+    string StatusBadgeClass(string status)
+    {
+        return (status ?? string.Empty).Trim().ToUpperInvariant() switch
+        {
+            "PRESENT" => "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+            "LATE" => "bg-amber-50 text-amber-700 ring-1 ring-amber-200",
+            "ABSENT" => "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
+            _ => "bg-slate-100 text-slate-700 ring-1 ring-slate-200"
+        };
+    }
 }
 
 <div class="space-y-6">
@@ -10,32 +23,38 @@
         <p class="text-sm text-slate-500">Xem lịch sử điểm danh theo học viên, topic và khoảng ngày.</p>
     </div>
 
-    <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-3 bg-white border border-slate-200 rounded-xl p-4">
-        <select name="studentId" class="rounded-lg border-slate-300 text-sm">
+    <form method="get" class="grid grid-cols-1 md:grid-cols-6 gap-3 bg-white border border-slate-200 rounded-xl p-4">
+        <select name="studentId" class="rounded-lg border-slate-300 text-sm md:col-span-2">
             <option value="">Tất cả học viên</option>
             @foreach (var student in Model.Students)
             {
-                <option value="@student.Id">@student.Text</option>
+                <option value="@student.Id" selected="@(Model.StudentId == student.Id ? "selected" : null)">@student.Text</option>
             }
         </select>
-        <select name="topicId" class="rounded-lg border-slate-300 text-sm">
+        <select name="topicId" class="rounded-lg border-slate-300 text-sm md:col-span-2">
             <option value="">Tất cả topic</option>
             @foreach (var topic in Model.Topics)
             {
-                <option value="@topic.Id">@topic.Text</option>
+                <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
             }
         </select>
         <input type="date" name="from" value="@(Model.From?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
         <input type="date" name="to" value="@(Model.To?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
-        <button class="rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+        <div class="md:col-span-6 flex flex-wrap items-center gap-2">
+            <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+            <a asp-action="Index" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa lọc</a>
+        </div>
     </form>
 
-    @if (Model.StudentId.HasValue)
-    {
-        <a asp-action="Export" asp-route-studentId="@Model.StudentId" class="inline-flex px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">Xuất CSV học viên</a>
-    }
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems bản ghi.</p>
+        @if (Model.StudentId.HasValue)
+        {
+            <a asp-action="Export" asp-route-studentId="@Model.StudentId" class="inline-flex px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700">Xuất CSV học viên</a>
+        }
+    </div>
 
-    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+    <div class="overflow-x-auto bg-white border border-slate-200 rounded-xl">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500">
                 <tr>
@@ -47,20 +66,52 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                @foreach (var row in Model.Items)
+                @if (Model.Items.Any())
+                {
+                    @foreach (var row in Model.Items)
+                    {
+                        <tr>
+                            <td class="px-4 py-3">
+                                <div class="font-semibold text-slate-900">@row.StudentName</div>
+                                <div class="text-xs text-slate-500">@row.StudentEmail</div>
+                            </td>
+                            <td class="px-4 py-3">@row.TopicTitle</td>
+                            <td class="px-4 py-3">@row.AttendanceDate.ToString("dd/MM/yyyy")</td>
+                            <td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs font-semibold @StatusBadgeClass(row.Status)">@row.Status</span></td>
+                            <td class="px-4 py-3 text-slate-600">@(string.IsNullOrWhiteSpace(row.Remarks) ? "Không có ghi chú" : row.Remarks)</td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td class="px-4 py-3">
-                            <div class="font-semibold text-slate-900">@row.StudentName</div>
-                            <div class="text-xs text-slate-500">@row.StudentEmail</div>
+                        <td colspan="5" class="px-4 py-10 text-center text-slate-500">
+                            Không có bản ghi điểm danh phù hợp với bộ lọc hiện tại.
                         </td>
-                        <td class="px-4 py-3">@row.TopicTitle</td>
-                        <td class="px-4 py-3">@row.AttendanceDate.ToString("dd/MM/yyyy")</td>
-                        <td class="px-4 py-3"><span class="rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold">@row.Status</span></td>
-                        <td class="px-4 py-3">@row.Remarks</td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            <a asp-action="Index"
+               asp-route-studentId="@Model.StudentId"
+               asp-route-topicId="@Model.TopicId"
+               asp-route-from="@(Model.From?.ToString("yyyy-MM-dd"))"
+               asp-route-to="@(Model.To?.ToString("yyyy-MM-dd"))"
+               asp-route-page="@(Model.CurrentPage - 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage <= 1 ? "pointer-events-none opacity-40" : "")">Trước</a>
+            <span class="font-medium text-slate-500">Trang @Model.CurrentPage / @Model.TotalPages</span>
+            <a asp-action="Index"
+               asp-route-studentId="@Model.StudentId"
+               asp-route-topicId="@Model.TopicId"
+               asp-route-from="@(Model.From?.ToString("yyyy-MM-dd"))"
+               asp-route-to="@(Model.To?.ToString("yyyy-MM-dd"))"
+               asp-route-page="@(Model.CurrentPage + 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage >= Model.TotalPages ? "pointer-events-none opacity-40" : "")">Sau</a>
+        </div>
+    }
 </div>

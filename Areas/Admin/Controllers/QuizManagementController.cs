@@ -10,6 +10,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers;
 [Authorize(Roles = "ADMIN")]
 public class QuizManagementController : Controller
 {
+    private const int PageSize = 20;
     private readonly IAdminQuizManagementService _quizManagementService;
     private readonly ApplicationDbContext _context;
 
@@ -19,9 +20,9 @@ public class QuizManagementController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(int? topicId, int? teacherId)
+    public async Task<IActionResult> Index(int? topicId, int? teacherId, int page = 1)
     {
-        return View(await _quizManagementService.GetAllQuizzesAsync(topicId, teacherId));
+        return View(await _quizManagementService.GetAllQuizzesAsync(topicId, teacherId, page, PageSize));
     }
 
     public async Task<IActionResult> Details(int quizId)

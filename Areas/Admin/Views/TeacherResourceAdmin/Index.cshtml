@@ -2,41 +2,112 @@
 @{
     ViewData["Title"] = "Tài liệu giáo viên";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var firstItem = Model.TotalItems == 0 ? 0 : ((Model.CurrentPage - 1) * Model.PageSize) + 1;
+    var lastItem = Math.Min(Model.TotalItems, Model.CurrentPage * Model.PageSize);
+
+    string StatusBadgeClass(string status)
+    {
+        return (status ?? string.Empty).Trim().ToUpperInvariant() switch
+        {
+            "APPROVED" => "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+            "PENDING" or "SUBMITTED" => "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
+            "REJECTED" => "bg-rose-50 text-rose-700 ring-1 ring-rose-200",
+            "ARCHIVED" => "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
+            _ => "bg-slate-100 text-slate-700 ring-1 ring-slate-200"
+        };
+    }
 }
 
 <div class="space-y-6">
-    <h1 class="text-2xl font-bold text-slate-900">Tài liệu giáo viên</h1>
-    <form method="get" class="flex gap-3 bg-white border border-slate-200 rounded-xl p-4">
-        <select name="teacherId" class="rounded-lg border-slate-300 text-sm">
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">Tài liệu giáo viên</h1>
+        <p class="text-sm text-slate-500">Duyệt, từ chối hoặc lưu trữ tài liệu do giáo viên thêm vào hệ thống.</p>
+    </div>
+
+    <form method="get" class="flex flex-col gap-3 bg-white border border-slate-200 rounded-xl p-4 sm:flex-row sm:items-center">
+        <select name="teacherId" class="rounded-lg border-slate-300 text-sm sm:min-w-72">
             <option value="">Tất cả giáo viên</option>
             @foreach (var teacher in Model.Teachers)
             {
-                <option value="@teacher.Id">@teacher.Text</option>
+                <option value="@teacher.Id" selected="@(Model.TeacherId == teacher.Id ? "selected" : null)">@teacher.Text</option>
             }
         </select>
-        <button class="rounded-lg bg-blue-600 px-4 text-white text-sm font-semibold">Lọc</button>
+        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+        <a asp-action="Index" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa lọc</a>
     </form>
-    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+
+    <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems tài liệu.</p>
+
+    <div class="overflow-x-auto bg-white border border-slate-200 rounded-xl">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
-            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Tài liệu</th><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Loại</th><th class="px-4 py-3">Trạng thái</th><th></th></tr></thead>
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Tài liệu</th><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Loại</th><th class="px-4 py-3">Trạng thái</th><th class="px-4 py-3">Ngày tạo</th><th class="px-4 py-3 text-right">Thao tác</th></tr></thead>
             <tbody class="divide-y divide-slate-100">
-                @foreach (var item in Model.Items)
+                @if (Model.Items.Any())
+                {
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="px-4 py-3">
+                                <div class="font-semibold text-slate-900">@item.SourceName</div>
+                                @if (!string.IsNullOrWhiteSpace(item.SourceUrl))
+                                {
+                                    <a href="@item.SourceUrl" target="_blank" rel="noopener noreferrer" class="text-xs text-blue-600 hover:text-blue-700">@item.SourceUrl</a>
+                                }
+                                else
+                                {
+                                    <span class="text-xs text-slate-400">Không có URL</span>
+                                }
+                            </td>
+                            <td class="px-4 py-3">@item.CreatedByName</td>
+                            <td class="px-4 py-3">@item.SourceType</td>
+                            <td class="px-4 py-3"><span class="rounded-full px-2 py-1 text-xs font-semibold @StatusBadgeClass(item.Status)">@item.Status</span></td>
+                            <td class="px-4 py-3 text-slate-500">@item.CreatedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex justify-end gap-3 whitespace-nowrap">
+                                    <form asp-action="Approve" method="post" onsubmit="return confirm('Duyệt tài liệu này?');">
+                                        <input type="hidden" name="resourceId" value="@item.ResourceId" />
+                                        <input type="hidden" name="teacherId" value="@Model.TeacherId" />
+                                        <button type="submit" class="text-emerald-600 font-semibold hover:text-emerald-700 whitespace-nowrap">Duyệt</button>
+                                    </form>
+                                    <form asp-action="Reject" method="post" onsubmit="return confirm('Từ chối tài liệu này?');">
+                                        <input type="hidden" name="resourceId" value="@item.ResourceId" />
+                                        <input type="hidden" name="teacherId" value="@Model.TeacherId" />
+                                        <button type="submit" class="text-amber-600 font-semibold hover:text-amber-700 whitespace-nowrap">Từ chối</button>
+                                    </form>
+                                    <form asp-action="Delete" method="post" onsubmit="return confirm('Lưu trữ tài liệu này? Tài liệu sẽ không bị xóa khỏi lịch sử.');">
+                                        <input type="hidden" name="resourceId" value="@item.ResourceId" />
+                                        <input type="hidden" name="teacherId" value="@Model.TeacherId" />
+                                        <button type="submit" class="text-red-600 font-semibold hover:text-red-700 whitespace-nowrap">Lưu trữ</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td class="px-4 py-3"><div class="font-semibold">@item.SourceName</div><a href="@item.SourceUrl" target="_blank" class="text-xs text-blue-600">@item.SourceUrl</a></td>
-                        <td class="px-4 py-3">@item.CreatedByName</td>
-                        <td class="px-4 py-3">@item.SourceType</td>
-                        <td class="px-4 py-3">@item.Status</td>
-                        <td class="px-4 py-3">
-                            <div class="flex justify-end gap-2">
-                                <form asp-action="Approve" method="post"><input type="hidden" name="resourceId" value="@item.ResourceId" /><button class="text-emerald-600 font-semibold">Duyệt</button></form>
-                                <form asp-action="Reject" method="post"><input type="hidden" name="resourceId" value="@item.ResourceId" /><button class="text-amber-600 font-semibold">Từ chối</button></form>
-                                <form asp-action="Delete" method="post"><input type="hidden" name="resourceId" value="@item.ResourceId" /><button class="text-red-600 font-semibold">Xóa</button></form>
-                            </div>
+                        <td colspan="6" class="px-4 py-10 text-center text-slate-500">
+                            Không có tài liệu giáo viên phù hợp với bộ lọc hiện tại.
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            <a asp-action="Index"
+               asp-route-teacherId="@Model.TeacherId"
+               asp-route-page="@(Model.CurrentPage - 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage <= 1 ? "pointer-events-none opacity-40" : "")">Trước</a>
+            <span class="font-medium text-slate-500">Trang @Model.CurrentPage / @Model.TotalPages</span>
+            <a asp-action="Index"
+               asp-route-teacherId="@Model.TeacherId"
+               asp-route-page="@(Model.CurrentPage + 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage >= Model.TotalPages ? "pointer-events-none opacity-40" : "")">Sau</a>
+        </div>
+    }
 </div>

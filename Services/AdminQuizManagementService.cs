@@ -14,8 +14,10 @@ public class AdminQuizManagementService : IAdminQuizManagementService
         _context = context;
     }
 
-    public async Task<QuizManagementIndexViewModel> GetAllQuizzesAsync(int? topicId = null, int? teacherId = null)
+    public async Task<QuizManagementIndexViewModel> GetAllQuizzesAsync(int? topicId = null, int? teacherId = null, int page = 1, int pageSize = 20)
     {
+        page = Math.Max(page, 1);
+        pageSize = Math.Clamp(pageSize, 1, 100);
         var query = _context.Quizzes.AsNoTracking()
             .Include(q => q.Topic)
             .Include(q => q.CreatedByNavigation)
@@ -33,14 +35,23 @@ public class AdminQuizManagementService : IAdminQuizManagementService
             query = query.Where(q => q.CreatedBy == teacherId.Value);
         }
 
+        var totalItems = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)pageSize));
+        page = Math.Min(page, totalPages);
+
         var quizzes = await query
             .OrderByDescending(q => q.CreatedAt)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
         return new QuizManagementIndexViewModel
         {
             TopicId = topicId,
             TeacherId = teacherId,
+            CurrentPage = page,
+            PageSize = pageSize,
+            TotalItems = totalItems,
             Topics = await GetTopicOptionsAsync(),
             Teachers = await GetTeacherOptionsAsync(),
             Items = quizzes.Select(quiz => new QuizManagementRowViewModel

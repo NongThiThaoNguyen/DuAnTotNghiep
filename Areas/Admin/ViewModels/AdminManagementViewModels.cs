@@ -49,7 +49,7 @@ public class StudentAttendanceRowViewModel
     public string? Remarks { get; set; }
 }
 
-public class StudentAttendanceListViewModel
+public class StudentAttendanceListViewModel : AdminPagedViewModel
 {
     public int? StudentId { get; set; }
     public int? TopicId { get; set; }
@@ -72,7 +72,7 @@ public class StudentQuizAttemptRowViewModel
     public DateTime? SubmittedAt { get; set; }
 }
 
-public class StudentQuizListViewModel
+public class StudentQuizListViewModel : AdminPagedViewModel
 {
     public int? StudentId { get; set; }
     public List<AdminOptionViewModel> Students { get; set; } = new();
@@ -112,7 +112,7 @@ public class StudentAssignmentRowViewModel
     public DateTime SubmittedAt { get; set; }
 }
 
-public class StudentAssignmentListViewModel
+public class StudentAssignmentListViewModel : AdminPagedViewModel
 {
     public int? StudentId { get; set; }
     public List<AdminOptionViewModel> Students { get; set; } = new();
@@ -180,36 +180,6 @@ public class TeacherPerformanceAdminViewModel
     public int CompletedLearningPaths { get; set; }
 }
 
-public class TeacherAssignmentRowViewModel
-{
-    public int AssignmentId { get; set; }
-    public int TeacherId { get; set; }
-    public string TeacherName { get; set; } = string.Empty;
-    public int? TopicId { get; set; }
-    public string TopicTitle { get; set; } = "Chưa gắn topic";
-    public string Title { get; set; } = string.Empty;
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public string? Classroom { get; set; }
-}
-
-public class TeacherAssignmentIndexViewModel
-{
-    public List<TeacherAssignmentRowViewModel> Items { get; set; } = new();
-}
-
-public class TeacherAssignmentCreateViewModel
-{
-    public int TeacherId { get; set; }
-    public int TopicId { get; set; }
-    public string Title { get; set; } = string.Empty;
-    public DateTime StartTime { get; set; } = DateTime.Today.AddHours(8);
-    public DateTime EndTime { get; set; } = DateTime.Today.AddHours(9);
-    public string? Classroom { get; set; }
-    public List<AdminOptionViewModel> Teachers { get; set; } = new();
-    public List<AdminOptionViewModel> Topics { get; set; } = new();
-}
-
 public class TeacherResourceRowViewModel
 {
     public int ResourceId { get; set; }
@@ -221,7 +191,7 @@ public class TeacherResourceRowViewModel
     public DateTime CreatedAt { get; set; }
 }
 
-public class TeacherResourceAdminIndexViewModel
+public class TeacherResourceAdminIndexViewModel : AdminPagedViewModel
 {
     public int? TeacherId { get; set; }
     public List<AdminOptionViewModel> Teachers { get; set; } = new();
@@ -240,7 +210,7 @@ public class QuizManagementRowViewModel
     public decimal AverageScore { get; set; }
 }
 
-public class QuizManagementIndexViewModel
+public class QuizManagementIndexViewModel : AdminPagedViewModel
 {
     public int? TopicId { get; set; }
     public int? TeacherId { get; set; }
@@ -288,7 +258,7 @@ public class AssignmentManagementRowViewModel
     public DateTime CreatedAt { get; set; }
 }
 
-public class AssignmentManagementIndexViewModel
+public class AssignmentManagementIndexViewModel : AdminPagedViewModel
 {
     public int? TopicId { get; set; }
     public List<AdminOptionViewModel> Topics { get; set; } = new();

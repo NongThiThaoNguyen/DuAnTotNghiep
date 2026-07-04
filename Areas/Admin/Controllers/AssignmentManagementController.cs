@@ -10,6 +10,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers;
 [Authorize(Roles = "ADMIN")]
 public class AssignmentManagementController : Controller
 {
+    private const int PageSize = 20;
     private readonly ApplicationDbContext _context;
 
     public AssignmentManagementController(ApplicationDbContext context)
@@ -17,8 +18,9 @@ public class AssignmentManagementController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(int? topicId)
+    public async Task<IActionResult> Index(int? topicId, int page = 1)
     {
+        page = Math.Max(page, 1);
         var query = _context.PracticeTasks.AsNoTracking()
             .Include(t => t.Topic)
             .Include(t => t.CreatedByNavigation)
@@ -30,15 +32,24 @@ public class AssignmentManagementController : Controller
             query = query.Where(t => t.TopicId == topicId.Value);
         }
 
+        var totalItems = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)PageSize));
+        page = Math.Min(page, totalPages);
+
         var model = new AssignmentManagementIndexViewModel
         {
             TopicId = topicId,
+            CurrentPage = page,
+            PageSize = PageSize,
+            TotalItems = totalItems,
             Topics = await _context.LearningTopics.AsNoTracking()
                 .OrderBy(t => t.Title)
                 .Select(t => new AdminOptionViewModel { Id = t.Id, Text = t.Title })
                 .ToListAsync(),
             Items = await query
                 .OrderByDescending(t => t.CreatedAt)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
                 .Select(t => new AssignmentManagementRowViewModel
                 {
                     AssignmentId = t.Id,
@@ -93,7 +104,7 @@ public class AssignmentManagementController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Delete(int assignmentId)
+    public async Task<IActionResult> Delete(int assignmentId, int? topicId)
     {
         var assignment = await _context.PracticeTasks
             .Include(t => t.PracticeSubmissions)
@@ -104,18 +115,12 @@ public class AssignmentManagementController : Controller
             return NotFound();
         }
 
-        if (assignment.PracticeSubmissions.Any())
-        {
-            assignment.Status = "ARCHIVED";
-            TempData["SuccessMessage"] = "Bài tập đã có submission nên được chuyển sang ARCHIVED.";
-        }
-        else
-        {
-            _context.PracticeTasks.Remove(assignment);
-            TempData["SuccessMessage"] = "Đã xóa bài tập.";
-        }
+        assignment.Status = "ARCHIVED";
+        TempData["SuccessMessage"] = assignment.PracticeSubmissions.Any()
+            ? "Bài tập đã có submission nên được lưu trữ để giữ lịch sử."
+            : "Đã lưu trữ bài tập.";
 
         await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), new { topicId });
     }
 }

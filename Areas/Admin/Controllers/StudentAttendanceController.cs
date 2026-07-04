@@ -11,6 +11,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers;
 [Authorize(Roles = "ADMIN")]
 public class StudentAttendanceController : Controller
 {
+    private const int PageSize = 20;
     private readonly ApplicationDbContext _context;
 
     public StudentAttendanceController(ApplicationDbContext context)
@@ -18,8 +19,9 @@ public class StudentAttendanceController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(int? studentId, int? topicId, DateOnly? from, DateOnly? to)
+    public async Task<IActionResult> Index(int? studentId, int? topicId, DateOnly? from, DateOnly? to, int page = 1)
     {
+        page = Math.Max(page, 1);
         var query = _context.Attendances.AsNoTracking()
             .Include(a => a.Student)
             .Include(a => a.Topic)
@@ -45,17 +47,26 @@ public class StudentAttendanceController : Controller
             query = query.Where(a => a.AttendanceDate <= to.Value);
         }
 
+        var totalItems = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)PageSize));
+        page = Math.Min(page, totalPages);
+
         var model = new StudentAttendanceListViewModel
         {
             StudentId = studentId,
             TopicId = topicId,
             From = from,
             To = to,
+            CurrentPage = page,
+            PageSize = PageSize,
+            TotalItems = totalItems,
             Students = await GetStudentOptionsAsync(),
             Topics = await GetTopicOptionsAsync(),
             Items = await query
                 .OrderByDescending(a => a.AttendanceDate)
                 .ThenBy(a => a.Student.FullName)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
                 .Select(a => new StudentAttendanceRowViewModel
                 {
                     Id = a.Id,

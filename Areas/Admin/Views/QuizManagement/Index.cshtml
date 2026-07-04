@@ -2,36 +2,102 @@
 @{
     ViewData["Title"] = "Quản lý quiz";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var firstItem = Model.TotalItems == 0 ? 0 : ((Model.CurrentPage - 1) * Model.PageSize) + 1;
+    var lastItem = Math.Min(Model.TotalItems, Model.CurrentPage * Model.PageSize);
+
+    string StatusBadgeClass(string status)
+    {
+        return (status ?? string.Empty).Trim().ToUpperInvariant() switch
+        {
+            "ACTIVE" or "PUBLISHED" => "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
+            "DRAFT" => "bg-blue-50 text-blue-700 ring-1 ring-blue-200",
+            "ARCHIVED" => "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
+            _ => "bg-slate-100 text-slate-700 ring-1 ring-slate-200"
+        };
+    }
 }
 
 <div class="space-y-6">
-    <h1 class="text-2xl font-bold text-slate-900">Quản lý quiz toàn hệ thống</h1>
-    <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white border border-slate-200 rounded-xl p-4">
-        <select name="topicId" class="rounded-lg border-slate-300 text-sm"><option value="">Tất cả topic</option>@foreach (var topic in Model.Topics){<option value="@topic.Id">@topic.Text</option>}</select>
-        <select name="teacherId" class="rounded-lg border-slate-300 text-sm"><option value="">Tất cả giáo viên</option>@foreach (var teacher in Model.Teachers){<option value="@teacher.Id">@teacher.Text</option>}</select>
-        <button class="rounded-lg bg-blue-600 text-white text-sm font-semibold">Lọc</button>
+    <div>
+        <h1 class="text-2xl font-bold text-slate-900">Quản lý quiz toàn hệ thống</h1>
+        <p class="text-sm text-slate-500">Theo dõi quiz thường theo topic, giáo viên, số câu hỏi và lượt làm.</p>
+    </div>
+
+    <form method="get" class="grid grid-cols-1 gap-3 bg-white border border-slate-200 rounded-xl p-4 md:grid-cols-4">
+        <select name="topicId" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Tất cả topic</option>
+            @foreach (var topic in Model.Topics)
+            {
+                <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
+            }
+        </select>
+        <select name="teacherId" class="rounded-lg border-slate-300 text-sm">
+            <option value="">Tất cả giáo viên</option>
+            @foreach (var teacher in Model.Teachers)
+            {
+                <option value="@teacher.Id" selected="@(Model.TeacherId == teacher.Id ? "selected" : null)">@teacher.Text</option>
+            }
+        </select>
+        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+        <a asp-action="Index" class="rounded-lg border border-slate-200 px-4 py-2 text-center text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa lọc</a>
     </form>
-    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
+
+    <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems quiz.</p>
+
+    <div class="overflow-x-auto bg-white border border-slate-200 rounded-xl">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
-            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Quiz</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Câu hỏi</th><th class="px-4 py-3">Attempts</th><th class="px-4 py-3">Điểm TB</th><th></th></tr></thead>
+            <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500"><tr><th class="px-4 py-3">Quiz</th><th class="px-4 py-3">Topic</th><th class="px-4 py-3">Giáo viên</th><th class="px-4 py-3">Câu hỏi</th><th class="px-4 py-3">Attempts</th><th class="px-4 py-3">Điểm TB</th><th class="px-4 py-3 text-right">Thao tác</th></tr></thead>
             <tbody class="divide-y divide-slate-100">
-                @foreach (var item in Model.Items)
+                @if (Model.Items.Any())
+                {
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="px-4 py-3"><div class="font-semibold text-slate-900">@item.Title</div><span class="mt-1 inline-flex rounded-full px-2 py-1 text-xs font-semibold @StatusBadgeClass(item.Status)">@item.Status</span></td>
+                            <td class="px-4 py-3">@item.TopicTitle</td>
+                            <td class="px-4 py-3">@item.TeacherName</td>
+                            <td class="px-4 py-3">@item.QuestionCount</td>
+                            <td class="px-4 py-3">@item.AttemptCount</td>
+                            <td class="px-4 py-3">@item.AverageScore.ToString("0.##")</td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex justify-end gap-3 whitespace-nowrap">
+                                    <a asp-action="Details" asp-route-quizId="@item.QuizId" class="text-blue-600 font-semibold hover:text-blue-700">Chi tiết</a>
+                                    <a asp-action="Attempts" asp-route-quizId="@item.QuizId" class="text-emerald-600 font-semibold hover:text-emerald-700">Attempts</a>
+                                    <form asp-action="Delete" method="post" class="inline" onsubmit="return confirm('Xóa quiz nếu chưa có lượt làm, hoặc lưu trữ nếu đã có lượt làm?');">
+                                        <input type="hidden" name="quizId" value="@item.QuizId" />
+                                        <button type="submit" class="text-red-600 font-semibold hover:text-red-700 whitespace-nowrap">Xóa/Lưu trữ</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td class="px-4 py-3"><div class="font-semibold">@item.Title</div><div class="text-xs text-slate-500">@item.Status</div></td>
-                        <td class="px-4 py-3">@item.TopicTitle</td>
-                        <td class="px-4 py-3">@item.TeacherName</td>
-                        <td class="px-4 py-3">@item.QuestionCount</td>
-                        <td class="px-4 py-3">@item.AttemptCount</td>
-                        <td class="px-4 py-3">@item.AverageScore.ToString("0.##")</td>
-                        <td class="px-4 py-3 text-right space-x-3">
-                            <a asp-action="Details" asp-route-quizId="@item.QuizId" class="text-blue-600 font-semibold">Chi tiết</a>
-                            <a asp-action="Attempts" asp-route-quizId="@item.QuizId" class="text-emerald-600 font-semibold">Attempts</a>
-                            <form asp-action="Delete" method="post" class="inline"><input type="hidden" name="quizId" value="@item.QuizId" /><button class="text-red-600 font-semibold">Xóa</button></form>
+                        <td colspan="7" class="px-4 py-10 text-center text-slate-500">
+                            Không có quiz phù hợp với bộ lọc hiện tại.
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            <a asp-action="Index"
+               asp-route-topicId="@Model.TopicId"
+               asp-route-teacherId="@Model.TeacherId"
+               asp-route-page="@(Model.CurrentPage - 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage <= 1 ? "pointer-events-none opacity-40" : "")">Trước</a>
+            <span class="font-medium text-slate-500">Trang @Model.CurrentPage / @Model.TotalPages</span>
+            <a asp-action="Index"
+               asp-route-topicId="@Model.TopicId"
+               asp-route-teacherId="@Model.TeacherId"
+               asp-route-page="@(Model.CurrentPage + 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage >= Model.TotalPages ? "pointer-events-none opacity-40" : "")">Sau</a>
+        </div>
+    }
 </div>

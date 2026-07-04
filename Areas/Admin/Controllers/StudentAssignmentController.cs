@@ -10,6 +10,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers;
 [Authorize(Roles = "ADMIN")]
 public class StudentAssignmentController : Controller
 {
+    private const int PageSize = 20;
     private readonly ApplicationDbContext _context;
 
     public StudentAssignmentController(ApplicationDbContext context)
@@ -17,8 +18,9 @@ public class StudentAssignmentController : Controller
         _context = context;
     }
 
-    public async Task<IActionResult> Index(int? studentId)
+    public async Task<IActionResult> Index(int? studentId, int page = 1)
     {
+        page = Math.Max(page, 1);
         var query = _context.PracticeSubmissions.AsNoTracking()
             .Include(s => s.Student)
             .Include(s => s.PracticeTask)
@@ -30,12 +32,21 @@ public class StudentAssignmentController : Controller
             query = query.Where(s => s.StudentId == studentId.Value);
         }
 
+        var totalItems = await query.CountAsync();
+        var totalPages = Math.Max(1, (int)Math.Ceiling(totalItems / (double)PageSize));
+        page = Math.Min(page, totalPages);
+
         var model = new StudentAssignmentListViewModel
         {
             StudentId = studentId,
+            CurrentPage = page,
+            PageSize = PageSize,
+            TotalItems = totalItems,
             Students = await GetStudentOptionsAsync(),
             Items = await query
                 .OrderByDescending(s => s.SubmittedAt)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
                 .Select(s => new StudentAssignmentRowViewModel
                 {
                     SubmissionId = s.Id,
