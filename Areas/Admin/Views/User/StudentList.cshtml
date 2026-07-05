@@ -2,6 +2,8 @@
 @{
     ViewData["Title"] = "Quản lý học viên";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var firstItem = Model.TotalItems == 0 ? 0 : ((Model.CurrentPage - 1) * Model.PageSize) + 1;
+    var lastItem = Math.Min(Model.TotalItems, Model.CurrentPage * Model.PageSize);
 }
 
 <div class="space-y-6">
@@ -17,21 +19,26 @@
         <input name="keyword" value="@Model.Keyword" class="rounded-lg border-slate-300 text-sm" placeholder="Tên hoặc email" />
         <select name="pathStatus" class="rounded-lg border-slate-300 text-sm">
             <option value="">Tất cả lộ trình</option>
-            <option value="ACTIVE">ACTIVE</option>
-            <option value="IN_PROGRESS">IN_PROGRESS</option>
-            <option value="COMPLETED">COMPLETED</option>
-            <option value="PAUSED">PAUSED</option>
+            <option value="ACTIVE" selected="@(Model.PathStatus == "ACTIVE" ? "selected" : null)">ACTIVE</option>
+            <option value="IN_PROGRESS" selected="@(Model.PathStatus == "IN_PROGRESS" ? "selected" : null)">IN_PROGRESS</option>
+            <option value="COMPLETED" selected="@(Model.PathStatus == "COMPLETED" ? "selected" : null)">COMPLETED</option>
+            <option value="PAUSED" selected="@(Model.PathStatus == "PAUSED" ? "selected" : null)">PAUSED</option>
         </select>
         <select name="levelId" class="rounded-lg border-slate-300 text-sm">
             <option value="">Tất cả trình độ</option>
             @foreach (var level in Model.Levels)
             {
-                <option value="@level.Id">@level.Text</option>
+                <option value="@level.Id" selected="@(Model.LevelId == level.Id ? "selected" : null)">@level.Text</option>
             }
         </select>
-        <input name="minAttendanceRate" value="@Model.MinAttendanceRate" type="number" min="0" max="100" class="rounded-lg border-slate-300 text-sm" placeholder="Điểm danh tối thiểu %" />
-        <button class="rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+        <input name="minAttendanceRate" value="@Model.MinAttendanceRate" type="number" min="0" max="100" step="0.01" class="rounded-lg border-slate-300 text-sm" placeholder="Điểm danh tối thiểu %" />
+        <div class="flex gap-2">
+            <button class="flex-1 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
+            <a asp-action="StudentList" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa</a>
+        </div>
     </form>
+
+    <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems học viên.</p>
 
     <div class="overflow-hidden bg-white border border-slate-200 rounded-xl">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
@@ -46,23 +53,57 @@
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-                @foreach (var item in Model.Items)
+                @if (Model.Items.Any())
+                {
+                    @foreach (var item in Model.Items)
+                    {
+                        <tr>
+                            <td class="px-4 py-3">
+                                <div class="font-semibold text-slate-900">@item.FullName</div>
+                                <div class="text-xs text-slate-500">@item.Email</div>
+                            </td>
+                            <td class="px-4 py-3">@item.LevelName</td>
+                            <td class="px-4 py-3">@item.PathStatus</td>
+                            <td class="px-4 py-3">@item.AttendanceRate.ToString("0.##")%</td>
+                            <td class="px-4 py-3">
+                                <span class="rounded-full px-2 py-1 text-xs font-semibold @(item.Status == "ACTIVE" ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : "bg-slate-100 text-slate-700 ring-1 ring-slate-200")">@item.Status</span>
+                            </td>
+                            <td class="px-4 py-3 text-right">
+                                <a asp-action="Details" asp-route-id="@item.Id" class="text-blue-600 font-semibold">Chi tiết</a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
                 {
                     <tr>
-                        <td class="px-4 py-3">
-                            <div class="font-semibold text-slate-900">@item.FullName</div>
-                            <div class="text-xs text-slate-500">@item.Email</div>
-                        </td>
-                        <td class="px-4 py-3">@item.LevelName</td>
-                        <td class="px-4 py-3">@item.PathStatus</td>
-                        <td class="px-4 py-3">@item.AttendanceRate.ToString("0.##")%</td>
-                        <td class="px-4 py-3">@item.Status</td>
-                        <td class="px-4 py-3 text-right">
-                            <a asp-action="Details" asp-route-id="@item.Id" class="text-blue-600 font-semibold">Chi tiết</a>
+                        <td colspan="6" class="px-4 py-10 text-center text-slate-500">
+                            Không có học viên phù hợp với bộ lọc hiện tại.
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
     </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm">
+            <a asp-action="StudentList"
+               asp-route-keyword="@Model.Keyword"
+               asp-route-pathStatus="@Model.PathStatus"
+               asp-route-levelId="@Model.LevelId"
+               asp-route-minAttendanceRate="@Model.MinAttendanceRate"
+               asp-route-page="@(Model.CurrentPage - 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage <= 1 ? "pointer-events-none opacity-40" : "")">Trước</a>
+            <span class="font-medium text-slate-500">Trang @Model.CurrentPage / @Model.TotalPages</span>
+            <a asp-action="StudentList"
+               asp-route-keyword="@Model.Keyword"
+               asp-route-pathStatus="@Model.PathStatus"
+               asp-route-levelId="@Model.LevelId"
+               asp-route-minAttendanceRate="@Model.MinAttendanceRate"
+               asp-route-page="@(Model.CurrentPage + 1)"
+               class="font-semibold text-slate-600 hover:text-blue-600 @(Model.CurrentPage >= Model.TotalPages ? "pointer-events-none opacity-40" : "")">Sau</a>
+        </div>
+    }
 </div>

@@ -49,7 +49,7 @@ namespace DuAnTotNghiep.Services
             var achievement = await _context.Achievements.FindAsync(id);
             if (achievement != null)
             {
-                _context.Achievements.Remove(achievement);
+                achievement.IsActive = false;
                 await _context.SaveChangesAsync();
             }
         }

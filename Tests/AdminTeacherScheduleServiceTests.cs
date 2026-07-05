@@ -93,6 +93,33 @@ public class AdminTeacherScheduleServiceTests
         }
     }
 
+    [Fact]
+    public async Task CreateScheduleAsync_RejectsOverlappingTeacherSchedule()
+    {
+        var options = CreateOptions();
+        var targetDate = new DateTime(2026, 7, 2);
+
+        using (var context = new ApplicationDbContext(options))
+        {
+            SeedScheduleData(context, targetDate);
+            await context.SaveChangesAsync();
+        }
+
+        using (var context = new ApplicationDbContext(options))
+        {
+            var service = CreateAdminTeacherScheduleService(context);
+            var form = CreateForm(
+                teacherId: 10,
+                topicId: 200,
+                title: "Overlapping schedule",
+                startTime: targetDate.AddHours(8).AddMinutes(30),
+                endTime: targetDate.AddHours(9).AddMinutes(30));
+
+            var exception = await Assert.ThrowsAsync<InvalidOperationException>(() => InvokeAsync(service, "CreateScheduleAsync", form));
+            Assert.Contains("đã có lịch", exception.Message);
+        }
+    }
+
     private static void SeedScheduleData(ApplicationDbContext context, DateTime targetDate)
     {
         var teacherRole = new Role { Id = 2, RoleCode = "TEACHER", RoleName = "Teacher" };

@@ -122,9 +122,9 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 await _achievementService.DeleteAsync(id);
 
                 var adminId = int.Parse(User.FindFirst("UserId")?.Value ?? "0");
-                await _auditService.LogAsync(adminId, "DELETE_ACHIEVEMENT", "Achievement", id, achievement.Title, null);
+                await _auditService.LogAsync(adminId, "DEACTIVATE_ACHIEVEMENT", "Achievement", id, achievement.Title, "Inactive");
 
-                TempData["SuccessMessage"] = "Xóa huy hiệu thành công.";
+                TempData["SuccessMessage"] = "Đã ẩn huy hiệu. Lịch sử huy hiệu của học viên vẫn được giữ lại.";
             }
             return RedirectToAction(nameof(Index));
         }

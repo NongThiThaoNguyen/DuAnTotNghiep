@@ -42,6 +42,9 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
         {
             const int pageSize = 20;
             page = Math.Max(1, page);
+            minAttendanceRate = minAttendanceRate.HasValue
+                ? Math.Clamp(minAttendanceRate.Value, 0, 100)
+                : null;
 
             var query = _context.Users.AsNoTracking()
                 .Include(u => u.Role)
@@ -66,7 +69,9 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
 
             var students = await query.OrderByDescending(u => u.CreatedAt).ToListAsync();
+            var studentIds = students.Select(u => u.Id).ToList();
             var attendanceGroups = await _context.Attendances.AsNoTracking()
+                .Where(a => studentIds.Contains(a.StudentId))
                 .GroupBy(a => a.StudentId)
                 .Select(g => new
                 {

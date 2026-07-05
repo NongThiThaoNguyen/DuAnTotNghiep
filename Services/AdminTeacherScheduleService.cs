@@ -247,6 +247,19 @@ public class AdminTeacherScheduleService : IAdminTeacherScheduleService
                 throw new InvalidOperationException("Chủ đề học tập được chọn không hợp lệ.");
             }
         }
+
+        var hasOverlappingSchedule = await _context.Schedules
+            .AsNoTracking()
+            .AnyAsync(s =>
+                s.Id != model.Id
+                && s.TeacherId == model.TeacherId
+                && s.StartTime < model.EndTime
+                && s.EndTime > model.StartTime);
+
+        if (hasOverlappingSchedule)
+        {
+            throw new InvalidOperationException("Giáo viên đã có lịch trong khung giờ này. Vui lòng chọn thời gian khác.");
+        }
     }
 
     private async Task PopulateOptionsAsync(AdminTeacherScheduleFormViewModel model)

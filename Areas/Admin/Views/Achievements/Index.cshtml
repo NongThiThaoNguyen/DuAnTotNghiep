@@ -88,11 +88,20 @@
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-blue-600 bg-blue-50 hover:bg-blue-100 transition-colors" title="Sửa">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
                                 </a>
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="inline-block" onsubmit="return confirm('Bạn có chắc chắn muốn xóa huy hiệu này? Lưu ý: thao tác này có thể ảnh hưởng đến những user đã được nhận huy hiệu này.');">
-                                    <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-600 bg-red-50 hover:bg-red-100 transition-colors" title="Xóa">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                                    </button>
-                                </form>
+                                @if (item.IsActive)
+                                {
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="inline-block" onsubmit="return confirm('Ẩn huy hiệu này khỏi cơ chế trao mới? Lịch sử user đã nhận vẫn được giữ lại.');">
+                                        <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-amber-600 bg-amber-50 hover:bg-amber-100 transition-colors" title="Ẩn huy hiệu">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L21 21M5.636 5.636L3 3"></path></svg>
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-slate-400 bg-slate-50" title="Huy hiệu đã ẩn">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    </span>
+                                }
                             </td>
                         </tr>
                     }
