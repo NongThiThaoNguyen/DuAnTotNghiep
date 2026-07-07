@@ -142,7 +142,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 UserId = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
-                AvatarUrl = "/images/default-avatar.png",
+                AvatarUrl = "/images/default-avatar.svg",
                 Achievements = allAchievements.Select(a => {
                     var ua = userAchievements.FirstOrDefault(u => u.AchievementId == a.Id);
                     return new UserAchievementItem

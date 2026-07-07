@@ -37,7 +37,17 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             
             if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.Completed)
             {
-                return RedirectToAction("Index", "Home");
+                if (!string.IsNullOrWhiteSpace(flowStatus.RedirectUrl))
+                {
+                    return Redirect(flowStatus.RedirectUrl);
+                }
+
+                if (flowStatus.AttemptId.HasValue)
+                {
+                    return RedirectToAction("Result", new { attemptId = flowStatus.AttemptId.Value });
+                }
+
+                return RedirectToAction("Suggestion");
             }
             if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.PlacementInProgress)
             {

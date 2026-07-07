@@ -4,25 +4,6 @@
     var isScoreBased = ViewBag.GoalCode == "IELTS" || ViewBag.GoalCode == "TOEIC";
 }
 
-<style>
-    .level-radio:checked + .level-card-body {
-        border-color: #3b82f6 !important;
-        background-color: #eff6ff !important;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-    }
-    .level-card-body {
-        transition: all 0.2s ease-in-out;
-        border: 2px solid #e2e8f0;
-    }
-    .level-card-body:hover {
-        border-color: #bfdbfe;
-    }
-    .level-radio:checked + .level-card-body .level-badge {
-        background-color: #3b82f6;
-        color: #ffffff;
-    }
-</style>
-
 <div class="max-w-3xl mx-auto py-12">
     
     <partial name="_OnboardingStepper" model="2" />

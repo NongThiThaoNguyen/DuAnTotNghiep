@@ -3,31 +3,6 @@
     ViewData["Title"] = "Mục tiêu học tập";
 }
 
-<style>
-    /* Custom CSS cho Card Selection kết hợp Tailwind */
-    .goal-radio:checked + .goal-card-body {
-        border-color: #3b82f6 !important; /* blue-500 */
-        background-color: #eff6ff !important; /* blue-50 */
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-        transform: translateY(-2px);
-    }
-    
-    .goal-card-body {
-        transition: all 0.2s ease-in-out;
-        border: 2px solid #e2e8f0; /* slate-200 */
-    }
-    
-    .goal-card-body:hover {
-        border-color: #bfdbfe; /* blue-200 */
-        transform: translateY(-2px);
-    }
-    
-    .goal-radio:checked + .goal-card-body .card-icon-container {
-        background-color: #3b82f6;
-        color: #ffffff;
-    }
-</style>
-
 <div class="max-w-3xl mx-auto py-12">
     <partial name="_OnboardingStepper" model="1" />
     <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">

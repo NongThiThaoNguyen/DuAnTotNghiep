@@ -4,25 +4,6 @@
     var goalCode = ViewBag.GoalCode as string ?? "";
 }
 
-<style>
-    .time-radio:checked + .time-card-body {
-        border-color: #3b82f6 !important;
-        background-color: #eff6ff !important;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-    }
-    .time-card-body {
-        transition: all 0.2s ease-in-out;
-        border: 2px solid #e2e8f0;
-    }
-    .time-card-body:hover {
-        border-color: #bfdbfe;
-    }
-    .time-radio:checked + .time-card-body .time-badge {
-        background-color: #3b82f6;
-        color: #ffffff;
-    }
-</style>
-
 <div class="max-w-3xl mx-auto py-12">
     
     <partial name="_OnboardingStepper" model="4" />

@@ -1,101 +1,75 @@
 @model DuAnTotNghiep.Models.ViewModels.Teacher.TeacherDashboardViewModel
 @{
     ViewData["Title"] = "Tổng quan giảng dạy";
-
-    // Time of day greeting
-    var hour = DateTime.Now.Hour;
-    var timeGreeting = "Chào buổi sáng";
-    if (hour >= 12 && hour < 18) timeGreeting = "Chào buổi chiều";
-    else if (hour >= 18) timeGreeting = "Chào buổi tối";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
-}
-
-<!-- Welcome Section -->
-<div class="dashboard-header-block card-ailearn mb-4">
-    <div class="d-flex align-items-center gap-4">
-        <div class="position-relative">
-            <img class="user-avatar-sidebar border border-2 border-primary" style="width: 64px; height: 64px;" src="@Model.AvatarUrl" alt="Avatar" />
-        </div>
-        <div>
-            <h1 class="mb-1 text-dark">@timeGreeting, @Model.TeacherName! 👋</h1>
-            <p class="mb-0 text-muted">Chào mừng bạn quay trở lại. Hãy quản lý lớp học và bài tập của học viên hiệu quả.</p>
-        </div>
-    </div>
-</div>
-
-<!-- Stats Row Grid -->
-<div class="dashboard-stats-row">
-    <!-- Stat 1: Courses -->
-    <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box purple">
-            <i class="fa-solid fa-graduation-cap"></i>
-        </div>
-        <div class="dashboard-stat-info">
-            <span class="dashboard-stat-label">Khóa học active</span>
-            <span class="dashboard-stat-value">@Model.CoursesCount</span>
-            <span class="dashboard-stat-subtext text-muted">Đang giảng dạy</span>
-        </div>
-    </div>
-
-    <!-- Stat 2: Students -->
-    <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box green">
-            <i class="fa-solid fa-users"></i>
-        </div>
-        <div class="dashboard-stat-info">
-            <span class="dashboard-stat-label">Học viên hoạt động</span>
-            <span class="dashboard-stat-value">@Model.StudentsCount</span>
-            <span class="dashboard-stat-subtext text-muted">Trên hệ thống</span>
-        </div>
-    </div>
-
-    <!-- Stat 3: Pending grades -->
-    <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box orange">
-            <i class="fa-solid fa-clipboard-list"></i>
-        </div>
-        <div class="dashboard-stat-info">
-            <span class="dashboard-stat-label">Bài tập cần chấm</span>
-            <span class="dashboard-stat-value text-danger">@Model.PendingSubmissionsCount</span>
-            <span class="dashboard-stat-subtext text-muted">Yêu cầu chờ duyệt</span>
-        </div>
-    </div>
-
-    <!-- Stat 4: Schedule -->
-    <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box blue">
-            <i class="fa-solid fa-calendar-days"></i>
-        </div>
-        <div class="dashboard-stat-info">
-            <span class="dashboard-stat-label">Lịch dạy hôm nay</span>
-            <span class="dashboard-stat-value">@Model.TodaySchedulesCount ca</span>
-            <span class="dashboard-stat-subtext text-muted">Giảng dạy & phòng học</span>
-        </div>
-    </div>
-</div>
-
-<!-- Main Column Grid Layout -->
-<div class="dashboard-cols-layout">
-    <!-- Left Column (Tables & info) -->
+<header class="teacher-page-header">
     <div>
-        <!-- 1. Recent Student Submissions -->
-        <div class="dashboard-panel-card card-ailearn p-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h2 class="mb-0 fs-6 text-dark font-weight-bold"><i class="fa-solid fa-file-signature text-primary me-2"></i>Bài tập học viên nộp gần đây</h2>
-                <a href="/Teacher/Assignments" class="small text-decoration-none text-primary">Xem tất cả &rarr;</a>
-            </div>
+        <span class="teacher-page-kicker">Không gian giảng dạy</span>
+        <h1>Tổng quan giảng dạy</h1>
+        <p>Theo dõi lớp học, công việc cần chấm và lịch dạy của bạn.</p>
+    </div>
+    <a class="btn btn-secondary-ailearn"
+       asp-area="Teacher"
+       asp-controller="Schedule"
+       asp-action="Index">
+        <i class="fa-regular fa-calendar" aria-hidden="true"></i>
+        Xem lịch dạy
+    </a>
+</header>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+<section class="teacher-panel teacher-welcome" aria-labelledby="teacherWelcomeTitle">
+    <span class="teacher-welcome-mark" aria-hidden="true">
+        <i class="fa-solid fa-chalkboard-user"></i>
+    </span>
+    <div>
+        <h2 id="teacherWelcomeTitle">Xin chào, @Model.TeacherName</h2>
+        <p>Những việc cần ưu tiên hôm nay đã được tổng hợp bên dưới.</p>
+    </div>
+</section>
+
+<section class="teacher-stat-grid" aria-label="Chỉ số giảng dạy">
+    <article class="teacher-stat">
+        <span class="teacher-stat-label">Khóa học đang dạy</span>
+        <strong class="teacher-stat-value">@Model.CoursesCount</strong>
+        <span class="teacher-stat-note">Khóa học đang hoạt động</span>
+    </article>
+    <article class="teacher-stat">
+        <span class="teacher-stat-label">Học viên</span>
+        <strong class="teacher-stat-value">@Model.StudentsCount</strong>
+        <span class="teacher-stat-note">Học viên trên hệ thống</span>
+    </article>
+    <article class="teacher-stat">
+        <span class="teacher-stat-label">Bài cần chấm</span>
+        <strong class="teacher-stat-value teacher-stat-value-danger">@Model.PendingSubmissionsCount</strong>
+        <span class="teacher-stat-note">Bài đang chờ phản hồi</span>
+    </article>
+    <article class="teacher-stat">
+        <span class="teacher-stat-label">Lịch hôm nay</span>
+        <strong class="teacher-stat-value">@Model.TodaySchedulesCount</strong>
+        <span class="teacher-stat-note">Ca giảng dạy đã lên lịch</span>
+    </article>
+</section>
+
+<div class="teacher-dashboard-grid">
+    <div class="teacher-dashboard-main">
+        <section class="teacher-panel">
+            <header class="teacher-section-header">
+                <div>
+                    <span class="teacher-section-kicker">Cần xử lý</span>
+                    <h2>Bài tập nộp gần đây</h2>
+                </div>
+                <a asp-area="Teacher" asp-controller="Assignments" asp-action="Index">Xem tất cả</a>
+            </header>
+
+            <div class="teacher-table-wrap">
+                <table>
                     <thead>
-                        <tr class="text-muted small font-weight-bold uppercase">
+                        <tr>
                             <th>Học viên</th>
                             <th>Bài tập</th>
                             <th>Ngày nộp</th>
-                            <th class="text-center">Trạng thái</th>
+                            <th>Trạng thái</th>
                             <th class="text-end">Hành động</th>
                         </tr>
                     </thead>
@@ -103,132 +77,147 @@
                         @if (!Model.RecentSubmissions.Any())
                         {
                             <tr>
-                                <td colspan="5" class="py-4 text-center text-muted small">Không có bài tập mới nào cần chấm.</td>
+                                <td colspan="5" class="teacher-empty-row">Không có bài tập mới cần chấm.</td>
                             </tr>
                         }
-                        @foreach (var sub in Model.RecentSubmissions)
+                        @foreach (var submission in Model.RecentSubmissions)
                         {
                             <tr>
-                                <td><span class="font-weight-semibold text-dark">@sub.StudentName</span></td>
-                                <td>@sub.TaskTitle</td>
-                                <td class="text-muted small">@sub.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
-                                <td class="text-center">
-                                    @if (sub.Status == "SUBMITTED")
+                                <td><strong>@submission.StudentName</strong></td>
+                                <td>@submission.TaskTitle</td>
+                                <td>@submission.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td>
+                                    @if (submission.Status == "SUBMITTED")
                                     {
-                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Đợi chấm</span>
+                                        <span class="teacher-status is-warning">Đợi chấm</span>
                                     }
                                     else
                                     {
-                                        <span class="badge bg-success-subtle text-success border border-success-subtle">Đã chấm</span>
+                                        <span class="teacher-status is-success">Đã chấm</span>
                                     }
                                 </td>
                                 <td class="text-end">
-                                    <a href="/Teacher/Assignments/Grade/@sub.Id" class="btn btn-primary-ailearn btn-sm py-1 px-3 fs-7">Chấm điểm</a>
+                                    <a class="btn btn-primary-ailearn btn-sm"
+                                       asp-area="Teacher"
+                                       asp-controller="Assignments"
+                                       asp-action="Grade"
+                                       asp-route-id="@submission.Id"
+                                       data-teacher-modal
+                                       data-modal-title="Chấm bài tập"
+                                       data-modal-size="xl">
+                                        Chấm điểm
+                                    </a>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
 
-        <!-- 2. Recent Quiz Attempts -->
-        <div class="dashboard-panel-card card-ailearn p-4">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h2 class="mb-0 fs-6 text-dark font-weight-bold"><i class="fa-solid fa-circle-check text-primary me-2"></i>Kết quả làm Quiz mới nhất</h2>
-                <a href="/Teacher/Grades" class="small text-decoration-none text-primary">Sổ điểm &rarr;</a>
-            </div>
+        <section class="teacher-panel">
+            <header class="teacher-section-header">
+                <div>
+                    <span class="teacher-section-kicker">Kết quả học tập</span>
+                    <h2>Lượt làm quiz mới nhất</h2>
+                </div>
+                <a asp-area="Teacher" asp-controller="Grades" asp-action="Index">Mở sổ điểm</a>
+            </header>
 
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
+            <div class="teacher-table-wrap">
+                <table>
                     <thead>
-                        <tr class="text-muted small font-weight-bold uppercase">
+                        <tr>
                             <th>Học viên</th>
-                            <th>Bài thi Quiz</th>
+                            <th>Bài quiz</th>
                             <th>Ngày làm</th>
-                            <th class="text-end">Điểm số</th>
+                            <th class="text-end">Điểm</th>
                         </tr>
                     </thead>
                     <tbody>
                         @if (!Model.RecentQuizAttempts.Any())
                         {
                             <tr>
-                                <td colspan="4" class="py-4 text-center text-muted small">Chưa có lượt làm Quiz nào gần đây.</td>
+                                <td colspan="4" class="teacher-empty-row">Chưa có lượt làm quiz gần đây.</td>
                             </tr>
                         }
                         @foreach (var attempt in Model.RecentQuizAttempts)
                         {
                             <tr>
-                                <td><span class="font-weight-semibold text-dark">@attempt.StudentName</span></td>
+                                <td><strong>@attempt.StudentName</strong></td>
                                 <td>@attempt.QuizTitle</td>
-                                <td class="text-muted small">@(attempt.SubmittedAt?.ToString("dd/MM/yyyy HH:mm") ?? "")</td>
-                                <td class="text-end font-weight-bold @(attempt.Score >= 50 ? "text-success" : "text-danger")">
-                                    @attempt.Score?.ToString("0.0")đ
+                                <td>@(attempt.SubmittedAt?.ToString("dd/MM/yyyy HH:mm") ?? "Chưa nộp")</td>
+                                <td class="text-end">
+                                    <strong class="@(attempt.Score >= 50 ? "teacher-score-pass" : "teacher-score-low")">
+                                        @(attempt.Score?.ToString("0.0") ?? "-")
+                                    </strong>
                                 </td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
-        </div>
+        </section>
     </div>
 
-    <!-- Right Column (Schedule and metrics) -->
-    <div>
-        <!-- 1. Today's teaching schedule -->
-        <div class="dashboard-panel-card card-ailearn p-4 mb-4">
-            <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom">
-                <h2 class="mb-0 fs-6 text-dark font-weight-bold"><i class="fa-solid fa-calendar-day text-primary me-2"></i>Lịch dạy hôm nay</h2>
-                <span class="badge bg-primary-subtle text-primary">@Model.TodaySchedules.Count ca</span>
-            </div>
+    <aside class="teacher-dashboard-aside" aria-label="Lịch và phân bố khóa học">
+        <section class="teacher-panel">
+            <header class="teacher-section-header">
+                <div>
+                    <span class="teacher-section-kicker">Hôm nay</span>
+                    <h2>Lịch dạy</h2>
+                </div>
+                <span class="teacher-status">@Model.TodaySchedules.Count ca</span>
+            </header>
 
-            <div class="d-flex flex-column gap-3 mb-3">
+            <div class="teacher-schedule-list">
                 @if (!Model.TodaySchedules.Any())
                 {
-                    <p class="text-muted small text-center py-3 mb-0">Hôm nay bạn không có lịch giảng dạy.</p>
+                    <div class="teacher-empty-state">Hôm nay bạn không có lịch giảng dạy.</div>
                 }
-                @foreach (var sch in Model.TodaySchedules)
+                @foreach (var schedule in Model.TodaySchedules)
                 {
-                    <div class="p-3 bg-light rounded-3 border">
-                        <h6 class="mb-1 text-dark font-weight-semibold">@sch.Title</h6>
-                        <div class="d-flex align-items-center gap-2 text-muted small mt-1">
-                            <i class="fa-solid fa-clock"></i>
-                            <span>@sch.StartTime.ToString("HH:mm") - @sch.EndTime.ToString("HH:mm")</span>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 text-muted small mt-1">
-                            <i class="fa-solid fa-location-dot"></i>
-                            <span>Phòng: @(sch.Classroom ?? "Online")</span>
-                        </div>
-                    </div>
+                    <article class="teacher-schedule-item">
+                        <h3>@schedule.Title</h3>
+                        <p><i class="fa-regular fa-clock" aria-hidden="true"></i> @schedule.StartTime.ToString("HH:mm") - @schedule.EndTime.ToString("HH:mm")</p>
+                        <p><i class="fa-solid fa-location-dot" aria-hidden="true"></i> @(schedule.Classroom ?? "Trực tuyến")</p>
+                    </article>
                 }
             </div>
 
-            <a href="/Teacher/Schedule" class="btn btn-secondary-ailearn w-100 btn-sm">Xem lịch biểu đầy đủ</a>
-        </div>
+            <a class="btn btn-secondary-ailearn w-100"
+               asp-area="Teacher"
+               asp-controller="Schedule"
+               asp-action="Index">Xem lịch đầy đủ</a>
+        </section>
 
-        <!-- 2. Course Distribution -->
-        <div class="dashboard-panel-card card-ailearn p-4">
-            <h2 class="mb-3 pb-2 border-bottom fs-6 text-dark font-weight-bold"><i class="fa-solid fa-chart-pie text-primary me-2"></i>Phân bố khóa học</h2>
+        <section class="teacher-panel">
+            <header class="teacher-section-header">
+                <div>
+                    <span class="teacher-section-kicker">Nội dung</span>
+                    <h2>Phân bố khóa học</h2>
+                </div>
+            </header>
 
-            <div class="d-flex flex-column gap-3">
-                @for (int i = 0; i < Model.ChartLabels.Count; i++)
+            <div class="teacher-progress-list">
+                @for (var index = 0; index < Model.ChartLabels.Count; index++)
                 {
-                    var label = Model.ChartLabels[i];
-                    var val = Model.ChartValues[i];
-                    var maxVal = Model.ChartValues.Max();
-                    var pct = maxVal > 0 ? (double)val / maxVal * 100 : 0;
+                    var label = Model.ChartLabels[index];
+                    var value = Model.ChartValues[index];
+                    var maxValue = Model.ChartValues.Any() ? Model.ChartValues.Max() : 0;
+                    var percent = maxValue > 0 ? (double)value / maxValue * 100 : 0;
 
-                    <div>
-                        <div class="d-flex justify-content-between text-muted small mb-1">
+                    <div class="teacher-progress-item">
+                        <div>
                             <span>@label</span>
-                            <span class="font-weight-semibold text-dark">@val khóa</span>
+                            <strong>@value khóa</strong>
                         </div>
-                        <div class="progress" style="height: 6px;">
-                            <div class="progress-bar bg-primary rounded-pill" role="progressbar" style="width: @pct%"></div>
+                        <div class="teacher-progress-track" role="progressbar" aria-label="@label" aria-valuenow="@value" aria-valuemin="0" aria-valuemax="@maxValue">
+                            <span class="teacher-progress-value" style="--teacher-progress: @percent%"></span>
                         </div>
                     </div>
                 }
             </div>
-        </div>
-    </div>
+        </section>
+    </aside>
 </div>

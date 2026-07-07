@@ -3,42 +3,44 @@
     ViewData["Title"] = "Sổ điểm học viên";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
+<div class="teacher-page-header">
     <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Sổ điểm học viên</h1>
-        <p class="text-muted m-0 small">Tổng hợp điểm Quiz và bài tập thực hành.</p>
+        <span class="teacher-page-kicker">Sổ điểm</span>
+        <h1>Sổ điểm học viên</h1>
+        <p>Tổng hợp điểm Quiz và bài tập thực hành theo từng khóa học.</p>
     </div>
-    <a asp-action="Pending" class="btn btn-primary-ailearn">Bài chờ chấm</a>
+    <a asp-action="Pending" class="btn btn-primary">
+        <i class="fa-solid fa-inbox" aria-hidden="true"></i>
+        Bài chờ chấm
+    </a>
 </div>
 
-<div class="card-ailearn p-0 overflow-hidden">
-    <table class="table table-hover align-middle mb-0">
+<div class="teacher-table-wrap">
+    <table class="table align-middle mb-0">
         <thead>
-            <tr class="text-muted small font-weight-bold uppercase bg-light">
-                <th class="py-3 px-4">Học viên</th>
-                <th class="py-3 px-4">Khóa học</th>
-                <th class="py-3 px-4 text-center">Điểm Quiz</th>
-                <th class="py-3 px-4 text-center">Điểm bài tập</th>
-                <th class="py-3 px-4 text-end">Tổng hợp</th>
+            <tr>
+                <th>Học viên</th>
+                <th>Khóa học</th>
+                <th class="text-center">Điểm Quiz</th>
+                <th class="text-center">Điểm bài tập</th>
+                <th class="text-end">Tổng hợp</th>
             </tr>
         </thead>
         <tbody>
             @if (!Model.Any())
             {
-                <tr><td colspan="5" class="py-4 text-center text-muted small">Chưa có dữ liệu điểm.</td></tr>
+                <tr>
+                    <td colspan="5" class="teacher-empty-row">Chưa có dữ liệu điểm.</td>
+                </tr>
             }
             @foreach (var row in Model)
             {
                 <tr>
-                    <td class="py-3 px-4 font-weight-bold">@row.StudentName</td>
-                    <td class="py-3 px-4 text-muted">@row.TopicName</td>
-                    <td class="py-3 px-4 text-center">@row.QuizScore.ToString("0.0")</td>
-                    <td class="py-3 px-4 text-center">@row.PracticeScore.ToString("0.0")</td>
-                    <td class="py-3 px-4 text-end font-weight-bold">@row.TotalScore.ToString("0.0")</td>
+                    <td><strong>@row.StudentName</strong></td>
+                    <td>@row.TopicName</td>
+                    <td class="text-center teacher-number">@row.QuizScore.ToString("0.0")</td>
+                    <td class="text-center teacher-number">@row.PracticeScore.ToString("0.0")</td>
+                    <td class="text-end teacher-number"><strong>@row.TotalScore.ToString("0.0")</strong></td>
                 </tr>
             }
         </tbody>

@@ -3,76 +3,89 @@
     ViewData["Title"] = "Quiz - " + Model.TopicTitle;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
+<div class="teacher-page-header">
     <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Quản lý Quiz</h1>
-        <p class="text-muted m-0 small">@Model.TopicTitle</p>
+        <span class="teacher-page-kicker">Quiz</span>
+        <h1>Quản lý Quiz</h1>
+        <p>@Model.TopicTitle</p>
     </div>
-    <div class="d-flex gap-2">
-        <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.TopicId" class="btn btn-secondary-ailearn">Khóa học</a>
-        <a asp-action="Create" asp-route-topicId="@Model.TopicId" class="btn btn-primary-ailearn">
-            <i class="fa-solid fa-plus me-1"></i> Tạo Quiz mới
+    <div class="teacher-action-group">
+        <a asp-controller="Courses" asp-action="Details" asp-route-id="@Model.TopicId" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            Khóa học
+        </a>
+        <a asp-action="Create"
+           asp-route-topicId="@Model.TopicId"
+           class="btn btn-primary">
+            <i class="fa-solid fa-plus" aria-hidden="true"></i>
+            Tạo Quiz
         </a>
     </div>
 </div>
 
-<div class="card-ailearn p-0 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr class="text-muted small font-weight-bold uppercase bg-light">
-                    <th class="py-3 px-4">Tên Quiz</th>
-                    <th class="py-3 px-4 text-center">Câu hỏi</th>
-                    <th class="py-3 px-4 text-center">Lượt làm</th>
-                    <th class="py-3 px-4 text-center">Điểm TB</th>
-                    <th class="py-3 px-4 text-center">Trạng thái</th>
-                    <th class="py-3 px-4 text-end">Thao tác</th>
+<div class="teacher-table-wrap">
+    <table class="table align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Tên Quiz</th>
+                <th class="text-center">Câu hỏi</th>
+                <th class="text-center">Lượt làm</th>
+                <th class="text-center">Điểm TB</th>
+                <th class="text-center">Trạng thái</th>
+                <th class="text-end">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Quizzes.Any())
+            {
+                <tr>
+                    <td colspan="6" class="teacher-empty-row">Khóa học này chưa có Quiz nào.</td>
                 </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Quizzes.Any())
-                {
-                    <tr>
-                        <td colspan="6" class="py-4 text-center text-muted small">Khóa học này chưa có Quiz nào.</td>
-                    </tr>
-                }
-                @foreach (var quiz in Model.Quizzes)
-                {
-                    <tr>
-                        <td class="py-3 px-4">
-                            <div class="d-flex flex-col">
-                                <span class="font-weight-bold text-dark">@quiz.Title</span>
-                                <span class="text-muted small line-clamp-1">@(quiz.Description ?? "Không có mô tả.")</span>
-                            </div>
-                        </td>
-                        <td class="py-3 px-4 text-center">@quiz.QuestionCount</td>
-                        <td class="py-3 px-4 text-center">@quiz.AttemptCount</td>
-                        <td class="py-3 px-4 text-center font-weight-semibold">@quiz.AverageScore.ToString("0.0")</td>
-                        <td class="py-3 px-4 text-center"><span class="purple-badge">@quiz.Status</span></td>
-                        <td class="py-3 px-4 text-end">
-                            <div class="d-flex justify-content-end gap-2 align-items-center">
-                                <a asp-action="Results" asp-route-id="@quiz.Id" class="btn btn-outline-primary btn-sm py-1 px-2 fs-7">Kết quả</a>
-                                <a asp-action="ManageQuestions" asp-route-id="@quiz.Id" class="btn btn-outline-info btn-sm p-1 px-2" title="Quản lý câu hỏi">
-                                    <i class="fa-solid fa-list-check"></i> Câu hỏi
-                                </a>
-                                <a asp-action="Edit" asp-route-id="@quiz.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
-                                <form asp-action="Delete" asp-route-id="@quiz.Id" asp-route-topicId="@Model.TopicId" method="post" class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <button type="submit" class="btn btn-outline-danger btn-sm p-1 px-2" title="Xóa">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
-    </div>
+            }
+            @foreach (var quiz in Model.Quizzes)
+            {
+                <tr>
+                    <td>
+                        <div class="teacher-table-title">
+                            <strong>@quiz.Title</strong>
+                            <span>@(quiz.Description ?? "Không có mô tả.")</span>
+                        </div>
+                    </td>
+                    <td class="text-center teacher-number">@quiz.QuestionCount</td>
+                    <td class="text-center teacher-number">@quiz.AttemptCount</td>
+                    <td class="text-center teacher-number">@quiz.AverageScore.ToString("0.0")</td>
+                    <td class="text-center"><span class="teacher-status">@quiz.Status</span></td>
+                    <td>
+                        <div class="teacher-action-group">
+                            <a asp-action="Results" asp-route-id="@quiz.Id" class="btn btn-secondary">Kết quả</a>
+                            <a asp-action="ManageQuestions" asp-route-id="@quiz.Id" class="btn btn-secondary">
+                                <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+                                Câu hỏi
+                            </a>
+                            <a asp-action="Edit"
+                               asp-route-id="@quiz.Id"
+                               class="teacher-icon-button"
+                               title="Sửa"
+                               aria-label="Sửa @quiz.Title"
+                               data-teacher-modal
+                               data-modal-title="Chỉnh sửa Quiz"
+                               data-modal-size="lg">
+                                <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                            </a>
+                            <form asp-action="Delete" asp-route-id="@quiz.Id" asp-route-topicId="@Model.TopicId" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit"
+                                        class="teacher-icon-button btn-action-delete"
+                                        title="Xóa"
+                                        aria-label="Xóa @quiz.Title"
+                                        onclick="return confirm('Bạn có chắc chắn muốn xóa Quiz này?');">
+                                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>

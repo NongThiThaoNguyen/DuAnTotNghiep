@@ -50,6 +50,13 @@
     else if (hour >= 12 && hour < 18) timeGreeting = "Chào buổi chiều";
     else if (hour >= 18 && hour < 22) timeGreeting = "Chào buổi tối";
     else timeGreeting = "Chào đêm muộn";
+
+    string studentName = user?.FullName ?? "Học viên";
+    string studentInitials = string.Concat(studentName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => part[0].ToString().ToUpperInvariant()));
+    if (string.IsNullOrWhiteSpace(studentInitials)) studentInitials = "HV";
 }
 
 <div class="max-w-7xl mx-auto py-6 px-4 font-sans space-y-8">
@@ -57,17 +64,24 @@
     <!-- ==================== 1. HEADER ==================== -->
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div class="flex items-center gap-4.5">
-            <div class="relative w-18 h-18">
-                <img class="w-18 h-18 rounded-full object-cover ring-4 ring-blue-50 bg-white" 
-                     src="@(user != null && !string.IsNullOrEmpty(user.AvatarUrl) ? user.AvatarUrl : "/default-images/avatar.png")" 
-                     alt="Avatar" />
+            <div class="relative w-18 h-18 student-overview-avatar-wrap">
+                @if (user != null && !string.IsNullOrEmpty(user.AvatarUrl))
+                {
+                    <img class="w-18 h-18 rounded-full object-cover ring-4 ring-blue-50 bg-white"
+                         src="@user.AvatarUrl"
+                         alt="@studentName" />
+                }
+                else
+                {
+                    <span class="student-overview-avatar-fallback" aria-hidden="true">@studentInitials</span>
+                }
                 <div class="absolute -bottom-1 -right-1 px-2 py-0.5 rounded-full text-[8px] font-bold uppercase tracking-wider @rankColor border">
                     @rankTier
                 </div>
             </div>
             <div>
-                <h1 class="text-2xl font-black text-slate-900 leading-tight">@timeGreeting, @(user?.FullName ?? "Học viên")! 👋</h1>
-                <p class="text-slate-500 text-sm mt-1">Hôm nay bạn muốn học gì nào? Lộ trình đang ở trạng thái tốt.</p>
+                <h1 class="text-2xl font-black text-slate-900 leading-tight">@timeGreeting, @studentName</h1>
+                <p class="text-slate-500 text-sm mt-1">Tiếp tục từ lộ trình hiện tại hoặc xem lại các chỉ số học tập trong tuần.</p>
                 <div class="flex items-center gap-2 mt-2">
                     <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-100">
                         Level @(profile?.CurrentLevel?.Code ?? "N/A")
@@ -131,7 +145,7 @@
         <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Chuỗi Streak</span>
             <div class="text-2xl font-black text-orange-500 mt-1">
-                @(dashboard?.StreakDays ?? 0) ngày 🔥
+                @(dashboard?.StreakDays ?? 0) ngày
             </div>
             <span class="text-[10px] text-slate-400 mt-1">Học đều đặn mỗi ngày</span>
         </div>
@@ -163,7 +177,7 @@
         <div class="bg-white p-4.5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
             <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Tích lũy XP</span>
             <div class="text-2xl font-black text-blue-600 mt-1">
-                @totalXp XP 🏆
+                @totalXp XP
             </div>
             <span class="text-[10px] text-slate-400 mt-1">Level học tập hiện tại: @level</span>
         </div>
@@ -375,19 +389,19 @@
                     <!-- Danh sách Huy hiệu đẹp -->
                     <div class="grid grid-cols-4 gap-2 pt-2 border-t border-slate-50">
                         <div class="flex flex-col items-center text-center opacity-100" title="Đã tích lũy >100 XP">
-                            <span class="text-2xl">🌱</span>
+                            <span class="student-achievement-mark">KĐ</span>
                             <span class="text-[9px] font-bold text-slate-600 mt-1">Khởi đầu</span>
                         </div>
                         <div class="flex flex-col items-center text-center @(completedLessons >= 5 ? "opacity-100" : "opacity-35")" title="Hoàn thành 5 bài học">
-                            <span class="text-2xl">📚</span>
+                            <span class="student-achievement-mark">BH</span>
                             <span class="text-[9px] font-bold text-slate-600 mt-1">Chăm chỉ</span>
                         </div>
                         <div class="flex flex-col items-center text-center @(completedQuizzes >= 3 ? "opacity-100" : "opacity-35")" title="Hoàn thành 3 bài Quiz">
-                            <span class="text-2xl">⚡</span>
+                            <span class="student-achievement-mark">QZ</span>
                             <span class="text-[9px] font-bold text-slate-600 mt-1">Bứt phá</span>
                         </div>
                         <div class="flex flex-col items-center text-center @(dashboard?.StreakDays >= 5 ? "opacity-100" : "opacity-35")" title="Học liên tục 5 ngày">
-                            <span class="text-2xl">🔥</span>
+                            <span class="student-achievement-mark">ST</span>
                             <span class="text-[9px] font-bold text-slate-600 mt-1">Kiên trì</span>
                         </div>
                     </div>

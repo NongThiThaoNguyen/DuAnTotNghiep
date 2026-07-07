@@ -5,14 +5,14 @@
     var snapshots = ViewBag.ProgressSnapshots as List<StudentProgressSnapshot> ?? new List<StudentProgressSnapshot>();
     var pathNodes = ViewBag.PathNodes as List<LearningPathNode> ?? new List<LearningPathNode>();
     var activities = ViewBag.StudyActivities as List<StudyActivityLog> ?? new List<StudyActivityLog>();
-    var avatar = string.IsNullOrEmpty(Model.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.FullName ?? "HV")}&background=6C63FF&color=fff" : Model.AvatarUrl;
+    var avatar = string.IsNullOrEmpty(Model.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.FullName ?? "HV")}&background=171a1f&color=fff" : Model.AvatarUrl;
 }
 
 <div class="max-w-7xl mx-auto py-8 px-4 font-sans space-y-8">
     
     <!-- Navigation back -->
     <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-        <a href="/Teacher/Students" class="text-xs font-bold text-slate-500 hover:text-purple-650 transition-colors flex items-center gap-1.5 no-modal">
+        <a href="/Teacher/Students" class="text-xs font-bold text-slate-500 hover:text-slate-650 transition-colors flex items-center gap-1.5 no-modal">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Quay lại danh sách học viên
         </a>
@@ -20,14 +20,14 @@
 
     <!-- Student Profile Header Card -->
     <div class="bg-white rounded-3xl border border-slate-200 shadow-md p-6 sm:p-8 flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-between relative overflow-hidden">
-        <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-500 to-indigo-500"></div>
+        <div class="absolute top-0 left-0 right-0 h-1 bg-slate-200"></div>
         <div class="flex items-center gap-5">
-            <img src="@avatar" alt="Avatar" class="w-20 h-20 rounded-full object-cover ring-4 ring-purple-100 bg-slate-50 shadow-sm" onerror="this.src='https://ui-avatars.com/api/?name=HV&background=6C63FF&color=fff';" />
+            <img src="@avatar" alt="Avatar" class="w-20 h-20 rounded-full object-cover ring-4 ring-slate-100 bg-slate-50 shadow-sm" onerror="this.src='https://ui-avatars.com/api/?name=HV&background=171a1f&color=fff';" />
             <div class="space-y-1.5">
                 <h1 class="text-2xl font-black text-slate-900 leading-tight">@Model.FullName</h1>
                 <p class="text-slate-500 text-xs font-medium">Học viên hệ thống | Ngày gia nhập: @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
                 <div class="flex flex-wrap gap-2 pt-1">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-100">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-slate-50 text-slate-700 border border-slate-100">
                         Email: @Model.Email
                     </span>
                     <span class="inline-flex items-center px-2.5 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-700 border border-blue-100">
@@ -38,7 +38,7 @@
         </div>
 
         <div>
-            <a href="/Teacher/Messages?studentId=@Model.Id" class="px-5 py-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold transition-all text-xs flex items-center gap-1.5 shadow-md shadow-purple-500/15 hover:from-purple-600 hover:to-indigo-700 hover:-translate-y-0.5 duration-200 cursor-pointer no-modal">
+            <a href="/Teacher/Messages?studentId=@Model.Id" class="px-5 py-3 rounded-xl bg-slate-900 text-white font-bold transition-all text-xs flex items-center gap-1.5 shadow-md shadow-slate-500/15 hover:bg-slate-800 hover:-translate-y-0.5 duration-200 cursor-pointer no-modal">
                 <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
                 Nhắn tin trao đổi
             </a>
@@ -54,7 +54,7 @@
             <!-- 1. Learning Path Current Status -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
                 <h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-route text-purple-500"></i>
+                    <i class="fa-solid fa-route text-slate-500"></i>
                     Lộ trình học tập hiện tại
                 </h3>
                 
@@ -88,7 +88,7 @@
             <!-- 2. Recent Study Activity Log -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
                 <h3 class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-clock-rotate-left text-purple-500"></i>
+                    <i class="fa-solid fa-clock-rotate-left text-slate-500"></i>
                     Nhật ký học tập gần đây
                 </h3>
                 
@@ -136,7 +136,7 @@
             <!-- Snapshot Progress Cards -->
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-5">
                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-chart-line text-purple-500"></i>
+                    <i class="fa-solid fa-chart-line text-slate-500"></i>
                     Tiến trình định kỳ
                 </h3>
                 
@@ -153,7 +153,7 @@
                                     <i class="fa-solid fa-calendar-day text-slate-400"></i>
                                     @snap.SnapshotDate.ToString("dd/MM/yyyy")
                                 </span>
-                                <span class="text-purple-650">Đạt @snap.ProgressPercent%</span>
+                                <span class="text-slate-650">Đạt @snap.ProgressPercent%</span>
                             </div>
                             <div class="grid grid-cols-2 gap-4 text-xs mt-1">
                                 <div>

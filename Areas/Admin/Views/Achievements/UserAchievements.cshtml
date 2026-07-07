@@ -28,7 +28,7 @@
 
     <!-- User Info Card -->
     <div class="bg-white rounded-2xl shadow-xs border border-slate-200 p-6 mb-8 flex items-center gap-6">
-        <img src="@Model.AvatarUrl" alt="@Model.FullName" class="w-16 h-16 rounded-full object-cover border border-slate-200" onerror="this.src='/images/default-avatar.png';" />
+        <img src="@Model.AvatarUrl" alt="@Model.FullName" class="w-16 h-16 rounded-full object-cover border border-slate-200" onerror="this.onerror=null;this.src='/images/default-avatar.svg';" />
         <div>
             <h3 class="text-lg font-bold text-slate-800">@Model.FullName</h3>
             <p class="text-sm text-slate-500">@Model.Email</p>

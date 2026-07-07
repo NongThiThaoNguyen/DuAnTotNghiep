@@ -6,14 +6,11 @@
     int totalPages = ViewBag.TotalPages ?? 1;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
+<div class="teacher-page-header">
     <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Danh sách Học viên</h1>
-        <p class="text-muted m-0 small">Theo dõi danh sách học viên, tiến trình học tập và bảng điểm tổng hợp.</p>
+        <span class="teacher-page-kicker">Học viên</span>
+        <h1>Danh sách học viên</h1>
+        <p>Theo dõi danh sách học viên, tiến trình học tập và bảng điểm tổng hợp.</p>
     </div>
 </div>
 
@@ -49,13 +46,17 @@
     }
     @foreach (var user in Model)
     {
-        var avatar = string.IsNullOrEmpty(user.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(user.FullName ?? "HV")}&background=6C63FF&color=fff" : user.AvatarUrl;
+        var avatar = string.IsNullOrWhiteSpace(user.AvatarUrl)
+            || user.AvatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
+            || user.AvatarUrl.Contains("/images/default-avatar.png", StringComparison.OrdinalIgnoreCase)
+            ? "/images/default-avatar.svg"
+            : user.AvatarUrl;
 
         <div class="course-card-wrapper-item">
             <div class="card-ailearn h-100 d-flex flex-column justify-content-between p-4">
                 <div>
                     <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
-                        <img src="@avatar" alt="Avatar" class="user-avatar-sidebar border border-2 border-primary" style="width: 48px; height: 48px;" onerror="this.src='https://ui-avatars.com/api/?name=HV&background=6C63FF&color=fff';" />
+                        <img src="@avatar" alt="Avatar" class="user-avatar-sidebar border border-2 border-primary" style="width: 48px; height: 48px;" onerror="this.onerror=null;this.src='/images/default-avatar.svg';" />
                         <div class="d-flex flex-column">
                             <span class="font-weight-bold text-dark text-sm">@user.FullName</span>
                             <span class="text-muted small text-truncate" style="max-width: 140px;">@user.Email</span>

@@ -3,38 +3,6 @@
     ViewData["Title"] = "Kỹ năng ưu tiên";
 }
 
-<style>
-    .skill-checkbox:checked + .skill-card-body {
-        border-color: #3b82f6 !important;
-        background-color: #eff6ff !important;
-        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-    }
-    .skill-card-body {
-        transition: all 0.2s ease-in-out;
-        border: 2px solid #e2e8f0;
-    }
-    .skill-card-body:hover {
-        border-color: #bfdbfe;
-    }
-    .skill-checkbox:checked + .skill-card-body .skill-icon-container {
-        background-color: #3b82f6;
-        color: #ffffff;
-    }
-    .skill-checkbox:checked + .skill-card-body .check-indicator {
-        opacity: 1;
-        transform: scale(1);
-    }
-    .check-indicator {
-        opacity: 0;
-        transform: scale(0.5);
-        transition: all 0.2s ease-in-out;
-    }
-    .skill-card-disabled {
-        opacity: 0.5;
-        cursor: not-allowed !important;
-    }
-</style>
-
 <div class="max-w-4xl mx-auto py-12">
     
     <partial name="_OnboardingStepper" model="3" />

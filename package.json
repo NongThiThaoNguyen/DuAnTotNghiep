@@ -1,5 +1,11 @@
 {
+  "scripts": {
+    "design:lint": "designmd lint DESIGN.md"
+  },
   "dependencies": {
     "playwright": "^1.61.1"
+  },
+  "devDependencies": {
+    "@google/design.md": "^0.3.0"
   }
 }

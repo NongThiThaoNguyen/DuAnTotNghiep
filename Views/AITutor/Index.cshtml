@@ -7,6 +7,12 @@
     var isOnline = !string.IsNullOrEmpty(apiKey);
     var isGemini = apiKey.StartsWith("AIzaSy");
     var modelName = isGemini ? (Configuration["AI:Model"] ?? "Gemini 1.5 Flash") : "GPT-4o Mini";
+    var rawStudentAvatarUrl = ViewBag.StudentAvatarUrl as string;
+    var studentAvatarUrl = string.IsNullOrWhiteSpace(rawStudentAvatarUrl)
+        || rawStudentAvatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
+        || rawStudentAvatarUrl.Contains("/images/default-avatar.png", StringComparison.OrdinalIgnoreCase)
+        ? "/images/default-avatar.svg"
+        : rawStudentAvatarUrl;
 }
 
 @section Styles {
@@ -42,7 +48,7 @@
     <div class="chat-header-ailearn">
         <div class="chat-tutor-profile">
             <div class="chat-tutor-avatar">
-                <img src="/images/ai-tutor.png" alt="AI Tutor" onerror="this.src='https://ui-avatars.com/api/?name=AI&background=6C63FF&color=fff'" />
+                <img src="/images/ai-tutor.svg" alt="AI Tutor" onerror="this.onerror=null;this.src='/images/default-avatar.svg';" />
                 <span class="chat-tutor-status @(isOnline ? "bg-emerald-500" : "bg-amber-500")"></span>
             </div>
             <div class="chat-tutor-info">
@@ -81,7 +87,7 @@
 
     <!-- Hidden configs -->
     <input type="hidden" id="conversationId" value="@Model.ConversationId" />
-    <input type="hidden" id="studentAvatarUrl" value="@ViewBag.StudentAvatarUrl" />
+    <input type="hidden" id="studentAvatarUrl" value="@studentAvatarUrl" />
     @Html.AntiForgeryToken()
 
     <!-- Messages Log -->
@@ -90,7 +96,7 @@
         {
             var isStudent = (msg.SenderType == "STUDENT");
             <div class="chat-bubble-wrapper @(isStudent ? "student" : "ai")">
-                <img src="@(isStudent ? ViewBag.StudentAvatarUrl : "/images/ai-tutor.png")" alt="Avatar" class="chat-bubble-avatar" onerror="this.src='https://ui-avatars.com/api/?name=@(isStudent ? "HV" : "AI")&background=6C63FF&color=fff'" />
+                <img src="@(isStudent ? studentAvatarUrl : "/images/ai-tutor.svg")" alt="Avatar" class="chat-bubble-avatar" onerror="this.onerror=null;this.src='/images/default-avatar.svg';" />
                 <div class="chat-bubble-content">
                     <p class="chat-bubble-text">@msg.MessageText</p>
                     <span class="chat-bubble-time">@msg.TimeLabel</span>

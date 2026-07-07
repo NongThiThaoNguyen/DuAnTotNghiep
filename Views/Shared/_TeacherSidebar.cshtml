@@ -1,0 +1,88 @@
+@{
+    var controller = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var contentControllers = new[] { "Courses", "Lessons", "Assignments", "Quizzes" };
+
+    string NavClass(params string[] targets)
+    {
+        var isActive = targets.Any(target =>
+            string.Equals(controller, target, StringComparison.OrdinalIgnoreCase));
+        return "role-nav-link teacher-nav-link rs-nav-link" + (isActive ? " is-active" : string.Empty);
+    }
+}
+
+<aside id="teacherSidebar"
+       class="role-sidebar teacher-sidebar teacher-sidebar-closed rs-sidebar"
+       aria-label="Điều hướng giảng viên">
+    <div class="teacher-sidebar-body rs-sidebar-body">
+        <a asp-area="Teacher" asp-controller="Home" asp-action="Index" class="teacher-brand rs-brand">
+            <span class="teacher-brand-mark rs-brand-mark" aria-hidden="true">D</span>
+            <span class="teacher-brand-copy rs-brand-copy">
+                <strong>AI Study English</strong>
+                <small>Không gian giảng dạy</small>
+            </span>
+        </a>
+
+        <p class="teacher-nav-section-title rs-nav-section">Giảng dạy</p>
+        <nav class="teacher-nav rs-nav-list" aria-label="Chức năng giảng dạy">
+            <a class="@NavClass("Home")" asp-area="Teacher" asp-controller="Home" asp-action="Index">
+                <i class="fa-solid fa-house" aria-hidden="true"></i>
+                <span>Tổng quan</span>
+            </a>
+            <a class="@NavClass(contentControllers)" asp-area="Teacher" asp-controller="Courses" asp-action="Index">
+                <i class="fa-solid fa-book-open" aria-hidden="true"></i>
+                <span>Khóa học giảng dạy</span>
+            </a>
+            <a class="@NavClass("Students")" asp-area="Teacher" asp-controller="Students" asp-action="Index">
+                <i class="fa-solid fa-user-group" aria-hidden="true"></i>
+                <span>Quản lý học viên</span>
+            </a>
+            <a class="@NavClass("Grades")" asp-area="Teacher" asp-controller="Grades" asp-action="Index">
+                <i class="fa-solid fa-chart-column" aria-hidden="true"></i>
+                <span>Quản lý điểm số</span>
+            </a>
+            <a class="@NavClass("Attendance")" asp-area="Teacher" asp-controller="Attendance" asp-action="Index">
+                <i class="fa-solid fa-clipboard-check" aria-hidden="true"></i>
+                <span>Điểm danh</span>
+            </a>
+        </nav>
+
+        <p class="teacher-nav-section-title rs-nav-section">Công cụ</p>
+        <nav class="teacher-nav rs-nav-list" aria-label="Công cụ giảng viên">
+            <a class="@NavClass("Resources")" asp-area="Teacher" asp-controller="Resources" asp-action="Index">
+                <i class="fa-solid fa-folder-open" aria-hidden="true"></i>
+                <span>Tài liệu học tập</span>
+            </a>
+            <a class="@NavClass("Messages")" asp-area="Teacher" asp-controller="Messages" asp-action="Index">
+                <i class="fa-solid fa-message" aria-hidden="true"></i>
+                <span>Tin nhắn</span>
+            </a>
+            <a class="@NavClass("Schedule")" asp-area="Teacher" asp-controller="Schedule" asp-action="Index">
+                <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+                <span>Lịch dạy</span>
+            </a>
+            <a class="@NavClass("Reports")" asp-area="Teacher" asp-controller="Reports" asp-action="Index">
+                <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+                <span>Báo cáo tổng hợp</span>
+            </a>
+        </nav>
+
+        <p class="teacher-nav-section-title rs-nav-section">Cá nhân</p>
+        <nav class="teacher-nav rs-nav-list" aria-label="Tài khoản giảng viên">
+            <a class="@NavClass("Profile")" asp-area="Teacher" asp-controller="Profile" asp-action="Index">
+                <i class="fa-solid fa-address-card" aria-hidden="true"></i>
+                <span>Hồ sơ cá nhân</span>
+            </a>
+            <a class="@NavClass("Settings")" asp-area="Teacher" asp-controller="Settings" asp-action="Index">
+                <i class="fa-solid fa-gear" aria-hidden="true"></i>
+                <span>Cài đặt</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="teacher-sidebar-footer rs-sidebar-footer">
+        <a class="teacher-logout-link" asp-area="" asp-controller="Account" asp-action="Logout">
+            <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+            <span>Đăng xuất</span>
+        </a>
+    </div>
+</aside>

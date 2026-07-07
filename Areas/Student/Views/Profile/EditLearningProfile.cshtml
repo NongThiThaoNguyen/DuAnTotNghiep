@@ -49,6 +49,12 @@
 
     bool hasErrors = !ViewData.ModelState.IsValid;
     string defaultMode = hasErrors ? "edit" : "dashboard";
+    string studentName = user?.FullName ?? "Học viên";
+    string studentInitials = string.Concat(studentName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => part[0].ToString().ToUpperInvariant()));
+    if (string.IsNullOrWhiteSpace(studentInitials)) studentInitials = "HV";
 }
 
 <div class="max-w-7xl mx-auto py-8 px-4 font-sans">
@@ -90,15 +96,22 @@
                 <!-- Card Lớn: Thông tin cá nhân học tập -->
                 <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between">
                     <div class="text-center pb-6 border-b border-slate-100">
-                        <div class="relative w-24 h-24 mx-auto mb-4">
-                            <img class="w-24 h-24 rounded-full object-cover ring-4 ring-blue-50 bg-white" 
-                                 src="@(user != null && !string.IsNullOrEmpty(user.AvatarUrl) ? user.AvatarUrl : "/default-images/avatar.png")" 
-                                 alt="Avatar" />
+                        <div class="relative w-24 h-24 mx-auto mb-4 student-profile-avatar-wrap">
+                            @if (user != null && !string.IsNullOrEmpty(user.AvatarUrl))
+                            {
+                                <img class="w-24 h-24 rounded-full object-cover ring-4 ring-blue-50 bg-white"
+                                     src="@user.AvatarUrl"
+                                     alt="@studentName" />
+                            }
+                            else
+                            {
+                                <span class="student-overview-avatar-fallback" aria-hidden="true">@studentInitials</span>
+                            }
                             <div class="absolute -bottom-1.5 -right-1 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider @rankColor border">
                                 @rankTier
                             </div>
                         </div>
-                        <h2 class="text-xl font-bold text-slate-900">@(user?.FullName ?? "Học viên")</h2>
+                        <h2 class="text-xl font-bold text-slate-900">@studentName</h2>
                         <p class="text-slate-400 text-xs mt-0.5">@(user?.Email ?? "")</p>
                         
                         <div class="mt-4 flex items-center justify-center gap-2">
@@ -133,11 +146,11 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <span class="block text-[10px] font-bold text-slate-400 uppercase">Học liên tục</span>
-                                <span class="text-base font-extrabold text-orange-500">@(dashboard?.StreakDays ?? 0) ngày 🔥</span>
+                                <span class="text-base font-extrabold text-orange-500">@(dashboard?.StreakDays ?? 0) ngày</span>
                             </div>
                             <div>
                                 <span class="block text-[10px] font-bold text-slate-400 uppercase">Tích lũy</span>
-                                <span class="text-base font-extrabold text-blue-600">@totalXp XP 🏆</span>
+                                <span class="text-base font-extrabold text-blue-600">@totalXp XP</span>
                             </div>
                         </div>
                     </div>

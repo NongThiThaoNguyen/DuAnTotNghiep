@@ -49,7 +49,7 @@
         <header class="lp-header">
             <div class="lp-header__left">
                 <p class="lp-header__eyebrow">
-                    @(Model.GeneratedByAi ? "✨ AI Study English — Lộ trình AI" : "AI Study English")
+                    @(Model.GeneratedByAi ? "AI Study English - Lộ trình AI" : "AI Study English")
                 </p>
                 <h1 class="lp-header__title">@Model.PathTitle</h1>
                 @if (!string.IsNullOrWhiteSpace(Model.PathDescription))
@@ -137,7 +137,7 @@
             }
             else
             {
-                <p class="lp-today-empty">Không có nhiệm vụ nào được lên lịch cho hôm nay. Tiếp tục lộ trình phía dưới nhé! 👇</p>
+                <p class="lp-today-empty">Không có nhiệm vụ nào được lên lịch cho hôm nay. Tiếp tục lộ trình phía dưới nhé.</p>
             }
         </section>
 

@@ -50,9 +50,21 @@ namespace DuAnTotNghiep.Controllers
             };
 
             var studentUser = await _context.Users.FindAsync(userId);
-            ViewBag.StudentAvatarUrl = studentUser?.AvatarUrl ?? "/default-images/avatar.png";
+            ViewBag.StudentAvatarUrl = NormalizeAvatarUrl(studentUser?.AvatarUrl);
 
             return View(vm);
+        }
+
+        private static string NormalizeAvatarUrl(string? avatarUrl)
+        {
+            if (string.IsNullOrWhiteSpace(avatarUrl)
+                || avatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
+                || avatarUrl.Contains("/images/default-avatar.png", StringComparison.OrdinalIgnoreCase))
+            {
+                return "/images/default-avatar.svg";
+            }
+
+            return avatarUrl;
         }
 
         [HttpPost]

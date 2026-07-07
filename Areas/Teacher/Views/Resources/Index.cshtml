@@ -8,120 +8,131 @@
     int totalPages = ViewBag.TotalPages ?? 1;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
+<div class="teacher-page-header">
     <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Kho tài liệu tham khảo</h1>
-        <p class="text-muted m-0 small">Quản lý sách điện tử, file nghe podcast, liên kết ngoài hỗ trợ học tập.</p>
+        <span class="teacher-page-kicker">Học liệu</span>
+        <h1>Kho tài liệu tham khảo</h1>
+        <p>Quản lý sách điện tử, podcast và liên kết học tập để học viên tham khảo đúng nguồn.</p>
     </div>
-    <a href="/Teacher/Resources/Create" class="btn btn-primary-ailearn">
-        <i class="fa-solid fa-plus me-1"></i> Tải lên học liệu mới
+    <a asp-action="Create"
+       class="btn btn-primary"
+       data-teacher-modal
+       data-modal-title="Thêm học liệu mới"
+       data-modal-size="lg">
+        <i class="fa-solid fa-plus" aria-hidden="true"></i>
+        Tải lên học liệu
     </a>
 </div>
 
-<!-- Filters Section -->
-<div class="card-ailearn mb-4">
-    <form method="get" class="row g-3 align-items-end">
-        <!-- Keyword Search -->
-        <div class="col-md-5">
-            <label class="form-label text-muted small uppercase font-weight-bold">Tìm kiếm</label>
-            <div class="search-box w-100">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="keyword" value="@keyword" placeholder="Nhập tên học liệu, tác giả..." />
-            </div>
+<form method="get" class="teacher-toolbar mb-4" aria-label="Bộ lọc học liệu">
+    <div class="teacher-toolbar-field is-wide">
+        <label for="resourceKeyword">Tìm kiếm</label>
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input id="resourceKeyword" type="text" name="keyword" value="@keyword" placeholder="Tên học liệu, tác giả hoặc tổ chức" />
         </div>
-
-        <!-- Source Type Filter -->
-        <div class="col-md-4">
-            <label class="form-label text-muted small uppercase font-weight-bold">Loại tài liệu</label>
-            <select name="sourceType" class="form-select border-1 rounded-3">
-                <option value="">Tất cả</option>
-                <option value="TEACHER_CREATED">Giáo viên biên soạn</option>
-                <option value="OFFICIAL">Chính thống (OFFICIAL)</option>
-                <option value="OPEN_LICENSE">Giấy phép mở (OPEN_LICENSE)</option>
-                <option value="REFERENCE_ONLY">Chỉ tham khảo (REFERENCE_ONLY)</option>
-            </select>
-        </div>
-
-        <!-- Action buttons -->
-        <div class="col-md-3 d-flex gap-2">
-            <button type="submit" class="btn btn-primary-ailearn flex-grow-1 btn-sm">Lọc</button>
-            <a href="/Teacher/Resources" class="btn btn-secondary-ailearn btn-sm" title="Làm mới">
-                <i class="fa-solid fa-rotate"></i>
-            </a>
-        </div>
-    </form>
-</div>
-
-<!-- Table List Card -->
-<div class="card-ailearn p-0 overflow-hidden">
-    <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
-            <thead>
-                <tr class="text-muted small font-weight-bold uppercase bg-light">
-                    <th class="py-3 px-4">Tên học liệu</th>
-                    <th class="py-3 px-4">Tác giả/Tổ chức</th>
-                    <th class="py-3 px-4 text-center">Phân loại nguồn</th>
-                    <th class="py-3 px-4 text-center">Chính sách sử dụng</th>
-                    <th class="py-3 px-4 text-end">Thao tác</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (!Model.Any())
-                {
-                    <tr>
-                        <td colspan="5" class="py-4 text-center text-muted small">Không tìm thấy tài liệu nào.</td>
-                    </tr>
-                }
-                @foreach (var item in Model)
-                {
-                    <tr>
-                        <td class="py-3 px-4">
-                            <div class="d-flex flex-column">
-                                <span class="font-weight-bold text-dark">@item.SourceName</span>
-                                @if (!string.IsNullOrEmpty(item.SourceUrl))
-                                {
-                                    <a href="@item.SourceUrl" target="_blank" class="text-xs text-primary text-decoration-underline text-truncate d-inline-block" style="max-width: 250px;">@item.SourceUrl</a>
-                                }
-                            </div>
-                        </td>
-                        <td class="py-3 px-4 text-muted">@(item.Author ?? "N/A") / @(item.Organization ?? "N/A")</td>
-                        <td class="py-3 px-4 text-center">
-                            <span class="purple-badge">@item.SourceType</span>
-                        </td>
-                        <td class="py-3 px-4 text-center text-muted">@item.UsagePolicy</td>
-                        <td class="py-3 px-4 text-end">
-                            <div class="d-flex justify-content-end gap-2">
-                                <a href="/Teacher/Resources/Details/@item.Id" class="btn btn-outline-primary btn-sm p-1 px-2" title="Xem">
-                                    <i class="fa-solid fa-eye"></i>
-                                </a>
-                                <a href="/Teacher/Resources/Edit/@item.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa">
-                                    <i class="fa-solid fa-pen"></i>
-                                </a>
-                                <a href="/Teacher/Resources/Delete/@item.Id" class="btn btn-outline-danger btn-sm p-1 px-2" title="Xóa">
-                                    <i class="fa-solid fa-trash"></i>
-                                </a>
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
     </div>
+
+    <div class="teacher-toolbar-field">
+        <label for="resourceType">Loại tài liệu</label>
+        <select id="resourceType" name="sourceType" class="form-select">
+            <option value="">Tất cả tài liệu</option>
+            <option value="TEACHER_CREATED" selected="@(sourceType == ReferenceSourceType.TEACHER_CREATED ? "selected" : null)">Giáo viên biên soạn</option>
+            <option value="OFFICIAL" selected="@(sourceType == ReferenceSourceType.OFFICIAL ? "selected" : null)">Chính thống</option>
+            <option value="OPEN_LICENSE" selected="@(sourceType == ReferenceSourceType.OPEN_LICENSE ? "selected" : null)">Giấy phép mở</option>
+            <option value="REFERENCE_ONLY" selected="@(sourceType == ReferenceSourceType.REFERENCE_ONLY ? "selected" : null)">Chỉ tham khảo</option>
+        </select>
+    </div>
+
+    <div class="teacher-action-group">
+        <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-filter" aria-hidden="true"></i>
+            Lọc
+        </button>
+        <a asp-action="Index" class="teacher-icon-button" title="Làm mới" aria-label="Làm mới bộ lọc">
+            <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+        </a>
+    </div>
+</form>
+
+<div class="teacher-table-wrap">
+    <table class="table align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Tên học liệu</th>
+                <th>Tác giả/Tổ chức</th>
+                <th class="text-center">Phân loại</th>
+                <th class="text-center">Chính sách</th>
+                <th class="text-end">Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="5" class="teacher-empty-row">Không tìm thấy tài liệu nào.</td>
+                </tr>
+            }
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="teacher-table-title">
+                            <strong>@item.SourceName</strong>
+                            @if (!string.IsNullOrEmpty(item.SourceUrl))
+                            {
+                                <a href="@item.SourceUrl" target="_blank" rel="noopener" class="teacher-resource-link">@item.SourceUrl</a>
+                            }
+                        </div>
+                    </td>
+                    <td>@(item.Author ?? "N/A") / @(item.Organization ?? "N/A")</td>
+                    <td class="text-center">
+                        <span class="teacher-status">@item.SourceType</span>
+                    </td>
+                    <td class="text-center">@item.UsagePolicy</td>
+                    <td>
+                        <div class="teacher-action-group">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="teacher-icon-button" title="Xem" aria-label="Xem @item.SourceName">
+                                <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                            </a>
+                            <a asp-action="Edit"
+                               asp-route-id="@item.Id"
+                               class="teacher-icon-button"
+                               title="Sửa"
+                               aria-label="Sửa @item.SourceName"
+                               data-teacher-modal
+                               data-modal-title="Chỉnh sửa học liệu"
+                               data-modal-size="lg">
+                                <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                            </a>
+                            <a asp-action="Delete"
+                               asp-route-id="@item.Id"
+                               class="teacher-icon-button btn-action-delete"
+                               title="Xóa"
+                               aria-label="Xóa @item.SourceName"
+                               data-teacher-modal
+                               data-modal-title="Xóa học liệu"
+                               data-modal-size="md">
+                                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
-<!-- Pagination -->
 @if (totalPages > 1)
 {
-    <div class="d-flex justify-content-center gap-2 mt-4">
+    <nav class="teacher-pagination" aria-label="Phân trang học liệu">
         @for (int p = 1; p <= totalPages; p++)
         {
-            <a href="/Teacher/Resources?page=@p&keyword=@keyword&sourceType=@sourceType" class="btn @(currentPage == p ? "btn-primary-ailearn" : "btn-secondary-ailearn") btn-sm px-3">
+            <a href="/Teacher/Resources?page=@p&keyword=@keyword&sourceType=@sourceType"
+               class="btn @(currentPage == p ? "btn-primary" : "btn-secondary")"
+               aria-current="@(currentPage == p ? "page" : null)">
                 @p
             </a>
         }
-    </div>
+    </nav>
 }

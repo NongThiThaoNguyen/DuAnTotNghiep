@@ -10,57 +10,77 @@
 
 <!-- Welcome Section -->
 <div class="dashboard-header-block">
-    <h1>Xin chào, @Model.StudentName! 👋</h1>
-    <p>Hôm nay bạn muốn học gì nào?</p>
+    <h1>Chào @Model.StudentName</h1>
+    <p>Tiếp tục từ phần bạn đang học hoặc xem lại tiến độ trong tuần.</p>
 </div>
+
+<section class="dashboard-next-task" aria-labelledby="next-task-title">
+    <div class="dashboard-next-task-copy">
+        <span class="dashboard-next-task-label">Nhiệm vụ tiếp theo</span>
+        @if (Model.NextTask != null)
+        {
+            <h2 id="next-task-title">@Model.NextTask.Title</h2>
+            <p>@Model.NextTask.NodeType · khoảng @Model.NextTask.EstimatedMinutes phút</p>
+        }
+        else
+        {
+            <h2 id="next-task-title">Xem lại lộ trình học hiện tại</h2>
+            <p>Chọn một nội dung phù hợp để bắt đầu phiên học hôm nay.</p>
+        }
+    </div>
+    <a href="@(Model.NextTask?.TargetUrl ?? "/Student/LearningPath")" class="dashboard-next-task-action">
+        Bắt đầu học
+        <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+    </a>
+</section>
 
 <!-- Stats Row Grid -->
 <div class="dashboard-stats-row">
     <!-- Stat 1: Study time -->
     <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box purple">
+        <div class="dashboard-stat-icon-box time">
             <i class="fa-solid fa-clock"></i>
         </div>
         <div class="dashboard-stat-info">
             <span class="dashboard-stat-label">Thời gian học tuần này</span>
             <span class="dashboard-stat-value">@Model.StudyMinutesThisWeek phút</span>
-            <span class="dashboard-stat-subtext green">Tích lũy hoạt động</span>
+            <span class="dashboard-stat-subtext green">Tổng thời lượng ghi nhận</span>
         </div>
     </div>
 
     <!-- Stat 2: Completed lessons -->
     <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box green">
+        <div class="dashboard-stat-icon-box success">
             <i class="fa-solid fa-book-open"></i>
         </div>
         <div class="dashboard-stat-info">
             <span class="dashboard-stat-label">Bài đã hoàn thành</span>
             <span class="dashboard-stat-value">@Model.CompletedLessons bài</span>
-            <span class="dashboard-stat-subtext green">Đã hoàn thành trên lộ trình</span>
+            <span class="dashboard-stat-subtext green">Đã hoàn thành trong lộ trình</span>
         </div>
     </div>
 
     <!-- Stat 3: Avg score -->
     <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box blue">
+        <div class="dashboard-stat-icon-box info">
             <i class="fa-solid fa-chart-line"></i>
         </div>
         <div class="dashboard-stat-info">
             <span class="dashboard-stat-label">Điểm trung bình</span>
             <span class="dashboard-stat-value">@(Model.AverageQuizScore > 0 ? $"{(Model.AverageQuizScore * 10).ToString("0.0")}%" : "0.0%")</span>
-            <span class="dashboard-stat-subtext green">Kiểm tra Quiz</span>
+            <span class="dashboard-stat-subtext green">Từ các bài quiz đã làm</span>
         </div>
     </div>
 
     <!-- Stat 4: Streak -->
     <div class="dashboard-stat-card">
-        <div class="dashboard-stat-icon-box orange">
+        <div class="dashboard-stat-icon-box streak">
             <i class="fa-solid fa-fire"></i>
         </div>
         <div class="dashboard-stat-info">
             <span class="dashboard-stat-label">Chuỗi ngày học</span>
             <span class="dashboard-stat-value">@Model.StreakDays ngày</span>
-            <span class="dashboard-stat-subtext orange">Tuyệt vời 🔥</span>
+            <span class="dashboard-stat-subtext orange">Duy trì nhịp học đều</span>
         </div>
     </div>
 </div>
@@ -87,17 +107,17 @@
 
         <!-- AI Recommendations Card -->
         <div class="dashboard-panel-card">
-            <h2><i class="fa-solid fa-wand-magic-sparkles text-primary me-2"></i>AI gợi ý cho bạn</h2>
+            <h2><i class="fa-solid fa-bookmark text-primary me-2"></i>Gợi ý ôn tập</h2>
             <div class="ai-recommendation-list">
                 <div class="ai-recommendation-card">
                     <span class="ai-rec-title">@Html.Raw(Model.AiRecommendation)</span>
                     @if (Model.NextTask != null)
                     {
-                        <a href="@Model.NextTask.TargetUrl" class="ai-rec-btn">Học ngay</a>
+                        <a href="@Model.NextTask.TargetUrl" class="ai-rec-btn">Tiếp tục học</a>
                     }
                     else
                     {
-                        <a href="/Courses" class="ai-rec-btn">Học ngay</a>
+                        <a href="/Courses" class="ai-rec-btn">Xem khóa học</a>
                     }
                 </div>
             </div>
@@ -108,10 +128,10 @@
     <div>
         <!-- AI Tutor Quick Chat Card -->
         <div class="tutor-banner-card">
-            <h3>AI Tutor luôn sẵn sàng hỗ trợ bạn!</h3>
-            <p>Bạn cần giải thích bài tập, hay gợi ý cách học? Hỏi AI ngay nhé!</p>
+            <h3>Trợ lý học tập</h3>
+            <p>Nhận giải thích cho bài tập hoặc gợi ý cách ôn lại phần chưa chắc.</p>
             <a href="/AITutor" class="tutor-banner-btn">
-                <span>Chat với AI Tutor</span>
+                <span>Mở trợ lý học tập</span>
                 <i class="fa-solid fa-arrow-right"></i>
             </a>
         </div>
@@ -126,7 +146,7 @@
                         <div class="timeline-dot"></div>
                         <div class="timeline-item-info">
                             <span class="timeline-item-title">Bắt đầu hành trình học tập</span>
-                            <span class="timeline-item-time">Chào mừng bạn gia nhập nền tảng học tập AI Learn.</span>
+                            <span class="timeline-item-time">Bắt đầu từ lộ trình hiện tại và ghi lại các hoạt động học mới nhất.</span>
                         </div>
                     </div>
                 }

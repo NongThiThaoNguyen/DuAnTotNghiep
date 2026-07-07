@@ -29,7 +29,7 @@ namespace DuAnTotNghiep.Services
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             var studentName = user?.FullName ?? "Học viên";
-            var avatarUrl = user?.AvatarUrl ?? "/default-images/avatar.png";
+            var avatarUrl = NormalizeAvatarUrl(user?.AvatarUrl);
 
             // 1. Fetch active learning path and nodes
             var path = await _context.StudentLearningPaths
@@ -202,6 +202,18 @@ namespace DuAnTotNghiep.Services
             }
 
             return streak;
+        }
+
+        private static string NormalizeAvatarUrl(string? avatarUrl)
+        {
+            if (string.IsNullOrWhiteSpace(avatarUrl)
+                || avatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
+                || avatarUrl.Contains("/images/default-avatar.png", StringComparison.OrdinalIgnoreCase))
+            {
+                return "/images/default-avatar.svg";
+            }
+
+            return avatarUrl;
         }
 
         private static string GetActivityLabel(string activityType)

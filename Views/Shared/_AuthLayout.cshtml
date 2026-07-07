@@ -1,51 +1,75 @@
 <!DOCTYPE html>
-<html lang="vi" class="h-full bg-slate-50">
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - DuAnTotNghiep</title>
-    
-    <!-- Google Fonts - Roboto -->
+    <title>@ViewData["Title"] - AI Study English</title>
+    <meta name="description" content="@ViewData["MetaDescription"]" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
-    
-    <!-- Compiled Tailwind CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/DuAnTotNghiep.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/role-shell.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/auth-shell.css" asp-append-version="true" />
 </head>
-<body class="h-full font-sans text-slate-900 bg-slate-50 flex items-center justify-center p-4">
+<body class="auth-shell role-shell">
+    <a class="rs-skip-link" href="#mainContent">Bỏ qua đến nội dung chính</a>
 
-    <!-- Auth Container -->
-    <div class="w-full max-w-md">
-        <!-- Logo Header -->
-        <div class="text-center mb-8">
-            <a asp-controller="Home" asp-action="Index" class="inline-flex items-center gap-3 justify-center">
-                <div class="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/30 text-white font-bold text-2xl">
-                    D
-                </div>
+    <div class="auth-page">
+        <header class="auth-header" aria-label="Điều hướng xác thực">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="rs-brand auth-brand">
+                <span class="rs-brand-mark">D</span>
+                <span class="rs-brand-copy">
+                    <strong>AI Study English</strong>
+                    <small>Không gian học tiếng Anh</small>
+                </span>
             </a>
-            <h1 class="mt-4 text-2xl font-bold tracking-tight text-slate-900">DuAn<span class="text-blue-600">TotNghiep</span></h1>
-            <p class="mt-2 text-sm text-slate-500">
-                @ViewData["Subtitle"]
-            </p>
-        </div>
+            <nav class="auth-header-actions" aria-label="Liên kết tài khoản">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="auth-link">Trang chủ</a>
+                <a asp-area="" asp-controller="Account" asp-action="Login" class="auth-link">Đăng nhập</a>
+                <a asp-area="" asp-controller="Account" asp-action="Register" class="auth-button-secondary">Đăng kí</a>
+            </nav>
+        </header>
 
-        <!-- Render View -->
-        <main>
-            @RenderBody()
+        <main id="mainContent" class="auth-main">
+            <section class="auth-context" aria-labelledby="authContextTitle">
+                <p class="auth-eyebrow">@ViewData["AuthEyebrow"]</p>
+                <h1 id="authContextTitle">@ViewData["AuthTitle"]</h1>
+                <p>@ViewData["AuthDescription"]</p>
+                <div class="auth-compact-note" aria-label="Thông tin ngắn">
+                    <span>1 tài khoản</span>
+                    <span>3 không gian</span>
+                </div>
+            </section>
+
+            <section class="auth-panel" aria-label="@ViewData["Title"]">
+                @RenderBody()
+            </section>
+
+            <aside class="auth-side-note auth-side-note-left" aria-hidden="true">
+                <span>Học viên</span>
+                <strong>Lộ trình cá nhân</strong>
+                <small>Từ vựng, luyện nghe, bài tập</small>
+            </aside>
+
+            <aside class="auth-side-note auth-side-note-right" aria-hidden="true">
+                <span>Giáo viên</span>
+                <strong>Theo dõi lớp học</strong>
+                <small>Bài học, bài nộp, phản hồi</small>
+            </aside>
         </main>
 
-        <!-- Footer -->
-        <p class="mt-8 text-center text-xs text-slate-500">
-            &copy; 2026 DuAnTotNghiep. Thiết kế bởi Nông Thị Thảo Nguyên.
-        </p>
+        <footer class="auth-footer">
+            <span>&copy; 2026 AI Study English</span>
+            <a asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách bảo mật</a>
+        </footer>
     </div>
 
     <partial name="_ToastNotifications" />
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/auth-shell.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

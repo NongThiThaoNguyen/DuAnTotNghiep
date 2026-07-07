@@ -1,167 +1,63 @@
 @using System.Security.Claims
-@inject DuAnTotNghiep.Services.Interfaces.INotificationService NotificationService
+@{
+    var userName = User.FindFirstValue(ClaimTypes.Name) ?? "Học viên";
+    var userInitials = string.Concat(userName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
+    if (string.IsNullOrWhiteSpace(userInitials))
+    {
+        userInitials = "HV";
+    }
+}
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="vi" class="h-full">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - AI Learn</title>
+    <title>@ViewData["Title"] - AI Study English (Student)</title>
 
-    <!-- Bootstrap 5.3 CSS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-    <!-- Font Awesome 6.4 -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-    
-    <!-- AI Learn custom layout and responsive styles -->
     <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
-
-    <!-- Page Specific CSS Section -->
     @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="~/css/role-shell.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/student-shell.css" asp-append-version="true" />
+    <script src="~/js/admin-sidebar-state.js" asp-append-version="true"></script>
 </head>
-<body>
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <aside class="sidebar">
-            <div>
-                <!-- Brand logo -->
-                <a href="/Dashboard" class="sidebar-logo">
-                    <div class="logo-icon">
-                        <i class="fa-solid fa-robot"></i>
-                    </div>
-                    <div class="logo-text">AI Learn</div>
-                </a>
+<body class="role-shell student-shell h-full" data-rs-shell data-rs-closed-class="student-sidebar-closed">
+    <a class="rs-skip-link" href="#mainContent">Bỏ qua đến nội dung chính</a>
+    <header class="student-mobile-topbar rs-mobile-topbar">
+        <button id="sidebarToggle" type="button" class="student-mobile-menu-button rs-mobile-menu-button" aria-label="Mở menu học viên" aria-controls="studentSidebar" aria-expanded="false" data-rs-toggle>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+        <a href="/Dashboard" class="student-mobile-brand rs-mobile-brand">
+            <span class="student-brand-mark rs-brand-mark">D</span>
+            <span>AI Study English</span>
+        </a>
+        <a href="/Profile" class="student-mobile-avatar rs-mobile-profile" title="@userName" aria-label="Mở hồ sơ học viên">@userInitials</a>
+    </header>
 
-                <!-- Menus -->
-                <ul class="sidebar-menu">
-                    @{
-                        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
-                        var action = ViewContext.RouteData.Values["action"]?.ToString();
-                    }
-                    <li class="menu-item @(controller == "Dashboard" ? "active" : "")">
-                        <a href="/Dashboard">
-                            <i class="fa-solid fa-house"></i>
-                            <span>Tổng quan</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "LearningPath" ? "active" : "")">
-                        <a href="/Student/LearningPath">
-                            <i class="fa-solid fa-route"></i>
-                            <span>Lộ trình học</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Courses" ? "active" : "")">
-                        <a href="/Courses">
-                            <i class="fa-solid fa-graduation-cap"></i>
-                            <span>Khóa học</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Quiz" ? "active" : "")">
-                        <a href="/Quiz">
-                            <i class="fa-solid fa-clipboard-list"></i>
-                            <span>Bài tập</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "AITutor" ? "active" : "")">
-                        <a href="/AITutor">
-                            <i class="fa-solid fa-comment-dots"></i>
-                            <span>Trợ lý AI</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Statistics" ? "active" : "")">
-                        <a href="/Statistics">
-                            <i class="fa-solid fa-chart-simple"></i>
-                            <span>Thống kê</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Achievements" ? "active" : "")">
-                        <a href="/Achievements">
-                            <i class="fa-solid fa-award"></i>
-                            <span>Thành tích</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Notes" ? "active" : "")">
-                        <a href="/Notes">
-                            <i class="fa-solid fa-note-sticky"></i>
-                            <span>Ghi chú</span>
-                        </a>
-                    </li>
-                    <li class="menu-item @(controller == "Profile" ? "active" : "")">
-                        <a href="/Profile">
-                            <i class="fa-solid fa-gear"></i>
-                            <span>Cài đặt</span>
-                        </a>
-                    </li>
-                    <li class="menu-item">
-                        <a href="/Account/Logout">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Đăng xuất</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+    <div class="student-shell-frame rs-shell-frame">
+        <div id="studentSidebarOverlay" class="student-sidebar-overlay rs-sidebar-overlay" aria-hidden="true" data-rs-overlay hidden></div>
+        <partial name="_StudentSidebar" />
 
-            <!-- Bottom User Profile Info -->
-            <div class="sidebar-user">
-                <img src="@(User.FindFirst("AvatarUrl")?.Value ?? "/default-images/avatar.png")" alt="Avatar" class="user-avatar-sidebar" onerror="this.src='https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "HV")&background=6C63FF&color=fff'" />
-                <div class="user-info-sidebar">
-                    <span class="user-name-sidebar">@User.Identity?.Name</span>
-                    <span class="user-role-sidebar">Học viên Premium</span>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main Content Wrapper -->
-        <main class="main-content">
-            <!-- Header bar -->
-            <header class="app-header">
-                <!-- Search -->
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" placeholder="Tìm kiếm khóa học..." id="headerSearchInput" />
-                </div>
-
-                <!-- Header Actions -->
-                <div class="header-actions">
-                    <!-- Notification -->
-                    @{
-                        int unreadNotifCount = 0;
-                        var claimNameId = User.FindFirst(ClaimTypes.NameIdentifier);
-                        if (claimNameId != null && int.TryParse(claimNameId.Value, out int currentUserId))
-                        {
-                            unreadNotifCount = await NotificationService.GetUnreadCountAsync(currentUserId);
-                        }
-                    }
-                    <button class="notification-btn" title="Thông báo" onclick="window.location.href='/Profile#notifications'">
-                        <i class="fa-regular fa-bell"></i>
-                        @if (unreadNotifCount > 0)
-                        {
-                            <span class="notification-badge"></span>
-                        }
-                    </button>
-
-                    <!-- User Profile Dropdown -->
-                    <a href="/Profile" class="profile-dropdown-btn">
-                        <img src="@(User.FindFirst("AvatarUrl")?.Value ?? "/default-images/avatar.png")" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=@(User.Identity?.Name ?? "HV")&background=6C63FF&color=fff'" />
-                        <span class="d-none d-md-inline">@User.Identity?.Name</span>
-                    </a>
-
-                </div>
-            </header>
-
-            <!-- Render Main View Content -->
-            <div class="container-fluid p-0 flex-grow-1 relative">
+        <main id="mainContent" class="student-content rs-main-content" role="main">
+            <partial name="_StudentAccountStrip" />
+            <div class="student-page student-page-learning">
                 @RenderBody()
             </div>
+            <footer class="student-footer">&copy; 2026 AI Study English · Không gian học tập dành cho học viên</footer>
         </main>
     </div>
 
     <partial name="_ToastNotifications" />
-
-    <!-- Bootstrap 5.3 JavaScript Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Page Specific JS Section -->
+    <script src="~/js/role-shell.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

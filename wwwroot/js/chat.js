@@ -78,9 +78,13 @@ document.addEventListener("DOMContentLoaded", function () {
         const item = document.createElement("div");
         item.className = `chat-bubble-wrapper ${isStudent ? 'student' : 'ai'}`;
         
-        const avatarImg = isStudent 
-            ? document.getElementById("studentAvatarUrl")?.value || "/default-images/avatar.png"
-            : "/images/ai-tutor.png";
+        const rawAvatarUrl = document.getElementById("studentAvatarUrl")?.value || "";
+        const studentAvatarUrl = rawAvatarUrl.includes("/default-images/avatar.png") || rawAvatarUrl.includes("/images/default-avatar.png")
+            ? "/images/default-avatar.svg"
+            : rawAvatarUrl || "/images/default-avatar.svg";
+        const avatarImg = isStudent
+            ? studentAvatarUrl
+            : "/images/ai-tutor.svg";
 
         item.innerHTML = `
             <img src="${avatarImg}" alt="${sender}" class="chat-bubble-avatar">
@@ -96,7 +100,7 @@ document.addEventListener("DOMContentLoaded", function () {
         const item = document.createElement("div");
         item.className = "chat-bubble-wrapper ai typing-indicator-item";
         item.innerHTML = `
-            <img src="/images/ai-tutor.png" alt="AI" class="chat-bubble-avatar">
+            <img src="/images/ai-tutor.svg" alt="AI" class="chat-bubble-avatar">
             <div class="chat-bubble-content">
                 <div class="typing-indicator">
                     <span class="typing-dot"></span>

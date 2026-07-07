@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-07-06T00:00:00+07:00",
+  "title": "Design System: AI Study English Classic Role Shell",
+  "extensions": {
+    "colorMeta": {
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Ivory Canvas",
+        "canonical": "#F7F5EF",
+        "tonalRamp": ["#171A1F", "#34312B", "#5D5548", "#8B806D", "#BDB4A3", "#D8D2C4", "#EFEBE1", "#F7F5EF"]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Warm Surface",
+        "canonical": "#FFFEFA",
+        "tonalRamp": ["#171A1F", "#3C3930", "#686251", "#968E79", "#C7BEA9", "#E4DDCE", "#F6F1E7", "#FFFEFA"]
+      },
+      "ink": {
+        "role": "primary",
+        "displayName": "Charcoal Ink",
+        "canonical": "#171A1F",
+        "tonalRamp": ["#050607", "#171A1F", "#2A3038", "#48505A", "#68717C", "#9098A2", "#C4C9CF", "#EFF1F3"]
+      },
+      "brass": {
+        "role": "primary",
+        "displayName": "Antique Brass",
+        "canonical": "#9A6A2F",
+        "tonalRamp": ["#231404", "#3C2509", "#6F4A1F", "#9A6A2F", "#BE9254", "#D8B77E", "#EDD8B3", "#FAF0DB"]
+      },
+      "oxblood": {
+        "role": "secondary",
+        "displayName": "Oxblood",
+        "canonical": "#7A2634",
+        "tonalRamp": ["#22060B", "#3E0E17", "#5D1B27", "#7A2634", "#A54856", "#C97A84", "#E7B4BA", "#F8E2E5"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Role dashboard headings and major page titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Product UI text, forms, lists, and tables."
+      }
+    },
+    "shadows": [
+      {
+        "name": "raised-overlay",
+        "value": "0 10px 28px rgb(23 26 31 / 0.08)",
+        "purpose": "Dropdowns, modals, and toasts only."
+      },
+      {
+        "name": "command-hover",
+        "value": "0 1px 2px rgb(23 26 31 / 0.08)",
+        "purpose": "Compact action hover feedback."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "180ms ease",
+        "purpose": "Default hover, focus, selected, and drawer feedback."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary command button for confirmed actions.",
+      "html": "<button class=\"ds-btn-primary\">Lưu thay đổi</button>",
+      "css": ".ds-btn-primary{background:#171A1F;color:#FFFEFA;border:1px solid #171A1F;border-radius:8px;padding:10px 16px;font:700 14px/1.2 'Be Vietnam Pro',Arial,sans-serif;transition:background-color 180ms ease,border-color 180ms ease,box-shadow 180ms ease}.ds-btn-primary:hover{background:#6F4A1F;border-color:#6F4A1F}.ds-btn-primary:focus-visible{outline:0;box-shadow:0 0 0 3px rgb(154 106 47 / .18)}"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Secondary command for cancel, filter, and back actions.",
+      "html": "<button class=\"ds-btn-secondary\">Hủy</button>",
+      "css": ".ds-btn-secondary{background:#FFFEFA;color:#171A1F;border:1px solid #D8D2C4;border-radius:8px;padding:10px 16px;font:700 14px/1.2 'Be Vietnam Pro',Arial,sans-serif;transition:background-color 180ms ease,border-color 180ms ease}.ds-btn-secondary:hover{background:#EFEBE1;border-color:#C9C0AE}.ds-btn-secondary:focus-visible{outline:0;box-shadow:0 0 0 3px rgb(154 106 47 / .18)}"
+    },
+    {
+      "name": "Role Sidebar Link",
+      "kind": "nav",
+      "refersTo": "nav-active",
+      "description": "Dark role navigation item with compact product rhythm.",
+      "html": "<a class=\"ds-role-link ds-role-link-active\" href=\"#\">Tổng quan</a>",
+      "css": ".ds-role-link{display:flex;align-items:center;min-height:40px;padding:10px 12px;border-radius:8px;color:rgb(255 254 250 / .72);text-decoration:none;font:700 14px/1.2 'Be Vietnam Pro',Arial,sans-serif;transition:background-color 180ms ease,color 180ms ease}.ds-role-link:hover,.ds-role-link-active{background:rgb(255 254 250 / .1);color:#FFFEFA}.ds-role-link-active{box-shadow:inset 3px 0 0 #9A6A2F}"
+    },
+    {
+      "name": "Admin Panel",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Flat work surface for charts, tables, and summary sections.",
+      "html": "<section class=\"ds-panel\"><h3>Người dùng đăng ký theo tháng</h3><p>Không gian biểu đồ hoặc bảng dữ liệu.</p></section>",
+      "css": ".ds-panel{background:#FFFEFA;border:1px solid #D8D2C4;border-radius:12px;padding:24px;box-shadow:none;color:#171A1F}.ds-panel h3{margin:0 0 12px;font:700 18px/1.35 'Be Vietnam Pro',Arial,sans-serif}.ds-panel p{margin:0;color:#5D6673;font:400 15px/1.6 'Be Vietnam Pro',Arial,sans-serif}"
+    },
+    {
+      "name": "Input",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Classic product field with brass focus.",
+      "html": "<label class=\"ds-label\">Tên khóa học</label><input class=\"ds-input\" value=\"Lộ trình học A2\" />",
+      "css": ".ds-label{display:block;margin-bottom:6px;color:#5D6673;font:700 12px/1.2 'Be Vietnam Pro',Arial,sans-serif;letter-spacing:.04em}.ds-input{width:100%;background:#FFFEFA;color:#171A1F;border:1px solid #D8D2C4;border-radius:8px;padding:10px 12px;font:400 15px/1.4 'Be Vietnam Pro',Arial,sans-serif}.ds-input:focus{outline:0;border-color:#9A6A2F;box-shadow:0 0 0 3px rgb(154 106 47 / .16)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quiet Academic Command Room",
+    "overview": "The interface is a classic product workspace for people who need to study, teach, and administer without visual friction. It should feel like a refined academic operations room: precise, calm, and slightly formal, with depth coming from hierarchy and proportion rather than decorative effects.",
+    "keyCharacteristics": [
+      "Restrained classic luxury, not vintage ornament.",
+      "Hairline borders and tonal layering instead of heavy card shadows.",
+      "Deep ink sidebars, ivory work surfaces, and brass accent used only for action or state.",
+      "Standard product UI behavior: clear focus, hover, disabled, error, success, and loading states."
+    ],
+    "rules": [
+      {
+        "name": "The Brass Rarity Rule",
+        "body": "Brass appears on less than ten percent of a screen. Its scarcity gives it authority.",
+        "section": "colors"
+      },
+      {
+        "name": "The No Purple Glow Rule",
+        "body": "Purple gradients, glow shadows, and glass overlays are prohibited across role workspaces.",
+        "section": "colors"
+      },
+      {
+        "name": "The Product Type Rule",
+        "body": "No decorative display fonts in buttons, labels, tables, or form controls.",
+        "section": "typography"
+      },
+      {
+        "name": "The Surface Honesty Rule",
+        "body": "A panel may have a border or a shadow, but not both as decoration. Most panels use only a border.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do use the same canvas, surface, ink, brass, border, and status tokens across Admin, Student, and Teacher.",
+      "Do keep Admin dense and table-first, with compact rows and clear action grouping.",
+      "Do preserve existing route structure, Razor sections, breadcrumbs, forms, and sidebar behavior.",
+      "Do use brass for focus and active state, not for every icon or badge.",
+      "Do keep motion to 150-220ms state feedback and respect reduced motion."
+    ],
+    "donts": [
+      "Don't use generic AI SaaS gradients, purple glow systems, glassmorphism as decoration, fake metrics, fake testimonials, identical three-card feature grids, oversized rounded cards, or mixed icon styles.",
+      "Don't make Admin, Student, and Teacher look like three separate products.",
+      "Don't use blue or purple as the dominant identity color in role workspaces.",
+      "Don't pair broad decorative shadows with borders on every panel.",
+      "Don't hide state behind color alone; pair status colors with text or icons."
+    ]
+  }
+}

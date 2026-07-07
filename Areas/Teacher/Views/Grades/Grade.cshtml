@@ -3,35 +3,91 @@
     ViewData["Title"] = "Chấm bài";
 }
 
-<div class="max-w-3xl mx-auto py-6 px-4 font-sans space-y-6">
+<div class="teacher-page-header">
     <div>
-        <a asp-action="Pending" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors">Quay lại bài chờ chấm</a>
-        <h1 class="text-2xl font-black text-slate-900 leading-tight mt-3">@Model.TaskTitle</h1>
-        <p class="text-slate-500 text-sm">@Model.StudentName - @Model.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</p>
+        <span class="teacher-page-kicker">Chấm bài</span>
+        <h1>@Model.TaskTitle</h1>
+        <p>@Model.StudentName · @Model.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</p>
+    </div>
+    <a asp-action="Pending" class="btn btn-secondary">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Bài chờ chấm
+    </a>
+</div>
+
+<div class="teacher-grading-layout">
+    <div class="teacher-dashboard-main">
+        <section class="teacher-panel">
+            <div class="teacher-section-header">
+                <div>
+                    <span class="teacher-section-kicker">Yêu cầu</span>
+                    <h2>Đề bài</h2>
+                </div>
+            </div>
+            <div class="teacher-submission-box">@Model.TaskDescription</div>
+        </section>
+
+        <section class="teacher-panel">
+            <div class="teacher-section-header">
+                <div>
+                    <span class="teacher-section-kicker">Bài làm</span>
+                    <h2>Nội dung học viên nộp</h2>
+                </div>
+            </div>
+            <div class="teacher-submission-box">
+                @if (string.IsNullOrWhiteSpace(Model.StudentAnswer))
+                {
+                    <span class="teacher-muted">Không có nội dung văn bản.</span>
+                }
+                else
+                {
+                    @Model.StudentAnswer
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.FileUrl))
+                {
+                    <div class="teacher-callout mt-3">
+                        <span>Tệp đính kèm</span>
+                        <a href="@Model.FileUrl" target="_blank" rel="noopener">Xem tệp tài liệu</a>
+                    </div>
+                }
+
+                @if (!string.IsNullOrWhiteSpace(Model.AudioUrl))
+                {
+                    <div class="teacher-callout mt-3">
+                        <span>Bản ghi âm</span>
+                        <audio controls>
+                            <source src="@Model.AudioUrl" type="audio/mpeg" />
+                            Trình duyệt của bạn không hỗ trợ phát âm thanh.
+                        </audio>
+                    </div>
+                }
+            </div>
+        </section>
     </div>
 
-    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-5">
-        <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Yêu cầu</div>
-            <p class="text-sm text-slate-700">@Model.TaskDescription</p>
-        </div>
-        <div>
-            <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Bài làm</div>
-            <div class="text-sm text-slate-800 bg-slate-50 border border-slate-150 rounded-xl p-4 whitespace-pre-line">@Model.StudentAnswer</div>
-        </div>
-        <form asp-action="Grade" asp-route-id="@Model.Id" method="post" class="space-y-4">
-            <div class="space-y-1.5">
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Điểm</label>
-                <input name="score" value="@Model.Score" type="number" step="0.1" min="0" max="100" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" required />
+    <aside class="teacher-panel teacher-grading-panel">
+        <div class="teacher-section-header">
+            <div>
+                <span class="teacher-section-kicker">Giáo viên</span>
+                <h2>Điểm và phản hồi</h2>
             </div>
-            <div class="space-y-1.5">
-                <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Phản hồi</label>
-                <textarea name="feedback" rows="5" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl">@Model.TeacherFeedback</textarea>
+        </div>
+
+        <form asp-action="Grade" asp-route-id="@Model.Id" method="post" class="teacher-form">
+            <div>
+                <label for="score">Điểm</label>
+                <input id="score" name="score" value="@Model.Score" type="number" step="0.1" min="0" max="100" required />
+                <p class="teacher-field-help">Nhập điểm từ 0.0 đến 100.0.</p>
             </div>
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <a asp-action="Pending" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs">Hủy</a>
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs">Lưu điểm</button>
+            <div>
+                <label for="feedback">Phản hồi</label>
+                <textarea id="feedback" name="feedback" rows="5">@Model.TeacherFeedback</textarea>
+            </div>
+            <div class="teacher-form-actions">
+                <a asp-action="Pending" class="btn btn-secondary">Hủy</a>
+                <button type="submit" class="btn btn-primary">Lưu điểm</button>
             </div>
         </form>
-    </div>
+    </aside>
 </div>

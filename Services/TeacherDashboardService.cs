@@ -112,7 +112,6 @@ public class TeacherDashboardService : ITeacherDashboardService
             return avatarUrl;
         }
 
-        var displayName = string.IsNullOrWhiteSpace(fullName) ? "GV" : fullName;
-        return $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(displayName)}&background=6C63FF&color=fff";
+        return "/images/default-avatar.svg";
     }
 }

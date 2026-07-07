@@ -1767,6 +1767,11 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("(sysutcdatetime())");
 
+                    b.Property<string>("VideoUrl")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)")
+                        .HasColumnName("video_url");
+
                     b.HasKey("Id")
                         .HasName("PK__original__3213E83FFCDBE3D5");
 
@@ -2598,11 +2603,9 @@ namespace DuAnTotNghiep.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)")
-                        .HasDefaultValue("PENDING")
                         .HasColumnName("status");
 
                     b.Property<DateTime?>("UpdatedAt")
@@ -2702,13 +2705,13 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("FastProgressScoreThreshold")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(5, 2)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
                     b.Property<decimal>("LowScoreThreshold")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(5, 2)");
 
                     b.Property<int>("MissedDaysThreshold")
                         .HasColumnType("int");
@@ -4980,8 +4983,7 @@ namespace DuAnTotNghiep.Migrations
                 {
                     b.HasOne("DuAnTotNghiep.Models.LearningPathNode", "LearningPathNode")
                         .WithMany("StudyActivityLogs")
-                        .HasForeignKey("LearningPathNodeId")
-                        .HasConstraintName("FK_sal_node");
+                        .HasForeignKey("LearningPathNodeId");
 
                     b.HasOne("DuAnTotNghiep.Models.User", "Student")
                         .WithMany("StudyActivityLogs")

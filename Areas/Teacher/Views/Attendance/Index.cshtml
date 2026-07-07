@@ -5,17 +5,15 @@
     var selectedDate = ViewBag.SelectedDate as string;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
+<div class="teacher-page-header">
     <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Điểm danh học viên</h1>
-        <p class="text-muted m-0 small">Điểm danh điểm số chuyên cần và ghi chú tình hình học tập hàng ngày.</p>
+        <span class="teacher-page-kicker">Lớp học</span>
+        <h1>Điểm danh học viên</h1>
+        <p>Điểm danh chuyên cần và ghi chú tình hình học tập hàng ngày.</p>
     </div>
-    <a href="/Teacher/Attendance/History" class="btn btn-secondary-ailearn">
-        Lịch sử điểm danh &rarr;
+    <a asp-action="History" class="btn btn-secondary">
+        <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
+        Lịch sử điểm danh
     </a>
 </div>
 

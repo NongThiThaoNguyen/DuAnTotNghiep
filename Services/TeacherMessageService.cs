@@ -55,7 +55,7 @@ namespace DuAnTotNghiep.Services
                 {
                     StudentId = student.Id,
                     StudentName = student.FullName,
-                    StudentAvatar = student.AvatarUrl ?? "/default-images/avatar.png",
+                    StudentAvatar = NormalizeAvatarUrl(student.AvatarUrl),
                     UnreadCount = unread,
                     LastMessageText = lastMsg?.MessageText ?? "Chưa có tin nhắn mới.",
                     LastMessageTime = lastMsg?.CreatedAt
@@ -63,6 +63,18 @@ namespace DuAnTotNghiep.Services
             }
 
             return chatSummaries;
+        }
+
+        private static string NormalizeAvatarUrl(string? avatarUrl)
+        {
+            if (string.IsNullOrWhiteSpace(avatarUrl)
+                || avatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
+                || avatarUrl.Contains("/images/default-avatar.png", StringComparison.OrdinalIgnoreCase))
+            {
+                return "/images/default-avatar.svg";
+            }
+
+            return avatarUrl;
         }
 
         public async Task<User?> GetStudentByIdAsync(int studentId)

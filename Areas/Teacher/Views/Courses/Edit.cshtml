@@ -3,80 +3,83 @@
     ViewData["Title"] = "Chỉnh sửa khóa học";
 }
 
-<div class="w-full mx-auto py-6 px-4 font-sans space-y-6">
+<div class="teacher-page-header">
     <div>
-        <a asp-action="Index" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors">Quay lại danh sách</a>
-        <h1 class="text-2xl font-black text-slate-900 leading-tight mt-3">Chỉnh sửa khóa học</h1>
-        <p class="text-slate-500 text-sm">Chỉnh sửa thông tin khóa học và lưu lại thay đổi.</p>
+        <span class="teacher-page-kicker">Khóa học</span>
+        <h1>Chỉnh sửa khóa học</h1>
+        <p>Cập nhật thông tin hiển thị, trình độ và trạng thái của khóa học.</p>
     </div>
+</div>
 
-    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm">
-        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="space-y-5">
-            <div asp-validation-summary="ModelOnly" class="text-xs text-red-500"></div>
-            <input type="hidden" asp-for="Id" />
+<div class="teacher-panel teacher-form-panel">
+    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" class="teacher-form">
+        <div asp-validation-summary="ModelOnly" class="teacher-validation-summary"></div>
+        <input type="hidden" asp-for="Id" />
 
-            <div class="space-y-1.5">
-                <label asp-for="Title" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Tên khóa học</label>
-                <input asp-for="Title" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" required />
-                <span asp-validation-for="Title" class="text-xs text-red-500"></span>
+        <div class="teacher-form-grid">
+            <div class="teacher-field-wide">
+                <label asp-for="Title">Tên khóa học</label>
+                <input asp-for="Title" required />
+                <span asp-validation-for="Title" class="teacher-field-error"></span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div class="space-y-1.5">
-                    <label asp-for="SkillId" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Kỹ năng</label>
-                    <select asp-for="SkillId" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white" required>
-                        @foreach (var skill in Model.SkillOptions)
-                        {
-                            <option value="@skill.Id">@skill.Name</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="space-y-1.5">
-                    <label asp-for="ProficiencyLevelId" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Trình độ</label>
-                    <select asp-for="ProficiencyLevelId" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white">
-                        <option value="">Không chọn</option>
-                        @foreach (var level in Model.LevelOptions)
-                        {
-                            <option value="@level.Id">@level.Code - @level.Name</option>
-                        }
-                    </select>
-                </div>
+            <div>
+                <label asp-for="SkillId">Kỹ năng</label>
+                <select asp-for="SkillId" required>
+                    @foreach (var skill in Model.SkillOptions)
+                    {
+                        <option value="@skill.Id">@skill.Name</option>
+                    }
+                </select>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div class="space-y-1.5">
-                    <label asp-for="DifficultyLevel" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Độ khó</label>
-                    <select asp-for="DifficultyLevel" class="w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl bg-white" required>
-                        <option value="BASIC">Cơ bản</option>
-                        <option value="MEDIUM">Trung bình</option>
-                        <option value="ADVANCED">Nâng cao</option>
-                    </select>
-                </div>
-                <div class="space-y-1.5">
-                    <label asp-for="EstimatedMinutes" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Thời lượng</label>
-                    <input asp-for="EstimatedMinutes" type="number" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" />
-                </div>
-                <div class="space-y-1.5">
-                    <label asp-for="OrderIndex" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Thứ tự</label>
-                    <input asp-for="OrderIndex" type="number" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl" />
-                </div>
+            <div>
+                <label asp-for="ProficiencyLevelId">Trình độ</label>
+                <select asp-for="ProficiencyLevelId">
+                    <option value="">Không chọn</option>
+                    @foreach (var level in Model.LevelOptions)
+                    {
+                        <option value="@level.Id">@level.Code - @level.Name</option>
+                    }
+                </select>
             </div>
 
-            <label class="inline-flex items-center gap-2 text-sm font-bold text-slate-700">
-                <input asp-for="IsActive" type="checkbox" class="rounded border-slate-300" />
-                Khóa học đang hoạt động
-            </label>
-
-            <div class="space-y-1.5">
-                <label asp-for="Description" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Mô tả khóa học</label>
-                <textarea asp-for="Description" rows="4" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl"></textarea>
+            <div>
+                <label asp-for="DifficultyLevel">Độ khó</label>
+                <select asp-for="DifficultyLevel" required>
+                    <option value="BASIC">Cơ bản</option>
+                    <option value="MEDIUM">Trung bình</option>
+                    <option value="ADVANCED">Nâng cao</option>
+                </select>
             </div>
 
-            <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-                <a asp-action="Index" class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs">Hủy</a>
-                <button type="submit" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs">Lưu thay đổi</button>
+            <div>
+                <label asp-for="EstimatedMinutes">Thời lượng</label>
+                <input asp-for="EstimatedMinutes" type="number" min="0" />
             </div>
-        </form>
-    </div>
+
+            <div>
+                <label asp-for="OrderIndex">Thứ tự</label>
+                <input asp-for="OrderIndex" type="number" min="0" />
+            </div>
+
+            <div class="teacher-field-wide">
+                <label class="teacher-check">
+                    <input asp-for="IsActive" type="checkbox" />
+                    <span>Khóa học đang hoạt động</span>
+                </label>
+            </div>
+
+            <div class="teacher-field-wide">
+                <label asp-for="Description">Mô tả khóa học</label>
+                <textarea asp-for="Description" rows="4"></textarea>
+            </div>
+        </div>
+
+        <div class="teacher-form-actions">
+            <a asp-action="Index" class="btn btn-secondary teacher-page-cancel">Hủy</a>
+            <button type="button" class="btn btn-secondary teacher-modal-cancel" data-teacher-modal-close>Hủy</button>
+            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+        </div>
+    </form>
 </div>

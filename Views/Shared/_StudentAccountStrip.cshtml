@@ -1,0 +1,44 @@
+@using System.Security.Claims
+@inject DuAnTotNghiep.Services.Interfaces.INotificationService NotificationService
+@{
+    var userName = User.FindFirstValue(ClaimTypes.Name) ?? "Học viên";
+    var initials = string.Concat(userName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = "HV";
+    }
+
+    var unreadCount = 0;
+    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (int.TryParse(userIdClaim, out var userId))
+    {
+        unreadCount = await NotificationService.GetUnreadCountAsync(userId);
+    }
+}
+
+<header class="student-account-strip rs-account-strip">
+    <div class="student-account-context rs-account-context">
+        <span class="rs-account-eyebrow">Học viên</span>
+        <span class="rs-account-page">@ViewData["Title"]</span>
+    </div>
+
+    <div class="student-account-actions rs-account-actions">
+        <a href="/Profile#notifications" class="student-notification-link rs-notification-button" aria-label="Thông báo@(unreadCount > 0 ? $": {unreadCount} chưa đọc" : "")">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V11a6 6 0 1 0-12 0v3.2a2 2 0 0 1-.6 1.4L4 17h11Zm0 0v1a3 3 0 0 1-6 0v-1" /></svg>
+            @if (unreadCount > 0)
+            {
+                <span class="student-notification-count">@Math.Min(unreadCount, 99)</span>
+            }
+        </a>
+        <a href="/Profile" class="student-account-card rs-account-profile" aria-label="Tài khoản đang đăng nhập: @userName">
+            <span class="student-account-meta rs-account-name">
+                <strong>@userName</strong>
+                <small>Hồ sơ học viên</small>
+            </span>
+            <span class="student-account-avatar rs-account-avatar">@initials</span>
+        </a>
+    </div>
+</header>

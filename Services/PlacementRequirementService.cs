@@ -48,11 +48,14 @@ namespace DuAnTotNghiep.Services
                 .OrderByDescending(a => a.StartedAt)
                 .ToListAsync();
 
-            if (attempts.Any(a => a.Status == "SUBMITTED" || a.Status == "GRADED"))
+            var completedAttempt = attempts.FirstOrDefault(a => a.Status == "SUBMITTED" || a.Status == "GRADED");
+            if (completedAttempt != null)
             {
                 return new PlacementFlowResultDto 
                 { 
-                    Status = PlacementFlowStatus.Completed
+                    Status = PlacementFlowStatus.Completed,
+                    AttemptId = completedAttempt.Id,
+                    RedirectUrl = $"/Student/PlacementTest/Result?attemptId={completedAttempt.Id}"
                 };
             }
 

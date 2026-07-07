@@ -6,7 +6,7 @@ namespace DuAnTotNghiep.Models.ViewModels.AILearn;
 public class DashboardViewModel
 {
     public string StudentName { get; set; } = "";
-    public string AvatarUrl { get; set; } = "/default-images/avatar.png";
+    public string AvatarUrl { get; set; } = "/images/default-avatar.svg";
     public string RankTier { get; set; } = "Bronze";
     public string LevelCode { get; set; } = "BEGINNER";
     public string TargetLevelCode { get; set; } = "N/A";

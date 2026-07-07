@@ -2,6 +2,11 @@
 @{
     Layout = "_AILearnLayout";
     ViewData["Title"] = "Hồ sơ của tôi";
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.AvatarUrl)
+        || Model.AvatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
+        || Model.AvatarUrl.Contains("/images/default-avatar.png", StringComparison.OrdinalIgnoreCase)
+        ? "/images/default-avatar.svg"
+        : Model.AvatarUrl;
 }
 
 @section Styles {
@@ -14,7 +19,7 @@
         <form asp-action="UploadAvatar" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <div class="profile-avatar-editor">
-                <img id="avatarPreviewImage" src="@(string.IsNullOrEmpty(Model.AvatarUrl) ? "/default-images/avatar.png" : Model.AvatarUrl)" alt="Avatar" onerror="this.src='https://ui-avatars.com/api/?name=@(Model.FullName)&background=6C63FF&color=fff'" />
+                <img id="avatarPreviewImage" src="@avatarUrl" alt="Avatar" onerror="this.onerror=null;this.src='/images/default-avatar.svg';" />
                 <label for="avatarInputFile" class="avatar-upload-btn">
                     <i class="fa-solid fa-camera"></i>
                 </label>

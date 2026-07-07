@@ -1,0 +1,117 @@
+@model DuAnTotNghiep.Areas.Admin.ViewModels.NotificationListViewModel
+@{
+    ViewData["Title"] = "Thông báo";
+}
+
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800 tracking-tight">Thông báo</h2>
+            <p class="text-sm text-slate-500 mt-1">Theo dõi và điều phối các thông báo đã gửi trong hệ thống.</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m7-7H5"></path>
+            </svg>
+            Tạo thông báo
+        </a>
+    </div>
+
+    <div class="role-panel overflow-hidden">
+        <div class="px-5 py-4 border-b border-slate-200 bg-slate-50/50 flex justify-between items-center">
+            <div>
+                <h3 class="text-base font-bold text-slate-900">Danh sách thông báo</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Tổng cộng @Model.TotalCount.ToString("N0") thông báo.</p>
+            </div>
+            <span class="rs-badge">
+                Trang @Math.Max(Model.CurrentPage, 1) / @Math.Max(Model.TotalPages, 1)
+            </span>
+        </div>
+
+        @if (Model.Notifications.Any())
+        {
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
+                        <tr>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Tiêu đề</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Loại</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Người nhận</th>
+                            <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Ngày tạo</th>
+                            <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-slate-100">
+                        @foreach (var notification in Model.Notifications)
+                        {
+                            var typeClass = notification.NotificationType?.ToUpperInvariant() switch
+                            {
+                                "URGENT" => "rs-badge-danger",
+                                "WARNING" => "rs-badge-warning",
+                                "INFO" => "rs-badge-info",
+                                _ => ""
+                            };
+
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="px-6 py-4">
+                                    <div class="max-w-xl">
+                                        <div class="text-sm font-bold text-slate-900">@notification.Title</div>
+                                        <div class="text-xs text-slate-500 mt-1 line-clamp-2">@notification.Content</div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="rs-badge @typeClass">@notification.NotificationType</span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                    @(notification.TargetUserId.HasValue ? $"Người dùng #{notification.TargetUserId}" : "Theo nhóm")
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
+                                    @notification.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right">
+                                    <div class="admin-icon-actions">
+                                        <a asp-action="Details" asp-route-id="@notification.Id" class="admin-icon-btn admin-icon-view" title="Chi tiết thông báo" aria-label="Chi tiết thông báo">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                            </svg>
+                                        </a>
+                                        <form asp-action="Delete" asp-route-id="@notification.Id" method="post" class="admin-icon-form">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="admin-icon-btn admin-icon-delete" title="Xóa thông báo" aria-label="Xóa thông báo">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M9 7h6m2 0H7m3 0V5a2 2 0 012-2h0a2 2 0 012 2v2"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="rs-empty-state px-6 py-14 text-center">
+                <div class="rs-icon-box mx-auto mb-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                    </svg>
+                </div>
+                <p class="text-sm font-semibold text-slate-700">Chưa có thông báo nào.</p>
+                <p class="text-sm text-slate-500 mt-1">Tạo thông báo đầu tiên để gửi thông tin đến học viên hoặc giáo viên.</p>
+            </div>
+        }
+
+        @if (Model.TotalPages > 1)
+        {
+            <div class="px-5 py-4 border-t border-slate-200 bg-white flex items-center justify-between">
+                <a asp-action="Index" asp-route-page="@(Model.CurrentPage - 1)" class="btn btn-outline-secondary @(Model.CurrentPage <= 1 ? "pointer-events-none opacity-50" : "")">Trước</a>
+                <span class="text-sm text-slate-500">Trang @Model.CurrentPage / @Model.TotalPages</span>
+                <a asp-action="Index" asp-route-page="@(Model.CurrentPage + 1)" class="btn btn-outline-secondary @(Model.CurrentPage >= Model.TotalPages ? "pointer-events-none opacity-50" : "")">Tiếp</a>
+            </div>
+        }
+    </div>
+</div>

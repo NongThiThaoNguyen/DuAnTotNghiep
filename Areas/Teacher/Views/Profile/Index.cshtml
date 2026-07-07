@@ -1,7 +1,7 @@
 @model DuAnTotNghiep.Models.User
 @{
     ViewData["Title"] = "Hồ sơ cá nhân";
-    var avatar = string.IsNullOrEmpty(Model.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.FullName ?? "GV")}&background=6C63FF&color=fff" : Model.AvatarUrl;
+    var avatar = string.IsNullOrEmpty(Model.AvatarUrl) ? $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.FullName ?? "GV")}&background=171a1f&color=fff" : Model.AvatarUrl;
 }
 
 <div class="max-w-5xl mx-auto px-4 font-sans space-y-6 animate-fadeIn" style="padding-top: 4px !important; margin-top: 0 !important;">
@@ -12,7 +12,7 @@
             <h1 class="text-2xl font-black text-slate-900 leading-tight">Hồ sơ cá nhân</h1>
             <p class="text-slate-500 text-sm mt-1">Xem, cập nhật thông tin cá nhân và thay đổi ảnh đại diện của bạn.</p>
         </div>
-        <span class="purple-badge">Giảng viên hệ thống</span>
+        <span class="slate-badge">Giảng viên hệ thống</span>
     </div>
 
     <!-- Main Profile Form -->
@@ -27,22 +27,22 @@
         <div class="col-lg-4">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 text-center space-y-6 relative overflow-hidden h-100">
                 <!-- Top gradient banner -->
-                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-500 to-indigo-500" style="background: linear-gradient(90deg, #6C63FF 0%, #8F8AFF 100%)"></div>
+                <div class="absolute top-0 left-0 right-0 h-2 bg-slate-200"></div>
                 
                 <!-- Profile Image Upload Box -->
                 <div class="pt-4">
                     <div class="position-relative d-inline-block mx-auto">
-                        <div class="avatar-container ring-4 ring-purple-100 shadow-md rounded-full overflow-hidden" style="width: 130px; height: 130px;">
-                            <img id="avatarPreviewImg" src="@avatar" alt="Avatar" class="w-100 h-100 object-cover" onerror="this.src='https://ui-avatars.com/api/?name=GV&background=6C63FF&color=fff';" style="width: 130px; height: 130px; object-fit: cover;" />
+                        <div class="avatar-container teacher-profile-avatar">
+                            <img id="avatarPreviewImg" src="@avatar" alt="Avatar" class="w-100 h-100 object-cover" onerror="this.src='https://ui-avatars.com/api/?name=GV&background=171a1f&color=fff';" />
                         </div>
                         
                         <!-- Upload Floating Camera Button -->
-                        <button type="button" onclick="document.getElementById('avatarFileInput').click()" class="position-absolute bottom-0 end-0 bg-purple-600 hover:bg-purple-700 text-white rounded-full border-3 border-white shadow-sm flex items-center justify-center p-2.5 transition-all" style="width: 38px; height: 38px; background-color: #6C63FF; border: 3px solid #FFFFFF; z-index: 10;" title="Tải ảnh lên">
+                        <button type="button" onclick="document.getElementById('avatarFileInput').click()" class="teacher-profile-upload-button" title="Tải ảnh lên" aria-label="Tải ảnh đại diện">
                             <i class="fa-solid fa-camera text-xs"></i>
                         </button>
                         
                         <!-- Hidden File input -->
-                        <input type="file" id="avatarFileInput" name="avatarFile" accept="image/*" style="display: none;" />
+                        <input type="file" id="avatarFileInput" name="avatarFile" accept="image/*" class="teacher-visually-hidden-file" />
                     </div>
                     
                     <p class="text-xs text-slate-400 mt-3">Định dạng JPG, PNG hoặc GIF. Tối đa 2MB.</p>
@@ -68,7 +68,7 @@
         <div class="col-lg-8">
             <div class="bg-white rounded-3xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6 relative overflow-hidden h-100">
                 <!-- Top gradient banner -->
-                <div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-purple-500 to-indigo-500" style="background: linear-gradient(90deg, #6C63FF 0%, #8F8AFF 100%)"></div>
+                <div class="absolute top-0 left-0 right-0 h-2 bg-slate-200"></div>
 
                 <div class="row g-4 pt-2">
                     <div class="col-12 border-b border-slate-100 pb-2">
@@ -79,7 +79,7 @@
                     <div class="col-md-6 space-y-1.5">
                         <label asp-for="FullName" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Họ và tên</label>
                         <div class="relative">
-                            <input asp-for="FullName" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập họ và tên..." required />
+                            <input asp-for="FullName" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-slate-800" placeholder="Nhập họ và tên..." required />
                         </div>
                         <span asp-validation-for="FullName" class="text-xs text-red-500"></span>
                     </div>
@@ -88,7 +88,7 @@
                     <div class="col-md-6 space-y-1.5">
                         <label asp-for="Email" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Email liên hệ</label>
                         <div class="relative">
-                            <input asp-for="Email" type="email" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="example@domain.com" required />
+                            <input asp-for="Email" type="email" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-slate-800" placeholder="example@domain.com" required />
                         </div>
                         <span asp-validation-for="Email" class="text-xs text-red-500"></span>
                     </div>
@@ -97,7 +97,7 @@
                     <div class="col-md-6 space-y-1.5">
                         <label asp-for="Phone" class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Số điện thoại</label>
                         <div class="relative">
-                            <input asp-for="Phone" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Nhập số điện thoại..." />
+                            <input asp-for="Phone" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-slate-800" placeholder="Nhập số điện thoại..." />
                         </div>
                         <span asp-validation-for="Phone" class="text-xs text-red-500"></span>
                     </div>
@@ -106,7 +106,7 @@
                     <div class="col-md-6 space-y-1.5">
                         <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ngày sinh</label>
                         <div class="relative">
-                            <input type="date" name="dateOfBirth" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" value="@(Model.UserProfile?.DateOfBirth?.ToString("yyyy-MM-dd"))" />
+                            <input type="date" name="dateOfBirth" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-slate-800" value="@(Model.UserProfile?.DateOfBirth?.ToString("yyyy-MM-dd"))" />
                         </div>
                     </div>
 
@@ -117,7 +117,7 @@
                     <!-- Gender -->
                     <div class="col-md-6 space-y-1.5">
                         <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Giới tính</label>
-                        <select name="gender" class="form-select w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all bg-white">
+                        <select name="gender" class="form-select w-full px-3 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all bg-white">
                             <option value="">-- Chọn giới tính --</option>
                             <option value="Male" selected="@(Model.UserProfile?.Gender == "Male")">Nam</option>
                             <option value="Female" selected="@(Model.UserProfile?.Gender == "Female")">Nữ</option>
@@ -129,14 +129,14 @@
                     <div class="col-md-6 space-y-1.5">
                         <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Quốc tịch / Quốc gia</label>
                         <div class="relative">
-                            <input type="text" name="country" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Việt Nam, USA, Japan..." value="@Model.UserProfile?.Country" />
+                            <input type="text" name="country" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-slate-800" placeholder="Việt Nam, USA, Japan..." value="@Model.UserProfile?.Country" />
                         </div>
                     </div>
 
                     <!-- Bio -->
                     <div class="col-12 space-y-1.5">
                         <label class="block text-[11px] font-bold text-slate-400 uppercase tracking-wider">Giới thiệu bản thân (Bio)</label>
-                        <textarea name="bio" id="bioTextarea" rows="4" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all font-medium text-slate-800" placeholder="Chia sẻ thêm về bản thân, kinh nghiệm giảng dạy của bạn...">@Model.UserProfile?.Bio</textarea>
+                        <textarea name="bio" id="bioTextarea" rows="4" class="w-full px-4 py-2.5 text-sm border border-slate-200 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-slate-500/20 focus:border-slate-500 transition-all font-medium text-slate-800" placeholder="Chia sẻ thêm về bản thân, kinh nghiệm giảng dạy của bạn...">@Model.UserProfile?.Bio</textarea>
                     </div>
                 </div>
 

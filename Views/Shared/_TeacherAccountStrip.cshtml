@@ -1,0 +1,43 @@
+@using System.Security.Claims
+@{
+    var displayName = User.FindFirst("FullName")?.Value
+        ?? User.Identity?.Name
+        ?? "Giảng viên";
+    var initials = string.Join("", displayName
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2)
+        .Select(part => char.ToUpperInvariant(part[0])));
+
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = "GV";
+    }
+}
+
+<header class="teacher-account-strip rs-account-strip">
+    <div class="teacher-account-context rs-account-context">
+        <span class="teacher-account-eyebrow rs-account-eyebrow">Giảng viên</span>
+        <span class="teacher-account-page rs-account-page">@ViewData["Title"]</span>
+    </div>
+
+    <div class="teacher-account-actions rs-account-actions">
+        <button type="button"
+                class="teacher-notification-button rs-notification-button"
+                title="Chưa có thông báo mới"
+                aria-label="Thông báo"
+                disabled>
+            <i class="fa-regular fa-bell" aria-hidden="true"></i>
+        </button>
+        <a class="teacher-account-profile rs-account-profile"
+           asp-area="Teacher"
+           asp-controller="Profile"
+           asp-action="Index"
+           aria-label="Mở hồ sơ cá nhân">
+            <span class="teacher-account-name rs-account-name">
+                <strong>@displayName</strong>
+                <small>Hồ sơ giảng viên</small>
+            </span>
+            <span class="teacher-account-avatar rs-account-avatar" aria-hidden="true">@initials</span>
+        </a>
+    </div>
+</header>

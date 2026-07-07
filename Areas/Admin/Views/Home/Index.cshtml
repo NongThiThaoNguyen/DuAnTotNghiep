@@ -4,7 +4,7 @@
     Layout = "_AdminLayout";
 }
 
-<div class="space-y-8 animate-fade-in">
+<div class="admin-dashboard space-y-8">
     <!-- Header Page -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
@@ -12,8 +12,8 @@
             <p class="text-sm text-slate-500 mt-1">Báo cáo phân tích và thống kê số liệu của hệ thống học tập AI Study English.</p>
         </div>
         <div class="flex items-center gap-3">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-700 rounded-lg border border-blue-200">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+            <span class="rs-badge rs-badge-info">
+                <span class="rs-status-dot"></span>
                 Dữ liệu trực tuyến
             </span>
             <div class="text-sm text-slate-500 font-medium">
@@ -23,12 +23,12 @@
     </div>
 
     <!-- General Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-6">
         <!-- Card 1: Users -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover-lift flex flex-col justify-between">
+        <div class="rs-stat-card flex flex-col justify-between">
             <div class="flex items-center justify-between">
                 <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Tổng người dùng</span>
-                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+                <div class="rs-icon-box">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
@@ -47,10 +47,10 @@
         </div>
 
         <!-- Card 2: Learning Paths -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover-lift flex flex-col justify-between">
+        <div class="rs-stat-card flex flex-col justify-between">
             <div class="flex items-center justify-between">
                 <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Học viên đang học</span>
-                <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+                <div class="rs-icon-box rs-icon-box-success">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.232.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.232.477-4.5 1.253"></path>
                     </svg>
@@ -65,10 +65,10 @@
         </div>
 
         <!-- Card 3: Quizzes & Placements -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover-lift flex flex-col justify-between">
+        <div class="rs-stat-card flex flex-col justify-between">
             <div class="flex items-center justify-between">
                 <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Placement 30 ngày</span>
-                <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
+                <div class="rs-icon-box rs-icon-box-warning">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                     </svg>
@@ -83,10 +83,10 @@
         </div>
 
         <!-- Card 4: Notifications -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs hover-lift flex flex-col justify-between">
+        <div class="rs-stat-card flex flex-col justify-between">
             <div class="flex items-center justify-between">
                 <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Thông báo chưa đọc</span>
-                <div class="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center text-violet-600">
+                <div class="rs-icon-box rs-icon-box-info">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
                     </svg>
@@ -102,10 +102,10 @@
     </div>
 
     <!-- Secondary Stats Grid (Remaining 4 counters) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-6">
         <!-- Learning Paths -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-sky-50 flex items-center justify-center text-sky-600 shrink-0">
+        <div class="rs-list-card p-5 flex items-center gap-4">
+            <div class="rs-icon-box shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
                 </svg>
@@ -117,8 +117,8 @@
         </div>
 
         <!-- Question Bank -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+        <div class="rs-list-card p-5 flex items-center gap-4">
+            <div class="rs-icon-box shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"></path>
                 </svg>
@@ -130,8 +130,8 @@
         </div>
 
         <!-- Reference Sources -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-purple-600 shrink-0">
+        <div class="rs-list-card p-5 flex items-center gap-4">
+            <div class="rs-icon-box shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                 </svg>
@@ -143,8 +143,8 @@
         </div>
 
         <!-- Other Indicator -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-rose-50 flex items-center justify-center text-rose-600 shrink-0">
+        <div class="rs-list-card p-5 flex items-center gap-4">
+            <div class="rs-icon-box rs-icon-box-danger shrink-0">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
                 </svg>
@@ -159,7 +159,7 @@
     <!-- Charts Section -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <!-- Chart 1: Người dùng đăng ký theo tháng -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="rs-chart-card p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Người dùng đăng ký theo tháng</h3>
             <div class="relative h-72">
                 @if (Model.UsersOverTime.Any())
@@ -179,7 +179,7 @@
         </div>
 
         <!-- Chart 2: Placement Test theo thời gian -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="rs-chart-card p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Placement Test theo thời gian</h3>
             <div class="relative h-72">
                 @if (Model.PlacementTestsOverTime.Any())
@@ -199,7 +199,7 @@
         </div>
 
         <!-- Chart 3: Phân tích AI -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="rs-chart-card p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Trình độ đề xuất bởi AI</h3>
             <div class="relative h-72">
                 @if (Model.AiAnalysisData.Any())
@@ -220,7 +220,7 @@
         </div>
 
         <!-- Chart 4: Tỷ lệ hoàn thành lộ trình -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="rs-chart-card p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Tỷ lệ hoàn thành lộ trình học</h3>
             <div class="relative h-72">
                 @if (Model.LearningPathCompletionData.Any())
@@ -240,7 +240,7 @@
         </div>
 
         <!-- Chart 5: Phân bố vai trò -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="rs-chart-card p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Cơ cấu tài khoản hệ thống</h3>
             <div class="relative h-72 flex justify-center">
                 @if (Model.RoleDistribution.Any())
@@ -262,7 +262,7 @@
         </div>
 
         <!-- Chart 6: Phân bố trình độ học viên -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
+        <div class="rs-chart-card p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Phân bố trình độ học viên</h3>
             <div class="relative h-72">
                 @if (Model.LevelDistribution.Any())
@@ -285,10 +285,10 @@
     <!-- Lists Section (Recent / New Items) -->
     <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
         <!-- 1. Học viên mới đăng ký -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="rs-list-card p-6">
+            <div class="rs-section-title">
                 <h3 class="text-lg font-bold text-slate-900">Học viên mới đăng ký</h3>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-md">Student</span>
+                <span class="rs-badge rs-badge-info">Student</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @if (Model.RecentUsers.Any())
@@ -297,7 +297,7 @@
                     {
                         <div class="py-3 flex items-start justify-between gap-4">
                             <div class="flex gap-3">
-                                <div class="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xs shrink-0">
+                                <div class="rs-avatar-initial flex items-center justify-center font-bold text-xs shrink-0">
                                     @(string.IsNullOrEmpty(student.FullName) ? "?" : student.FullName.Substring(0, Math.Min(2, student.FullName.Length)).ToUpper())
                                 </div>
                                 <div>
@@ -309,7 +309,7 @@
                             </div>
                             <div class="text-right">
                                 <span class="text-xs text-slate-400 block">@student.CreatedAt.ToString("dd/MM/yyyy")</span>
-                                <a href="/Admin/User/Details/@student.Id" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Chi tiết</a>
+                                <a href="/Admin/User/Details/@student.Id" class="rs-inline-link text-xs font-semibold">Chi tiết</a>
                             </div>
                         </div>
                     }
@@ -327,10 +327,10 @@
         </div>
 
         <!-- 2. Placement Test gần đây -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="rs-list-card p-6">
+            <div class="rs-section-title">
                 <h3 class="text-lg font-bold text-slate-900">Placement Test gần đây</h3>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-amber-50 text-amber-700 rounded-md">Thi thử</span>
+                <span class="rs-badge rs-badge-warning">Thi thử</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @if (Model.RecentPlacementTests.Any())
@@ -348,13 +348,13 @@
                                 <span class="text-xs text-slate-400 block">@test.StartedAt.ToString("dd/MM/yyyy")</span>
                                 @if (test.TotalScore.HasValue)
                                 {
-                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md">
+                                    <span class="rs-badge rs-badge-success">
                                         @test.TotalScore.Value.ToString("0.0")đ
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold bg-slate-100 text-slate-600 rounded-md">
+                                    <span class="rs-badge">
                                         @test.Status
                                     </span>
                                 }
@@ -375,10 +375,10 @@
         </div>
 
         <!-- 3. AI Recommendation gần đây -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="rs-list-card p-6">
+            <div class="rs-section-title">
                 <h3 class="text-lg font-bold text-slate-900">Nhận xét & Gợi ý mới từ AI</h3>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-violet-50 text-violet-700 rounded-md">AI Generated</span>
+                <span class="rs-badge rs-badge-info">AI Generated</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @if (Model.RecentAiRecommendations.Any())
@@ -393,7 +393,7 @@
                             <p class="text-xs text-slate-600 line-clamp-2 italic">"@rec.FeedbackText"</p>
                             @if (!string.IsNullOrEmpty(rec.RecommendedAction))
                             {
-                                <span class="text-[11px] font-semibold text-violet-600 block mt-0.5">
+                                <span class="text-[11px] font-semibold block mt-0.5 rs-muted-action">
                                     Hành động gợi ý: @rec.RecommendedAction
                                 </span>
                             }
@@ -413,10 +413,10 @@
         </div>
 
         <!-- 4. Question Bank mới -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="rs-list-card p-6">
+            <div class="rs-section-title">
                 <h3 class="text-lg font-bold text-slate-900">Câu hỏi ngân hàng mới</h3>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-md">Học liệu</span>
+                <span class="rs-badge">Học liệu</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @if (Model.NewQuestionBankItems.Any())
@@ -431,7 +431,7 @@
                                 </span>
                             </div>
                             <div class="shrink-0 text-right">
-                                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md">
+                                <span class="rs-badge rs-badge-success">
                                     @q.ReviewStatus
                                 </span>
                             </div>
@@ -451,10 +451,10 @@
         </div>
 
         <!-- 5. Reference Source mới -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="rs-list-card p-6">
+            <div class="rs-section-title">
                 <h3 class="text-lg font-bold text-slate-900">Tài nguyên tham chiếu mới</h3>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-purple-50 text-purple-700 rounded-md">Tài liệu</span>
+                <span class="rs-badge">Tài liệu</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @if (Model.NewReferenceSources.Any())
@@ -466,14 +466,14 @@
                                 <span class="text-sm font-bold text-slate-800 block truncate">@src.SourceName</span>
                                 @if (!string.IsNullOrEmpty(src.SourceUrl))
                                 {
-                                    <a href="@src.SourceUrl" target="_blank" class="text-xs text-blue-600 hover:underline block mt-0.5 truncate">
+                                    <a href="@src.SourceUrl" target="_blank" class="rs-inline-link text-xs block mt-0.5 truncate">
                                         @src.SourceUrl
                                     </a>
                                 }
                             </div>
                             <div class="text-right shrink-0">
                                 <span class="text-xs text-slate-400 block">@src.SourceType</span>
-                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md mt-1">
+                                <span class="rs-badge rs-badge-success mt-1">
                                     @src.Status
                                 </span>
                             </div>
@@ -493,10 +493,10 @@
         </div>
 
         <!-- 6. Learning Path mới -->
-        <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs">
-            <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+        <div class="rs-list-card p-6">
+            <div class="rs-section-title">
                 <h3 class="text-lg font-bold text-slate-900">Lộ trình học tập mới tạo</h3>
-                <span class="text-xs font-semibold px-2.5 py-1 bg-sky-50 text-sky-700 rounded-md">Lộ trình</span>
+                <span class="rs-badge">Lộ trình</span>
             </div>
             <div class="divide-y divide-slate-100">
                 @if (Model.NewLearningPaths.Any())
@@ -512,7 +512,7 @@
                             </div>
                             <div class="text-right shrink-0">
                                 <span class="text-xs text-slate-400 block">@path.CreatedAt.ToString("dd/MM/yyyy")</span>
-                                <span class="inline-flex items-center gap-1.5 px-2 py-0.5 text-xs font-semibold bg-emerald-50 text-emerald-700 rounded-md mt-1">
+                                <span class="rs-badge rs-badge-success mt-1">
                                     @path.Status
                                 </span>
                             </div>
@@ -539,18 +539,16 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Colors configuration from modern blue palette
-            const primaryBlue = '#2563EB';
-            const lightBlue = '#DBEAFE';
-            const hoverBlue = '#1D4ED8';
-            const borderGray = '#E2E8F0';
-            const textPrimary = '#0F172A';
-            const textSecondary = '#64748B';
+            // Colors follow DESIGN.md classic role shell tokens.
+            const primaryColor = '#9A6A2F';
+            const primaryFill = 'rgba(154, 106, 47, 0.12)';
+            const borderGray = '#D8D2C4';
+            const textSecondary = '#5D6673';
 
-            const successColor = '#22C55E';
-            const warningColor = '#F59E0B';
-            const dangerColor = '#EF4444';
-            const violetColor = '#8B5CF6';
+            const successColor = '#2F6B4F';
+            const warningColor = '#9A6A2F';
+            const dangerColor = '#9B2F32';
+            const infoColor = '#315F7D';
 
             // 1. Chart Users Over Time
             const usersCtx = document.getElementById('usersOverTimeChart');
@@ -563,8 +561,8 @@
                         datasets: [{
                             label: 'Người dùng mới',
                             data: data.map(x => x.value),
-                            borderColor: primaryBlue,
-                            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                            borderColor: primaryColor,
+                            backgroundColor: primaryFill,
                             fill: true,
                             tension: 0.4,
                             borderWidth: 3
@@ -595,8 +593,8 @@
                         datasets: [{
                             label: 'Lượt kiểm tra',
                             data: data.map(x => x.value),
-                            borderColor: '#F59E0B',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            borderColor: warningColor,
+                            backgroundColor: 'rgba(154, 106, 47, 0.12)',
                             fill: true,
                             tension: 0.4,
                             borderWidth: 3
@@ -626,7 +624,7 @@
                         labels: data.map(x => x.label),
                         datasets: [{
                             data: data.map(x => x.value),
-                            backgroundColor: violetColor,
+                            backgroundColor: infoColor,
                             borderRadius: 6
                         }]
                     },
@@ -681,7 +679,7 @@
                         labels: data.map(x => x.label),
                         datasets: [{
                             data: data.map(x => x.value),
-                            backgroundColor: [primaryBlue, successColor, warningColor, dangerColor]
+                            backgroundColor: [primaryColor, successColor, warningColor, dangerColor]
                         }]
                     },
                     options: {
@@ -707,7 +705,7 @@
                         labels: data.map(x => x.label),
                         datasets: [{
                             data: data.map(x => x.value),
-                            backgroundColor: '#0EA5E9',
+                            backgroundColor: infoColor,
                             borderRadius: 6
                         }]
                     },

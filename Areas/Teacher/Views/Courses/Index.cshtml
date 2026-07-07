@@ -3,124 +3,126 @@
     ViewData["Title"] = "Khóa học giảng dạy";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
-}
-
-<div class="courses-header mb-4">
+<div class="teacher-page-header">
     <div>
-        <h1 class="text-dark m-0 fs-3 font-weight-bold">Khóa học giảng dạy</h1>
-        <p class="text-muted m-0 small">Quản lý nội dung học tập, phân loại theo kỹ năng và trình độ.</p>
+        <span class="teacher-page-kicker">Không gian nội dung</span>
+        <h1>Khóa học giảng dạy</h1>
+        <p>Quản lý lộ trình, kỹ năng và bài học theo cùng một cấu trúc học thuật.</p>
     </div>
-    <a asp-action="Create" class="btn btn-primary-ailearn">
+    <a asp-action="Create"
+       class="btn btn-primary"
+       data-teacher-modal
+       data-modal-title="Tạo khóa học mới"
+       data-modal-size="lg">
         <i class="fa-solid fa-plus me-1"></i> Tạo khóa học mới
     </a>
 </div>
 
-<div class="card-ailearn mb-4">
-    <form method="get" class="row g-3 align-items-end">
-        <div class="col-md-5">
-            <label class="form-label text-muted small uppercase font-weight-bold">Tìm kiếm</label>
-            <div class="search-box w-100">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="search" value="@Model.Search" placeholder="Nhập tên khóa học, mã..." />
-            </div>
+<form method="get" class="teacher-toolbar mb-4" aria-label="Bộ lọc khóa học">
+    <div class="teacher-toolbar-field is-wide">
+        <label for="courseSearch">Tìm kiếm</label>
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+            <input id="courseSearch"
+                   type="text"
+                   name="search"
+                   value="@Model.Search"
+                   placeholder="Tên khóa học hoặc mã chủ đề" />
         </div>
+    </div>
 
-        <div class="col-md-4">
-            <label class="form-label text-muted small uppercase font-weight-bold">Kỹ năng</label>
-            <select name="skill" class="form-select border-1 rounded-3">
-                <option value="">Tất cả</option>
-                @foreach (var option in Model.SkillOptions)
-                {
-                    <option value="@option.Code" selected="@(Model.Skill == option.Code ? "selected" : null)">@option.Name</option>
-                }
-            </select>
-        </div>
+    <div class="teacher-toolbar-field">
+        <label for="courseSkill">Kỹ năng</label>
+        <select id="courseSkill" name="skill" class="form-select">
+            <option value="">Tất cả kỹ năng</option>
+            @foreach (var option in Model.SkillOptions)
+            {
+                <option value="@option.Code" selected="@(Model.Skill == option.Code ? "selected" : null)">@option.Name</option>
+            }
+        </select>
+    </div>
 
-        <div class="col-md-3 d-flex gap-2">
-            <button type="submit" class="btn btn-primary-ailearn flex-grow-1 btn-sm">Tìm kiếm</button>
-            <a asp-action="Index" class="btn btn-secondary-ailearn btn-sm" title="Làm mới">
-                <i class="fa-solid fa-rotate"></i>
-            </a>
-        </div>
-    </form>
-</div>
+    <div class="teacher-action-group">
+        <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-filter" aria-hidden="true"></i>
+            Lọc
+        </button>
+        <a asp-action="Index" class="teacher-icon-button" title="Làm mới" aria-label="Làm mới bộ lọc">
+            <i class="fa-solid fa-rotate" aria-hidden="true"></i>
+        </a>
+    </div>
+</form>
 
-<div class="course-grid-ailearn">
+<div class="teacher-course-grid">
     @if (!Model.Courses.Any())
     {
-        <div class="card-ailearn col-span-full w-100 text-center py-5 text-muted">
-            Không tìm thấy khóa học nào khớp với bộ lọc.
-        </div>
-    }
-
-    @{
-        int index = 0;
-    }
-    @foreach (var course in Model.Courses)
-    {
-        string thumbBg = $"linear-gradient(135deg, {(index % 3 == 0 ? "#7B6DFF, #6C63FF" : index % 3 == 1 ? "#4ADE80, #22C55E" : "#60A5FA, #3B82F6")}, #08142E)";
-        index++;
-
-        <div class="course-card-wrapper-item">
-            <div class="card-ailearn course-card-ailearn hoverable">
-                <div class="course-card-thumb" style="height: 140px;">
-                    <a href="/Teacher/Courses/Details/@course.Id" style="display: block; width: 100%; height: 100%;">
-                        <div style="width: 100%; height: 100%; background: @thumbBg; display: flex; align-items: center; justify-content: center; color: white;">
-                            <i class="fa-solid fa-graduation-cap" style="font-size: 2.5rem; opacity: 0.25;"></i>
-                        </div>
-                    </a>
-                    <span class="course-card-tag">@course.DifficultyLevel</span>
-                </div>
-
-                <div class="course-card-info p-0">
-                    <div>
-                        <div class="d-flex gap-1.5 mb-2">
-                            <span class="purple-badge">@course.SkillName</span>
-                            @if (!string.IsNullOrWhiteSpace(course.LevelName))
-                            {
-                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">
-                                    @course.LevelName
-                                </span>
-                            }
-                            @if (!course.IsActive)
-                            {
-                                <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle rounded-pill">
-                                    Inactive
-                                </span>
-                            }
-                        </div>
-
-                        <a href="/Teacher/Courses/Details/@course.Id" class="text-decoration-none">
-                            <h3 class="fs-6 text-dark font-weight-bold mb-1">@course.Title</h3>
-                        </a>
-                        <p class="text-muted small mb-3">@(course.Description ?? "Không có mô tả chi tiết.")</p>
-                    </div>
-
-                    <div class="course-card-meta flex-wrap gap-2">
-                        <div class="d-flex gap-3">
-                            <div class="course-card-meta-item">
-                                <i class="fa-solid fa-book-open"></i>
-                                <span>@course.LessonCount bài học</span>
-                            </div>
-                            <div class="course-card-meta-item">
-                                <i class="fa-solid fa-users"></i>
-                                <span>@course.StudentCount học viên</span>
-                            </div>
-                        </div>
-
-                        <div class="d-flex gap-1 ms-auto" style="z-index: 10; position: relative;">
-                            <form asp-action="Delete" asp-route-id="@course.Id" method="post" class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-danger btn-sm p-1 px-2" title="Xóa" onclick="if(!confirm('Bạn có chắc chắn muốn xóa khóa học này?')) return false;">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+        <div class="teacher-empty-state teacher-course-empty">
+            <div>
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <p>Không tìm thấy khóa học nào khớp với bộ lọc hiện tại.</p>
             </div>
         </div>
+    }
+
+    @foreach (var course in Model.Courses)
+    {
+        <article class="teacher-course-card">
+            <a asp-action="Details" asp-route-id="@course.Id" class="teacher-course-cover" aria-label="Xem chi tiết @course.Title">
+                <span class="teacher-course-symbol" aria-hidden="true">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </span>
+                <span class="teacher-status">@course.DifficultyLevel</span>
+            </a>
+
+            <div class="teacher-course-body">
+                <div class="teacher-meta-pills">
+                    <span class="teacher-status">@course.SkillName</span>
+                    @if (!string.IsNullOrWhiteSpace(course.LevelName))
+                    {
+                        <span class="teacher-status is-success">@course.LevelName</span>
+                    }
+                    @if (!course.IsActive)
+                    {
+                        <span class="teacher-status">Đã ẩn</span>
+                    }
+                </div>
+
+                <a asp-action="Details" asp-route-id="@course.Id" class="teacher-course-title">
+                    @course.Title
+                </a>
+                <p>@(course.Description ?? "Chưa có mô tả chi tiết cho khóa học này.")</p>
+
+                <div class="teacher-course-meta">
+                    <span><i class="fa-solid fa-book-open" aria-hidden="true"></i> @course.LessonCount bài học</span>
+                    <span><i class="fa-solid fa-users" aria-hidden="true"></i> @course.StudentCount học viên</span>
+                </div>
+
+                <div class="teacher-card-actions">
+                    <a asp-action="Details" asp-route-id="@course.Id" class="teacher-icon-button" title="Xem chi tiết" aria-label="Xem chi tiết @course.Title">
+                        <i class="fa-solid fa-eye" aria-hidden="true"></i>
+                    </a>
+                    <a asp-action="Edit"
+                       asp-route-id="@course.Id"
+                       class="teacher-icon-button"
+                       title="Chỉnh sửa"
+                       aria-label="Chỉnh sửa @course.Title"
+                       data-teacher-modal
+                       data-modal-title="Chỉnh sửa khóa học"
+                       data-modal-size="lg">
+                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    </a>
+                    <form asp-action="Delete" asp-route-id="@course.Id" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"
+                                class="teacher-icon-button btn-action-delete"
+                                title="Xóa"
+                                aria-label="Xóa @course.Title"
+                                onclick="return confirm('Bạn có chắc chắn muốn xóa khóa học này?');">
+                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </article>
     }
 </div>

@@ -3,96 +3,119 @@
     ViewData["Title"] = "Chi tiết khóa học - " + Model.Title;
 }
 
-<div class="max-w-4xl mx-auto py-6 px-4 font-sans space-y-8">
-    <div class="flex items-center justify-between">
-        <a asp-action="Index" class="text-xs font-bold text-slate-500 hover:text-blue-600 transition-colors">Quay lại danh sách</a>
-        <a asp-action="Edit" asp-route-id="@Model.Id" class="px-4 py-2 rounded-xl border border-slate-200 text-slate-750 hover:bg-slate-50 font-bold text-xs">Chỉnh sửa</a>
+<div class="teacher-page-header">
+    <div>
+        <span class="teacher-page-kicker">Chi tiết khóa học</span>
+        <h1>@Model.Title</h1>
+        <p>@(Model.Description ?? "Chưa có mô tả chi tiết cho khóa học này.")</p>
+    </div>
+    <div class="teacher-action-group">
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+            Danh sách
+        </a>
+        <a asp-action="Edit"
+           asp-route-id="@Model.Id"
+           class="btn btn-primary"
+           data-teacher-modal
+           data-modal-title="Chỉnh sửa khóa học"
+           data-modal-size="lg">
+            <i class="fa-solid fa-pen" aria-hidden="true"></i>
+            Chỉnh sửa
+        </a>
+    </div>
+</div>
+
+<div class="teacher-panel mb-4">
+    <div class="teacher-meta-pills mb-3">
+        <span class="teacher-status">Kỹ năng: @Model.SkillName</span>
+        @if (!string.IsNullOrWhiteSpace(Model.LevelName))
+        {
+            <span class="teacher-status is-success">Trình độ: @Model.LevelCode (@Model.LevelName)</span>
+        }
+        <span class="teacher-status is-warning">Độ khó: @Model.DifficultyLevel</span>
     </div>
 
-    <div class="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-sm space-y-4">
-        <div class="flex flex-wrap items-center gap-2">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100">
-                Kỹ năng: @Model.SkillName
-            </span>
-            @if (!string.IsNullOrWhiteSpace(Model.LevelName))
-            {
-                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-100">
-                    Trình độ: @Model.LevelCode (@Model.LevelName)
-                </span>
-            }
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-600 border border-amber-100">
-                Độ khó: @Model.DifficultyLevel
-            </span>
+    <dl class="teacher-detail-grid">
+        <div>
+            <dt>Mã chủ đề</dt>
+            <dd>@(Model.TopicCode ?? "N/A")</dd>
         </div>
-
-        <h1 class="text-2xl font-black text-slate-900 leading-tight">@Model.Title</h1>
-        <p class="text-slate-650 text-sm leading-relaxed">@(Model.Description ?? "Không có mô tả chi tiết.")</p>
-
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-slate-100 text-xs text-slate-500">
-            <div>
-                <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Mã chủ đề</span>
-                <span class="text-slate-800 font-bold mt-0.5 block">@(Model.TopicCode ?? "N/A")</span>
-            </div>
-            <div>
-                <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Thời lượng</span>
-                <span class="text-slate-800 font-bold mt-0.5 block">@(Model.EstimatedMinutes ?? 0) phút</span>
-            </div>
-            <div>
-                <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Thứ tự</span>
-                <span class="text-slate-800 font-bold mt-0.5 block">@Model.OrderIndex</span>
-            </div>
-            <div>
-                <span class="block text-[10px] text-slate-400 font-bold uppercase tracking-wider">Trạng thái</span>
-                <span class="text-slate-800 font-bold mt-0.5 block">@Model.Status</span>
-            </div>
+        <div>
+            <dt>Thời lượng</dt>
+            <dd>@(Model.EstimatedMinutes ?? 0) phút</dd>
         </div>
-    </div>
-
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 class="text-base font-bold text-slate-900">Bài học trong khóa (@Model.Lessons.Count)</h3>
-            <a href="/Teacher/Lessons/Create?courseId=@Model.Id" class="text-xs font-bold text-blue-600 hover:text-blue-700">+ Thêm bài học mới</a>
+        <div>
+            <dt>Thứ tự</dt>
+            <dd>@Model.OrderIndex</dd>
         </div>
+        <div>
+            <dt>Trạng thái</dt>
+            <dd>@Model.Status</dd>
+        </div>
+    </dl>
+</div>
 
-        <div class="divide-y divide-slate-100">
+<div class="teacher-dashboard-grid">
+    <section class="teacher-panel">
+        <div class="teacher-section-header">
+            <div>
+                <span class="teacher-section-kicker">Bài học</span>
+                <h2>Bài học trong khóa (@Model.Lessons.Count)</h2>
+            </div>
+            <a asp-controller="Lessons" asp-action="Create" asp-route-courseId="@Model.Id" class="btn btn-secondary">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Thêm bài học
+            </a>
+        </div>
+        <div class="teacher-list">
             @if (!Model.Lessons.Any())
             {
-                <p class="text-slate-400 text-xs py-4 text-center">Khóa học này chưa có bài học nào.</p>
+                <div class="teacher-empty-state">Khóa học này chưa có bài học nào.</div>
             }
             @foreach (var lesson in Model.Lessons)
             {
-                <div class="py-3 flex items-center justify-between text-sm hover:bg-slate-50/55 px-2 rounded-lg">
-                    <div class="flex flex-col">
-                        <span class="font-semibold text-slate-800">@lesson.Title</span>
-                        <span class="text-xs text-slate-450">Thời lượng: @(lesson.EstimatedMinutes ?? 0) phút | Trạng thái: @lesson.Status</span>
+                <div class="teacher-list-row">
+                    <div>
+                        <strong>@lesson.Title</strong>
+                        <span>@(lesson.EstimatedMinutes ?? 0) phút · @lesson.Status</span>
                     </div>
-                    <a href="/Teacher/Lessons/Edit/@lesson.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa"><i class="fa-solid fa-pen"></i></a>
+                    <a asp-controller="Lessons" asp-action="Edit" asp-route-id="@lesson.Id" class="teacher-icon-button" title="Sửa bài học" aria-label="Sửa bài học @lesson.Title">
+                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    </a>
                 </div>
             }
         </div>
-    </div>
+    </section>
 
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-            <h3 class="text-base font-bold text-slate-900">Bài trắc nghiệm Quiz (@Model.Quizzes.Count)</h3>
-            <a href="/Teacher/Quizzes/Create?topicId=@Model.Id" class="text-xs font-bold text-blue-600 hover:text-blue-700">+ Thêm Quiz mới</a>
+    <section class="teacher-panel">
+        <div class="teacher-section-header">
+            <div>
+                <span class="teacher-section-kicker">Đánh giá</span>
+                <h2>Bài trắc nghiệm (@Model.Quizzes.Count)</h2>
+            </div>
+            <a asp-controller="Quizzes" asp-action="Create" asp-route-topicId="@Model.Id" class="btn btn-secondary">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i>
+                Thêm quiz
+            </a>
         </div>
-
-        <div class="divide-y divide-slate-100">
+        <div class="teacher-list">
             @if (!Model.Quizzes.Any())
             {
-                <p class="text-slate-400 text-xs py-4 text-center">Khóa học này chưa có bài trắc nghiệm Quiz.</p>
+                <div class="teacher-empty-state">Khóa học này chưa có bài trắc nghiệm.</div>
             }
             @foreach (var quiz in Model.Quizzes)
             {
-                <div class="py-3 flex items-center justify-between text-sm hover:bg-slate-50/55 px-2 rounded-lg">
-                    <div class="flex flex-col">
-                        <span class="font-semibold text-slate-800">@quiz.Title</span>
-                        <span class="text-xs text-slate-450">@quiz.QuestionCount câu hỏi | Trạng thái: @quiz.Status</span>
+                <div class="teacher-list-row">
+                    <div>
+                        <strong>@quiz.Title</strong>
+                        <span>@quiz.QuestionCount câu hỏi · @quiz.Status</span>
                     </div>
-                    <a href="/Teacher/Quizzes/Edit/@quiz.Id" class="btn btn-outline-secondary btn-sm p-1 px-2" title="Sửa"><i class="fa-solid fa-pen"></i></a>
+                    <a asp-controller="Quizzes" asp-action="Edit" asp-route-id="@quiz.Id" class="teacher-icon-button" title="Sửa quiz" aria-label="Sửa quiz @quiz.Title">
+                        <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    </a>
                 </div>
             }
         </div>
-    </div>
+    </section>
 </div>

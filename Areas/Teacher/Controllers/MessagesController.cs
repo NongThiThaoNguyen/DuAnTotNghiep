@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Models.ViewModels.Teacher;
 using DuAnTotNghiep.Services.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -46,7 +47,11 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             {
                 var selectedStudent = await _messageService.GetStudentByIdAsync(studentId.Value);
                 ViewBag.SelectedStudentName = selectedStudent?.FullName ?? "Học viên";
-                ViewBag.SelectedStudentAvatar = selectedStudent?.AvatarUrl ?? "/default-images/avatar.png";
+                ViewBag.SelectedStudentAvatar = string.IsNullOrWhiteSpace(selectedStudent?.AvatarUrl)
+                    || selectedStudent.AvatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
+                    || selectedStudent.AvatarUrl.Contains("/images/default-avatar.png", StringComparison.OrdinalIgnoreCase)
+                    ? "/images/default-avatar.svg"
+                    : selectedStudent.AvatarUrl;
 
                 messages = await _messageService.GetConversationAsync(teacherId, studentId.Value);
             }
