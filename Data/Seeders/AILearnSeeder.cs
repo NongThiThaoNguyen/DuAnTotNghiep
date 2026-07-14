@@ -431,7 +431,7 @@ public class AILearnSeeder
                 var task = await _context.PracticeTasks.FirstOrDefaultAsync(t => t.TopicId == course.Id);
                 if (task == null)
                 {
-                    task = new PracticeTask { TopicId = course.Id, SkillId = grammarSkill.Id, Title = "Bài tập: Viết email", Instruction = "Viết email ứng tuyển", TaskType = "WRITING", DifficultyLevel = "BEGINNER", CreatedBy = teacherUser.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow };
+                    task = new PracticeTask { TopicId = course.Id, SkillId = grammarSkill.Id, Title = "Bài tập: Viết email", Instruction = "Viết email ứng tuyển", TaskType = "SHORT_ANSWER", DifficultyLevel = "BASIC", CreatedBy = teacherUser.Id, Status = "ACTIVE", CreatedAt = DateTime.UtcNow };
                     _context.PracticeTasks.Add(task);
                     await _context.SaveChangesAsync();
                 }

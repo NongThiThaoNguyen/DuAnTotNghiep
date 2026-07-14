@@ -21,23 +21,25 @@ namespace DuAnTotNghiep.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Trì hoãn khởi động ban đầu khoảng 30 giây để tránh làm chậm tiến trình khởi chạy ứng dụng
-            await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
-
-            while (!stoppingToken.IsCancellationRequested)
+            try
             {
-                try
-                {
-                    using (var scope = _serviceProvider.CreateScope())
-                    {
-                        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                        var progressService = scope.ServiceProvider.GetRequiredService<IProgressTrackingService>();
+                // Trì hoãn khởi động ban đầu khoảng 30 giây để tránh làm chậm tiến trình khởi chạy ứng dụng
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
 
-                        // Lấy tất cả studentId trong hệ thống để định kỳ cập nhật snapshot tiến độ
-                        var studentIds = await context.Users
-                            .Where(u => u.Role.RoleCode == "STUDENT")
-                            .Select(u => u.Id)
-                            .ToListAsync(stoppingToken);
+                while (!stoppingToken.IsCancellationRequested)
+                {
+                    try
+                    {
+                        List<int> studentIds;
+                        using (var scope = _serviceProvider.CreateScope())
+                        {
+                            var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                            // Lấy tất cả studentId trong hệ thống để định kỳ cập nhật snapshot tiến độ
+                            studentIds = await context.Users
+                                .Where(u => u.Role.RoleCode == "STUDENT")
+                                .Select(u => u.Id)
+                                .ToListAsync(stoppingToken);
+                        }
 
                         foreach (var studentId in studentIds)
                         {
@@ -45,22 +47,36 @@ namespace DuAnTotNghiep.Services
 
                             try
                             {
-                                await progressService.RecalculateStudentProgress(studentId);
+                                using (var innerScope = _serviceProvider.CreateScope())
+                                {
+                                    var progressService = innerScope.ServiceProvider.GetRequiredService<IProgressTrackingService>();
+                                    await progressService.RecalculateStudentProgress(studentId);
+                                }
+                                // Tạm nghỉ nhỏ để giảm tải kết nối DB
+                                await Task.Delay(100, stoppingToken);
                             }
-                            catch (Exception ex)
+                            catch (Exception ex) when (ex is not OperationCanceledException)
                             {
                                 System.Diagnostics.Debug.WriteLine($"Error recalculating progress for student ID {studentId}: {ex.Message}");
                             }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Error in ProgressSnapshotBackgroundService execution: {ex.Message}");
-                }
+                    catch (Exception ex) when (ex is not OperationCanceledException)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Error in ProgressSnapshotBackgroundService execution: {ex.Message}");
+                    }
 
-                // Chờ 24 giờ trước chu kỳ chạy tiếp theo
-                await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
+                    // Chờ 24 giờ trước chu kỳ chạy tiếp theo
+                    await Task.Delay(TimeSpan.FromHours(24), stoppingToken);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Tiến trình bị hủy một cách bình thường khi tắt server
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Fatal error in ProgressSnapshotBackgroundService: {ex.Message}");
             }
         }
     }

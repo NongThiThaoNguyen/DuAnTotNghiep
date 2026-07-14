@@ -117,7 +117,7 @@ public class TeacherQuizAndGradingServiceTests
         var skill = new EnglishSkill { Id = 1, SkillCode = "WRITING", SkillName = "Writing", IsActive = true };
         var topic = new LearningTopic { Id = 100, SkillId = 1, Skill = skill, Title = "Writing Basics", DifficultyLevel = "BASIC", Status = "ACTIVE", CreatedBy = 10 };
         var quiz = new Quiz { Id = 300, TopicId = 100, Topic = topic, SkillId = 1, Skill = skill, Title = "Seed Quiz", QuizType = "PRACTICE", Status = "PUBLISHED", CreatedBy = 10, CreatedAt = DateTime.UtcNow };
-        var task = new PracticeTask { Id = 400, TopicId = 100, Topic = topic, SkillId = 1, Skill = skill, Title = "Essay Task", Instruction = "Write an essay", TaskType = "WRITING", DifficultyLevel = "BASIC", Status = "ACTIVE", CreatedBy = 10 };
+        var task = new PracticeTask { Id = 400, TopicId = 100, Topic = topic, SkillId = 1, Skill = skill, Title = "Essay Task", Instruction = "Write an essay", TaskType = "SHORT_ANSWER", DifficultyLevel = "BASIC", Status = "ACTIVE", CreatedBy = 10 };
 
         context.Roles.AddRange(teacherRole, studentRole);
         context.Users.AddRange(teacher, student);

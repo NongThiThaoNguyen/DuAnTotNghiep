@@ -90,8 +90,8 @@ public class TeacherDashboardServiceTests
                 Skill = skill,
                 Title = "Introduce yourself",
                 Instruction = "Record an answer.",
-                TaskType = "SPEAKING",
-                DifficultyLevel = "BEGINNER",
+                TaskType = "SHORT_ANSWER",
+                DifficultyLevel = "BASIC",
                 Status = "ACTIVE",
                 CreatedBy = teacher.Id
             };

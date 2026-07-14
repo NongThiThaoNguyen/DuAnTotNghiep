@@ -38,13 +38,37 @@
                 <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
             }
         </select>
-        <input type="date" name="from" value="@(Model.From?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
-        <input type="date" name="to" value="@(Model.To?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
+        <div class="relative md:col-span-1">
+            <input type="text" id="display_from" readonly value="@(Model.From?.ToString("dd/MM/yyyy"))" placeholder="Từ ngày (DD/MM/YYYY)" class="rounded-lg border-slate-300 text-sm w-full pr-8 bg-white" />
+            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <input type="date" name="from" value="@(Model.From?.ToString("yyyy-MM-dd"))" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'display_from')" />
+        </div>
+        
+        <div class="relative md:col-span-1">
+            <input type="text" id="display_to" readonly value="@(Model.To?.ToString("dd/MM/yyyy"))" placeholder="Đến ngày (DD/MM/YYYY)" class="rounded-lg border-slate-300 text-sm w-full pr-8 bg-white" />
+            <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+            <input type="date" name="to" value="@(Model.To?.ToString("yyyy-MM-dd"))" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'display_to')" />
+        </div>
+
         <div class="md:col-span-6 flex flex-wrap items-center gap-2">
             <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
             <a asp-action="Index" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa lọc</a>
         </div>
     </form>
+    
+    <script>
+        function syncDate(dateInput, displayId) {
+            const displayEl = document.getElementById(displayId);
+            if (dateInput.value) {
+                const parts = dateInput.value.split('-');
+                if (parts.length === 3) {
+                    displayEl.value = parts[2] + '/' + parts[1] + '/' + parts[0];
+                }
+            } else {
+                displayEl.value = '';
+            }
+        }
+    </script>
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems bản ghi.</p>

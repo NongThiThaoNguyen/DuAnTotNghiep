@@ -80,11 +80,19 @@
                     </div>
                     <div class="md:col-span-2">
                         <label asp-for="AiRequest.FromDate" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Từ ngày</label>
-                        <input asp-for="AiRequest.FromDate" name="FromDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                        <div class="relative w-full">
+                            <input type="text" id="display_ai_from" readonly value="@(Model.AiRequest.FromDate.ToString("dd/MM/yyyy"))" placeholder="DD/MM/YYYY" class="block w-full px-3 py-2.5 pr-8 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <input asp-for="AiRequest.FromDate" name="FromDate" type="date" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'display_ai_from')" />
+                        </div>
                     </div>
                     <div class="md:col-span-2">
                         <label asp-for="AiRequest.ToDate" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Đến ngày</label>
-                        <input asp-for="AiRequest.ToDate" name="ToDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                        <div class="relative w-full">
+                            <input type="text" id="display_ai_to" readonly value="@(Model.AiRequest.ToDate.ToString("dd/MM/yyyy"))" placeholder="DD/MM/YYYY" class="block w-full px-3 py-2.5 pr-8 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <input asp-for="AiRequest.ToDate" name="ToDate" type="date" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'display_ai_to')" />
+                        </div>
                     </div>
                     <div class="md:col-span-2">
                         <label asp-for="AiRequest.SessionsCount" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Số buổi</label>
@@ -198,11 +206,19 @@
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Từ ngày</label>
-                        <input asp-for="Filter.FromDate" name="FromDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                        <div class="relative w-full">
+                            <input type="text" id="display_filter_from" readonly value="@(filter.FromDate?.ToString("dd/MM/yyyy"))" placeholder="DD/MM/YYYY" class="block w-full px-3 py-2.5 pr-8 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <input asp-for="Filter.FromDate" name="FromDate" type="date" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'display_filter_from')" />
+                        </div>
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Đến ngày</label>
-                        <input asp-for="Filter.ToDate" name="ToDate" type="date" class="block w-full px-3 py-2.5 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                        <div class="relative w-full">
+                            <input type="text" id="display_filter_to" readonly value="@(filter.ToDate?.ToString("dd/MM/yyyy"))" placeholder="DD/MM/YYYY" class="block w-full px-3 py-2.5 pr-8 border border-slate-300 rounded-xl leading-5 bg-white focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition-all" />
+                            <svg class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <input asp-for="Filter.ToDate" name="ToDate" type="date" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="syncDate(this, 'display_filter_to')" />
+                        </div>
                     </div>
                     <div class="md:col-span-2 flex items-end gap-2">
                         <button type="submit" class="flex-1 inline-flex justify-center items-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 focus:ring-4 focus:ring-blue-500/20 transition-all shadow-sm">
@@ -354,3 +370,16 @@
         }
     </div>
 </div>
+<script>
+    function syncDate(dateInput, displayId) {
+        const displayEl = document.getElementById(displayId);
+        if (dateInput.value) {
+            const parts = dateInput.value.split('-');
+            if (parts.length === 3) {
+                displayEl.value = parts[2] + '/' + parts[1] + '/' + parts[0];
+            }
+        } else {
+            displayEl.value = '';
+        }
+    }
+</script>
