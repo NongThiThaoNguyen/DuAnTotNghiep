@@ -3,11 +3,33 @@
     ViewData["Title"] = "Kỹ năng ưu tiên";
 }
 
-<div class="max-w-4xl mx-auto py-12">
-    
-    <partial name="_OnboardingStepper" model="3" />
+@section Styles {
+    <style>
+        .skill-card-body {
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .skill-card-body:hover {
+            border-color: #93c5fd;
+        }
+        .skill-checkbox:checked + .skill-card-body {
+            border-color: #2563eb !important;
+            background-color: rgba(239, 246, 255, 0.6) !important;
+            box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.15) !important;
+        }
+        .skill-checkbox:checked + .skill-card-body .skill-icon-container {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+        }
+        .skill-checkbox:checked + .skill-card-body .check-indicator {
+            opacity: 1 !important;
+        }
+    </style>
+}
 
-    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">
+<div class="max-w-5xl mx-auto py-6 px-4">
+    <partial name="_OnboardingStepper" model="3" />
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-6 sm:p-10 border border-slate-200/80 mt-6">
         
         <h2 class="text-3xl font-bold mb-4 text-center text-slate-800">Bạn muốn cải thiện kỹ năng nào nhất?</h2>
         <p class="text-slate-500 text-center mb-8">Chọn <span class="font-bold text-blue-600">tối thiểu 1</span> và <span class="font-bold text-blue-600">tối đa 4</span> kỹ năng. AI sẽ ưu tiên phân bổ bài học theo thứ tự bạn chọn.</p>

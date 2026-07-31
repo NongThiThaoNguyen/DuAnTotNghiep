@@ -1,4 +1,5 @@
 @using System.Security.Claims
+@inject DuAnTotNghiep.Services.Interfaces.INotificationService NotificationService
 @{
     var displayName = User.FindFirst("FullName")?.Value
         ?? User.Identity?.Name
@@ -12,6 +13,13 @@
     {
         initials = "GV";
     }
+
+    var unreadCount = 0;
+    var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    if (int.TryParse(userIdClaim, out var userId))
+    {
+        unreadCount = await NotificationService.GetUnreadCountAsync(userId);
+    }
 }
 
 <header class="teacher-account-strip rs-account-strip">
@@ -21,13 +29,27 @@
     </div>
 
     <div class="teacher-account-actions rs-account-actions">
-        <button type="button"
-                class="teacher-notification-button rs-notification-button"
-                title="Chưa có thông báo mới"
-                aria-label="Thông báo"
-                disabled>
-            <i class="fa-regular fa-bell" aria-hidden="true"></i>
-        </button>
+        <div class="rs-notification-wrapper" style="position: relative;">
+            <button type="button"
+                    id="notificationBellBtn"
+                    class="teacher-notification-button rs-notification-button"
+                    aria-label="Thông báo"
+                    aria-expanded="false">
+                <i class="fa-regular fa-bell" aria-hidden="true"></i>
+                <span id="notificationBadge" class="student-notification-count @(unreadCount > 0 ? "" : "d-none")">@Math.Min(unreadCount, 99)</span>
+            </button>
+
+            <div id="notificationDropdownMenu" class="rs-notification-dropdown d-none" aria-hidden="true">
+                <div class="rs-notification-dropdown-header">
+                    <span class="rs-notification-dropdown-title">Thông báo</span>
+                    <button type="button" id="markAllNotificationsReadBtn" class="rs-notification-mark-all">Đánh dấu tất cả đã đọc</button>
+                </div>
+                <div id="notificationDropdownBody" class="rs-notification-dropdown-body">
+                    <div class="rs-notification-loading">Đang tải thông báo...</div>
+                </div>
+            </div>
+        </div>
+
         <a class="teacher-account-profile rs-account-profile"
            asp-area="Teacher"
            asp-controller="Profile"

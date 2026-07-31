@@ -1494,3 +1494,193 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ==========================================================================
+   Notification Dropdown Component
+   ========================================================================== */
+.rs-notification-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.rs-notification-button {
+  cursor: pointer;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-line);
+  transition: all 0.2s ease;
+}
+
+.rs-notification-button:hover {
+  background: var(--rs-canvas);
+  border-color: var(--rs-line-strong);
+}
+
+.rs-notification-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  right: 0;
+  width: 360px;
+  max-width: calc(100vw - 2rem);
+  background: var(--rs-surface, #ffffff);
+  border: 1px solid var(--rs-line, #e2e8f0);
+  border-radius: 0.75rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.12), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  z-index: 1050;
+  overflow: hidden;
+  animation: rsNotifFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rs-notification-dropdown.d-none {
+  display: none !important;
+}
+
+@keyframes rsNotifFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.rs-notification-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--rs-line, #e2e8f0);
+  background: var(--rs-surface, #ffffff);
+}
+
+.rs-notification-dropdown-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--rs-ink, #0f172a);
+}
+
+.rs-notification-mark-all {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--rs-primary, #2563eb);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.rs-notification-mark-all:hover {
+  text-decoration: underline;
+  color: var(--rs-primary-dark, #1d4ed8);
+}
+
+.rs-notification-dropdown-body {
+  max-height: 380px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.rs-notification-loading,
+.rs-notification-empty {
+  padding: 2rem 1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--rs-ink-muted, #64748b);
+}
+
+.rs-notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--rs-line, #f1f5f9);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+}
+
+.rs-notification-item:last-child {
+  border-bottom: none;
+}
+
+.rs-notification-item:hover {
+  background-color: var(--rs-canvas, #f8fafc);
+}
+
+.rs-notification-item.unread {
+  background-color: rgba(37, 99, 235, 0.04);
+}
+
+.rs-notification-item.unread::before {
+  content: '';
+  position: absolute;
+  left: 0.4rem;
+  top: 1.15rem;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #2563eb;
+}
+
+.rs-notification-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  font-size: 0.9rem;
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.rs-notification-icon.type-SYSTEM {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+}
+
+.rs-notification-icon.type-WARNING {
+  background: rgba(245, 158, 11, 0.1);
+  color: #d97706;
+}
+
+.rs-notification-icon.type-SUCCESS {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.rs-notification-content-wrap {
+  flex: 1;
+  min-width: 0;
+}
+
+.rs-notification-item-title {
+  font-size: 0.83rem;
+  font-weight: 700;
+  color: var(--rs-ink, #0f172a);
+  margin-bottom: 0.2rem;
+  line-height: 1.3;
+}
+
+.rs-notification-item-text {
+  font-size: 0.78rem;
+  color: var(--rs-ink-muted, #475569);
+  line-height: 1.4;
+  word-break: break-word;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rs-notification-item-time {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  margin-top: 0.3rem;
+}
+

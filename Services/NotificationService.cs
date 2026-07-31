@@ -65,6 +65,30 @@ namespace DuAnTotNghiep.Services
             return true;
         }
 
+        public async Task<bool> MarkAllAsReadAsync(int userId)
+        {
+            var unreadNotificationIds = await _context.Notifications
+                .Where(n => (n.TargetUserId == userId || n.TargetUserId == null) && !n.NotificationReads.Any(r => r.UserId == userId))
+                .Select(n => n.Id)
+                .ToListAsync();
+
+            if (!unreadNotificationIds.Any()) return true;
+
+            var now = DateTime.UtcNow;
+            foreach (var notifId in unreadNotificationIds)
+            {
+                await _context.NotificationReads.AddAsync(new NotificationRead
+                {
+                    NotificationId = notifId,
+                    UserId = userId,
+                    ReadAt = now
+                });
+            }
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         // Admin Methods
         public async Task<List<Notification>> GetAllAsync(int page, int pageSize)
         {

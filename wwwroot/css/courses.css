@@ -1,137 +1,351 @@
-/* Courses specific styles */
+/* ================================================================
+   2026 Courses Page — Complete Redesign
+   ================================================================ */
 
-.courses-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
-    gap: 16px;
+/* ── 1. PAGE TOOLBAR (Search + Filters) ──────────────────────── */
+.c26-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
 }
 
-.category-tabs-wrapper {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-    width: 100%;
+/* Search bar */
+.c26-search-wrap {
+  position: relative;
+  flex: 0 0 280px;
+  min-width: 200px;
+}
+.c26-search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  color: var(--c26-text-muted);
+  pointer-events: none;
+  transition: color var(--c26-t-fast);
+}
+.c26-search-input {
+  width: 100%;
+  height: 38px;
+  padding: 0 16px 0 38px;
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-pill);
+  background: var(--c26-card);
+  font-size: 13.5px;
+  font-family: var(--c26-font-body);
+  color: var(--c26-text-primary);
+  transition: border-color var(--c26-t-fast), box-shadow var(--c26-t-fast);
+  outline: none;
+}
+.c26-search-input::placeholder { color: var(--c26-text-muted); }
+.c26-search-input:focus {
+  border-color: var(--c26-primary);
+  box-shadow: 0 0 0 3px var(--c26-primary-glow);
+}
+.c26-search-wrap:focus-within .c26-search-icon { color: var(--c26-primary); }
+
+/* Category filter chips */
+.c26-filter-bar {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  flex: 1;
+  min-width: 0;
+}
+.c26-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0 14px;
+  height: 34px;
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-pill);
+  background: var(--c26-card);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c26-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color var(--c26-t-fast), background var(--c26-t-fast),
+              color var(--c26-t-fast), transform var(--c26-t-fast);
+  font-family: var(--c26-font-body);
+}
+.c26-chip:hover {
+  border-color: var(--c26-primary);
+  color: var(--c26-primary);
+  transform: translateY(-1px);
+}
+.c26-chip.active {
+  background: var(--c26-primary);
+  border-color: var(--c26-primary);
+  color: #fff;
+  box-shadow: 0 3px 10px var(--c26-primary-glow);
+}
+.c26-chip.active:hover {
+  background: var(--c26-primary-dark);
+  border-color: var(--c26-primary-dark);
+  color: #fff;
 }
 
-.category-tab-ailearn {
-    padding: 10px 20px;
-    background-color: #FFFFFF;
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all var(--transition-speed) ease;
+/* Results count */
+.c26-results-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--c26-text-muted);
+  white-space: nowrap;
+  margin-left: auto;
 }
 
-.category-tab-ailearn:hover {
-    color: var(--primary-color);
-    background-color: rgba(108, 99, 255, 0.05);
+/* ── 2. COURSE GRID ───────────────────────────────────────────── */
+.c26-course-grid {
+  display: grid;
+  gap: 20px;
+  /* Layout 3 cột (2 hàng 3 cột cho 6 khóa học) */
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.category-tab-ailearn.active {
-    background-color: var(--primary-color);
-    color: #FFFFFF;
-    border-color: var(--primary-color);
-    box-shadow: 0 4px 12px rgba(108, 99, 255, 0.25);
+/* ── 3. COURSE CARD ───────────────────────────────────────────── */
+.c26-course-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--c26-card) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-radius: var(--c26-r-xl) !important;
+  overflow: hidden;
+  box-shadow: var(--c26-elev-sm) !important;
+  transition: transform var(--c26-t), box-shadow var(--c26-t), border-color var(--c26-t);
+  cursor: pointer;
+  text-decoration: none !important;
+  color: inherit;
+}
+.c26-course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--c26-elev-card-hover) !important;
+  border-color: var(--c26-primary-glow) !important;
 }
 
-/* Course Grid */
-.course-grid-ailearn {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 24px;
+/* Card thumbnail */
+.c26-card-thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%) !important;
+  flex-shrink: 0;
+}
+.c26-card-thumb-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: transform 0.4s ease;
+}
+.c26-course-card:hover .c26-card-thumb-img {
+  transform: scale(1.08);
+}
+.c26-card-thumb-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.22);
+  font-size: 3.5rem;
+  z-index: 0;
+}
+.c26-card-thumb-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.55));
+  z-index: 2;
+  pointer-events: none;
+}
+.c26-card-thumb-tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 4px 11px;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  color: var(--c26-primary);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: var(--c26-r-pill);
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.course-card-ailearn {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+/* Thumb color variants based on skill */
+.c26-card-thumb[data-skill="GRAMMAR"] {
+  background: linear-gradient(135deg, #6366F1, #818CF8) !important;
+}
+.c26-card-thumb[data-skill="VOCABULARY"] {
+  background: linear-gradient(135deg, #8B5CF6, #A78BFA) !important;
+}
+.c26-card-thumb[data-skill="COMMUNICATION"],
+.c26-card-thumb[data-skill="SPEAKING"] {
+  background: linear-gradient(135deg, #EC4899, #F472B6) !important;
+}
+.c26-card-thumb[data-skill="LISTENING"] {
+  background: linear-gradient(135deg, #14B8A6, #2DD4BF) !important;
+}
+.c26-card-thumb[data-skill="READING"] {
+  background: linear-gradient(135deg, #F59E0B, #FBBF24) !important;
+}
+.c26-card-thumb[data-skill="WRITING"] {
+  background: linear-gradient(135deg, #22C55E, #4ADE80) !important;
 }
 
-.course-card-thumb {
-    position: relative;
-    width: 100%;
-    height: 160px;
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    margin-bottom: 16px;
+/* Card body */
+.c26-card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 16px;
+  gap: 12px;
 }
 
-.course-card-thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform var(--transition-speed) ease;
+/* Title + description */
+.c26-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+  line-height: 1.35;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-family: var(--c26-font-display) !important;
+}
+.c26-card-desc {
+  font-size: 12.5px;
+  color: var(--c26-text-secondary);
+  line-height: 1.55;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.course-card-ailearn:hover .course-card-thumb img {
-    transform: scale(1.05);
+/* Card meta row */
+.c26-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.c26-card-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--c26-text-secondary);
+}
+.c26-card-meta-item svg {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
 }
 
-.course-card-tag {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background-color: rgba(8, 20, 46, 0.75);
-    backdrop-filter: blur(4px);
-    color: #FFFFFF;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
+/* Rating stars */
+.c26-rating {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--c26-warning);
+}
+.c26-rating-val {
+  color: var(--c26-text-secondary);
+  font-weight: 600;
+  margin-left: 2px;
 }
 
-.course-card-info {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+/* Card actions (pinned to bottom) */
+.c26-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-direction: column;
+  margin-top: auto;
 }
 
-.course-card-info h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-main);
-    margin: 0 0 10px 0;
-    line-height: 1.4;
+/* Spacer line between progress and actions */
+.c26-card-divider {
+  height: 1px;
+  background: var(--c26-border);
+  margin: 0 -16px;
 }
 
-.course-card-info p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    margin: 0 0 20px 0;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+/* ── 4. EMPTY STATE ───────────────────────────────────────────── */
+.c26-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 64px 32px;
+  text-align: center;
+  grid-column: 1 / -1;
+}
+.c26-empty-icon {
+  width: 56px;
+  height: 56px;
+  color: var(--c26-text-muted);
+  opacity: 0.5;
+}
+.c26-empty-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+  font-family: var(--c26-font-display) !important;
+}
+.c26-empty-sub {
+  font-size: 13.5px;
+  color: var(--c26-text-secondary);
 }
 
-.course-card-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    border-top: 1px solid var(--border-color);
-    padding-top: 16px;
-    margin-top: auto;
+/* ── 5. PAGE HEADER ───────────────────────────────────────────── */
+.c26-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.c26-page-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--c26-text-primary);
+  margin: 0 0 4px;
+  font-family: var(--c26-font-display) !important;
+}
+.c26-page-sub {
+  font-size: 13.5px;
+  color: var(--c26-text-secondary);
+  margin: 0;
 }
 
-.course-card-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+/* ── 6. RESPONSIVE GRID BREAKPOINTS ──────────────────────────── */
+@media (max-width: 992px) {
+  .c26-course-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .c26-toolbar { gap: 10px; }
+  .c26-search-wrap { flex: 1 1 100%; }
+  .c26-filter-bar { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+  .c26-card-body { padding: 12px; }
 }
-
-.course-card-meta-item i {
-    color: var(--primary-color);
+@media (max-width: 576px) {
+  .c26-course-grid { grid-template-columns: 1fr; }
 }

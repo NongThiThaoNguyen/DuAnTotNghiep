@@ -43,19 +43,17 @@
             }
         </div>
 
-        <div class="flex flex-col md:flex-row justify-center items-center gap-8 md:gap-16 mt-8">
-            <div class="flex flex-col items-center">
-                <div class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Tổng Điểm</div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8">
+            <div class="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <div class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-3">Tổng Điểm</div>
                 <div class="text-5xl font-black text-indigo-600">@Model.TotalScore <span class="text-2xl text-slate-400 font-medium">/ @Model.MaxScore</span></div>
                 <div class="mt-2 text-lg font-semibold text-slate-700">@Model.Percentage.ToString("0.##")%</div>
             </div>
 
-            <div class="hidden md:block w-px h-24 bg-slate-200"></div>
-
-            <div class="flex flex-col items-center">
-                <div class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Trình Độ Ước Lượng</div>
-                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-100 to-blue-50 flex items-center justify-center border-4 border-white shadow-md ring-1 ring-slate-100">
-                    <span class="text-4xl font-black text-indigo-600">@Model.EstimatedLevel</span>
+            <div class="flex flex-col items-center justify-center p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                <div class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-3">Trình Độ Ước Lượng</div>
+                <div class="inline-flex items-center justify-center px-8 py-4 rounded-full bg-gradient-to-br from-indigo-100 to-blue-50 border-4 border-white shadow-md ring-1 ring-slate-100 whitespace-nowrap">
+                    <span class="text-3xl font-black text-indigo-600">@Model.EstimatedLevel</span>
                 </div>
             </div>
         </div>

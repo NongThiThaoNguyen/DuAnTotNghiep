@@ -21,7 +21,7 @@
 
     var dashboard = ViewBag.ProgressDashboard as DuAnTotNghiep.Models.ViewModels.Progress.ProgressDashboardViewModel;
     decimal avgQuizScore = ViewBag.AverageQuizScore ?? 0m;
-    var timeline = ViewBag.Timeline as List<dynamic>;
+    var timeline = ViewBag.Timeline as List<DuAnTotNghiep.Models.ViewModels.Progress.StudentTimelineItemViewModel>;
 
     // XP & Level calculations
     int studyMinutes = dashboard?.TotalStudyMinutes ?? 0;
@@ -459,7 +459,7 @@
                     </div>
 
                     <div class="pt-2">
-                        <a href="/Student/Home/Index" class="w-full text-center py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md shadow-blue-600/10 block">
+                        <a href="/Student/LearningPath" class="w-full text-center py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition-all shadow-md shadow-blue-600/10 block">
                             Tiếp tục học
                         </a>
                     </div>

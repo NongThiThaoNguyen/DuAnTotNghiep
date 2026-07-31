@@ -152,14 +152,20 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                 }
                 else if (dto.ActivityType.Equals(ActivityType.Review, System.StringComparison.OrdinalIgnoreCase) && dto.TopicId.HasValue)
                 {
-                    var node = await _context.LearningPathNodes
+                    // Reset tất cả node thuộc topic này về trạng thái ban đầu để học viên làm lại từ đầu
+                    var topicNodes = await _context.LearningPathNodes
                         .Include(n => n.LearningPath)
-                        .FirstOrDefaultAsync(n => n.LearningPath.StudentId == studentId && n.TopicId == dto.TopicId.Value && n.LearningPath.Status == "ACTIVE");
+                        .Where(n => n.LearningPath.StudentId == studentId && n.TopicId == dto.TopicId.Value && n.LearningPath.Status == "ACTIVE")
+                        .ToListAsync();
                     
-                    if (node != null)
+                    if (topicNodes.Any())
                     {
-                        node.Status = ProgressStatus.NeedReview;
-                        _context.LearningPathNodes.Update(node);
+                        foreach (var node in topicNodes)
+                        {
+                            node.Status = ProgressStatus.Available;
+                            node.CompletedAt = null;
+                        }
+                        _context.LearningPathNodes.UpdateRange(topicNodes);
                         await _context.SaveChangesAsync();
                     }
                     await _studentProgressService.RecordActivityAsync(dto, studentId);
@@ -195,7 +201,7 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                    dto.ActivityType.Equals(ActivityType.Practice, System.StringComparison.OrdinalIgnoreCase);
         }
 
-        [HttpGet]
+        [HttpGet("/Student/Progress/SkillDetail/{skillId:int}")]
         public async Task<IActionResult> SkillDetail(int skillId, int? studentId = null)
         {
             int currentUserId = GetUserId();
@@ -235,7 +241,7 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             return View(viewModel);
         }
 
-        [HttpGet]
+        [HttpGet("/Student/Progress/TopicDetail/{topicId:int}")]
         public async Task<IActionResult> TopicDetail(int topicId, int? studentId = null)
         {
             int currentUserId = GetUserId();

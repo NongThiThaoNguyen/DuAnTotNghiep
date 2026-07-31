@@ -1,0 +1,129 @@
+@model DuAnTotNghiep.Models.ViewModels.AILearn.CourseDetailViewModel
+@{
+    Layout = "_AILearnLayout";
+    ViewData["Title"] = Model.Title;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
+}
+
+<div class="mb-4">
+    <a href="/Courses" class="btn btn-sm btn-outline-secondary mb-3">
+        <i class="fa-solid fa-arrow-left me-1"></i> Quay lại danh sách khóa học
+    </a>
+
+    <!-- Course Header Banner -->
+    <div class="card-ailearn p-4 mb-4" style="background: linear-gradient(135deg, #1E1B4B, #312E81, #4338CA); color: #fff; border: none; border-radius: 16px;">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge bg-primary px-3 py-2">@Model.SkillName</span>
+                    @if (!string.IsNullOrEmpty(Model.LevelName))
+                    {
+                        <span class="badge bg-secondary px-3 py-2">@Model.LevelName</span>
+                    }
+                    <span class="badge bg-outline-light border px-3 py-2">@Model.Difficulty</span>
+                </div>
+                <h1 class="h2 font-weight-bold mb-3">@Model.Title</h1>
+                <p class="text-light opacity-90 mb-4" style="line-height: 1.6;">@Model.Description</p>
+                
+                <div class="d-flex flex-wrap gap-4 text-light small opacity-80 mb-4">
+                    <div><i class="fa-solid fa-book-open me-2"></i>@Model.LessonCount bài học</div>
+                    @if (Model.EstimatedMinutes.HasValue)
+                    {
+                        <div><i class="fa-solid fa-clock me-2"></i>@Model.EstimatedMinutes.Value phút tổng số</div>
+                    }
+                    <div><i class="fa-solid fa-check-circle me-2"></i>Đã hoàn thành @Model.CompletedLessonCount/@Model.LessonCount bài</div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    @if (Model.LastCompletedLessonId.HasValue)
+                    {
+                        <a href="/Lesson/Detail/@Model.LastCompletedLessonId.Value" class="btn btn-warning btn-lg fw-bold px-4">
+                            <i class="fa-solid fa-play me-2"></i>Tiếp tục học
+                        </a>
+                    }
+                    else if (Model.FirstLessonId.HasValue)
+                    {
+                        <a href="/Lesson/Detail/@Model.FirstLessonId.Value" class="btn btn-primary-ailearn btn-lg fw-bold px-4">
+                            <i class="fa-solid fa-play me-2"></i>Bắt đầu học ngay
+                        </a>
+                    }
+                    <a href="/Quiz/Take/@Model.Id" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fa-solid fa-vial me-2"></i>Làm Quiz kiểm tra
+                    </a>
+                </div>
+            </div>
+            
+            <div class="col-lg-4 text-center mt-4 mt-lg-0">
+                <div class="p-3 rounded-3 text-dark bg-white shadow-lg text-center overflow-hidden" style="border-radius: 16px !important;">
+                    @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+                    {
+                        <div class="mb-3 rounded-3 overflow-hidden" style="max-height: 160px;">
+                            <img src="@Model.ThumbnailUrl" alt="@Model.Title" class="img-fluid w-100" style="object-fit: cover; max-height: 160px;" onerror="this.style.display='none';" />
+                        </div>
+                    }
+                    <h4 class="h6 font-weight-bold text-muted mb-2">TIẾN ĐỘ KHÓA HỌC</h4>
+                    <div class="h2 font-weight-bold text-primary mb-3">@Model.ProgressPercent%</div>
+                    <div class="progress mb-3" style="height: 10px; border-radius: 5px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: @Model.ProgressPercent%" aria-valuenow="@Model.ProgressPercent" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <p class="small text-muted mb-0">Hoàn thành bài học để tăng tiến độ khóa học của bạn</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Syllabus / Lesson List Section -->
+    <div class="card-ailearn p-4">
+        <h3 class="h5 font-weight-bold mb-4 pb-2 border-bottom">Danh sách nội dung bài học (@Model.LessonCount)</h3>
+
+        @if (Model.Lessons == null || !Model.Lessons.Any())
+        {
+            <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-folder-open mb-3" style="font-size: 3rem; opacity: 0.4;"></i>
+                <p>Khóa học này hiện đang cập nhật bài học.</p>
+            </div>
+        }
+        else
+        {
+            <div class="list-group list-group-flush">
+                @foreach (var item in Model.Lessons)
+                {
+                    <a href="/Lesson/Detail/@item.Id" class="list-group-item list-group-item-action p-3 d-flex align-items-center justify-content-between rounded mb-2 border hoverable">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center @(item.IsCompleted ? "bg-success text-white" : "bg-light text-primary")" style="width: 40px; height: 40px; font-weight: bold; flex-shrink: 0;">
+                                @if (item.IsCompleted)
+                                {
+                                    <i class="fa-solid fa-check"></i>
+                                }
+                                else
+                                {
+                                    <span>@item.OrderIndex</span>
+                                }
+                            </div>
+                            <div>
+                                <h4 class="h6 font-weight-bold mb-1 text-dark">@item.Title</h4>
+                                @if (!string.IsNullOrWhiteSpace(item.Summary))
+                                {
+                                    <p class="small text-muted mb-0 text-truncate" style="max-width: 600px;">@item.Summary</p>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center gap-3 ms-3">
+                            @if (item.EstimatedMinutes.HasValue)
+                            {
+                                <span class="small text-muted"><i class="fa-regular fa-clock me-1"></i>@item.EstimatedMinutes.Value phút</span>
+                            }
+                            <span class="btn btn-sm @(item.IsCompleted ? "btn-outline-success" : "btn-primary-ailearn")">
+                                @(item.IsCompleted ? "Học lại" : "Học bài")
+                            </span>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>

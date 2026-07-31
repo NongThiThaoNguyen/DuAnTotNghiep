@@ -1,0 +1,774 @@
+/* ================================================================
+   2026 AI Study English — Complete Design System
+   Inspired by: Linear, Notion, Vercel, Coursera
+   Font: Inter + Plus Jakarta Sans
+   ================================================================ */
+
+/* ── 1. DESIGN TOKENS ─────────────────────────────────────────── */
+:root {
+  /* Primary Palette */
+  --c26-primary:         #6366F1;
+  --c26-primary-dark:    #4F46E5;
+  --c26-primary-light:   rgba(99, 102, 241, 0.08);
+  --c26-primary-glow:    rgba(99, 102, 241, 0.18);
+  --c26-secondary:       #8B5CF6;
+  --c26-secondary-light: rgba(139, 92, 246, 0.08);
+
+  /* Semantic */
+  --c26-success:         #22C55E;
+  --c26-success-light:   rgba(34, 197, 94, 0.10);
+  --c26-success-dark:    #16A34A;
+  --c26-warning:         #F59E0B;
+  --c26-warning-light:   rgba(245, 158, 11, 0.10);
+  --c26-danger:          #EF4444;
+  --c26-danger-light:    rgba(239, 68, 68, 0.10);
+  --c26-info:            #3B82F6;
+  --c26-info-light:      rgba(59, 130, 246, 0.08);
+
+  /* Neutrals */
+  --c26-bg:              #F8FAFC;
+  --c26-card:            #FFFFFF;
+  --c26-border:          #E5E7EB;
+  --c26-border-strong:   #D1D5DB;
+  --c26-text-primary:    #111827;
+  --c26-text-secondary:  #6B7280;
+  --c26-text-muted:      #9CA3AF;
+  --c26-surface-hover:   #F9FAFB;
+  --c26-surface-2:       #F3F4F6;
+
+  /* Typography */
+  --c26-font-display: 'Plus Jakarta Sans', 'Inter', 'Noto Sans', sans-serif;
+  --c26-font-body:    'Inter', 'Plus Jakarta Sans', 'Noto Sans', sans-serif;
+
+  /* Spacing — 8px base system */
+  --c26-s1:  4px;
+  --c26-s2:  8px;
+  --c26-s3:  12px;
+  --c26-s4:  16px;
+  --c26-s5:  20px;
+  --c26-s6:  24px;
+  --c26-s8:  32px;
+  --c26-s10: 40px;
+  --c26-s12: 48px;
+  --c26-s16: 64px;
+
+  /* Border Radius */
+  --c26-r-sm:   6px;
+  --c26-r-md:   10px;
+  --c26-r-lg:   14px;
+  --c26-r-xl:   18px;
+  --c26-r-2xl:  24px;
+  --c26-r-pill: 9999px;
+
+  /* Elevation — NO class names with "shadow" to avoid student-shell override */
+  --c26-elev-xs: 0 1px 2px rgba(17, 24, 39, 0.05);
+  --c26-elev-sm: 0 2px 8px rgba(17, 24, 39, 0.07), 0 0 0 1px rgba(17, 24, 39, 0.03);
+  --c26-elev-md: 0 4px 16px rgba(17, 24, 39, 0.08), 0 1px 3px rgba(17, 24, 39, 0.05);
+  --c26-elev-lg: 0 8px 32px rgba(17, 24, 39, 0.10), 0 2px 8px rgba(17, 24, 39, 0.06);
+  --c26-elev-card-hover: 0 12px 40px rgba(99, 102, 241, 0.13), 0 4px 12px rgba(17, 24, 39, 0.07);
+
+  /* Transitions */
+  --c26-t-fast:  120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --c26-t:       200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --c26-t-slow:  350ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Layout */
+  --c26-content-max: 1600px;
+}
+
+/* ── 2. STUDENT SHELL PALETTE OVERRIDE ──────────────────────────
+   Switch the old "Classic Luxury" brass/ivory palette to the
+   2026 indigo SaaS palette while keeping all layout logic intact.
+   ─────────────────────────────────────────────────────────────── */
+.student-shell {
+  --rs-canvas:       var(--c26-bg);
+  --rs-surface:      var(--c26-card);
+  --rs-surface-muted:#F1F5F9;
+  --rs-ink:          var(--c26-text-primary);
+  --rs-ink-2:        #1F2937;
+  --rs-ink-muted:    var(--c26-text-secondary);
+  --rs-line:         var(--c26-border);
+  --rs-line-strong:  var(--c26-border-strong);
+  --rs-brass:        var(--c26-primary);
+  --rs-brass-deep:   var(--c26-primary-dark);
+  --rs-danger:       var(--c26-danger);
+  --rs-danger-bg:    var(--c26-danger-light);
+  --rs-success:      var(--c26-success-dark);
+  --rs-success-bg:   var(--c26-success-light);
+  --rs-warning:      var(--c26-warning);
+  --rs-warning-bg:   var(--c26-warning-light);
+  --rs-info:         var(--c26-info);
+  --rs-info-bg:      var(--c26-info-light);
+  --rs-shadow-raised: var(--c26-elev-md);
+  --rs-focus-ring:   0 0 0 3px var(--c26-primary-glow);
+  --rs-font-sans:    var(--c26-font-body);
+  --rs-radius-control: var(--c26-r-md);
+  --rs-radius-panel:   var(--c26-r-lg);
+  --rs-content-max:  var(--c26-content-max);
+  --rs-sidebar-width: 260px;
+  --rs-account-height: 60px;
+
+  /* Let box-shadows through */
+  --box-shadow-sm: var(--c26-elev-sm);
+  --box-shadow-md: var(--c26-elev-md);
+  --primary-color: var(--c26-primary);
+  --primary-hover: var(--c26-primary-dark);
+  --text-main:     var(--c26-text-primary);
+  --text-muted:    var(--c26-text-secondary);
+  --border-color:  var(--c26-border);
+  --border-radius-md: var(--c26-r-md);
+  --border-radius-lg: var(--c26-r-lg);
+  --body-bg:       var(--c26-bg);
+  --card-bg:       var(--c26-card);
+  --transition-speed: 200ms;
+
+  /* Font override */
+  font-family: var(--c26-font-body) !important;
+}
+
+/* Allow box-shadows on our new component classes */
+.student-shell .c26-card,
+.student-shell .c26-sidebar,
+.student-shell .c26-header,
+.student-shell .c26-course-card,
+.student-shell .c26-example-card,
+.student-shell .c26-resource-card,
+.student-shell .c26-lesson-nav-item {
+  box-shadow: var(--c26-elev-sm) !important;
+}
+
+/* Allow gradients on new component classes */
+.student-shell .c26-gradient,
+.student-shell .c26-objective-card,
+.student-shell .c26-brand-mark {
+  background-image: initial !important;
+  background: revert !important;
+}
+
+/* Reset unwanted student-shell overrides for new component classes */
+.student-shell .c26-course-card,
+.student-shell .c26-example-card,
+.student-shell .c26-resource-card,
+.student-shell .c26-pill,
+.student-shell .c26-btn,
+.student-shell .c26-badge {
+  border-color: initial !important;
+  border-radius: initial !important;
+  background: initial !important;
+}
+
+/* Prevent shadow stripping for new classes */
+.student-shell .c26-course-card:hover,
+.student-shell .c26-example-card:hover,
+.student-shell .c26-resource-card:hover {
+  box-shadow: var(--c26-elev-card-hover) !important;
+}
+
+/* ── 3. GLOBAL TYPOGRAPHY ────────────────────────────────────── */
+.student-shell,
+.student-shell h1,
+.student-shell h2,
+.student-shell h3,
+.student-shell h4,
+.student-shell h5,
+.student-shell h6 {
+  font-family: var(--c26-font-body) !important;
+}
+
+.student-shell .c26-display,
+.student-shell .c26-heading {
+  font-family: var(--c26-font-display) !important;
+}
+
+/* ── 4. FOCUS RING ───────────────────────────────────────────── */
+.student-shell :focus-visible {
+  outline: 2px solid var(--c26-primary) !important;
+  outline-offset: 2px !important;
+}
+
+/* ── 5. SIDEBAR REDESIGN — 2026 Linear/Notion Style ─────────── */
+.student-sidebar {
+  background: var(--c26-card) !important;
+  border-right: 1px solid var(--c26-border) !important;
+  width: var(--rs-sidebar-width) !important;
+}
+
+/* Brand header */
+.c26-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 16px 16px;
+  text-decoration: none;
+  color: var(--c26-text-primary);
+  border-bottom: 1px solid var(--c26-border);
+  margin-bottom: 8px;
+  transition: opacity var(--c26-t-fast);
+}
+.c26-brand:hover { opacity: 0.85; color: var(--c26-text-primary); }
+
+.c26-brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--c26-primary), var(--c26-secondary)) !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  font-family: var(--c26-font-display) !important;
+  box-shadow: 0 2px 8px var(--c26-primary-glow) !important;
+}
+
+.c26-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.c26-brand-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--c26-font-display) !important;
+}
+.c26-brand-sub {
+  font-size: 11px;
+  color: var(--c26-text-muted);
+  font-weight: 500;
+}
+
+/* Nav groups */
+.c26-nav-group {
+  padding: 4px 12px;
+  margin-bottom: 2px;
+}
+.c26-nav-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--c26-text-muted);
+  padding: 12px 4px 4px;
+  margin: 0;
+}
+
+/* Nav links */
+.c26-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 10px;
+  border-radius: var(--c26-r-md) !important;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--c26-text-secondary);
+  text-decoration: none !important;
+  transition: background var(--c26-t-fast), color var(--c26-t-fast);
+  position: relative;
+  min-height: 36px;
+  margin-bottom: 1px;
+}
+.c26-nav-link:hover {
+  background: var(--c26-surface-hover) !important;
+  color: var(--c26-text-primary) !important;
+}
+.c26-nav-link.is-active {
+  background: var(--c26-primary-light) !important;
+  color: var(--c26-primary) !important;
+  font-weight: 600 !important;
+}
+.c26-nav-link.is-active::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  border-radius: 0 3px 3px 0;
+  background: var(--c26-primary);
+}
+.c26-nav-link svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity var(--c26-t-fast);
+}
+.c26-nav-link:hover svg,
+.c26-nav-link.is-active svg {
+  opacity: 1;
+}
+.c26-nav-link.is-active svg {
+  color: var(--c26-primary);
+}
+
+/* Sidebar footer */
+.c26-sidebar-footer {
+  padding: 12px 12px 20px;
+  border-top: 1px solid var(--c26-border);
+}
+.c26-logout-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 10px;
+  border-radius: var(--c26-r-md) !important;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--c26-text-secondary);
+  text-decoration: none !important;
+  transition: background var(--c26-t-fast), color var(--c26-t-fast);
+  min-height: 36px;
+}
+.c26-logout-link:hover {
+  background: var(--c26-danger-light) !important;
+  color: var(--c26-danger) !important;
+}
+.c26-logout-link svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  opacity: 0.6;
+}
+
+/* ── 6. HEADER / ACCOUNT STRIP REDESIGN ─────────────────────── */
+.student-account-strip {
+  background: var(--c26-card) !important;
+  border-bottom: 1px solid var(--c26-border) !important;
+  padding: 0 28px !important;
+  min-height: var(--rs-account-height) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 30 !important;
+  backdrop-filter: blur(12px) !important;
+}
+
+.c26-header-left {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.c26-header-eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--c26-text-muted);
+}
+.c26-header-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+  font-family: var(--c26-font-display) !important;
+}
+
+.c26-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+/* Notification button */
+.c26-notif-btn {
+  position: relative;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-md);
+  background: var(--c26-card);
+  color: var(--c26-text-secondary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color var(--c26-t-fast), background var(--c26-t-fast), color var(--c26-t-fast);
+}
+.c26-notif-btn:hover {
+  border-color: var(--c26-border-strong);
+  background: var(--c26-surface-hover);
+  color: var(--c26-text-primary);
+}
+.c26-notif-btn svg { width: 17px; height: 17px; }
+.c26-notif-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 16px;
+  height: 16px;
+  background: var(--c26-danger);
+  color: #fff;
+  border: 2px solid var(--c26-card);
+  border-radius: var(--c26-r-pill);
+  font-size: 9px;
+  font-weight: 800;
+  text-align: center;
+  line-height: 12px;
+  padding: 0 2px;
+}
+
+/* Avatar / profile chip */
+.c26-profile-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 4px;
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-pill);
+  background: var(--c26-card);
+  text-decoration: none !important;
+  color: var(--c26-text-primary);
+  transition: border-color var(--c26-t-fast), background var(--c26-t-fast);
+}
+.c26-profile-chip:hover {
+  border-color: var(--c26-border-strong);
+  background: var(--c26-surface-hover);
+  color: var(--c26-text-primary);
+}
+.c26-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c26-primary), var(--c26-secondary));
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.c26-profile-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c26-text-primary);
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.c26-profile-role {
+  font-size: 11px;
+  color: var(--c26-text-muted);
+}
+
+/* ── 7. PAGE CONTENT AREA ────────────────────────────────────── */
+.student-page {
+  max-width: var(--c26-content-max) !important;
+}
+
+.student-page-learning {
+  max-width: var(--c26-content-max) !important;
+  padding: 28px 32px !important;
+}
+
+/* ── 8. SHARED BUTTON SYSTEM ─────────────────────────────────── */
+.c26-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 16px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: var(--c26-r-md) !important;
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: var(--c26-font-body) !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background var(--c26-t-fast), border-color var(--c26-t-fast),
+              color var(--c26-t-fast), transform var(--c26-t-fast), box-shadow var(--c26-t-fast);
+  white-space: nowrap;
+}
+.c26-btn:active { transform: scale(0.97); }
+
+.c26-btn-primary {
+  background: var(--c26-primary) !important;
+  border-color: var(--c26-primary) !important;
+  color: #fff !important;
+}
+.c26-btn-primary:hover {
+  background: var(--c26-primary-dark) !important;
+  border-color: var(--c26-primary-dark) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 12px var(--c26-primary-glow) !important;
+}
+
+.c26-btn-outline {
+  background: transparent !important;
+  border-color: var(--c26-border) !important;
+  color: var(--c26-text-secondary) !important;
+}
+.c26-btn-outline:hover {
+  border-color: var(--c26-border-strong) !important;
+  background: var(--c26-surface-hover) !important;
+  color: var(--c26-text-primary) !important;
+}
+
+.c26-btn-ghost {
+  background: transparent !important;
+  border-color: transparent !important;
+  color: var(--c26-text-secondary) !important;
+}
+.c26-btn-ghost:hover {
+  background: var(--c26-surface-hover) !important;
+  color: var(--c26-text-primary) !important;
+}
+
+.c26-btn-sm {
+  height: 30px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+.c26-btn-lg {
+  height: 42px;
+  padding: 0 22px;
+  font-size: 14.5px;
+  border-radius: var(--c26-r-lg) !important;
+}
+.c26-btn-full { width: 100%; }
+
+/* Disabled state */
+.c26-btn[disabled], .c26-btn.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Success button */
+.c26-btn-success {
+  background: var(--c26-success) !important;
+  border-color: var(--c26-success) !important;
+  color: #fff !important;
+}
+.c26-btn-success:hover {
+  background: var(--c26-success-dark) !important;
+  border-color: var(--c26-success-dark) !important;
+  color: #fff !important;
+}
+
+/* ── 9. BADGE SYSTEM ─────────────────────────────────────────── */
+.c26-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: var(--c26-r-pill) !important;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--c26-surface-2) !important;
+  color: var(--c26-text-secondary) !important;
+  border: none !important;
+}
+.c26-badge-primary {
+  background: var(--c26-primary-light) !important;
+  color: var(--c26-primary) !important;
+}
+.c26-badge-success {
+  background: var(--c26-success-light) !important;
+  color: var(--c26-success-dark) !important;
+}
+.c26-badge-warning {
+  background: var(--c26-warning-light) !important;
+  color: #92400E !important;
+}
+.c26-badge-secondary {
+  background: var(--c26-secondary-light) !important;
+  color: var(--c26-secondary) !important;
+}
+
+/* ── 10. PROGRESS BAR ────────────────────────────────────────── */
+.c26-progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.c26-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--c26-text-secondary);
+}
+.c26-progress-bar {
+  height: 5px;
+  background: var(--c26-border);
+  border-radius: var(--c26-r-pill);
+  overflow: hidden;
+}
+.c26-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--c26-primary), var(--c26-secondary));
+  border-radius: var(--c26-r-pill);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.c26-progress-fill.complete {
+  background: linear-gradient(90deg, var(--c26-success), #16A34A);
+}
+
+/* ── 11. NOTIFICATION DROPDOWN ───────────────────────────────── */
+.rs-notification-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 8px);
+  width: 340px;
+  background: var(--c26-card);
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-xl);
+  box-shadow: var(--c26-elev-lg);
+  z-index: 200;
+  overflow: hidden;
+}
+.rs-notification-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--c26-border);
+}
+.rs-notification-dropdown-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+}
+.rs-notification-mark-all {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--c26-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+.rs-notification-dropdown-body {
+  max-height: 360px;
+  overflow-y: auto;
+}
+.rs-notification-loading {
+  padding: 24px;
+  text-align: center;
+  color: var(--c26-text-muted);
+  font-size: 13px;
+}
+.rs-notification-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--c26-border);
+  transition: background var(--c26-t-fast);
+}
+.rs-notification-item:hover {
+  background: var(--c26-surface-hover);
+}
+.rs-notification-item:last-child {
+  border-bottom: none;
+}
+.rs-notification-item.unread {
+  background: var(--c26-primary-light);
+}
+
+/* ── 12. CARD FOUNDATION ─────────────────────────────────────── */
+.c26-card {
+  background: var(--c26-card) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-radius: var(--c26-r-xl) !important;
+  box-shadow: var(--c26-elev-sm) !important;
+  overflow: hidden;
+}
+
+/* ── 13. MOBILE TOPBAR OVERRIDES ─────────────────────────────── */
+.student-mobile-topbar {
+  background: var(--c26-card) !important;
+  border-bottom: 1px solid var(--c26-border) !important;
+}
+.student-mobile-menu-button {
+  border: 1px solid var(--c26-border) !important;
+  background: var(--c26-card) !important;
+  border-radius: var(--c26-r-md) !important;
+  color: var(--c26-text-secondary) !important;
+}
+.student-mobile-brand {
+  color: var(--c26-text-primary) !important;
+  font-family: var(--c26-font-display) !important;
+}
+.student-mobile-avatar,
+.student-account-avatar,
+.student-brand-mark {
+  background: linear-gradient(135deg, var(--c26-primary), var(--c26-secondary)) !important;
+  color: #fff !important;
+  border-radius: var(--c26-r-md) !important;
+}
+
+/* ── 14. FOOTER OVERRIDE ─────────────────────────────────────── */
+.student-footer {
+  background: var(--c26-card) !important;
+  border-top: 1px solid var(--c26-border) !important;
+  color: var(--c26-text-muted) !important;
+  font-size: 12px !important;
+}
+
+/* ── 15. ANIMATIONS ──────────────────────────────────────────── */
+@keyframes c26-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes c26-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes c26-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes c26-progress-in {
+  from { width: 0; }
+}
+
+.c26-anim-fade  { animation: c26-fade-in  0.3s var(--c26-t) forwards; }
+.c26-anim-up    { animation: c26-fade-up  0.4s var(--c26-t) forwards; }
+.c26-anim-scale { animation: c26-scale-in 0.25s var(--c26-t) forwards; }
+
+/* Stagger children */
+.c26-stagger > * { opacity: 0; animation: c26-fade-up 0.35s var(--c26-t) forwards; }
+.c26-stagger > *:nth-child(1)  { animation-delay: 0.04s; }
+.c26-stagger > *:nth-child(2)  { animation-delay: 0.08s; }
+.c26-stagger > *:nth-child(3)  { animation-delay: 0.12s; }
+.c26-stagger > *:nth-child(4)  { animation-delay: 0.16s; }
+.c26-stagger > *:nth-child(5)  { animation-delay: 0.20s; }
+.c26-stagger > *:nth-child(6)  { animation-delay: 0.24s; }
+.c26-stagger > *:nth-child(7)  { animation-delay: 0.28s; }
+.c26-stagger > *:nth-child(8)  { animation-delay: 0.32s; }
+.c26-stagger > *:nth-child(9)  { animation-delay: 0.36s; }
+.c26-stagger > *:nth-child(10) { animation-delay: 0.40s; }
+.c26-stagger > *:nth-child(n+11) { animation-delay: 0.44s; }
+
+/* ── 16. SCROLLBAR ───────────────────────────────────────────── */
+.student-shell ::-webkit-scrollbar { width: 6px; }
+.student-shell ::-webkit-scrollbar-track { background: transparent; }
+.student-shell ::-webkit-scrollbar-thumb {
+  background: var(--c26-border-strong);
+  border-radius: var(--c26-r-pill);
+}
+.student-shell ::-webkit-scrollbar-thumb:hover { background: var(--c26-text-muted); }
+
+/* ── 17. RESPONSIVE SIDEBAR ──────────────────────────────────── */
+@media (max-width: 1024px) {
+  .student-sidebar { transform: translateX(-100%); }
+  .student-sidebar-closed .student-sidebar { transform: translateX(-100%); }
+  .student-shell-frame,
+  .rs-shell-frame { grid-template-columns: 0 minmax(0, 1fr) !important; }
+}

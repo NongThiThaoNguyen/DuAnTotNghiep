@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -43,12 +43,12 @@ namespace DuAnTotNghiep.Data.Migrations
                 oldMaxLength: 50,
                 oldDefaultValue: "PENDING");
 
-            migrationBuilder.AddColumn<string>(
-                name: "video_url",
-                table: "original_lessons",
-                type: "nvarchar(2000)",
-                maxLength: 2000,
-                nullable: true);
+            // migrationBuilder.AddColumn<string>(
+            //     name: "video_url",
+            //     table: "original_lessons",
+            //     type: "nvarchar(2000)",
+            //     maxLength: 2000,
+            //     nullable: true);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_study_activity_logs_learning_path_nodes_learning_path_node_id",

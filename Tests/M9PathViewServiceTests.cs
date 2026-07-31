@@ -222,11 +222,11 @@ public class M9PathViewServiceTests
     }
 
     [Theory]
-    [InlineData(NodeType.Topic, 10, null, null, null, "/Student/Topics/Details/10")]
-    [InlineData(NodeType.Lesson, null, 20, null, null, "/Student/Lesson/Details/20")]
-    [InlineData(NodeType.Quiz, null, null, 30, null, "/Student/Quiz/Details/30")]
-    [InlineData(NodeType.Practice, null, null, null, 40, "/Student/Practice/Details/40")]
-    [InlineData(NodeType.Review, 10, null, null, null, "/Student/Progress/TopicDetail/10")]
+    [InlineData(NodeType.Topic, 10, null, null, null, "/Student/LearningPath")]
+    [InlineData(NodeType.Lesson, null, 20, null, null, "/Lesson/Detail/20")]
+    [InlineData(NodeType.Quiz, null, null, 30, null, "/Quiz/Take/30")]
+    [InlineData(NodeType.Practice, null, null, null, 40, "/Lesson/Detail/40")]
+    [InlineData(NodeType.Review, 10, null, null, null, "/Student/LearningPath")]
     [InlineData(NodeType.AiTutor, 10, null, null, null, "/Student/AiTutor/Node/99")]
     public async Task BuildNodeTargetUrlAsync_UsesNodeTypeSpecificTargets(
         string nodeType,

@@ -75,7 +75,8 @@ namespace DuAnTotNghiep.Controllers
             }
             catch (Exception ex)
             {
-                return NotFound(ex.Message);
+                var fullMessage = ex.InnerException != null ? $"{ex.Message} ---> Inner: {ex.InnerException.Message}" : ex.Message;
+                return Content($"Submit Error: {fullMessage}\n\nTrace:\n{ex}");
             }
         }
     }

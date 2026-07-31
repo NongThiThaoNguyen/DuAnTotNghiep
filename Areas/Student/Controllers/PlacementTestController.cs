@@ -75,12 +75,13 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Start(int testId)
+        public async Task<IActionResult> Start(int testId, int? suggestedTestId)
         {
+            int finalTestId = testId > 0 ? testId : (suggestedTestId ?? 0);
             var userId = GetUserId();
             try
             {
-                var attempt = await _placementTestService.StartAttemptAsync(userId, testId);
+                var attempt = await _placementTestService.StartAttemptAsync(userId, finalTestId);
                 return RedirectToAction("Take", new { attemptId = attempt.Id });
             }
             catch (System.Exception ex)
@@ -116,15 +117,19 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         [HttpPost]
         public async Task<IActionResult> SaveAnswer([FromBody] SaveAnswerInputDto input)
         {
-            var studentId = HttpContext.Session.GetInt32("UserId");
-            if (studentId == null)
+            var studentId = GetUserId();
+            if (studentId <= 0)
+            {
+                studentId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            }
+            if (studentId <= 0)
             {
                 return Unauthorized(new { success = false, message = "Not logged in" });
             }
 
             try
             {
-                var result = await _placementTestService.SaveAnswerAsync(input, studentId.Value);
+                var result = await _placementTestService.SaveAnswerAsync(input, studentId);
                 if (!result.Success)
                 {
                     return BadRequest(new { success = false, message = result.Message });

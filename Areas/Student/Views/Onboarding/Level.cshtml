@@ -4,10 +4,30 @@
     var isScoreBased = ViewBag.GoalCode == "IELTS" || ViewBag.GoalCode == "TOEIC";
 }
 
-<div class="max-w-3xl mx-auto py-12">
-    
+@section Styles {
+    <style>
+        .level-card-body {
+            border: 2px solid #e2e8f0;
+            transition: all 0.2s ease;
+        }
+        .level-card-body:hover {
+            border-color: #93c5fd;
+        }
+        .level-radio:checked + .level-card-body {
+            border-color: #2563eb !important;
+            background-color: rgba(239, 246, 255, 0.6) !important;
+            box-shadow: 0 8px 16px -4px rgba(37, 99, 235, 0.15) !important;
+        }
+        .level-radio:checked + .level-card-body .level-badge {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+        }
+    </style>
+}
+
+<div class="max-w-5xl mx-auto py-6 px-4">
     <partial name="_OnboardingStepper" model="2" />
-    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-6 sm:p-10 border border-slate-200/80 mt-6">
         
         <form method="post" asp-action="Level">
             @Html.AntiForgeryToken()

@@ -18,10 +18,29 @@ public class LessonViewModel
 
     public bool IsCompleted { get; set; }
 
+    public List<LessonGrammarExampleViewModel> GrammarExamples { get; set; } = new();
+    public List<LessonResourceViewModel> Resources { get; set; } = new();
+
     public List<LessonNavigationItemViewModel> LessonsInCourse { get; set; } = new();
 
     public int? PreviousLessonId { get; set; }
     public int? NextLessonId { get; set; }
+}
+
+public class LessonGrammarExampleViewModel
+{
+    public string Title { get; set; } = "";
+    public string Syntax { get; set; } = "";
+    public string Example { get; set; } = "";
+    public string Translation { get; set; } = "";
+    public string? Explanation { get; set; }
+}
+
+public class LessonResourceViewModel
+{
+    public string Title { get; set; } = "";
+    public string FileType { get; set; } = "PDF";
+    public string FileUrl { get; set; } = "#";
 }
 
 public class LessonNavigationItemViewModel

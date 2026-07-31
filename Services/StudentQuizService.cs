@@ -30,7 +30,91 @@ namespace DuAnTotNghiep.Services
                         .ThenInclude(qb => qb.QuestionOptions)
                 .FirstOrDefaultAsync(q => q.TopicId == topicId);
 
-            if (quiz == null) return null;
+            if (quiz == null)
+            {
+                var topic = await _context.LearningTopics.FindAsync(topicId);
+                if (topic == null) return null;
+
+                // Auto-create a default quiz for this topic
+                quiz = new Quiz
+                {
+                    TopicId = topicId,
+                    SkillId = topic.SkillId,
+                    Title = $"Bài trắc nghiệm: {topic.Title}",
+                    Description = $"Bài kiểm tra trắc nghiệm củng cố kiến thức cho chủ đề {topic.Title}.",
+                    QuizType = "TOPIC_QUIZ",
+                    TimeLimitMinutes = 15,
+                    PassingScore = 7.0m,
+                    Status = "PUBLISHED",
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _context.Quizzes.AddAsync(quiz);
+                await _context.SaveChangesAsync();
+
+                // Add sample questions
+                var defaultQuestions = new[]
+                {
+                    ("Choose the correct word: 'He is very _______ in learning English.'", "interested", new[] { "interested", "interest", "interesting", "interestingly" }, "Adjective describing feelings."),
+                    ("What is the synonym of 'essential'?", "vital", new[] { "vital", "optional", "minor", "trivial" }, "'Essential' means vital."),
+                    ("She succeeded _______ passing the final exam.", "in", new[] { "in", "on", "at", "with" }, "Succeed in V-ing."),
+                    ("Which sentence is grammatically correct?", "If I were you, I would accept the offer.", new[] { "If I were you, I would accept the offer.", "If I am you, I will accept the offer.", "If I was you, I will accept the offer.", "If I had been you, I accept." }, "Second conditional rule."),
+                    ("What does 'break a leg' mean?", "Good luck!", new[] { "Good luck!", "Break your leg", "Run fast", "Be quiet" }, "Idiom for wishing good luck.")
+                };
+
+                int qIndex = 1;
+                foreach (var (qText, correctAns, opts, exp) in defaultQuestions)
+                {
+                    var qBank = new QuestionBank
+                    {
+                        TopicId = topicId,
+                        SkillId = topic.SkillId,
+                        QuestionType = "MULTIPLE_CHOICE",
+                        QuestionText = qText,
+                        CorrectAnswer = correctAns,
+                        Explanation = exp,
+                        DifficultyLevel = "MEDIUM",
+                        SourceType = "SYSTEM",
+                        ReviewStatus = "APPROVED",
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+                    await _context.QuestionBanks.AddAsync(qBank);
+                    await _context.SaveChangesAsync();
+
+                    var qq = new QuizQuestion
+                    {
+                        QuizId = quiz.Id,
+                        QuestionId = qBank.Id,
+                        Points = 2.0m,
+                        OrderIndex = qIndex++
+                    };
+                    await _context.QuizQuestions.AddAsync(qq);
+
+                    int oIndex = 1;
+                    foreach (var opt in opts)
+                    {
+                        var qOpt = new QuestionOption
+                        {
+                            QuestionId = qBank.Id,
+                            OptionText = opt,
+                            IsCorrect = (opt == correctAns),
+                            OrderIndex = oIndex++
+                        };
+                        await _context.QuestionOptions.AddAsync(qOpt);
+                    }
+                }
+                await _context.SaveChangesAsync();
+
+                // Re-fetch full quiz with includes
+                quiz = await _context.Quizzes
+                    .Include(q => q.Topic)
+                    .Include(q => q.QuizQuestions)
+                        .ThenInclude(qq => qq.Question)
+                            .ThenInclude(qb => qb.QuestionOptions)
+                    .FirstOrDefaultAsync(q => q.Id == quiz.Id);
+
+                if (quiz == null) return null;
+            }
 
             return new QuizViewModel
             {
@@ -126,13 +210,18 @@ namespace DuAnTotNghiep.Services
             };
             await _context.QuizAttempts.AddAsync(attempt);
 
+            int? nodeId = await _context.LearningPathNodes
+                .Where(n => n.QuizId == quizId || (quiz.TopicId.HasValue && n.TopicId == quiz.TopicId && n.NodeType == "QUIZ"))
+                .Select(n => (int?)n.Id)
+                .FirstOrDefaultAsync();
+
             // Save Activity Log
             var log = new StudyActivityLog
             {
                 StudentId = userId,
                 ActivityType = "QUIZ",
                 TopicId = quiz.TopicId,
-                LearningPathNodeId = quizId,
+                LearningPathNodeId = nodeId,
                 DurationMinutes = 10,
                 Score = score,
                 CreatedAt = DateTime.UtcNow

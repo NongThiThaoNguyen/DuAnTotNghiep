@@ -38,6 +38,11 @@ public class ProfileController : Controller
     [HttpGet("Profile")]
     public async Task<IActionResult> Index()
     {
+        if (User.IsInRole("STUDENT"))
+        {
+            return RedirectToAction("EditLearningProfile", "Profile", new { area = "Student" });
+        }
+
         try
         {
             int userId = GetCurrentUserId();
@@ -53,7 +58,6 @@ public class ProfileController : Controller
         }
         catch (Exception)
         {
-            // Ideally return View("Error", new ErrorViewModel { ... })
             TempData["ErrorMessage"] = "Đã xảy ra lỗi hệ thống. Vui lòng thử lại sau.";
             return RedirectToAction("Index", "Home");
         }

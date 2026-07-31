@@ -93,12 +93,12 @@ namespace DuAnTotNghiep.Services
         {
             // Simple logic: return the first published test that hasn't been completed by student
             var completedAttempts = (await _attemptRepository.GetAllAsync())
-                .Where(a => a.StudentId == studentId && (a.Status == "SUBMITTED" || a.Status == "GRADED"))
+                .Where(a => a.StudentId == studentId && (a.Status == "SUBMITTED" || a.Status == "GRADED" || a.Status == "COMPLETED"))
                 .Select(a => a.PlacementTestId)
                 .ToList();
 
             var availableTest = (await _testRepository.GetAllAsync())
-                .FirstOrDefault(t => t.Status == "PUBLISHED" && !completedAttempts.Contains(t.Id));
+                .FirstOrDefault(t => (t.Status == "PUBLISHED" || t.Status == "ACTIVE") && !completedAttempts.Contains(t.Id));
 
             if (availableTest == null) return null;
 
@@ -117,7 +117,7 @@ namespace DuAnTotNghiep.Services
         public async Task<bool> CanStartAttemptAsync(int studentId, int placementTestId)
         {
             var test = await _testRepository.GetByIdAsync(placementTestId);
-            if (test == null || test.Status != "PUBLISHED")
+            if (test == null || (test.Status != "PUBLISHED" && test.Status != "ACTIVE"))
             {
                 return false;
             }
@@ -125,7 +125,7 @@ namespace DuAnTotNghiep.Services
             var allAttempts = await _attemptRepository.GetAllAsync();
             var existingCompleted = allAttempts
                 .Any(a => a.StudentId == studentId && a.PlacementTestId == placementTestId && 
-                         (a.Status == "SUBMITTED" || a.Status == "GRADED"));
+                         (a.Status == "SUBMITTED" || a.Status == "GRADED" || a.Status == "COMPLETED"));
 
             if (existingCompleted)
             {

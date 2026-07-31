@@ -73,9 +73,173 @@ namespace DuAnTotNghiep.Services
                 VideoUrl = videoUrl,
                 EstimatedMinutes = lesson.EstimatedMinutes ?? 15,
                 IsCompleted = isCompleted,
+                GrammarExamples = GenerateGrammarExamples(lesson),
+                Resources = GenerateResources(lesson),
                 LessonsInCourse = lessonNav,
                 PreviousLessonId = prevId,
                 NextLessonId = nextId
+            };
+        }
+
+        private List<LessonGrammarExampleViewModel> GenerateGrammarExamples(OriginalLesson lesson)
+        {
+            var list = new List<LessonGrammarExampleViewModel>();
+            string title = lesson.Title ?? "";
+            string topicTitle = lesson.Topic?.Title ?? "";
+
+            if (title.Contains("Form-filling") || title.Contains("Số") || title.Contains("Tên"))
+            {
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "1. Cấu trúc điền thông tin Cá nhân (Form-filling)",
+                    Syntax = "Name + Spelling (A-Z) / Number + Dialing",
+                    Example = "A: Could I take your full name? B: It's Sarah Jenkins, J-E-N-K-I-N-S.",
+                    Translation = "A: Tôi xin tên đầy đủ của bạn? B: Là Sarah Jenkins, đánh vần J-E-N-K-I-N-S.",
+                    Explanation = "Chú ý trọng âm phát âm con số 13/30 và cách phát âm các chữ cái dễ nhầm lẫn (A/E/I, G/J)."
+                });
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "2. Cấu trúc địa chỉ & Mã bưu điện",
+                    Syntax = "House Number + Street Name + Postcode",
+                    Example = "124 Oxford Street, London, Postcode: W1D 1BS.",
+                    Translation = "Số 124 Đường Oxford, London, Mã bưu điện: W1D 1BS.",
+                    Explanation = "Chữ số '0' thường được đọc là 'oh' hoặc 'zero' trong số điện thoại."
+                });
+            }
+            else if (title.Contains("Skimming") || title.Contains("Reading") || title.Contains("Đọc hiểu"))
+            {
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "1. Cấu trúc câu chủ đề (Topic Sentence)",
+                    Syntax = "Subject + Main Verb + Key Idea",
+                    Example = "The rapid expansion of AI has transformed modern industries.",
+                    Translation = "Sự phát triển nhanh chóng của AI đã thay đổi các ngành công nghiệp hiện đại.",
+                    Explanation = "Đọc câu đầu tiên của đoạn văn để xác định ngay ý chính (Main Idea)."
+                });
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "2. Mệnh đề đối lập (Contrast Clauses)",
+                    Syntax = "While / Although + Clause 1, Clause 2",
+                    Example = "While automation enhances efficiency, skeptics express concern over job loss.",
+                    Translation = "Trong khi tự động hóa tăng hiệu suất, người hoài nghi lo ngại mất việc làm.",
+                    Explanation = "Chú ý các từ nối chuyển ý như While, However, Consequently để xác định quan điểm."
+                });
+            }
+            else if (title.Contains("Line Graph") || title.Contains("Task 1") || title.Contains("Biểu đồ"))
+            {
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "1. Cấu trúc mô tả xu hướng tăng/giảm (Trends)",
+                    Syntax = "S + experience / see + a/an + Adj + Noun + in + Data",
+                    Example = "Hamburger consumption experienced a dramatic upward trend from 1970 to 1990.",
+                    Translation = "Mức tiêu thụ hamburger đã trải qua một xu hướng tăng mạnh từ 1970 đến 1990.",
+                    Explanation = "Có thể linh hoạt đổi sang dạng Động từ + Trạng từ: 'Hamburger consumption increased dramatically'."
+                });
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "2. Cấu trúc so sánh dữ liệu (Data Comparison)",
+                    Syntax = "Compared to / In comparison with + Noun, S + Verb",
+                    Example = "The figure for pizza stood at 50%, compared to only 20% for fish and chips.",
+                    Translation = "Con số của pizza đạt 50%, so với chỉ 20% của cá và khoai tây chiên.",
+                    Explanation = "Dùng cụm 'the figure for...' để tránh lặp lại danh từ chính nhiều lần."
+                });
+            }
+            else if (title.Contains("Present Simple") || title.Contains("Hiện tại đơn"))
+            {
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "1. Thì Hiện tại đơn diễn tả thói quen (Habits)",
+                    Syntax = "S + Adverb of Frequency (always/usually) + V(s/es)",
+                    Example = "She always drinks green tea in the morning before working.",
+                    Translation = "Cô ấy luôn uống trà xanh vào buổi sáng trước khi làm việc.",
+                    Explanation = "Trạng từ chỉ tần suất luôn đứng trước động từ thường và đứng sau To Be."
+                });
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "2. Thì Hiện tại đơn diễn tả sự thật hiển nhiên (Facts)",
+                    Syntax = "S + V(s/es) + Object",
+                    Example = "Water boils at 100 degrees Celsius under normal pressure.",
+                    Translation = "Nước sôi ở 100 độ C dưới áp suất bình thường.",
+                    Explanation = "Không sử dụng thì tiếp diễn cho các quy luật tự nhiên và sự thật khoa học."
+                });
+            }
+            else if (title.Contains("Present Continuous") || title.Contains("Hiện tại tiếp diễn"))
+            {
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "1. Cấu trúc hành động đang diễn ra (Action at present)",
+                    Syntax = "S + am/is/are + V-ing + (at the moment / now)",
+                    Example = "They are currently conducting a research project in the lab.",
+                    Translation = "Họ hiện đang tiến hành một dự án nghiên cứu trong phòng thí nghiệm.",
+                    Explanation = "Nhớ nhân đôi phụ âm cuối với động từ 1 âm tiết kết thúc bằng 1 nguyên âm + 1 phụ âm (run -> running)."
+                });
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "2. Cấu trúc phàn nàn với 'Always'",
+                    Syntax = "S + am/is/are + always + V-ing",
+                    Example = "He is always forgetting to turn off the lights when leaving.",
+                    Translation = "Anh ấy toàn quên tắt đèn khi đi ra ngoài.",
+                    Explanation = "Diễn tả thói quen xấu gây bực mình cho người nói."
+                });
+            }
+            else if (title.Contains("Family") || title.Contains("Gia đình"))
+            {
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "1. Cấu trúc miêu tả ngoại hình & tính cách giống người thân",
+                    Syntax = "S + take after + Somebody (in + Aspect)",
+                    Example = "I take after my father in both appearance and work ethic.",
+                    Translation = "Tôi giống bố tôi cả về ngoại hình lẫn đạo đức nghề nghiệp.",
+                    Explanation = "'Take after' là phrasal verb thông dụng nghĩa là có nét giống ai đó trong gia đình."
+                });
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "2. Cấu trúc nuôi dưỡng & lớn lên",
+                    Syntax = "S + be + brought up / raised + in/by + Someone",
+                    Example = "She was brought up in a loving and supportive nuclear family.",
+                    Translation = "Cô ấy được nuôi dưỡng trong một gia đình nhỏ giàu tình thương và luôn hỗ trợ nhau.",
+                    Explanation = "Phân biệt 'Nuclear family' (Gia đình 2 thế hệ) và 'Extended family' (Gia đình đa thế hệ)."
+                });
+            }
+            else
+            {
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = $"1. Cấu trúc trọng tâm: {title}",
+                    Syntax = "Subject + Key Verb + Object / Complement",
+                    Example = $"Mastering {title} requires consistent daily practice.",
+                    Translation = $"Thành thạo {title} đòi hỏi phải luyện tập đều đặn hàng ngày.",
+                    Explanation = $"Áp dụng linh hoạt cấu trúc này khi thực hành bài tập chủ đề {topicTitle}."
+                });
+                list.Add(new LessonGrammarExampleViewModel
+                {
+                    Title = "2. Cấu trúc mở rộng phản xạ (Applied Sentence Pattern)",
+                    Syntax = "It is + Adjective + for + Somebody + to + V-bare",
+                    Example = "It is essential for learners to apply grammar rules in real communication.",
+                    Translation = "Điều thiết yếu là người học phải áp dụng các quy tắc ngữ pháp vào giao tiếp thực tế.",
+                    Explanation = "Sử dụng cấu trúc 'It is + Adj + for Sb to V' giúp câu văn trôi chảy và chuyên nghiệp hơn."
+                });
+            }
+
+            return list;
+        }
+
+        private List<LessonResourceViewModel> GenerateResources(OriginalLesson lesson)
+        {
+            return new List<LessonResourceViewModel>
+            {
+                new LessonResourceViewModel
+                {
+                    Title = $"Tài liệu tóm tắt bài giảng - {lesson.Title}.pdf",
+                    FileType = "PDF",
+                    FileUrl = "#"
+                },
+                new LessonResourceViewModel
+                {
+                    Title = $"Audio luyện phát âm & ví dụ - {lesson.Title}.mp3",
+                    FileType = "MP3",
+                    FileUrl = "#"
+                }
             };
         }
 

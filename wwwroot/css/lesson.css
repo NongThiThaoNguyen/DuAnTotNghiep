@@ -1,233 +1,757 @@
-/* Lesson Detail Specific styles */
+/* ================================================================
+   2026 Lesson Detail Page — Complete Redesign
+   ================================================================ */
 
-.lesson-layout {
-    display: grid;
-    grid-template-columns: 2.8fr 1.2fr;
-    gap: 32px;
+/* ── 1. LESSON TWO-COLUMN LAYOUT ─────────────────────────────── */
+.c26-lesson-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 2.7fr) minmax(260px, 1fr);
+  gap: 24px;
+  align-items: start;
 }
 
-.lesson-player-container {
-    background-color: #000000;
-    border-radius: var(--border-radius-lg);
-    overflow: hidden;
-    position: relative;
+/* ── 2. VIDEO PLAYER ─────────────────────────────────────────── */
+.c26-player-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: var(--c26-r-xl);
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.22);
+}
+.c26-player-wrap iframe,
+.c26-player-wrap video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+
+/* ── 3. LESSON HEADER BLOCK ──────────────────────────────────── */
+.c26-lesson-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+.c26-lesson-title-block h2 {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--c26-text-primary);
+  margin: 0 0 6px;
+  line-height: 1.3;
+  font-family: var(--c26-font-display) !important;
+}
+.c26-lesson-meta {
+  font-size: 13px;
+  color: var(--c26-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.c26-lesson-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.c26-lesson-meta-item svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* ── 4. LESSON TABS — MODERN PILL STYLE ──────────────────────── */
+.c26-tabs-wrap {
+  position: sticky;
+  top: 60px; /* height of account strip header */
+  z-index: 20;
+  background: var(--c26-bg);
+  padding: 12px 0;
+  margin-bottom: 20px;
+}
+.c26-tabs-bar {
+  display: inline-flex;
+  align-items: center;
+  background: var(--c26-card);
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-pill);
+  padding: 4px;
+  gap: 2px;
+  position: relative;
+  box-shadow: var(--c26-elev-xs);
+}
+.c26-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 18px;
+  border-radius: var(--c26-r-pill);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c26-text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color var(--c26-t-fast), background var(--c26-t-fast);
+  white-space: nowrap;
+  font-family: var(--c26-font-body);
+  position: relative;
+  z-index: 1;
+}
+.c26-tab-btn:hover {
+  color: var(--c26-text-primary);
+  background: var(--c26-surface-hover);
+}
+.c26-tab-btn.active {
+  background: var(--c26-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px var(--c26-primary-glow);
+}
+.c26-tab-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+.c26-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: var(--c26-r-pill);
+  font-size: 10px;
+  font-weight: 800;
+}
+.c26-tab-btn:not(.active) .c26-tab-badge {
+  background: var(--c26-surface-2);
+  color: var(--c26-text-secondary);
+}
+
+/* Tab panels */
+.c26-tab-panel { display: none; }
+.c26-tab-panel.active {
+  display: block;
+  animation: c26-fade-in 0.25s var(--c26-t-fast) forwards;
+}
+
+/* ── 5. LEARNING OBJECTIVE CARD ──────────────────────────────── */
+.c26-objective-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px 24px;
+  background: linear-gradient(135deg, rgba(59,130,246,0.07) 0%, rgba(99,102,241,0.05) 100%) !important;
+  border: 1px solid rgba(99,102,241,0.2) !important;
+  border-left: 4px solid var(--c26-primary) !important;
+  border-radius: var(--c26-r-lg) !important;
+  margin-bottom: 24px;
+}
+.c26-objective-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--c26-r-md);
+  background: var(--c26-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px var(--c26-primary-glow);
+}
+.c26-objective-icon svg { width: 20px; height: 20px; }
+.c26-objective-body {}
+.c26-objective-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--c26-primary);
+  margin: 0 0 6px;
+}
+.c26-objective-body > *:not(.c26-objective-label) {
+  font-size: 14px;
+  color: var(--c26-text-primary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* ── 6. LESSON CONTENT TYPOGRAPHY ────────────────────────────── */
+.c26-lesson-content {
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--c26-text-primary);
+}
+.c26-lesson-content h1,
+.c26-lesson-content h2,
+.c26-lesson-content h3,
+.c26-lesson-content h4 {
+  font-family: var(--c26-font-display) !important;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+  margin-top: 1.75em;
+  margin-bottom: 0.6em;
+  line-height: 1.3;
+}
+.c26-lesson-content h1 { font-size: 22px; }
+.c26-lesson-content h2 {
+  font-size: 18px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--c26-border);
+}
+.c26-lesson-content h3 { font-size: 16px; }
+.c26-lesson-content h4 { font-size: 14.5px; }
+
+.c26-lesson-content p { margin: 0 0 1em; }
+
+.c26-lesson-content ul,
+.c26-lesson-content ol {
+  margin: 0 0 1em;
+  padding-left: 1.5em;
+}
+.c26-lesson-content li { margin-bottom: 0.35em; }
+
+.c26-lesson-content code {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  font-size: 13px;
+  background: var(--c26-surface-2);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--c26-primary-dark);
+}
+.c26-lesson-content pre {
+  background: var(--c26-text-primary);
+  color: #E2E8F0;
+  padding: 16px 20px;
+  border-radius: var(--c26-r-lg);
+  overflow-x: auto;
+  margin: 1.2em 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+.c26-lesson-content pre code {
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+.c26-lesson-content img {
+  max-width: 100%;
+  border-radius: var(--c26-r-lg);
+  margin: 1em 0;
+}
+
+/* Callout blocks */
+.c26-lesson-content blockquote {
+  margin: 1.2em 0;
+  padding: 14px 20px;
+  border-left: 4px solid var(--c26-primary);
+  background: var(--c26-primary-light);
+  border-radius: 0 var(--c26-r-md) var(--c26-r-md) 0;
+  color: var(--c26-text-primary);
+  font-style: normal;
+}
+.c26-lesson-content blockquote p { margin: 0; }
+
+/* Grammar highlight */
+.c26-highlight {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--c26-primary-dark);
+  padding: 0 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+/* Grammar formula card (within content) */
+.c26-grammar-formula {
+  background: var(--c26-surface-2) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-left: 3px solid var(--c26-secondary) !important;
+  border-radius: var(--c26-r-md) !important;
+  padding: 14px 18px !important;
+  margin: 1em 0 !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13.5px;
+  color: var(--c26-text-primary);
+}
+
+/* ── 7. EXAMPLE CARDS ─────────────────────────────────────────── */
+.c26-example-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.c26-example-card {
+  background: var(--c26-card) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-radius: var(--c26-r-xl) !important;
+  overflow: hidden;
+  transition: transform var(--c26-t), box-shadow var(--c26-t);
+  box-shadow: var(--c26-elev-xs) !important;
+}
+.c26-example-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--c26-elev-md) !important;
+}
+
+/* Card top: colored accent band */
+.c26-example-band {
+  height: 4px;
+  background: linear-gradient(90deg, var(--c26-primary), var(--c26-secondary));
+}
+
+.c26-example-body {
+  padding: 20px 24px;
+}
+
+/* Example number chip */
+.c26-example-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: var(--c26-primary-light);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--c26-primary);
+  margin-bottom: 12px;
+}
+
+/* Title of example */
+.c26-example-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c26-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin: 0 0 14px;
+}
+
+/* Syntax line */
+.c26-syntax-block {
+  background: var(--c26-surface-2) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-radius: var(--c26-r-md) !important;
+  padding: 10px 14px !important;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 13px;
+  color: var(--c26-text-primary);
+  margin: 0 0 14px;
+  word-break: break-all;
+}
+.c26-syntax-label {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--c26-text-muted);
+  margin-bottom: 4px;
+}
+
+/* English sentence */
+.c26-example-english {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--c26-text-primary);
+  line-height: 1.55;
+  margin: 0 0 8px;
+}
+
+/* Vietnamese translation */
+.c26-example-vi {
+  font-size: 13.5px;
+  color: var(--c26-text-secondary);
+  font-style: italic;
+  margin: 0 0 14px;
+  padding-left: 12px;
+  border-left: 2px solid var(--c26-border);
+}
+
+/* Explanation note */
+.c26-example-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--c26-warning-light) !important;
+  border-radius: var(--c26-r-md) !important;
+  padding: 10px 14px !important;
+  font-size: 13px;
+  color: var(--c26-text-primary);
+  line-height: 1.55;
+  margin: 0;
+}
+.c26-example-note svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--c26-warning);
+}
+
+/* Pronunciation button */
+.c26-pronounce-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--c26-primary-light) !important;
+  border: none !important;
+  border-radius: var(--c26-r-pill) !important;
+  color: var(--c26-primary) !important;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--c26-t-fast), transform var(--c26-t-fast);
+  font-family: var(--c26-font-body);
+}
+.c26-pronounce-btn:hover {
+  background: var(--c26-primary-glow) !important;
+  transform: scale(1.04);
+}
+.c26-pronounce-btn:active { transform: scale(0.96); }
+.c26-pronounce-btn svg { width: 13px; height: 13px; }
+
+/* Active speaking button state */
+.c26-pronounce-btn.speaking {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 12px rgba(79, 70, 229, 0.4) !important;
+  animation: pulse-glow 1.5s infinite alternate;
+}
+.c26-pronounce-btn.speaking svg {
+  color: #ffffff !important;
+}
+
+/* Word highlight when speech is active */
+.speech-word {
+  display: inline-block;
+  padding: 1px 3px;
+  border-radius: 4px;
+  transition: all 0.15s ease-in-out;
+}
+
+.active-speaking-word {
+  background: #4f46e5 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.4) !important;
+  transform: scale(1.08);
+  margin: 0 1px;
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 6px rgba(79, 70, 229, 0.3); }
+  100% { box-shadow: 0 0 16px rgba(79, 70, 229, 0.6); }
+}
+
+/* ── 8. REFERENCE / RESOURCE CARDS ───────────────────────────── */
+.c26-resource-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.c26-resource-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--c26-card) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-radius: var(--c26-r-lg) !important;
+  padding: 16px;
+  text-decoration: none !important;
+  color: var(--c26-text-primary);
+  transition: border-color var(--c26-t-fast), background var(--c26-t-fast), transform var(--c26-t-fast), box-shadow var(--c26-t-fast);
+  box-shadow: var(--c26-elev-xs) !important;
+}
+.c26-resource-card:hover {
+  border-color: var(--c26-primary) !important;
+  background: var(--c26-primary-light) !important;
+  transform: translateX(4px);
+  box-shadow: var(--c26-elev-sm) !important;
+}
+.c26-resource-card:hover .c26-resource-title {
+  color: var(--c26-primary) !important;
+}
+
+.c26-resource-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--c26-r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 20px;
+}
+.c26-resource-icon-pdf  { background: rgba(239,68,68,0.1); color: var(--c26-danger); }
+.c26-resource-icon-mp3  { background: rgba(139,92,246,0.1); color: var(--c26-secondary); }
+.c26-resource-icon-doc  { background: rgba(59,130,246,0.1); color: var(--c26-info); }
+.c26-resource-icon-file { background: var(--c26-surface-2); color: var(--c26-text-secondary); }
+
+.c26-resource-info { flex: 1; min-width: 0; }
+.c26-resource-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c26-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 0 2px;
+  transition: color var(--c26-t-fast);
+}
+.c26-resource-type {
+  font-size: 11.5px;
+  color: var(--c26-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Empty resource state */
+.c26-resource-empty {
+  text-align: center;
+  padding: 40px 24px;
+  color: var(--c26-text-muted);
+  font-size: 13.5px;
+}
+
+/* ── 9. LESSON SIDEBAR NAVIGATION ────────────────────────────── */
+.c26-lesson-sidenav-card {
+  background: var(--c26-card) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-radius: var(--c26-r-xl) !important;
+  overflow: hidden;
+  position: sticky;
+  top: 80px;
+  max-height: calc(100vh - 100px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--c26-elev-sm) !important;
+}
+.c26-sidenav-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--c26-border);
+  flex-shrink: 0;
+}
+.c26-sidenav-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+  margin: 0 0 2px;
+  font-family: var(--c26-font-display) !important;
+}
+.c26-sidenav-sub {
+  font-size: 11.5px;
+  color: var(--c26-text-muted);
+  margin: 0;
+}
+.c26-sidenav-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+/* Lesson nav items */
+.c26-lesson-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--c26-r-md) !important;
+  text-decoration: none !important;
+  color: var(--c26-text-secondary);
+  transition: background var(--c26-t-fast), color var(--c26-t-fast);
+  margin-bottom: 2px;
+}
+.c26-lesson-nav-item:hover {
+  background: var(--c26-surface-hover) !important;
+  color: var(--c26-text-primary) !important;
+}
+.c26-lesson-nav-item.active {
+  background: var(--c26-primary-light) !important;
+  color: var(--c26-primary) !important;
+  font-weight: 600 !important;
+}
+.c26-lesson-nav-item.active .c26-lesson-nav-status {
+  background: var(--c26-primary);
+  color: #fff;
+  border-color: var(--c26-primary);
+}
+
+/* Status indicator circle */
+.c26-lesson-nav-status {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c26-border);
+  background: var(--c26-card);
+  color: var(--c26-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background var(--c26-t-fast), color var(--c26-t-fast), border-color var(--c26-t-fast);
+}
+.c26-lesson-nav-status.done {
+  background: var(--c26-success-light);
+  border-color: var(--c26-success);
+  color: var(--c26-success-dark);
+}
+.c26-lesson-nav-status.done svg { width: 12px; height: 12px; }
+
+.c26-lesson-nav-info { flex: 1; min-width: 0; }
+.c26-lesson-nav-title {
+  font-size: 12.5px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0 0 1px;
+}
+.c26-lesson-nav-dur {
+  font-size: 11px;
+  color: var(--c26-text-muted);
+}
+
+/* ── 10. LESSON NAVIGATION FOOTER (prev/next) ─────────────────── */
+.c26-lesson-nav-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* ── 11. TRANSCRIPT BOX ───────────────────────────────────────── */
+.c26-transcript-wrap {
+  margin-bottom: 20px;
+}
+.c26-transcript-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 16px;
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-md);
+  background: var(--c26-card);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--c26-text-secondary);
+  cursor: pointer;
+  transition: background var(--c26-t-fast), border-color var(--c26-t-fast), color var(--c26-t-fast);
+  font-family: var(--c26-font-body);
+}
+.c26-transcript-toggle:hover {
+  border-color: var(--c26-primary);
+  color: var(--c26-primary);
+  background: var(--c26-primary-light);
+}
+.c26-transcript-toggle svg { width: 15px; height: 15px; }
+.c26-transcript-body {
+  margin-top: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--c26-surface-2);
+  border: 1px solid var(--c26-border);
+  border-radius: var(--c26-r-md);
+  padding: 14px 16px;
+  font-size: 13.5px;
+  line-height: 1.8;
+  color: var(--c26-text-primary);
+}
+.c26-transcript-body.hidden { display: none; }
+.transcript-line {
+  padding: 3px 4px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background var(--c26-t-fast);
+}
+.transcript-line:hover { background: rgba(99,102,241,0.08); }
+.transcript-line.active {
+  background: var(--c26-primary-light);
+  color: var(--c26-primary);
+  font-weight: 600;
+}
+
+/* ── 12. TAB SECTION INTROS ───────────────────────────────────── */
+.c26-section-intro {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--c26-surface-hover) !important;
+  border: 1px solid var(--c26-border) !important;
+  border-radius: var(--c26-r-lg) !important;
+  margin-bottom: 20px;
+}
+.c26-section-intro-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--c26-r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.c26-section-intro-icon.violet {
+  background: var(--c26-secondary-light);
+  color: var(--c26-secondary);
+}
+.c26-section-intro-icon svg { width: 18px; height: 18px; }
+.c26-section-intro-body {}
+.c26-section-intro-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--c26-text-primary);
+  margin: 0 0 3px;
+  font-family: var(--c26-font-display) !important;
+}
+.c26-section-intro-sub {
+  font-size: 12.5px;
+  color: var(--c26-text-secondary);
+  margin: 0;
+}
+
+/* ── 13. RESPONSIVE LAYOUT ────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .c26-lesson-layout {
+    grid-template-columns: 1fr;
+  }
+  .c26-lesson-sidenav-card {
+    position: static;
+    max-height: 340px;
+  }
+}
+@media (max-width: 640px) {
+  .c26-tabs-bar {
     width: 100%;
-    aspect-ratio: 16/9;
-    box-shadow: var(--box-shadow-md);
-}
-
-.lesson-player-container video {
-    width: 100%;
-    height: 100%;
-    display: block;
-}
-
-.lesson-header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-top: 24px;
-    margin-bottom: 24px;
-    gap: 20px;
-}
-
-.lesson-title-block h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    margin: 0 0 6px 0;
-    color: var(--text-main);
-}
-
-.lesson-title-block span {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    font-weight: 500;
-}
-
-.lesson-details-card {
-    margin-bottom: 24px;
-}
-
-.lesson-details-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 20px;
-}
-
-.lesson-details-tab {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    transition: all var(--transition-speed);
-}
-
-.lesson-details-tab:hover {
-    color: var(--primary-color);
-}
-
-.lesson-details-tab.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
-}
-
-.tab-content-item {
-    display: none;
-    line-height: 1.7;
-    font-size: 0.95rem;
-}
-
-.tab-content-item.active {
-    display: block;
-}
-
-/* Lesson Navigation Sidebar */
-.lesson-sidebar-list {
-    display: flex;
+    overflow-x: auto;
+    border-radius: var(--c26-r-lg);
+  }
+  .c26-tab-btn {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+  .c26-lesson-header {
     flex-direction: column;
-    gap: 12px;
-}
-
-.lesson-sidebar-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
-    background-color: #FFFFFF;
-    text-decoration: none;
-    color: var(--text-main);
-    transition: all var(--transition-speed);
-}
-
-.lesson-sidebar-item:hover {
-    border-color: var(--primary-color);
-    background-color: rgba(108, 99, 255, 0.02);
-}
-
-.lesson-sidebar-item.active {
-    background-color: rgba(108, 99, 255, 0.05);
-    border-color: var(--primary-color);
-}
-
-.lesson-sidebar-item-status {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    flex-shrink: 0;
-}
-
-.lesson-sidebar-item-status.completed {
-    background-color: rgba(74, 222, 128, 0.1);
-    color: #4ADE80;
-}
-
-.lesson-sidebar-item-status.pending {
-    background-color: var(--body-bg);
-    border: 1.5px solid var(--border-color);
-    color: var(--text-muted);
-}
-
-.lesson-sidebar-item-info {
-    flex-grow: 1;
-    min-width: 0;
-}
-
-.lesson-sidebar-item-title {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.lesson-sidebar-item-duration {
-    font-size: 0.75rem;
-    color: var(--text-muted);
-    margin-top: 2px;
-}
-
-/* Resource List styling */
-.resource-list {
-    display: flex;
+  }
+  .c26-lesson-nav-footer {
     flex-direction: column;
-    gap: 12px;
-}
-
-.resource-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius-md);
-    background-color: var(--body-bg);
-}
-
-.resource-item-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.resource-item-info i {
-    font-size: 1.2rem;
-    color: var(--primary-color);
-}
-
-/* Vocabulary Cards Styles */
-.vocab-section { padding-top: 10px; }
-.vocab-list { display: flex; flex-direction: column; gap: 16px; }
-.vocab-card { 
-    background: var(--bg-body, #f8f9fa); 
-    border: 1px solid var(--border-color, #e9ecef); 
-    border-radius: 12px; 
-    padding: 16px; 
-    transition: all 0.3s ease; 
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02); 
-}
-.vocab-card:hover { 
-    transform: translateY(-2px); 
-    box-shadow: 0 4px 12px rgba(0,0,0,0.06); 
-    border-color: var(--primary-color, #6366f1); 
-}
-.vocab-header { display: flex; justify-content: space-between; align-items: flex-start; }
-.vocab-word-info { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.vocab-word { font-size: 1.2rem; font-weight: 700; margin: 0; color: var(--primary-color, #6366f1); }
-.text-gradient { 
-    background: linear-gradient(135deg, #6366f1, #a855f7); 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
-}
-.vocab-type { color: #64748b; font-style: italic; font-size: 0.9rem; }
-.vocab-ipa { 
-    color: #0f172a; 
-    font-family: 'Courier New', Courier, monospace; 
-    font-size: 0.95rem; 
-    background: #e2e8f0; 
-    padding: 2px 6px; 
-    border-radius: 4px; 
-}
-.btn-pronounce { 
-    width: 36px; height: 36px; 
-    border-radius: 50%; border: none; 
-    background: #e0e7ff; color: #4f46e5; 
-    display: flex; align-items: center; justify-content: center; 
-    cursor: pointer; transition: all 0.2s; 
-}
-.btn-pronounce:hover { background: #4f46e5; color: white; transform: scale(1.1); }
-.btn-pronounce:active { transform: scale(0.95); }
-.vocab-meaning { 
-    color: #334155; font-size: 0.95rem; 
-    margin-top: 10px; border-top: 1px dashed #cbd5e1; padding-top: 10px; 
+  }
+  .c26-example-body { padding: 14px 16px; }
 }

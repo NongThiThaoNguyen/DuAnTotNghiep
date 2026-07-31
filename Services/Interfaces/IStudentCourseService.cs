@@ -7,5 +7,6 @@ namespace DuAnTotNghiep.Services.Interfaces
     {
         Task<CoursesViewModel> GetCoursesViewModelAsync(int userId, string? category, string? search);
         Task<int?> GetFirstLessonIdAsync(int topicId);
+        Task<CourseDetailViewModel?> GetCourseDetailAsync(int topicId, int userId);
     }
 }

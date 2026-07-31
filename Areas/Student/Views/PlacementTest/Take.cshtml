@@ -192,20 +192,41 @@
                 timerInterval = setInterval(updateCountdown, 1000);
             }
 
-            // Auto Save Logic
+            // Auto Save & Visual Highlight Logic
             const form = document.getElementById('testForm');
             const attemptId = document.querySelector('input[name="attemptId"]').value;
             const indicator = document.getElementById('autoSaveIndicator');
 
             form.addEventListener('change', function(e) {
-                if(e.target.tagName === 'INPUT') {
-                    const nameAttr = e.target.getAttribute('name');
+                const target = e.target;
+                if (target && target.tagName === 'INPUT') {
+                    // Update visual selection styles for radio options
+                    if (target.type === 'radio') {
+                        const nameAttr = target.getAttribute('name');
+                        if (nameAttr) {
+                            const groupRadios = form.querySelectorAll(`input[name="${CSS.escape(nameAttr)}"]`);
+                            groupRadios.forEach(radio => {
+                                const parentLabel = radio.closest('.mcq-option-label') || radio.closest('label');
+                                if (parentLabel) {
+                                    if (radio.checked) {
+                                        parentLabel.classList.add('border-indigo-600', 'bg-indigo-50/60', 'ring-1', 'ring-indigo-600');
+                                        parentLabel.classList.remove('border-slate-300', 'border-slate-200');
+                                    } else {
+                                        parentLabel.classList.remove('border-indigo-600', 'bg-indigo-50/60', 'ring-1', 'ring-indigo-600');
+                                        parentLabel.classList.add('border-slate-200');
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    const nameAttr = target.getAttribute('name');
                     if(nameAttr && nameAttr.startsWith('answers[')) {
                         // Extract question id from answers[123]
                         const match = nameAttr.match(/answers\[(\d+)\]/);
                         if(match && match[1]) {
                             const questionId = match[1];
-                            const answerValue = e.target.value;
+                            const answerValue = target.value;
 
                             indicator.innerText = "Trạng thái lưu: Đang lưu...";
                             indicator.className = "text-slate-500 italic";

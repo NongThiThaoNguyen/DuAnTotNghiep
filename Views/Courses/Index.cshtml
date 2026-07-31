@@ -8,96 +8,188 @@
     <link rel="stylesheet" href="~/css/courses.css" asp-append-version="true" />
 }
 
-<!-- Courses Filter Header -->
-<div class="card-ailearn mb-4">
-    <div class="row align-items-center">
-        <!-- Search bar -->
-        <div class="col-md-4 mb-3 mb-md-0">
-            <div class="search-box w-100">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" placeholder="Tìm kiếm theo tên khóa học..." id="courseSearchInput" value="@Model.SearchQuery" />
-            </div>
-        </div>
-
-        <!-- Filter tabs -->
-        <div class="col-md-8">
-            <div class="category-tabs-wrapper">
-                @foreach (var cat in Model.Categories)
-                {
-                    <button class="category-tab-ailearn @(Model.ActiveCategory == cat ? "active" : "")" data-category="@cat">
-                        @if (cat == "ALL")
-                        {
-                            <span>Tất cả</span>
-                        }
-                        else if (cat == "COMMUNICATION")
-                        {
-                            <span>Giao tiếp</span>
-                        }
-                        else
-                        {
-                            <span>@cat</span>
-                        }
-                    </button>
-                }
-            </div>
-        </div>
+<!-- Page Header -->
+<div class="c26-page-header">
+    <div>
+        <h1 class="c26-page-title c26-display">Khóa học</h1>
+        <p class="c26-page-sub">Khám phá và học các khóa tiếng Anh phù hợp với lộ trình của bạn</p>
     </div>
+    <span class="c26-badge c26-badge-primary" style="font-size:12.5px;padding:6px 14px;">
+        @Model.Courses.Count() khóa học
+    </span>
 </div>
 
-<!-- Courses Grid List -->
-<div class="course-grid-ailearn" id="coursesListGrid">
+<!-- Search + Category Filter Toolbar -->
+<div class="c26-toolbar">
+    <!-- Search -->
+    <div class="c26-search-wrap">
+        <svg class="c26-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+            <circle cx="11" cy="11" r="8" stroke-width="2"/>
+            <path stroke-linecap="round" stroke-width="2" d="m21 21-4.35-4.35"/>
+        </svg>
+        <input type="text"
+               id="courseSearchInput"
+               class="c26-search-input"
+               placeholder="Tìm kiếm khóa học..."
+               value="@Model.SearchQuery"
+               aria-label="Tìm kiếm khóa học" />
+    </div>
+
+    <!-- Category Chips -->
+    <div class="c26-filter-bar" role="group" aria-label="Lọc theo danh mục">
+        @foreach (var cat in Model.Categories)
+        {
+            <button class="c26-chip category-tab-ailearn @(Model.ActiveCategory == cat ? "active" : "")"
+                    data-category="@cat"
+                    aria-pressed="@(Model.ActiveCategory == cat ? "true" : "false")">
+                @switch (cat)
+                {
+                    case "ALL":
+                        <span>Tất cả</span>
+                        break;
+                    case "COMMUNICATION":
+                        <span>Giao tiếp</span>
+                        break;
+                    case "GRAMMAR":
+                        <span>Ngữ pháp</span>
+                        break;
+                    case "VOCABULARY":
+                        <span>Từ vựng</span>
+                        break;
+                    case "LISTENING":
+                        <span>Nghe</span>
+                        break;
+                    case "SPEAKING":
+                        <span>Nói</span>
+                        break;
+                    case "READING":
+                        <span>Đọc</span>
+                        break;
+                    case "WRITING":
+                        <span>Viết</span>
+                        break;
+                    default:
+                        <span>@cat</span>
+                        break;
+                }
+            </button>
+        }
+    </div>
+
+    <span class="c26-results-label" id="c26-results-count" aria-live="polite">
+        @Model.Courses.Count() kết quả
+    </span>
+</div>
+
+<!-- Course Grid -->
+<div class="c26-course-grid c26-stagger" id="coursesListGrid">
     @foreach (var c in Model.Courses)
     {
-        <div class="course-card-wrapper-item" data-category="@c.SkillCode" data-title="@c.Title">
-            <div class="card-ailearn course-card-ailearn hoverable">
-                <!-- Thumbnail -->
-                <div class="course-card-thumb">
-                    <!-- Standard mockup background using CSS gradient -->
-                    <div style="width: 100%; height: 100%; background: linear-gradient(135deg, #7B6DFF, #6C63FF, #08142E); display: flex; align-items: center; justify-content: center; color: white;">
-                        <i class="fa-solid fa-book-open" style="font-size: 3rem; opacity: 0.25;"></i>
-                    </div>
-                    <span class="course-card-tag">@c.SkillName</span>
+        <article class="c26-course-card course-card-wrapper-item"
+                 data-category="@c.SkillCode"
+                 data-title="@c.Title.ToLower()">
+
+            <!-- Thumbnail -->
+            <div class="c26-card-thumb" data-skill="@c.SkillCode.ToUpper()" aria-hidden="true">
+                @if (!string.IsNullOrEmpty(c.ThumbnailUrl))
+                {
+                    <img src="@c.ThumbnailUrl" alt="@c.Title" class="c26-card-thumb-img" onerror="this.onerror=null; this.style.display='none';" />
+                }
+                <div class="c26-card-thumb-icon">
+                    <i class="fa-solid fa-book-open"></i>
+                </div>
+                <div class="c26-card-thumb-gradient"></div>
+                <span class="c26-card-thumb-tag">@c.SkillName</span>
+            </div>
+
+            <!-- Body -->
+            <div class="c26-card-body">
+                <!-- Title + Description -->
+                <div>
+                    <h3 class="c26-card-title">@c.Title</h3>
+                    <p class="c26-card-desc">@c.Description</p>
                 </div>
 
-                <!-- Card Details -->
-                <div class="course-card-info">
-                    <div>
-                        <h3>@c.Title</h3>
-                        <p>@c.Description</p>
+                <!-- Progress -->
+                <div class="c26-progress-wrap">
+                    <div class="c26-progress-header">
+                        <span>Tiến độ</span>
+                        <span style="color: @(c.ProgressPercent >= 100 ? "var(--c26-success-dark)" : "var(--c26-primary)"); font-weight:700;">
+                            @c.ProgressPercent%
+                        </span>
                     </div>
+                    <div class="c26-progress-bar">
+                        <div class="c26-progress-fill @(c.ProgressPercent >= 100 ? "complete" : "")"
+                             style="width: @c.ProgressPercent%"
+                             role="progressbar"
+                             aria-valuenow="@c.ProgressPercent"
+                             aria-valuemin="0"
+                             aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
 
-                    <!-- Progress bar -->
-                    <div class="progress-container-ailearn mb-3">
-                        <div class="progress-header-ailearn">
-                            <span class="small text-muted">Tiến độ</span>
-                            <span class="small text-muted">@c.ProgressPercent%</span>
-                        </div>
-                        <div class="progress-bar-ailearn">
-                            <div class="progress-bar-fill" style="width: @c.ProgressPercent%"></div>
-                        </div>
+                <!-- Metadata badges -->
+                <div class="c26-card-meta">
+                    @{
+                        var diffBadge = c.Difficulty?.ToLower() switch
+                        {
+                            "beginner" or "cơ bản" => "c26-badge-success",
+                            "intermediate" or "trung cấp" => "c26-badge-warning",
+                            "advanced" or "nâng cao" => "c26-badge-secondary",
+                            _ => ""
+                        };
+                    }
+                    <span class="c26-badge @diffBadge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:10px;height:10px;">
+                            <path stroke-linecap="round" stroke-width="2.5" d="M5 20V10m7 10V4m7 16v-7"/>
+                        </svg>
+                        @c.Difficulty
+                    </span>
+                    <div class="c26-card-meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6M4 6h16v14H4V6Zm0-2h16"/>
+                        </svg>
+                        <span>@c.LessonCount bài</span>
                     </div>
+                    <div class="c26-rating">
+                        <svg viewBox="0 0 24 24" fill="currentColor" style="width:12px;height:12px;">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        <span>4.8</span>
+                    </div>
+                </div>
 
-                    <!-- Bottom metadata -->
-                    <div class="course-card-meta">
-                        <div class="course-card-meta-item">
-                            <i class="fa-solid fa-signal"></i>
-                            <span>@c.Difficulty</span>
-                        </div>
-                        <div class="course-card-meta-item">
-                            <i class="fa-solid fa-file-invoice"></i>
-                            <span>@c.LessonCount bài học</span>
-                        </div>
-                    </div>
+                <div class="c26-card-divider"></div>
 
-                    <!-- Buttons -->
-                    <div class="d-grid gap-2 mt-3">
-                        <a href="/Courses/StartCourse/@c.Id" class="btn btn-primary-ailearn btn-sm">Bắt đầu học</a>
-                        <a href="/Quiz/Take/@c.Id" class="btn btn-secondary-ailearn btn-sm">Làm Quiz</a>
-                    </div>
+                <!-- Action Buttons -->
+                <div class="c26-card-actions">
+                    <a href="/Courses/Detail/@c.Id"
+                       class="c26-btn c26-btn-primary c26-btn-full"
+                       aria-label="Tiếp tục học: @c.Title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:14px;height:14px;">
+                            <polygon fill="currentColor" stroke="none" points="5,3 19,12 5,21"/>
+                        </svg>
+                        Tiếp tục học
+                    </a>
+                    <a href="/Courses/StartCourse/@c.Id"
+                       class="c26-btn c26-btn-outline c26-btn-full">
+                        Xem chi tiết
+                    </a>
                 </div>
             </div>
-        </div>
+        </article>
     }
+
+    <!-- Empty state (shown by JS when no results) -->
+    <div class="c26-empty-state" id="c26EmptyState" style="display:none;" aria-live="polite">
+        <svg class="c26-empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <circle cx="11" cy="11" r="8" stroke-width="1.5"/>
+            <path stroke-linecap="round" stroke-width="1.5" d="m21 21-4.35-4.35M11 8v3m0 3h.01"/>
+        </svg>
+        <p class="c26-empty-title">Không tìm thấy khóa học</p>
+        <p class="c26-empty-sub">Hãy thử từ khoá khác hoặc chọn danh mục khác.</p>
+    </div>
 </div>
 
 @section Scripts {

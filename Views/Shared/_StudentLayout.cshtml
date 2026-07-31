@@ -59,12 +59,14 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/DuAnTotNghiep.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="~/css/role-shell.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/student-shell.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/2026-redesign.css" asp-append-version="true" />
     <script src="~/js/admin-sidebar-state.js" asp-append-version="true"></script>
 </head>
 <body class="role-shell student-shell h-full" data-rs-shell data-rs-closed-class="student-sidebar-closed">
@@ -77,7 +79,7 @@
             <span class="student-brand-mark rs-brand-mark">D</span>
             <span>AI Study English</span>
         </a>
-        <a href="/Profile" class="student-mobile-avatar rs-mobile-profile" title="@userName" aria-label="Mở hồ sơ học viên">@userInitials</a>
+        <a href="/Student/Profile/EditLearningProfile" class="student-mobile-avatar rs-mobile-profile" title="@userName" aria-label="Mở hồ sơ học viên">@userInitials</a>
     </header>
 
     <div class="student-shell-frame rs-shell-frame">
@@ -110,6 +112,7 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/role-shell.js" asp-append-version="true"></script>
+    <script src="~/js/notification-dropdown.js" asp-append-version="true"></script>
     <partial name="_ToastNotifications" />
     @await RenderSectionAsync("Scripts", required: false)
 </body>

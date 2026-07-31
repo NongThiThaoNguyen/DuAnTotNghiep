@@ -9,6 +9,7 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task<List<Notification>> GetNotificationsAsync(int userId, bool? unreadOnly = null);
         Task<int> GetUnreadCountAsync(int userId);
         Task<bool> MarkAsReadAsync(int notificationId, int userId);
+        Task<bool> MarkAllAsReadAsync(int userId);
 
         // Admin Methods
         Task<List<Notification>> GetAllAsync(int page, int pageSize);

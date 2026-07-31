@@ -8,20 +8,21 @@
     <link rel="stylesheet" href="~/css/lesson.css" asp-append-version="true" />
 }
 
-<div class="lesson-layout">
-    <!-- Left Column: Video and Tabs -->
+<div class="c26-lesson-layout">
+
+    <!-- ── LEFT COLUMN ─────────────────────────────────────── -->
     <div>
+
         <!-- Video Player -->
         @if (Model.ContentType == "VIDEO_LINK" && !string.IsNullOrEmpty(Model.VideoUrl))
         {
             bool isYoutube = Model.VideoUrl.Contains("youtube.com") || Model.VideoUrl.Contains("youtu.be");
             string embedUrl = Model.VideoUrl;
-            
+
             if (isYoutube)
             {
                 if (Model.VideoUrl == "https://www.youtube.com/embed/...")
                 {
-                    // Ignore placeholder
                     isYoutube = false;
                 }
                 else if (Model.VideoUrl.Contains("youtube.com/watch?v="))
@@ -41,182 +42,442 @@
                 }
             }
 
-            @if (Model.VideoUrl != "https://www.youtube.com/embed/...")
+            if (Model.VideoUrl != "https://www.youtube.com/embed/...")
             {
-                <div class="lesson-player-container" style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 12px; margin-bottom: 10px;">
+                <div class="c26-player-wrap">
                     @if (isYoutube)
                     {
-                        <iframe id="youtubePlayer" src="@embedUrl" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+                        <iframe id="youtubePlayer"
+                                src="@embedUrl"
+                                title="@Model.LessonTitle"
+                                frameborder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen>
+                        </iframe>
                     }
                     else
                     {
-                        <video id="html5Player" controls style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;">
+                        <video id="html5Player" controls>
                             <source src="@Model.VideoUrl" type="video/mp4" />
-                            Trình duyệt của bạn không hỗ trợ tag video.
+                            Trình duyệt của bạn không hỗ trợ video.
                         </video>
                     }
                 </div>
             }
 
-            <!-- Transcript Section -->
-            @if (Model.LessonId == 125) 
+            <!-- Transcript (lesson 125 only) -->
+            @if (Model.LessonId == 125)
             {
-                <div class="transcript-wrapper mb-4">
-                    <button class="btn btn-outline-primary btn-sm w-100 d-flex justify-content-between align-items-center" type="button" data-bs-toggle="collapse" data-bs-target="#transcriptBox" aria-expanded="true" aria-controls="transcriptBox" style="border-radius: 8px;">
-                        <span class="fw-bold"><i class="fa-solid fa-closed-captioning me-2"></i>Lời thoại (Transcript)</span>
-                        <i class="fa-solid fa-chevron-down"></i>
+                <div class="c26-transcript-wrap">
+                    <button class="c26-transcript-toggle"
+                            type="button"
+                            id="transcriptToggleBtn"
+                            aria-expanded="true"
+                            aria-controls="transcriptBox">
+                        <span style="display:flex;align-items:center;gap:8px;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                                      d="M7 8h10M7 12h7M4 20l4-4h12V4H4v16Z"/>
+                            </svg>
+                            Lời thoại (Transcript)
+                        </span>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" id="transcriptChevron" aria-hidden="true"
+                             style="transition:transform 0.2s;width:16px;height:16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6"/>
+                        </svg>
                     </button>
-                    <div class="collapse show mt-2" id="transcriptBox">
-                        <div class="card card-body bg-light border-0" style="max-height: 250px; overflow-y: auto; border-radius: 8px; font-size: 0.95rem; line-height: 1.8;">
-                            <!-- Mẫu dữ liệu Transcript (sẽ được gen bằng DB hoặc Hardcode mẫu ở đây) -->
-                            <div class="transcript-line" data-time="0">Welcome back to another English lesson!</div>
-                            <div class="transcript-line" data-time="4">Today, we are talking about <strong>Continuous</strong> and <strong>Perfect</strong> tenses.</div>
-                            <div class="transcript-line" data-time="9">It's very important to understand them <strong>simultaneously</strong>.</div>
-                            <div class="transcript-line" data-time="14">Let's look at the first example on the board...</div>
-                            <div class="transcript-line" data-time="20">When you say "I am doing", it means the action is happening right now.</div>
-                        </div>
+                    <div class="c26-transcript-body" id="transcriptBox">
+                        <div class="transcript-line" data-time="0">Welcome back to another English lesson!</div>
+                        <div class="transcript-line" data-time="4">Today, we are talking about <strong>Continuous</strong> and <strong>Perfect</strong> tenses.</div>
+                        <div class="transcript-line" data-time="9">It's very important to understand them <strong>simultaneously</strong>.</div>
+                        <div class="transcript-line" data-time="14">Let's look at the first example on the board...</div>
+                        <div class="transcript-line" data-time="20">When you say "I am doing", it means the action is happening right now.</div>
                     </div>
                 </div>
             }
         }
 
-        <!-- Lesson Header Actions -->
-        <div class="lesson-header-section">
-            <div class="lesson-title-block">
+        <!-- Lesson Header -->
+        <div class="c26-lesson-header">
+            <div class="c26-lesson-title-block">
                 <h2>@Model.LessonTitle</h2>
-                <span>Khóa học: @Model.CourseTitle &bull; Thời lượng dự kiến: @Model.EstimatedMinutes phút</span>
+                <div class="c26-lesson-meta">
+                    <div class="c26-lesson-meta-item">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11v16H6.5A2.5 2.5 0 0 0 4 21.5v-16Zm16 0A2.5 2.5 0 0 0 17.5 3H13v16h4.5a2.5 2.5 0 0 1 2.5 2.5v-16Z"/>
+                        </svg>
+                        <span>@Model.CourseTitle</span>
+                    </div>
+                    <div class="c26-lesson-meta-item" style="color:var(--c26-text-muted);">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                            <path stroke-linecap="round" stroke-width="2" d="M12 6v6l4 2"/>
+                        </svg>
+                        <span>@Model.EstimatedMinutes phút</span>
+                    </div>
+                </div>
             </div>
-            
+
+            <!-- Mark Complete -->
             <form asp-controller="Lesson" asp-action="MarkCompleted" asp-route-id="@Model.LessonId" method="post">
                 @Html.AntiForgeryToken()
                 @if (Model.IsCompleted)
                 {
-                    <button class="btn btn-success" disabled>
-                        <i class="fa-solid fa-circle-check me-2"></i>Đã hoàn thành
+                    <button class="c26-btn c26-btn-success" disabled aria-label="Bài học đã hoàn thành">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m5 13 4 4L19 7"/>
+                        </svg>
+                        Đã hoàn thành
                     </button>
                 }
                 else
                 {
-                    <button type="submit" class="btn-primary-ailearn">
-                        <i class="fa-solid fa-check me-2"></i>Đánh dấu hoàn thành
+                    <button type="submit" class="c26-btn c26-btn-primary" aria-label="Đánh dấu bài học hoàn thành">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m5 13 4 4L19 7"/>
+                        </svg>
+                        Đánh dấu hoàn thành
                     </button>
                 }
             </form>
         </div>
 
-        <!-- Details tabs -->
-        <div class="card-ailearn lesson-details-card">
-            <div class="lesson-details-tabs">
-                <div class="lesson-details-tab active" data-tab="desc">Nội dung bài học</div>
-                <div class="lesson-details-tab" data-tab="examples">Ví dụ & Giải nghĩa</div>
-                <div class="lesson-details-tab" data-tab="resources">Tài liệu tham khảo</div>
-            </div>
+        <!-- ── TABS ──────────────────────────────────────────── -->
+        <div class="c26-tabs-wrap">
+            <div class="c26-tabs-bar" role="tablist" aria-label="Nội dung bài học">
 
-            <!-- Tab content -->
-            <div class="tab-content">
-                <!-- Description -->
-                <div class="tab-content-item active" id="descContent">
-                    @Html.Raw(Model.Content)
-                </div>
+                <button class="c26-tab-btn active lesson-details-tab"
+                        data-tab="desc"
+                        role="tab"
+                        aria-selected="true"
+                        aria-controls="descContent"
+                        id="tab-desc">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12h6M9 16h6M4 6h16v14H4V6Zm0-2h16"/>
+                    </svg>
+                    Nội dung bài học
+                </button>
 
-                <!-- Examples -->
-                <div class="tab-content-item" id="examplesContent">
-                    <h5>Cấu trúc ngữ pháp áp dụng</h5>
-                    <p>Trong bài giảng này, học sinh nên lưu ý các cấu trúc câu sau:</p>
-                    <div class="p-3 border rounded bg-light mb-3">
-                        <strong>1. Relative Clauses (Mệnh đề quan hệ):</strong><br>
-                        Syntax: `Noun + who/which/that + Verb/Clause`<br>
-                        <em>Example:</em> The tutor who supports me is very friendly.<br>
-                        <strong>Dịch:</strong> Trợ lý người hỗ trợ tôi rất thân thiện.
-                    </div>
-                    <div class="p-3 border rounded bg-light">
-                        <strong>2. Active / Passive Voice (Chủ động / Bị động):</strong><br>
-                        Syntax: `S + be + V3/ed + by Noun`<br>
-                        <em>Example:</em> The lesson was prepared by AI Tutor.<br>
-                        <strong>Dịch:</strong> Bài học được chuẩn bị bởi Trợ lý AI.
-                    </div>
-                </div>
+                <button class="c26-tab-btn lesson-details-tab"
+                        data-tab="examples"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="examplesContent"
+                        id="tab-examples">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M14.828 14.828A4 4 0 1 0 9.172 9.172a4 4 0 0 0 5.656 5.656ZM6.343 17.657l-2.829 2.829M17.657 6.343l2.829-2.829"/>
+                    </svg>
+                    Ví dụ &amp; Giải nghĩa
+                    @if (Model.GrammarExamples != null && Model.GrammarExamples.Any())
+                    {
+                        <span class="c26-tab-badge">@Model.GrammarExamples.Count()</span>
+                    }
+                </button>
 
-                <!-- Resources -->
-                <div class="tab-content-item" id="resourcesContent">
-                    <div class="resource-list">
-                        <div class="resource-item">
-                            <div class="resource-item-info">
-                                <i class="fa-regular fa-file-pdf"></i>
-                                <span>Tài liệu tóm tắt ngữ pháp bài học.pdf</span>
-                            </div>
-                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-download"></i></a>
-                        </div>
-                        <div class="resource-item">
-                            <div class="resource-item-info">
-                                <i class="fa-regular fa-file-audio"></i>
-                                <span>Audio phát âm ví dụ bài giảng.mp3</span>
-                            </div>
-                            <a href="#" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-download"></i></a>
-                        </div>
-                    </div>
-                </div>
+                <button class="c26-tab-btn lesson-details-tab"
+                        data-tab="resources"
+                        role="tab"
+                        aria-selected="false"
+                        aria-controls="resourcesContent"
+                        id="tab-resources">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.172 7l-6.586 6.586a2 2 0 1 0 2.828 2.828l6.414-6.586a4 4 0 0 0-5.656-5.656l-6.415 6.585a6 6 0 1 0 8.486 8.486"/>
+                    </svg>
+                    Tài liệu tham khảo
+                    @if (Model.Resources != null && Model.Resources.Any())
+                    {
+                        <span class="c26-tab-badge">@Model.Resources.Count()</span>
+                    }
+                </button>
+
             </div>
         </div>
 
-        <!-- Sibling Navigation footer links -->
-        <div class="d-flex justify-content-between">
+        <!-- ── TAB PANELS ─────────────────────────────────── -->
+
+        <!-- Panel 1: Lesson Content -->
+        <div class="c26-tab-panel tab-content-item active"
+             id="descContent"
+             role="tabpanel"
+             aria-labelledby="tab-desc">
+
+            <!-- Learning Objective card (render if content contains a note about objective) -->
+            <div class="c26-objective-card">
+                <div class="c26-objective-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm0 14v-4m0-4h.01"/>
+                    </svg>
+                </div>
+                <div class="c26-objective-body">
+                    <p class="c26-objective-label">Mục tiêu bài học</p>
+                    <p>Sau khi hoàn thành bài học <strong>@Model.LessonTitle</strong>, bạn sẽ nắm vững cấu trúc ngữ pháp, cách dùng thực tế và vận dụng linh hoạt trong giao tiếp hằng ngày.</p>
+                </div>
+            </div>
+
+            <!-- Rich lesson content -->
+            <div class="c26-lesson-content">
+                @Html.Raw(Model.Content)
+            </div>
+        </div>
+
+        <!-- Panel 2: Examples & Explanation -->
+        <div class="c26-tab-panel tab-content-item"
+             id="examplesContent"
+             role="tabpanel"
+             aria-labelledby="tab-examples">
+
+            <!-- Section intro -->
+            <div class="c26-section-intro">
+                <div class="c26-section-intro-icon violet">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M14.828 14.828A4 4 0 1 0 9.172 9.172a4 4 0 0 0 5.656 5.656ZM6.343 17.657l-2.829 2.829M17.657 6.343l2.829-2.829"/>
+                    </svg>
+                </div>
+                <div class="c26-section-intro-body">
+                    <p class="c26-section-intro-title">Cấu trúc ngữ pháp &amp; Ví dụ áp dụng</p>
+                    <p class="c26-section-intro-sub">Lưu ý các cấu trúc câu quan trọng và ví dụ thực tế trong bài giảng này</p>
+                </div>
+            </div>
+
+            @if (Model.GrammarExamples != null && Model.GrammarExamples.Any())
+            {
+                <div class="c26-example-list c26-stagger">
+                    @{int exNum = 0;}
+                    @foreach (var ex in Model.GrammarExamples)
+                    {
+                        exNum++;
+                        <div class="c26-example-card">
+                            <div class="c26-example-band"></div>
+                            <div class="c26-example-body">
+
+                                <!-- Number badge + title -->
+                                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                                    <span class="c26-example-num">@exNum</span>
+                                    <button class="c26-pronounce-btn btn-pronounce"
+                                            data-word="@ex.Example"
+                                            type="button"
+                                            aria-label="Nghe phát âm">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M15.536 8.464a5 5 0 0 1 0 7.072M12 6v12m-4.243-1.757A9 9 0 0 1 12 3m0 18a9 9 0 0 1-4.243-2.757"/>
+                                        </svg>
+                                        Nghe
+                                    </button>
+                                </div>
+
+                                <h4 class="c26-example-title">@ex.Title</h4>
+
+                                @if (!string.IsNullOrWhiteSpace(ex.Syntax))
+                                {
+                                    <div>
+                                        <p class="c26-syntax-label">Cấu trúc</p>
+                                        <div class="c26-syntax-block">@ex.Syntax</div>
+                                    </div>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(ex.Example))
+                                {
+                                    <p class="c26-example-english">@ex.Example</p>
+                                }
+
+                                @if (!string.IsNullOrWhiteSpace(ex.Translation))
+                                {
+                                    <p class="c26-example-vi">@ex.Translation</p>
+                                }
+
+                                @if (!string.IsNullOrEmpty(ex.Explanation))
+                                {
+                                    <div class="c26-example-note">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Zm0 8v4m0 4h.01"/>
+                                        </svg>
+                                        <span><strong>Ghi chú:</strong> @ex.Explanation</span>
+                                    </div>
+                                }
+
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="c26-resource-empty">
+                    <svg style="width:40px;height:40px;color:var(--c26-text-muted);margin-bottom:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6M9 16h6M4 6h16v14H4V6Z"/>
+                    </svg>
+                    <p style="font-size:14px;font-weight:600;color:var(--c26-text-secondary);margin:0;">Chưa có ví dụ cho bài học này</p>
+                </div>
+            }
+        </div>
+
+        <!-- Panel 3: Reference Materials -->
+        <div class="c26-tab-panel tab-content-item"
+             id="resourcesContent"
+             role="tabpanel"
+             aria-labelledby="tab-resources">
+
+            <!-- Section intro -->
+            <div class="c26-section-intro">
+                <div class="c26-section-intro-icon" style="background:var(--c26-info-light);color:var(--c26-info);">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15.172 7l-6.586 6.586a2 2 0 1 0 2.828 2.828l6.414-6.586a4 4 0 0 0-5.656-5.656l-6.415 6.585a6 6 0 1 0 8.486 8.486"/>
+                    </svg>
+                </div>
+                <div class="c26-section-intro-body">
+                    <p class="c26-section-intro-title">Tài liệu tham khảo</p>
+                    <p class="c26-section-intro-sub">Tải xuống tài liệu hỗ trợ để ôn tập và luyện tập thêm</p>
+                </div>
+            </div>
+
+            @if (Model.Resources != null && Model.Resources.Any())
+            {
+                <div class="c26-resource-list c26-stagger">
+                    @foreach (var res in Model.Resources)
+                    {
+                        var (iconClass, iconSymbol) = res.FileType?.ToUpper() switch
+                        {
+                            "PDF"  => ("c26-resource-icon-pdf",  "fa-file-pdf"),
+                            "MP3"  => ("c26-resource-icon-mp3",  "fa-file-audio"),
+                            "DOCX" or "DOC" => ("c26-resource-icon-doc", "fa-file-word"),
+                            _ => ("c26-resource-icon-file", "fa-file")
+                        };
+
+                        <a href="@res.FileUrl"
+                           class="c26-resource-card"
+                           download
+                           aria-label="Tải xuống: @res.Title (@res.FileType)">
+                            <div class="c26-resource-icon-wrap @iconClass">
+                                <i class="fa-regular @iconSymbol" aria-hidden="true"></i>
+                            </div>
+                            <div class="c26-resource-info">
+                                <p class="c26-resource-title">@res.Title</p>
+                                <span class="c26-resource-type">@res.FileType</span>
+                            </div>
+                            <div class="c26-btn c26-btn-outline c26-btn-sm" style="flex-shrink:0;" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:13px;height:13px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M12 16l4-4m0 0-4-4m4 4H3m9 4v1a3 3 0 0 0 3 3h7V3h-7a3 3 0 0 0-3 3v1"/>
+                                </svg>
+                                Tải xuống
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="c26-resource-empty">
+                    <svg style="width:40px;height:40px;color:var(--c26-text-muted);margin-bottom:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                              d="M15.172 7l-6.586 6.586a2 2 0 1 0 2.828 2.828l6.414-6.586a4 4 0 0 0-5.656-5.656l-6.415 6.585a6 6 0 1 0 8.486 8.486"/>
+                    </svg>
+                    <p style="font-size:14px;font-weight:600;color:var(--c26-text-secondary);margin:0;">Không có tài liệu đính kèm</p>
+                </div>
+            }
+        </div>
+
+        <!-- Lesson Navigation -->
+        <div class="c26-lesson-nav-footer">
             @if (Model.PreviousLessonId.HasValue)
             {
-                <a href="/Lesson/Detail/@Model.PreviousLessonId" class="btn btn-secondary-ailearn">
-                    <i class="fa-solid fa-arrow-left me-2"></i>Bài trước
+                <a href="/Lesson/Detail/@Model.PreviousLessonId"
+                   class="c26-btn c26-btn-outline"
+                   aria-label="Đến bài học trước">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18-6-6 6-6"/>
+                    </svg>
+                    Bài trước
                 </a>
             }
             else
             {
-                <button class="btn btn-secondary-ailearn" disabled>
-                    <i class="fa-solid fa-arrow-left me-2"></i>Bài trước
+                <button class="c26-btn c26-btn-outline" disabled>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m15 18-6-6 6-6"/>
+                    </svg>
+                    Bài trước
                 </button>
             }
 
             @if (Model.NextLessonId.HasValue)
             {
-                <a href="/Lesson/Detail/@Model.NextLessonId" class="btn btn-primary-ailearn">
-                    Bài tiếp theo<i class="fa-solid fa-arrow-right ms-2"></i>
+                <a href="/Lesson/Detail/@Model.NextLessonId"
+                   class="c26-btn c26-btn-primary"
+                   aria-label="Đến bài học tiếp theo">
+                    Bài tiếp theo
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 18 6-6-6-6"/>
+                    </svg>
                 </a>
             }
             else
             {
-                <a href="/Courses" class="btn btn-primary-ailearn">
-                    Quay về khóa học<i class="fa-solid fa-house ms-2"></i>
+                <a href="/Courses" class="c26-btn c26-btn-primary" aria-label="Quay về danh sách khóa học">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 12 12 3l9 9M5 10v10h14V10M9 20v-6h6v6"/>
+                    </svg>
+                    Về khóa học
                 </a>
             }
         </div>
-    </div>
 
-    <!-- Right Column: Sidebar Navigation -->
+    </div><!-- end left column -->
+
+    <!-- ── RIGHT COLUMN: Lesson Navigation ─────────────────── -->
     <div>
-        <div class="card-ailearn">
-            <h3 class="h6 font-weight-bold mb-3">Danh sách bài học</h3>
-            <div class="lesson-sidebar-list">
+        <div class="c26-lesson-sidenav-card">
+
+            <div class="c26-sidenav-header">
+                <p class="c26-sidenav-title">Danh sách bài học</p>
+                <p class="c26-sidenav-sub">@Model.LessonsInCourse.Count() bài trong khóa</p>
+            </div>
+
+            <nav class="c26-sidenav-list" aria-label="Các bài học trong khóa">
                 @foreach (var sib in Model.LessonsInCourse)
                 {
-                    <a href="/Lesson/Detail/@sib.Id" class="lesson-sidebar-item @(sib.IsCurrent ? "active" : "")">
-                        <div class="lesson-sidebar-item-status @(sib.IsCompleted ? "completed" : "pending")">
+                    <a href="/Lesson/Detail/@sib.Id"
+                       class="c26-lesson-nav-item lesson-sidebar-item @(sib.IsCurrent ? "active" : "")"
+                       aria-current="@(sib.IsCurrent ? "page" : null)"
+                       aria-label="Bài @sib.OrderIndex: @sib.Title@(sib.IsCompleted ? " - Đã hoàn thành" : "")">
+
+                        <div class="c26-lesson-nav-status @(sib.IsCompleted ? "done" : "") lesson-sidebar-item-status @(sib.IsCompleted ? "completed" : "pending")">
                             @if (sib.IsCompleted)
                             {
-                                <i class="fa-solid fa-check"></i>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m5 13 4 4L19 7"/>
+                                </svg>
                             }
                             else
                             {
                                 <span>@sib.OrderIndex</span>
                             }
                         </div>
-                        <div class="lesson-sidebar-item-info">
-                            <h4 class="lesson-sidebar-item-title">@sib.Title</h4>
-                            <span class="lesson-sidebar-item-duration">@((sib.OrderIndex * 2) + 12) phút</span>
+
+                        <div class="c26-lesson-nav-info lesson-sidebar-item-info">
+                            <p class="c26-lesson-nav-title lesson-sidebar-item-title">@sib.Title</p>
+                            <span class="c26-lesson-nav-dur lesson-sidebar-item-duration">
+                                @((sib.OrderIndex * 2) + 12) phút
+                            </span>
                         </div>
+
                     </a>
                 }
-            </div>
+            </nav>
+
         </div>
     </div>
-</div>
+
+</div><!-- end lesson layout -->
 
 @section Scripts {
     <script src="~/js/lesson.js" asp-append-version="true"></script>

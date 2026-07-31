@@ -37,6 +37,18 @@ namespace DuAnTotNghiep.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Detail(int id)
+        {
+            int userId = GetCurrentUserId();
+            if (userId == 0) return RedirectToAction("Login", "Account");
+
+            var courseDetail = await _courseService.GetCourseDetailAsync(id, userId);
+            if (courseDetail == null) return NotFound();
+
+            return View(courseDetail);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> StartCourse(int id)
         {
             var firstLessonId = await _courseService.GetFirstLessonIdAsync(id);

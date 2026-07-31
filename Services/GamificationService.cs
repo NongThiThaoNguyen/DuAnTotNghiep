@@ -95,7 +95,7 @@ namespace DuAnTotNghiep.Services
 
             int unlockedAchievementsXp = await _context.UserAchievements
                 .Where(ua => ua.UserId == userId && ua.IsUnlocked)
-                .SumAsync(ua => ua.Achievement.XpReward);
+                .SumAsync(ua => (int?)ua.Achievement.XpReward) ?? 0;
 
             return studyMinutes * 10 + completedLessons * 50 + completedQuizzes * 100 + unlockedAchievementsXp;
         }

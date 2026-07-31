@@ -356,26 +356,258 @@ namespace DuAnTotNghiep.Data.Seeders
 
         private async Task SeedPlacementTestsAsync()
         {
-            if (!_context.PlacementTests.Any())
+            var adminUser = await _userRepository.GetByEmailAsync("admin@aistudyenglish.com");
+            var beginnerLevel = (await _levelRepository.GetAllAsync()).FirstOrDefault(l => l.Code == "BEGINNER");
+            
+            if (adminUser == null || beginnerLevel == null) return;
+
+            var test = await _context.PlacementTests.FirstOrDefaultAsync(t => t.Title == "General English Placement Test");
+            if (test == null)
             {
-                var adminUser = await _userRepository.GetByEmailAsync("admin@aistudyenglish.com");
-                var beginnerLevel = (await _levelRepository.GetAllAsync()).FirstOrDefault(l => l.Code == "BEGINNER");
-                
-                if (adminUser != null && beginnerLevel != null)
+                test = new PlacementTest
                 {
-                    var test = new PlacementTest
-                    {
-                        Title = "General English Placement Test",
-                        Description = "Bài đánh giá năng lực tiếng Anh tổng quát.",
-                        TimeLimitMinutes = 30,
-                        TargetLevelId = beginnerLevel.Id,
-                        CreatedBy = adminUser.Id,
-                        Status = PlacementTestStatus.Published,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.PlacementTests.Add(test);
-                    await _context.SaveChangesAsync();
+                    Title = "General English Placement Test",
+                    Description = "Bài đánh giá năng lực tiếng Anh tổng quát.",
+                    TimeLimitMinutes = 30,
+                    TargetLevelId = beginnerLevel.Id,
+                    CreatedBy = adminUser.Id,
+                    Status = PlacementTestStatus.Published,
+                    TotalScore = 100,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.PlacementTests.Add(test);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                test.TotalScore = 100;
+                test.Status = PlacementTestStatus.Published;
+                _context.PlacementTests.Update(test);
+                await _context.SaveChangesAsync();
+            }
+
+            // Check if sections already exist for this test
+            bool hasSections = await _context.PlacementTestSections.AnyAsync(s => s.PlacementTestId == test.Id);
+            if (!hasSections)
+            {
+                var skills = await _context.EnglishSkills.ToListAsync();
+                var grammarSkill = skills.FirstOrDefault(s => s.SkillCode == "GRAMMAR");
+                var vocabSkill = skills.FirstOrDefault(s => s.SkillCode == "VOCABULARY");
+                var readingSkill = skills.FirstOrDefault(s => s.SkillCode == "READING");
+
+                if (grammarSkill == null || vocabSkill == null || readingSkill == null)
+                    return;
+
+                // Create Sections
+                var grammarSection = new PlacementTestSection
+                {
+                    PlacementTestId = test.Id,
+                    SkillId = grammarSkill.Id,
+                    SectionName = "Grammar",
+                    Instruction = "Choose the correct grammar structure.",
+                    OrderIndex = 1
+                };
+                var vocabSection = new PlacementTestSection
+                {
+                    PlacementTestId = test.Id,
+                    SkillId = vocabSkill.Id,
+                    SectionName = "Vocabulary",
+                    Instruction = "Choose the best word to complete the sentence.",
+                    OrderIndex = 2
+                };
+                var readingSection = new PlacementTestSection
+                {
+                    PlacementTestId = test.Id,
+                    SkillId = readingSkill.Id,
+                    SectionName = "Reading",
+                    Instruction = "Read the passage and answer the questions.",
+                    OrderIndex = 3
+                };
+
+                _context.PlacementTestSections.Add(grammarSection);
+                _context.PlacementTestSections.Add(vocabSection);
+                _context.PlacementTestSections.Add(readingSection);
+                await _context.SaveChangesAsync();
+
+                // Define placement questions
+                var grammarQuestionsRaw = new (string QuestionText, string[] Options, int CorrectIndex)[]
+                {
+                    ("She ___ to school every day.", new[] {"go","goes","going","gone"}, 1),
+                    ("They ___ watching TV right now.", new[] {"is","are","am","be"}, 1),
+                    ("I ___ my homework yesterday.", new[] {"do","did","done","doing"}, 1),
+                    ("There ___ a book on the table.", new[] {"is","are","be","been"}, 0),
+                    ("He is ___ than his brother.", new[] {"tall","taller","tallest","more tall"}, 1),
+                    ("___ you like coffee?", new[] {"Do","Does","Are","Is"}, 0),
+                    ("She has ___ apple.", new[] {"a","an","the","-"}, 1),
+                    ("We ___ to the beach last summer.", new[] {"go","went","gone","going"}, 1),
+                    ("This is one ___ my favourite books.", new[] {"of","from","at","in"}, 0),
+                    ("I have lived here ___ 2020.", new[] {"since","for","from","at"}, 0),
+                    ("If it rains, I ___ stay home.", new[] {"will","would","can","must"}, 0),
+                    ("She is the ___ student in class.", new[] {"good","better","best","most good"}, 2),
+                    ("He can't come ___ he is sick.", new[] {"because","but","so","although"}, 0),
+                    ("They ___ finished the project yet.", new[] {"haven't","hasn't","didn't","doesn't"}, 0),
+                    ("My sister is ___ than me.", new[] {"young","younger","youngest","more young"}, 1),
+                    ("I ___ never been to Japan.", new[] {"have","has","had","having"}, 0),
+                    ("Please ___ the door.", new[] {"close","closes","closed","closing"}, 0),
+                    ("She said she ___ tired.", new[] {"is","was","be","been"}, 1),
+                    ("How ___ apples do you want?", new[] {"much","many","a lot","lot of"}, 1),
+                    ("I look forward to ___ you soon.", new[] {"see","seeing","saw","seen"}, 1),
+                    ("By the time we arrived, the movie ___ already started.", new[] {"has","had","have","was"}, 1),
+                    ("The report ___ by the manager tomorrow.", new[] {"reviews","will review","will be reviewed","reviewed"}, 2),
+                    ("If I ___ more time, I would travel more.", new[] {"have","had","has","having"}, 1),
+                    ("The book ___ I bought yesterday is interesting.", new[] {"who","that","whom","whose"}, 1),
+                    ("She's been working here ___ five years.", new[] {"since","for","from","at"}, 1),
+                    ("Neither of the answers ___ correct.", new[] {"is","are","were","be"}, 0),
+                    ("He suggested ___ to the doctor.", new[] {"go","going","to go","went"}, 1),
+                    ("The bridge ___ in 1990.", new[] {"built","was built","builds","building"}, 1),
+                    ("I wish I ___ speak French.", new[] {"can","could","will","would"}, 1),
+                    ("Despite ___ hard, he failed the exam.", new[] {"study","studies","studying","studied"}, 2),
+                    ("The more you practice, ___ you become.", new[] {"good","better","the better","best"}, 2),
+                    ("She denied ___ the money.", new[] {"take","taking","took","to take"}, 1),
+                    ("Not only ___ late, but he also forgot his homework.", new[] {"he was","was he","he is","is he"}, 1),
+                    ("Had I known, I ___ have come earlier.", new[] {"will","would","can","must"}, 1),
+                    ("The city ___ population has grown rapidly is now overcrowded.", new[] {"that","which","whose","who"}, 2),
+                    ("He is used to ___ up early.", new[] {"get","gets","getting","got"}, 2),
+                    ("It's high time we ___ a decision.", new[] {"make","made","making","makes"}, 1),
+                    ("The number of students ___ increasing every year.", new[] {"is","are","were","have"}, 0),
+                    ("I'd rather you ___ smoke here.", new[] {"don't","didn't","not","won't"}, 1),
+                    ("She acted as if she ___ everything about it.", new[] {"knows","knew","know","known"}, 1),
+                    ("Scarcely ___ the movie started when the lights went out.", new[] {"had","has","did","was"}, 0),
+                    ("Few people ___ aware of the risks involved.", new[] {"is","are","was","been"}, 1),
+                    ("This information ___ very useful for our research.", new[] {"is","are","were","been"}, 0),
+                    ("Each of the students ___ a laptop.", new[] {"have","has","having","had"}, 1),
+                    ("The data collected over five years ___ still being analysed.", new[] {"is","are","was","been"}, 0)
+                };
+
+                var vocabQuestionsRaw = new (string QuestionText, string[] Options, int CorrectIndex)[]
+                {
+                    ("\"Environment\" most closely means:", new[] {"the natural world","a type of food","a business plan","a school subject"}, 0),
+                    ("A synonym of \"increase\" is:", new[] {"fall","rise","stay","stop"}, 1),
+                    ("\"However\" is used to show:", new[] {"addition","contrast","a result","a reason"}, 1),
+                    ("The opposite of \"decrease\" is:", new[] {"reduce","increase","lower","drop"}, 1),
+                    ("\"Achieve\" means:", new[] {"to succeed in doing something","to forget something","to buy something","to lose something"}, 0),
+                    ("\"Opportunity\" means:", new[] {"a problem","a chance","a rule","a mistake"}, 1),
+                    ("A synonym of \"important\" is:", new[] {"significant","tiny","boring","random"}, 0),
+                    ("\"Furthermore\" is used to:", new[] {"add more information","show doubt","end an idea","ask a question"}, 0),
+                    ("\"Benefit\" means:", new[] {"an advantage","a punishment","a document","a delay"}, 0),
+                    ("\"Recommend\" means:", new[] {"to forbid","to suggest","to ignore","to copy"}, 1),
+                    ("\"According to the report\" means:", new[] {"based on the report","instead of the report","against the report","before the report"}, 0),
+                    ("\"In addition\" means:", new[] {"also","however","therefore","unless"}, 0),
+                    ("\"On the other hand\" is used to:", new[] {"show a different viewpoint","give an example","show agreement","end a story"}, 0),
+                    ("\"Prefer\" means:", new[] {"to like one thing more than another","to dislike something","to forget something","to sell something"}, 0),
+                    ("\"Describe\" means:", new[] {"to explain what something is like","to buy something","to hide something","to delay something"}, 0),
+                    ("A synonym of \"difficult\" is:", new[] {"challenging","simple","cheap","fast"}, 0),
+                    ("\"Compare\" means:", new[] {"to look at similarities and differences","to ignore something","to translate something","to repeat something"}, 0),
+                    ("\"Appointment\" means:", new[] {"a scheduled meeting","a type of food","a holiday","a mistake"}, 0),
+                    ("Which is the correct collocation?", new[] {"make a decision","do a decision","take a decision","have a decision"}, 0),
+                    ("Which is the correct collocation?", new[] {"do a photo","take a photo","make a photo","have a photo"}, 1),
+                    ("Which is the correct collocation?", new[] {"make homework","do homework","take homework","have homework"}, 1),
+                    ("Which is the correct collocation?", new[] {"achieve a goal","make a goal","do a goal","take a goal"}, 0),
+                    ("Which is the correct collocation?", new[] {"do a role","take a role","play a role","make a role"}, 2),
+                    ("A synonym of \"huge\" is:", new[] {"enormous","tiny","narrow","short"}, 0),
+                    ("A synonym of \"quick\" is:", new[] {"rapid","slow","late","calm"}, 0),
+                    ("\"Global warming\" refers to:", new[] {"rising world temperatures","falling sea levels","new technology","population decline"}, 0),
+                    ("\"Sustainable\" means:", new[] {"able to continue without causing harm","expensive","temporary","dangerous"}, 0),
+                    ("\"Urban\" refers to:", new[] {"a city area","a farm","a forest","a river"}, 0),
+                    ("\"Rural\" refers to:", new[] {"the countryside","a shopping mall","an airport","a factory"}, 0),
+                    ("\"Consequently\" means:", new[] {"as a result","by contrast","for example","in summary"}, 0),
+                    ("\"Despite\" is used to show:", new[] {"contrast","cause","time","addition"}, 0),
+                    ("The antonym of \"increase\" is:", new[] {"decrease","expand","grow","rise"}, 0),
+                    ("\"Significant\" means:", new[] {"important or notable","boring","cheap","short"}, 0),
+                    ("\"Approximately\" means:", new[] {"exactly","about / roughly","never","always"}, 1),
+                    ("\"Essential\" means:", new[] {"necessary","optional","forbidden","unusual"}, 0)
+                };
+
+                var readingQuestionsRaw = new (string QuestionText, string[] Options, int CorrectIndex)[]
+                {
+                    ("Mai works in a small coffee shop in the city centre. She starts work at 7 a.m. and finishes at 3 p.m. every day except Sunday.<br><br><b>What time does Mai finish work?</b>", new[] {"7 a.m.","3 p.m.","Sunday","All day"}, 1),
+                    ("The weather forecast says it will rain tomorrow, so John decided to take his umbrella to work.<br><br><b>Why did John take his umbrella?</b>", new[] {"Because it is sunny","Because he lost his coat","Because it will rain","Because he works late"}, 2),
+                    ("Many students choose to study abroad because they want to improve their English and experience a new culture.<br><br><b>What is one reason students study abroad?</b>", new[] {"To earn more money","To improve their English","To avoid exams","To stay near family"}, 1),
+                    ("The library closes at 9 p.m. on weekdays, but on weekends it closes earlier, at 5 p.m.<br><br><b>When does the library close earlier?</b>", new[] {"Weekdays","Weekends","Every day","Never"}, 1),
+                    ("Although Linh was tired after a long day at work, she still went to the gym to keep fit.<br><br><b>What did Linh do despite being tired?</b>", new[] {"She went home to sleep","She went to the gym","She cancelled her plans","She stayed at work"}, 1),
+                    ("The company has grown quickly in the past two years, doubling its number of employees.<br><br><b>What happened to the number of employees?</b>", new[] {"It stayed the same","It halved","It doubled","It disappeared"}, 2),
+                    ("Recycling helps reduce waste and protects the environment, but many people still don't recycle regularly.<br><br><b>What is one benefit of recycling mentioned?</b>", new[] {"It reduces waste","It creates more waste","It costs more money","It takes more time"}, 0),
+                    ("The new bridge will connect the two cities, reducing travel time by half an hour.<br><br><b>What will the new bridge do?</b>", new[] {"Increase travel time","Reduce travel time","Close both cities","Replace the airport"}, 1),
+                    ("Due to heavy traffic, Nam arrived at the meeting twenty minutes late.<br><br><b>Why was Nam late?</b>", new[] {"He overslept","Heavy traffic","He forgot the meeting","He was sick"}, 1),
+                    ("Scientists warn that global temperatures could rise by two degrees by 2100 if nothing changes.<br><br><b>What might happen by 2100?</b>", new[] {"Temperatures could rise","Temperatures could fall","Nothing will change","Temperatures will stay the same"}, 0),
+                    ("The museum offers free entry on the first Sunday of every month.<br><br><b>When is entry to the museum free?</b>", new[] {"Every Sunday","The first Sunday of the month","Every day","Only on holidays"}, 1),
+                    ("Although the exam was difficult, most students passed because they had studied hard.<br><br><b>Why did most students pass?</b>", new[] {"The exam was easy","They studied hard","The teacher helped during the exam","They guessed the answers"}, 1),
+                    ("The government has introduced a new policy to reduce plastic use in supermarkets.<br><br><b>What is the new policy about?</b>", new[] {"Increasing plastic use","Reducing plastic use","Closing supermarkets","Building new supermarkets"}, 1),
+                    ("Because of the pandemic, many companies allowed employees to work from home.<br><br><b>What did companies allow?</b>", new[] {"Working from home","Longer holidays","Higher salaries","Shorter work hours"}, 0),
+                    ("The hotel is located near the beach, making it popular with tourists in summer.<br><br><b>Why is the hotel popular in summer?</b>", new[] {"It is cheap","It is near the beach","It has a pool","It is in the city centre"}, 1),
+                    ("Reading before bed can help you relax and fall asleep more easily.<br><br><b>What can reading before bed help with?</b>", new[] {"Waking up early","Falling asleep","Working faster","Eating healthily"}, 1),
+                    ("The report shows that online shopping has increased significantly since 2020.", new[] {"In-store shopping","Online shopping","Travel bookings","Restaurant visits"}, 1),
+                    ("Farmers in the region have struggled due to a lack of rain this year.<br><br><b>What problem have farmers faced?</b>", new[] {"Too much rain","Lack of rain","Low crop prices","New taxes"}, 1),
+                    ("Public transport in the city has improved, with more buses now running every ten minutes.<br><br><b>What has improved?</b>", new[] {"Public transport","Air quality","School education","Housing prices"}, 0),
+                    ("The university offers scholarships to students who achieve excellent academic results.<br><br><b>Who can get a scholarship?</b>", new[] {"All students","Students with excellent results","Only international students","Only first-year students"}, 1)
+                };
+
+                var grammarQs = new List<QuestionBank>();
+                var vocabQs = new List<QuestionBank>();
+                var readingQs = new List<QuestionBank>();
+
+                foreach (var q in grammarQuestionsRaw)
+                {
+                    grammarQs.Add(CreateMCQ(grammarSkill.Id, beginnerLevel.Id, adminUser.Id, q.QuestionText, q.Options[0], q.Options[1], q.Options[2], q.Options[3], q.CorrectIndex + 1));
                 }
+                foreach (var q in vocabQuestionsRaw)
+                {
+                    vocabQs.Add(CreateMCQ(vocabSkill.Id, beginnerLevel.Id, adminUser.Id, q.QuestionText, q.Options[0], q.Options[1], q.Options[2], q.Options[3], q.CorrectIndex + 1));
+                }
+                foreach (var q in readingQuestionsRaw)
+                {
+                    readingQs.Add(CreateMCQ(readingSkill.Id, beginnerLevel.Id, adminUser.Id, q.QuestionText, q.Options[0], q.Options[1], q.Options[2], q.Options[3], q.CorrectIndex + 1));
+                }
+
+                var allQuestions = new List<QuestionBank>();
+                allQuestions.AddRange(grammarQs);
+                allQuestions.AddRange(vocabQs);
+                allQuestions.AddRange(readingQs);
+
+                foreach (var q in allQuestions)
+                {
+                    _context.QuestionBanks.Add(q);
+                }
+                await _context.SaveChangesAsync();
+
+                // Link to Sections
+                int grammarOrder = 1;
+                foreach (var q in grammarQs)
+                {
+                    _context.PlacementTestQuestions.Add(new PlacementTestQuestion
+                    {
+                        SectionId = grammarSection.Id,
+                        QuestionId = q.Id,
+                        Points = 2, // 2 points per question
+                        OrderIndex = grammarOrder++
+                    });
+                }
+
+                int vocabOrder = 1;
+                foreach (var q in vocabQs)
+                {
+                    _context.PlacementTestQuestions.Add(new PlacementTestQuestion
+                    {
+                        SectionId = vocabSection.Id,
+                        QuestionId = q.Id,
+                        Points = 2,
+                        OrderIndex = vocabOrder++
+                    });
+                }
+
+                int readingOrder = 1;
+                foreach (var q in readingQs)
+                {
+                    _context.PlacementTestQuestions.Add(new PlacementTestQuestion
+                    {
+                        SectionId = readingSection.Id,
+                        QuestionId = q.Id,
+                        Points = 2,
+                        OrderIndex = readingOrder++
+                    });
+                }
+
+                await _context.SaveChangesAsync();
             }
         }
         private async Task SeedPlacementTestDemoAsync()

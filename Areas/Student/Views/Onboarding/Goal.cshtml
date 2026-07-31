@@ -3,50 +3,102 @@
     ViewData["Title"] = "Mục tiêu học tập";
 }
 
-<div class="max-w-3xl mx-auto py-12">
+@section Styles {
+    <style>
+        .goal-card-body {
+            border: 2px solid #e2e8f0;
+            background-color: #ffffff;
+            transition: all 0.2s ease-in-out;
+        }
+        .goal-card-body:hover {
+            border-color: #93c5fd;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.1);
+        }
+        .goal-radio:checked + .goal-card-body {
+            border-color: #2563eb !important;
+            background-color: rgba(239, 246, 255, 0.6) !important;
+            box-shadow: 0 12px 24px -6px rgba(37, 99, 235, 0.2) !important;
+        }
+        .goal-radio:checked + .goal-card-body .card-icon-container {
+            background-color: #2563eb !important;
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3) !important;
+        }
+        .goal-radio:checked + .goal-card-body .check-indicator {
+            opacity: 1 !important;
+            transform: scale(1) !important;
+        }
+        .check-indicator {
+            opacity: 0;
+            transform: scale(0.7);
+            transition: all 0.2s ease-in-out;
+        }
+    </style>
+}
+
+<div class="max-w-5xl mx-auto py-6 px-4">
     <partial name="_OnboardingStepper" model="1" />
-    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-8 md:p-12 border border-slate-100">
-        <h2 class="text-3xl font-bold mb-4 text-center text-slate-800">Mục tiêu chính của bạn là gì?</h2>
-        <p class="text-slate-500 text-center mb-10">Hãy chọn 1 mục tiêu quan trọng nhất lúc này để AI tối ưu hóa lộ trình dành riêng cho bạn.</p>
+    
+    <div class="bg-white shadow-xl shadow-slate-200/60 rounded-3xl p-6 sm:p-10 border border-slate-200/80 mt-6">
+        <h2 class="text-2xl sm:text-3xl font-extrabold mb-3 text-center text-slate-900 tracking-tight">Mục tiêu chính của bạn là gì?</h2>
+        <p class="text-slate-500 text-center mb-8 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">Hãy chọn 1 mục tiêu quan trọng nhất lúc này để AI tối ưu hóa lộ trình dành riêng cho bạn.</p>
 
         <form method="post" asp-action="Goal">
             @Html.AntiForgeryToken()
             
-            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 text-sm font-medium"></div>
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 text-sm font-medium text-center"></div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 @if (ViewBag.Goals != null)
                 {
                     foreach (var goal in ViewBag.Goals)
                     {
-                        <label class="cursor-pointer block relative">
-                            <input type="radio" asp-for="MainGoalId" value="@goal.Id" class="hidden goal-radio" />
-                            <div class="goal-card-body h-full rounded-2xl p-6 text-center bg-white relative overflow-hidden">
-                                <div class="flex justify-center mb-4">
-                                    <div class="card-icon-container w-14 h-14 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center text-2xl shadow-sm transition-colors">
-                                        <!-- SVG Target Icon thay cho Bootstrap Icons -->
-                                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                        </svg>
-                                    </div>
+                        var isChecked = Model != null && Model.MainGoalId == goal.Id;
+                        <label class="cursor-pointer block relative goal-label">
+                            @if (isChecked)
+                            {
+                                <input type="radio" name="MainGoalId" value="@goal.Id" class="hidden goal-radio" checked="checked" />
+                            }
+                            else
+                            {
+                                <input type="radio" name="MainGoalId" value="@goal.Id" class="hidden goal-radio" />
+                            }
+                            
+                            <div class="goal-card-body h-full rounded-2xl p-5 text-center bg-white relative overflow-hidden flex flex-col items-center justify-between">
+                                <!-- Checkmark badge -->
+                                <div class="absolute top-3 right-3 text-blue-600 check-indicator">
+                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
                                 </div>
-                                <h5 class="font-bold text-slate-800 text-lg mb-2">@goal.GoalName</h5>
-                                <p class="text-slate-500 text-sm leading-relaxed">@goal.Description</p>
+
+                                <div class="w-full">
+                                    <div class="flex justify-center mb-3">
+                                        <div class="card-icon-container w-13 h-13 p-3 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center text-xl shadow-sm transition-colors">
+                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                            </svg>
+                                        </div>
+                                    </div>
+                                    <h5 class="font-bold text-slate-900 text-base mb-1.5">@goal.GoalName</h5>
+                                    <p class="text-slate-500 text-xs leading-relaxed">@goal.Description</p>
+                                </div>
                             </div>
                         </label>
                     }
                 }
             </div>
 
-            <div class="text-center mt-6">
-                <span asp-validation-for="MainGoalId" class="text-red-500 font-bold block mb-4 text-sm"></span>
+            <div class="text-center mt-4">
+                <span asp-validation-for="MainGoalId" class="text-red-500 font-bold block text-sm"></span>
             </div>
 
-            <div class="flex items-center justify-between mt-12 pt-6 border-t border-slate-100">
-                <a asp-action="Start" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Quay lại</a>
-                <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
+            <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
+                <a asp-action="Start" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors text-sm">Quay lại</a>
+                <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2 text-sm">
                     Tiếp tục
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
             </div>
         </form>
@@ -60,7 +112,7 @@
             if ($(this).valid()) {
                 var btn = this.querySelector('button[type="submit"]');
                 btn.disabled = true;
-                btn.innerHTML = 'Đang lưu... <svg class="animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+                btn.innerHTML = 'Đang lưu... <svg class="animate-spin ml-2 h-4 w-4 text-white inline" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
                 btn.classList.add('opacity-75', 'cursor-not-allowed');
             }
         });

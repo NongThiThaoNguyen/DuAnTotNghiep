@@ -33,15 +33,24 @@
             </div>
             <h1 class="lp-empty__title">Chưa có lộ trình học tập</h1>
             <p class="lp-empty__text">
-                Hệ thống sẽ tự động tạo lộ trình học tập cá nhân hoá sau khi bạn hoàn thành bài kiểm tra đầu vào và đánh giá năng lực.
+                Hệ thống AI sẽ tạo lộ trình học tập cá nhân hoá dựa trên kết quả kiểm tra đầu vào và phân tích năng lực của bạn.
             </p>
-            <a class="lp-btn-primary" asp-area="Student" asp-controller="Home" asp-action="Index">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" />
-                </svg>
-                Về trang chủ
-            </a>
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:8px;">
+                <a class="lp-btn-primary" asp-area="Student" asp-controller="LearningPath" asp-action="Generate">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    Tạo lộ trình AI
+                </a>
+                <a class="lp-btn-primary" style="background:#64748b;" asp-area="Student" asp-controller="Home" asp-action="Index">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" />
+                    </svg>
+                    Về trang chủ
+                </a>
+            </div>
         </div>
+
     }
     else
     {

@@ -112,7 +112,7 @@ builder.Services.AddScoped<INotificationService, NotificationService>();
 builder.Services.AddScoped<IStudentSettingService, StudentSettingService>();
 builder.Services.AddScoped<INotesService, NotesService>();
 builder.Services.AddScoped<ILearningPathEngineService, LearningPathEngineService>();
-builder.Services.AddScoped<ILearningPathAiService, LearningPathAiService>();
+builder.Services.AddScoped<ILearningPathAiService, GeminiLearningPathAiService>();
 builder.Services.AddScoped<ILearningPathComplianceService, LearningPathComplianceService>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.IPromptTemplateService, PromptTemplateService>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IPromptTemplateService, PromptTemplateService>();
@@ -134,6 +134,12 @@ builder.Services.AddScoped<IAdminTeacherScheduleService, AdminTeacherScheduleSer
 builder.Services.AddHttpClient<IAdminTeacherScheduleAiService, AdminTeacherScheduleAiService>(client =>
 {
     client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+});
+
+// Gemini HTTP client shared by LearningPath & CompetencyAnalysis AI services
+builder.Services.AddHttpClient<GeminiHttpClient>(client =>
+{
+    client.Timeout = TimeSpan.FromSeconds(60);
 });
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<ITeacherResourceService, TeacherResourceService>();
@@ -250,4 +256,5 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Trigger restart for dotnet watch
 app.Run();

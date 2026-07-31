@@ -38,6 +38,12 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         }
 
         [HttpGet]
+        public IActionResult Index()
+        {
+            return RedirectToAction(nameof(EditLearningProfile));
+        }
+
+        [HttpGet]
         public async Task<IActionResult> EditLearningProfile()
         {
             int userId = GetUserId();
@@ -188,11 +194,11 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                 .Take(3)
                 .ToListAsync();
 
-            var timeline = new List<dynamic>();
+            var timeline = new List<DuAnTotNghiep.Models.ViewModels.Progress.StudentTimelineItemViewModel>();
 
             foreach (var log in recentActivities)
             {
-                timeline.Add(new {
+                timeline.Add(new DuAnTotNghiep.Models.ViewModels.Progress.StudentTimelineItemViewModel {
                     Type = log.ActivityType,
                     Title = log.LearningPathNode?.NodeTitle ?? log.Topic?.Title ?? "Luyện tập học tập",
                     Time = log.CreatedAt,
@@ -202,7 +208,7 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
 
             foreach (var att in placementAttempts)
             {
-                timeline.Add(new {
+                timeline.Add(new DuAnTotNghiep.Models.ViewModels.Progress.StudentTimelineItemViewModel {
                     Type = "PLACEMENT_TEST",
                     Title = "Làm bài thi Placement Test",
                     Time = att.SubmittedAt ?? att.StartedAt,
@@ -212,7 +218,7 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
 
             foreach (var c in competencyAnalyses)
             {
-                timeline.Add(new {
+                timeline.Add(new DuAnTotNghiep.Models.ViewModels.Progress.StudentTimelineItemViewModel {
                     Type = "AI_RECOMMENDATION",
                     Title = "AI Đánh giá năng lực & Đề xuất",
                     Time = c.CreatedAt,

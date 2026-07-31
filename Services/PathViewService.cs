@@ -110,11 +110,11 @@ namespace DuAnTotNghiep.Services
             var nodeType = node.NodeType?.ToUpperInvariant();
             string? targetUrl = nodeType switch
             {
-                NodeType.Topic when node.TopicId.HasValue => $"/Student/Topics/Details/{node.TopicId.Value}",
-                NodeType.Lesson when node.LessonId.HasValue => $"/Student/Lesson/Details/{node.LessonId.Value}",
-                NodeType.Quiz when node.QuizId.HasValue => $"/Student/Quiz/Details/{node.QuizId.Value}",
-                NodeType.Practice when node.PracticeTaskId.HasValue => $"/Student/Practice/Details/{node.PracticeTaskId.Value}",
-                NodeType.Review when node.TopicId.HasValue => $"/Student/Progress/TopicDetail/{node.TopicId.Value}",
+                NodeType.Topic when node.TopicId.HasValue => $"/Student/LearningPath",
+                NodeType.Lesson when node.LessonId.HasValue => $"/Lesson/Detail/{node.LessonId.Value}",
+                NodeType.Quiz when node.QuizId.HasValue => $"/Quiz/Take/{node.QuizId.Value}",
+                NodeType.Practice when node.PracticeTaskId.HasValue => $"/Lesson/Detail/{node.PracticeTaskId.Value}",
+                NodeType.Review when node.TopicId.HasValue => $"/Student/LearningPath",
                 NodeType.AiTutor => $"/Student/AiTutor/Node/{node.Id}",
                 _ => null
             };

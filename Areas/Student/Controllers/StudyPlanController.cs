@@ -1,8 +1,10 @@
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Services.Interfaces;
 
@@ -93,6 +95,31 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             {
                 TempData["Error"] = "Không tìm thấy nhiệm vụ.";
                 return RedirectToAction("Today");
+            }
+
+            // Node TOPIC/REVIEW chỉ là container, tự động hoàn thành và mở khóa bài con
+            var nodeType = node.NodeType?.ToUpperInvariant();
+            if (nodeType == "TOPIC" || nodeType == "REVIEW")
+            {
+                await _pathViewService.MarkNodeCompletedAsync(nodeId, userId, "LEARN", node.EstimatedMinutes);
+
+                // Tìm bài con tiếp theo đã được mở khóa để redirect tới
+                var nextNode = await _context.LearningPathNodes
+                    .Where(n => n.LearningPathId == node.LearningPathId && n.OrderIndex > node.OrderIndex && n.Status != "LOCKED")
+                    .OrderBy(n => n.OrderIndex)
+                    .FirstOrDefaultAsync();
+
+                if (nextNode != null)
+                {
+                    var nextUrl = await _pathViewService.BuildNodeTargetUrlAsync(nextNode);
+                    if (!string.IsNullOrEmpty(nextUrl))
+                    {
+                        return Redirect(nextUrl);
+                    }
+                }
+
+                // Fallback: về trang lộ trình học
+                return RedirectToAction("Index", "LearningPath", new { area = "Student" });
             }
 
             // Update status to InProgress if it is currently Available
