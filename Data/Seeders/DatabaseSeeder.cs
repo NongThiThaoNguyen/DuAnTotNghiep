@@ -36,6 +36,7 @@ namespace DuAnTotNghiep.Data.Seeders
 
         public async Task SeedAsync()
         {
+            await EnsureTablesExistAsync();
             await SeedRolesAsync();
             await SeedUsersAsync();
             await SeedGoalsAsync();
@@ -49,6 +50,32 @@ namespace DuAnTotNghiep.Data.Seeders
             await SeedLearningPathDemoAsync();
             await SeedReferenceSourcesAsync();
             await SeedOriginalLessonsAsync();
+        }
+
+        private async Task EnsureTablesExistAsync()
+        {
+            try
+            {
+                var sql = @"
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'topic_prerequisites')
+BEGIN
+    CREATE TABLE [dbo].[topic_prerequisites] (
+        [id] INT IDENTITY(1,1) NOT NULL,
+        [topic_id] INT NOT NULL,
+        [prerequisite_topic_id] INT NOT NULL,
+        [created_at] DATETIME2 NOT NULL DEFAULT (sysutcdatetime()),
+        CONSTRAINT [PK_topic_prerequisites] PRIMARY KEY CLUSTERED ([id] ASC),
+        CONSTRAINT [FK_topic_prerequisites_topic] FOREIGN KEY ([topic_id]) REFERENCES [dbo].[learning_topics] ([id]),
+        CONSTRAINT [FK_topic_prerequisites_prerequisite] FOREIGN KEY ([prerequisite_topic_id]) REFERENCES [dbo].[learning_topics] ([id])
+    );
+    CREATE UNIQUE NONCLUSTERED INDEX [UQ_topic_prerequisite] ON [dbo].[topic_prerequisites] ([topic_id] ASC, [prerequisite_topic_id] ASC);
+END";
+                await _context.Database.ExecuteSqlRawAsync(sql);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[EnsureTablesExistAsync] {ex.Message}");
+            }
         }
 
         private async Task SeedRolesAsync()
@@ -1139,12 +1166,8 @@ namespace DuAnTotNghiep.Data.Seeders
                 .FirstOrDefaultAsync(p => p.StudentId == student.Id && (p.Title == "M9 Demo Learning Path" || p.Title == "Lộ trình học tập AI mẫu"));
             if (existingPath != null)
             {
-                if (existingPath.LearningPathNodes != null && existingPath.LearningPathNodes.Any())
-                {
-                    _context.LearningPathNodes.RemoveRange(existingPath.LearningPathNodes);
-                }
-                _context.StudentLearningPaths.Remove(existingPath);
-                await _context.SaveChangesAsync();
+                // Skip if path already exists to avoid FK constraint issues
+                return;
             }
 
             var path = new StudentLearningPath

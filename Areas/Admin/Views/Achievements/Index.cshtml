@@ -44,14 +44,22 @@
                     {
                         <tr class="hover:bg-slate-50/50 transition-colors">
                             <td class="px-6 py-4">
-                                <div class="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center overflow-hidden border border-slate-200">
-                                    @if (!string.IsNullOrEmpty(item.IconUrl))
+                                <div class="w-12 h-12 bg-amber-50/80 rounded-xl flex items-center justify-center overflow-hidden border border-amber-200/70 shadow-2xs">
+                                    @if (!string.IsNullOrEmpty(item.IconUrl) && (item.IconUrl.StartsWith("/") || item.IconUrl.StartsWith("http")))
                                     {
-                                        <img src="@item.IconUrl" alt="@item.Title" class="w-8 h-8 object-contain" onerror="this.src='/images/default-badge.png';" />
+                                        <img src="@item.IconUrl" alt="@item.Title" class="w-8 h-8 object-contain" />
+                                    }
+                                    else if (!string.IsNullOrEmpty(item.IconUrl) && item.IconUrl.StartsWith("fa-"))
+                                    {
+                                        <i class="fa-solid @item.IconUrl text-xl text-amber-600"></i>
+                                    }
+                                    else if (!string.IsNullOrEmpty(item.IconUrl))
+                                    {
+                                        <span class="text-xl">@item.IconUrl</span>
                                     }
                                     else
                                     {
-                                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                                        <i class="fa-solid fa-award text-xl text-amber-500"></i>
                                     }
                                 </div>
                             </td>
@@ -90,7 +98,7 @@
                                 </a>
                                 @if (item.IsActive)
                                 {
-                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="inline-block" onsubmit="return confirm('Ẩn huy hiệu này khỏi cơ chế trao mới? Lịch sử user đã nhận vẫn được giữ lại.');">
+                                    <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="inline-block no-auto-disable" onsubmit="return confirm('Ẩn huy hiệu này khỏi cơ chế trao mới? Lịch sử user đã nhận vẫn được giữ lại.');">
                                         <button type="submit" class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-amber-600 bg-amber-50 hover:bg-amber-100 transition-colors" title="Ẩn huy hiệu">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L21 21M5.636 5.636L3 3"></path></svg>
                                         </button>

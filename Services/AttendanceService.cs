@@ -23,17 +23,32 @@ namespace DuAnTotNghiep.Services
         {
             var studentAttendances = new List<StudentAttendanceViewModel>();
 
-            // Find active students enrolled in this topic
+            // Find active students associated with this topic
             var students = await _context.Users
                 .Include(u => u.Role)
                 .Where(u => u.Role.RoleCode == "STUDENT" && u.Status == "ACTIVE" &&
-                    _context.StudentLearningPaths.Any(slp =>
+                    (_context.StudentLearningPaths.Any(slp =>
                         slp.StudentId == u.Id &&
                         slp.Status == "ACTIVE" &&
                         _context.LearningPathNodes.Any(lpn => lpn.LearningPathId == slp.Id && lpn.TopicId == topicId)
-                    ))
+                    )
+                    || _context.StudentProgressSnapshots.Any(sps => sps.StudentId == u.Id && sps.TopicId == topicId)
+                    || _context.StudyActivityLogs.Any(log => log.StudentId == u.Id && log.TopicId == topicId)
+                    || _context.Attendances.Any(a => a.StudentId == u.Id && a.TopicId == topicId)
+                    )
+                )
                 .OrderBy(u => u.FullName)
                 .ToListAsync();
+
+            // Fallback: If no student is explicitly mapped to this topic yet, fetch all active students in system
+            if (!students.Any())
+            {
+                students = await _context.Users
+                    .Include(u => u.Role)
+                    .Where(u => u.Role.RoleCode == "STUDENT" && u.Status == "ACTIVE")
+                    .OrderBy(u => u.FullName)
+                    .ToListAsync();
+            }
 
             var records = await _context.Attendances
                 .Where(a => a.TopicId == topicId && a.AttendanceDate == date)

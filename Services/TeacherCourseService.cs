@@ -56,12 +56,15 @@ public class TeacherCourseService : ITeacherCourseService
                 Title = topic.Title,
                 Description = topic.Description,
                 SkillName = topic.Skill.SkillName,
+                SkillCode = topic.Skill.SkillCode,
                 LevelName = topic.Level?.Name,
                 LessonCount = topic.OriginalLessons.Count,
                 StudentCount = await GetCourseStudentCountAsync(topic.Id),
                 IsActive = topic.Status == "ACTIVE",
                 DifficultyLevel = topic.DifficultyLevel,
-                CreatedAt = topic.CreatedAt
+                CreatedAt = topic.CreatedAt,
+                ThumbnailUrl = DuAnTotNghiep.Helpers.CourseThumbnailHelper.ResolveThumbnailUrl(
+                    topic.Title, topic.TopicCode, topic.Skill.SkillCode)
             });
         }
 

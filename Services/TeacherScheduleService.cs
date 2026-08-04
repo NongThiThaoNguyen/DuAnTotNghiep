@@ -2,6 +2,7 @@ using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -77,6 +78,18 @@ namespace DuAnTotNghiep.Services
         {
             _context.Schedules.Remove(schedule);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Schedule>> GetSchedulesByDateRangeAsync(int teacherId, DateTime start, DateTime end)
+        {
+            return await _context.Schedules
+                .Include(s => s.Topic)
+                .Where(s => s.TeacherId == teacherId &&
+                            s.StartTime.Date >= start.Date &&
+                            s.StartTime.Date <= end.Date)
+                .OrderBy(s => s.StartTime)
+                .AsNoTracking()
+                .ToListAsync();
         }
 
         public async Task<List<LearningTopic>> GetActiveTopicsAsync()

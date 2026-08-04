@@ -37,19 +37,19 @@
     </style>
 }
 
-<div class="max-w-5xl mx-auto py-6 px-4">
+<div class="max-w-5xl mx-auto py-3 px-4">
     <partial name="_OnboardingStepper" model="1" />
     
-    <div class="bg-white shadow-xl shadow-slate-200/60 rounded-3xl p-6 sm:p-10 border border-slate-200/80 mt-6">
-        <h2 class="text-2xl sm:text-3xl font-extrabold mb-3 text-center text-slate-900 tracking-tight">Mục tiêu chính của bạn là gì?</h2>
-        <p class="text-slate-500 text-center mb-8 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">Hãy chọn 1 mục tiêu quan trọng nhất lúc này để AI tối ưu hóa lộ trình dành riêng cho bạn.</p>
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-5 sm:p-7 border border-slate-200/80 mt-2">
+        <h2 class="text-2xl font-bold mb-1 text-center text-slate-800">Mục tiêu chính của bạn là gì?</h2>
+        <p class="text-slate-500 text-xs text-center mb-5 max-w-xl mx-auto">Hãy chọn 1 mục tiêu quan trọng nhất lúc này để AI tối ưu hóa lộ trình dành riêng cho bạn.</p>
 
         <form method="post" asp-action="Goal">
             @Html.AntiForgeryToken()
             
-            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 text-sm font-medium text-center"></div>
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-3 text-sm font-medium text-center"></div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mb-5">
                 @if (ViewBag.Goals != null)
                 {
                     foreach (var goal in ViewBag.Goals)
@@ -65,23 +65,23 @@
                                 <input type="radio" name="MainGoalId" value="@goal.Id" class="hidden goal-radio" />
                             }
                             
-                            <div class="goal-card-body h-full rounded-2xl p-5 text-center bg-white relative overflow-hidden flex flex-col items-center justify-between">
+                            <div class="goal-card-body h-full rounded-xl p-4 text-center bg-white relative overflow-hidden flex flex-col items-center justify-between">
                                 <!-- Checkmark badge -->
-                                <div class="absolute top-3 right-3 text-blue-600 check-indicator">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                                <div class="absolute top-2.5 right-2.5 text-blue-600 check-indicator">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                                     </svg>
                                 </div>
 
-                                <div class="w-full">
-                                    <div class="flex justify-center mb-3">
-                                        <div class="card-icon-container w-13 h-13 p-3 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center text-xl shadow-sm transition-colors">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="w-full flex flex-col items-center">
+                                    <div class="flex justify-center mb-2">
+                                        <div class="card-icon-container w-11 h-11 rounded-xl bg-slate-100 text-slate-600 flex items-center justify-center text-lg shadow-sm transition-colors">
+                                            <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                                             </svg>
                                         </div>
                                     </div>
-                                    <h5 class="font-bold text-slate-900 text-base mb-1.5">@goal.GoalName</h5>
+                                    <h5 class="font-bold text-slate-800 text-base mb-1">@goal.GoalName</h5>
                                     <p class="text-slate-500 text-xs leading-relaxed">@goal.Description</p>
                                 </div>
                             </div>
@@ -90,13 +90,13 @@
                 }
             </div>
 
-            <div class="text-center mt-4">
+            <div class="text-center">
                 <span asp-validation-for="MainGoalId" class="text-red-500 font-bold block text-sm"></span>
             </div>
 
-            <div class="flex items-center justify-between mt-8 pt-6 border-t border-slate-100">
-                <a asp-action="Start" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors text-sm">Quay lại</a>
-                <button type="submit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2 text-sm">
+            <div class="flex items-center justify-between mt-5 pt-4 border-t border-slate-100">
+                <a asp-action="Start" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">Quay lại</a>
+                <button type="submit" class="px-7 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
                     Tiếp tục
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>

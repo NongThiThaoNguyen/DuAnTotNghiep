@@ -998,6 +998,69 @@
   border-bottom: 1px solid var(--rs-line);
   background: var(--rs-surface-muted);
   color: var(--rs-brass-deep);
+  overflow: hidden;
+}
+
+/* Image variant */
+.teacher-course-cover--img {
+  aspect-ratio: 16 / 9;
+  min-height: unset;
+  background: linear-gradient(135deg, #6366F1 0%, #8B5CF6 50%, #06B6D4 100%);
+}
+
+/* Skill-based gradient colours (mirrors student side) */
+.teacher-course-cover--img[data-skill="GRAMMAR"]     { background: linear-gradient(135deg, #6366F1, #818CF8) !important; }
+.teacher-course-cover--img[data-skill="VOCABULARY"]  { background: linear-gradient(135deg, #8B5CF6, #A78BFA) !important; }
+.teacher-course-cover--img[data-skill="COMMUNICATION"],
+.teacher-course-cover--img[data-skill="SPEAKING"]   { background: linear-gradient(135deg, #EC4899, #F472B6) !important; }
+.teacher-course-cover--img[data-skill="LISTENING"]   { background: linear-gradient(135deg, #14B8A6, #2DD4BF) !important; }
+.teacher-course-cover--img[data-skill="READING"]     { background: linear-gradient(135deg, #F59E0B, #FCD34D) !important; }
+.teacher-course-cover--img[data-skill="WRITING"]     { background: linear-gradient(135deg, #10B981, #34D399) !important; }
+
+.teacher-course-thumb-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  transition: transform 0.4s ease;
+}
+.teacher-course-card:hover .teacher-course-thumb-img { transform: scale(1.07); }
+
+.teacher-course-thumb-icon {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.22);
+  font-size: 3rem;
+  z-index: 0;
+}
+
+.teacher-course-thumb-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, transparent 30%, rgba(0,0,0,0.5));
+  z-index: 2;
+  pointer-events: none;
+}
+
+.teacher-course-thumb-tag {
+  position: absolute !important;
+  top: 0.65rem;
+  left: 0.65rem;
+  background: rgba(255,255,255,0.93) !important;
+  backdrop-filter: blur(6px);
+  color: #4f46e5 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 999px !important;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .teacher-course-cover .teacher-status {

@@ -26,6 +26,13 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
         public async Task<IActionResult> Index(int? topicId, DateOnly? date)
         {
             var topics = await _attendanceService.GetActiveTopicsAsync();
+
+            // Auto-select first active course if no topic is explicitly selected
+            if (!topicId.HasValue && topics.Any())
+            {
+                topicId = topics.First().Id;
+            }
+
             ViewBag.TopicsList = new SelectList(topics, "Id", "Title", topicId);
 
             var selectedDate = date ?? DateOnly.FromDateTime(DateTime.Today);

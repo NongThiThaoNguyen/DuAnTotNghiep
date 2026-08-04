@@ -67,12 +67,23 @@
     @foreach (var course in Model.Courses)
     {
         <article class="teacher-course-card">
-            <a asp-action="Details" asp-route-id="@course.Id" class="teacher-course-cover" aria-label="Xem chi tiết @course.Title">
-                <span class="teacher-course-symbol" aria-hidden="true">
-                    <i class="fa-solid fa-graduation-cap"></i>
-                </span>
-                <span class="teacher-status">@course.DifficultyLevel</span>
-            </a>
+        <a asp-action="Details" asp-route-id="@course.Id"
+           class="teacher-course-cover teacher-course-cover--img"
+           data-skill="@course.SkillCode?.ToUpper()"
+           aria-label="Xem chi tiết @course.Title">
+            @if (!string.IsNullOrEmpty(course.ThumbnailUrl))
+            {
+                <img src="@course.ThumbnailUrl"
+                     alt="@course.Title"
+                     class="teacher-course-thumb-img"
+                     onerror="this.onerror=null; this.style.display='none';" />
+            }
+            <span class="teacher-course-thumb-icon" aria-hidden="true">
+                <i class="fa-solid fa-graduation-cap"></i>
+            </span>
+            <span class="teacher-course-thumb-gradient"></span>
+            <span class="teacher-status teacher-course-thumb-tag">@course.DifficultyLevel</span>
+        </a>
 
             <div class="teacher-course-body">
                 <div class="teacher-meta-pills">

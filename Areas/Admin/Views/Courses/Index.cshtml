@@ -1,0 +1,213 @@
+@model IEnumerable<DuAnTotNghiep.Areas.Admin.ViewModels.AdminCourseListItemViewModel>
+@{
+    ViewData["Title"] = "Quản lý khóa học";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    string DifficultyLabel(string? d) => (d ?? "").ToUpperInvariant() switch
+    {
+        "BEGINNER" => "Cơ bản",
+        "BASIC"    => "Cơ bản",
+        "ELEMENTARY" => "Sơ cấp",
+        "INTERMEDIATE" => "Trung cấp",
+        "UPPER_INTERMEDIATE" => "Trên trung cấp",
+        "ADVANCED" => "Nâng cao",
+        _ => d ?? "-"
+    };
+
+    string StatusLabel(string? s) => (s ?? "").ToUpperInvariant() switch
+    {
+        "ACTIVE"   => "Đang hoạt động",
+        "INACTIVE" => "Tạm dừng",
+        "ARCHIVED" => "Lưu trữ",
+        _ => s ?? "-"
+    };
+
+    string StatusBadgeClass(string? s) => (s ?? "").ToUpperInvariant() switch
+    {
+        "ACTIVE"   => "bg-success",
+        "INACTIVE" => "bg-warning",
+        "ARCHIVED" => "bg-secondary",
+        _ => "bg-info"
+    };
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages  = ViewBag.TotalPages  ?? 1;
+    int total       = ViewBag.Total       ?? 0;
+}
+
+<div class="container-fluid">
+    <div class="d-flex align-items-center justify-content-between mt-4 mb-3">
+        <div>
+            <h2 class="mb-0">Khóa học</h2>
+            <p class="text-muted small mt-1">Tổng cộng <strong>@total</strong> khóa học trong hệ thống</p>
+        </div>
+        <a asp-action="Create" class="btn btn-primary">
+            <svg class="w-4 h-4 me-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Tạo khóa học mới
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <!-- Filter -->
+    <div class="card mb-3">
+        <div class="card-body">
+            <form method="get" asp-action="Index" class="grid gap-3 md:grid-cols-12 md:items-end">
+                <div class="md:col-span-4">
+                    <input type="text" name="search" class="form-control"
+                           placeholder="Tìm theo tên, mã khóa học..." value="@ViewBag.Search" />
+                </div>
+                <div class="md:col-span-3">
+                    <select name="skill" class="form-select" asp-items="ViewBag.SkillOptions">
+                        <option value="">-- Tất cả kỹ năng --</option>
+                    </select>
+                </div>
+                <div class="md:col-span-2">
+                    <select name="status" class="form-select">
+                        <option value="">-- Trạng thái --</option>
+                        <option value="ACTIVE" selected="@(ViewBag.Status == "ACTIVE")">Đang hoạt động</option>
+                        <option value="INACTIVE" selected="@(ViewBag.Status == "INACTIVE")">Tạm dừng</option>
+                    </select>
+                </div>
+                <div class="md:col-span-1">
+                    <button type="submit" class="btn btn-secondary w-100">Lọc</button>
+                </div>
+                <div class="md:col-span-1">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">Đặt lại</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên khóa học</th>
+                    <th>Kỹ năng</th>
+                    <th>Trình độ</th>
+                    <th>Độ khó</th>
+                    <th>Số bài học</th>
+                    <th>Trạng thái</th>
+                    <th>Ngày tạo</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <span class="text-muted small font-mono">@(item.TopicCode ?? "-")</span>
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.Id" class="fw-semibold text-decoration-none">
+                                @item.Title
+                            </a>
+                            @if (!string.IsNullOrWhiteSpace(item.Description))
+                            {
+                                <div class="text-muted small mt-1" style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="@item.Description">
+                                    @item.Description
+                                </div>
+                            }
+                        </td>
+                        <td>@item.SkillName</td>
+                        <td>@(item.LevelName ?? "-")</td>
+                        <td>@DifficultyLabel(item.DifficultyLevel)</td>
+                        <td>
+                            <span class="badge bg-info">@item.LessonCount bài</span>
+                        </td>
+                        <td>
+                            <span class="badge @StatusBadgeClass(item.Status)">@StatusLabel(item.Status)</span>
+                        </td>
+                        <td>
+                            <span class="small text-muted">@item.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</span>
+                        </td>
+                        <td class="admin-actions-cell">
+                            <div class="admin-icon-actions">
+                                <a asp-action="Details" asp-route-id="@item.Id"
+                                   class="admin-icon-btn admin-icon-view" title="Xem chi tiết">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                </a>
+                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                   class="admin-icon-btn admin-icon-edit" title="Chỉnh sửa">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </a>
+                                <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="admin-icon-form"
+                                      onsubmit="return confirm('Bạn có chắc muốn @(item.Status == "ACTIVE" ? "tạm dừng" : "kích hoạt") khóa học này?');">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit"
+                                            class="admin-icon-btn @(item.Status == "ACTIVE" ? "admin-icon-disable" : "admin-icon-restore")"
+                                            title="@(item.Status == "ACTIVE" ? "Tạm dừng" : "Kích hoạt")">
+                                        @if (item.Status == "ACTIVE")
+                                        {
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M18.364 5.636A9 9 0 105.636 18.364 9 9 0 0018.364 5.636zM6.343 6.343l11.314 11.314" />
+                                            </svg>
+                                        }
+                                        else
+                                        {
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M9 12l2 2 4-4M7 4h10a2 2 0 012 2v14H5V6a2 2 0 012-2z" />
+                                            </svg>
+                                        }
+                                    </button>
+                                </form>
+                                <a asp-area="Admin" asp-controller="LearningTopics" asp-action="Details" asp-route-id="@item.Id"
+                                   class="admin-icon-btn" style="background:#f0fdf4;color:#15803d;" title="Xem chủ đề học tập">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-4">Không có khóa học nào</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    @if (totalPages > 1)
+    {
+        <nav aria-label="Phân trang khóa học" class="mt-3 d-flex justify-content-center gap-1">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <a asp-action="Index"
+                   asp-route-page="@i"
+                   asp-route-search="@ViewBag.Search"
+                   asp-route-skill="@ViewBag.Skill"
+                   asp-route-status="@ViewBag.Status"
+                   class="btn @(i == currentPage ? "btn-primary" : "btn-outline-secondary") btn-sm">
+                    @i
+                </a>
+            }
+        </nav>
+    }
+</div>

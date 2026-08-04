@@ -671,22 +671,23 @@ a.lp-node-card:hover {
     align-items: center;
     gap: 8px;
     padding: 10px 24px;
-    background: var(--rs-ink);
-    color: var(--rs-surface);
+    background: #4f46e5;
+    color: #ffffff;
     font-size: 14px;
     font-weight: 600;
     border-radius: 12px;
     border: none;
     cursor: pointer;
+    text-decoration: none;
     transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-    box-shadow: none;
+    box-shadow: 0 2px 8px rgba(79,70,229,0.30);
 }
 
 .lp-btn-primary:hover {
-    background: var(--rs-brass-deep);
+    background: #4338ca;
     transform: translateY(-1px);
-    box-shadow: none;
-    color: var(--rs-surface);
+    box-shadow: 0 4px 14px rgba(79,70,229,0.35);
+    color: #ffffff;
 }
 
 /* ============================================================

@@ -18,7 +18,11 @@ namespace DuAnTotNghiep.Models.Repositories
         {
             return await _dbSet
                 .Include(t => t.TopicPrerequisites)
+                .Include(t => t.Skill)
+                .Include(t => t.Level)
+                .Include(t => t.ParentTopic)
                 .AsNoTracking()
+                .OrderBy(t => t.OrderIndex)
                 .ToListAsync();
         }
 

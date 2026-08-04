@@ -1,0 +1,81 @@
+@model DuAnTotNghiep.Models.ViewModels.Teacher.CreateCourseViewModel
+@{
+    ViewData["Title"] = "Tạo khóa học mới";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="d-flex align-items-center gap-2 mt-4 mb-3">
+        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </a>
+        <h2 class="mb-0">Tạo khóa học mới</h2>
+    </div>
+
+    <div class="card mt-2" style="max-width:680px">
+        <div class="card-body">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+
+                <div class="mb-3">
+                    <label asp-for="Title" class="form-label">Tên khóa học <span class="text-danger">*</span></label>
+                    <input asp-for="Title" class="form-control" placeholder="Nhập tên khóa học" required />
+                    <span asp-validation-for="Title" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="form-label">Mô tả</label>
+                    <textarea asp-for="Description" class="form-control" rows="3"
+                              placeholder="Mô tả nội dung khóa học..."></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="SkillId" class="form-label">Kỹ năng <span class="text-danger">*</span></label>
+                        <select asp-for="SkillId" class="form-select" required
+                                asp-items="@(new SelectList(Model.SkillOptions, "Id", "Name"))">
+                            <option value="">-- Chọn kỹ năng --</option>
+                        </select>
+                        <span asp-validation-for="SkillId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="ProficiencyLevelId" class="form-label">Trình độ</label>
+                        <select asp-for="ProficiencyLevelId" class="form-select"
+                                asp-items="@(new SelectList(Model.LevelOptions, "Id", "Name"))">
+                            <option value="">-- Chọn trình độ --</option>
+                        </select>
+                        <span asp-validation-for="ProficiencyLevelId" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="DifficultyLevel" class="form-label">Độ khó <span class="text-danger">*</span></label>
+                        <select asp-for="DifficultyLevel" class="form-select" required>
+                            <option value="BEGINNER">Cơ bản (Beginner)</option>
+                            <option value="ELEMENTARY">Sơ cấp (Elementary)</option>
+                            <option value="INTERMEDIATE">Trung cấp (Intermediate)</option>
+                            <option value="UPPER_INTERMEDIATE">Trên trung cấp</option>
+                            <option value="ADVANCED">Nâng cao (Advanced)</option>
+                        </select>
+                        <span asp-validation-for="DifficultyLevel" class="text-danger small"></span>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label asp-for="EstimatedMinutes" class="form-label">Thời gian ước tính (phút)</label>
+                        <input asp-for="EstimatedMinutes" class="form-control" type="number" min="1" placeholder="VD: 120" />
+                        <span asp-validation-for="EstimatedMinutes" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary">Tạo khóa học</button>
+                    <a asp-action="Index" class="btn btn-outline-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

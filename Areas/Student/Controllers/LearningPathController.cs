@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using DuAnTotNghiep.Data;
+using DuAnTotNghiep.Helpers;
+using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models.Exceptions;
+using DuAnTotNghiep.Models.ViewModels.Student;
 using DuAnTotNghiep.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -172,6 +175,90 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
 
             _logger.LogInformation("Student {StudentId} opened learning path node {NodeId}", userId, nodeId);
             return Redirect(targetUrl);
+        }
+
+        // GET: /Student/LearningPath/Topic/{nodeId}
+        [HttpGet("/Student/LearningPath/Topic/{nodeId:int}")]
+        public async Task<IActionResult> TopicDetail(int nodeId)
+        {
+            var userId = GetUserId();
+
+            var node = await _context.LearningPathNodes
+                .Include(n => n.Topic)
+                    .ThenInclude(t => t!.LearningObjectives.OrderBy(o => o.OrderIndex))
+                .Include(n => n.Topic)
+                    .ThenInclude(t => t!.Skill)
+                .Include(n => n.LearningPath)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(n => n.Id == nodeId);
+
+            if (node == null || node.Topic == null)
+                return NotFound();
+
+            if (node.LearningPath.StudentId != userId)
+                return Forbid();
+
+            // Get sibling nodes in same learning path for navigation
+            var allNodes = await _context.LearningPathNodes
+                .Where(n => n.LearningPathId == node.LearningPathId)
+                .OrderBy(n => n.OrderIndex)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var nodeIndex = allNodes.FindIndex(n => n.Id == nodeId);
+            var prevNodeId = nodeIndex > 0 ? allNodes[nodeIndex - 1].Id : (int?)null;
+            var nextNodeId = nodeIndex < allNodes.Count - 1 ? allNodes[nodeIndex + 1].Id : (int?)null;
+
+            // Get child nodes that belong to this topic in the path
+            var childNodes = allNodes
+                .Where(n => n.TopicId == node.TopicId && n.NodeType != NodeType.Topic && n.NodeType != NodeType.Review)
+                .OrderBy(n => n.OrderIndex)
+                .ToList();
+
+            var childNodeItems = new List<TopicChildNodeItem>();
+            foreach (var child in childNodes)
+            {
+                var targetUrl = await _pathViewService.BuildNodeTargetUrlAsync(child) ?? "#";
+                childNodeItems.Add(new TopicChildNodeItem
+                {
+                    NodeId = child.Id,
+                    Title = child.NodeTitle,
+                    NodeType = child.NodeType,
+                    Status = child.Status,
+                    EstimatedMinutes = child.EstimatedMinutes,
+                    ScheduledDate = child.ScheduledDate,
+                    IsClickable = child.Status is "AVAILABLE" or "COMPLETED",
+                    TargetUrl = targetUrl
+                });
+            }
+
+            var topic = node.Topic;
+            var vm = new TopicDetailViewModel
+            {
+                TopicId = topic.Id,
+                TopicTitle = topic.Title,
+                TopicDescription = topic.Description,
+                SkillName = topic.Skill?.SkillName ?? "",
+                SkillCode = topic.Skill?.SkillCode ?? "",
+                DifficultyLevel = topic.DifficultyLevel,
+                EstimatedMinutes = topic.EstimatedMinutes,
+                ThumbnailUrl = CourseThumbnailHelper.ResolveThumbnailUrl(topic.Title, topic.TopicCode, topic.Skill?.SkillCode),
+                NodeId = node.Id,
+                NodeStatus = node.Status,
+                AiReason = node.AiReason,
+                PathPhase = node.PathPhase,
+                Objectives = topic.LearningObjectives.Select(o => new TopicObjectiveItem
+                {
+                    ObjectiveText = o.ObjectiveText,
+                    CognitiveLevel = o.CognitiveLevel,
+                    OrderIndex = o.OrderIndex
+                }).ToList(),
+                ChildNodes = childNodeItems,
+                PreviousNodeId = prevNodeId,
+                NextNodeId = nextNodeId
+            };
+
+            return View(vm);
         }
 
         private ILearningPathEngineService LearningPathEngineService

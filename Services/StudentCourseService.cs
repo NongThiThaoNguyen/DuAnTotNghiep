@@ -20,20 +20,7 @@ namespace DuAnTotNghiep.Services
 
         private static string ResolveThumbnailUrl(DuAnTotNghiep.Models.LearningTopic t)
         {
-            var title = t.Title?.ToUpperInvariant() ?? "";
-            var code = t.TopicCode?.ToUpperInvariant() ?? "";
-            var skillCode = t.Skill?.SkillCode?.ToUpperInvariant() ?? "";
-
-            if (code.Contains("IELTS") || title.Contains("IELTS")) return "/images/courses/ielts.png";
-            if (code.Contains("TOEIC") || title.Contains("TOEIC")) return "/images/courses/toeic.png";
-            if (skillCode == "GRAMMAR" || title.Contains("NGỮ PHÁP") || title.Contains("THÌ") || title.Contains("TENSES") || title.Contains("PRESENT")) return "/images/courses/grammar.png";
-            if (skillCode == "VOCABULARY" || title.Contains("TỪ VỰNG") || title.Contains("FAMILY") || title.Contains("SCHOOL") || title.Contains("TRAVEL")) return "/images/courses/vocabulary.png";
-            if (skillCode == "COMMUNICATION" || skillCode == "SPEAKING" || title.Contains("GIAO TIẾP") || title.Contains("SPEAKING") || title.Contains("NÓI")) return "/images/courses/communication.png";
-            if (skillCode == "LISTENING" || title.Contains("LISTENING") || title.Contains("NGHE")) return "/images/courses/listening.png";
-            if (skillCode == "READING" || title.Contains("READING") || title.Contains("ĐỌC")) return "/images/courses/reading.svg";
-            if (skillCode == "WRITING" || title.Contains("WRITING") || title.Contains("VIẾT")) return "/images/courses/writing.svg";
-
-            return "/images/courses/default.svg";
+            return DuAnTotNghiep.Helpers.CourseThumbnailHelper.ResolveThumbnailUrl(t);
         }
 
         public async Task<CoursesViewModel> GetCoursesViewModelAsync(int userId, string? category, string? search)

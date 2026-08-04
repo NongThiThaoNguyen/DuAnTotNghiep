@@ -18,12 +18,14 @@ public class CourseListItemViewModel
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string SkillName { get; set; } = string.Empty;
+    public string? SkillCode { get; set; }
     public string? LevelName { get; set; }
     public int LessonCount { get; set; }
     public int StudentCount { get; set; }
     public bool IsActive { get; set; }
     public string DifficultyLevel { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
+    public string ThumbnailUrl { get; set; } = "/images/courses/default.svg";
 }
 
 public class CourseDetailViewModel

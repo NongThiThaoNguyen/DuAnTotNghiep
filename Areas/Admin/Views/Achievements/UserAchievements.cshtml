@@ -49,14 +49,22 @@
                 }
 
                 <div class="p-6 flex flex-col items-center text-center flex-1">
-                    <div class="w-20 h-20 rounded-full flex items-center justify-center mb-4 @(item.IsUnlocked ? "bg-amber-100 border-2 border-amber-300" : "bg-slate-100 border border-slate-200 opacity-60")">
-                        @if (!string.IsNullOrEmpty(item.IconUrl))
+                    <div class="w-20 h-20 rounded-full flex items-center justify-center mb-4 @(item.IsUnlocked ? "bg-amber-100 border-2 border-amber-300 shadow-sm" : "bg-slate-100 border border-slate-200 opacity-60")">
+                        @if (!string.IsNullOrEmpty(item.IconUrl) && (item.IconUrl.StartsWith("/") || item.IconUrl.StartsWith("http")))
                         {
-                            <img src="@item.IconUrl" alt="@item.Title" class="w-12 h-12 object-contain @(item.IsUnlocked ? "" : "grayscale")" onerror="this.src='/images/default-badge.png';" />
+                            <img src="@item.IconUrl" alt="@item.Title" class="w-12 h-12 object-contain @(item.IsUnlocked ? "" : "grayscale")" />
+                        }
+                        else if (!string.IsNullOrEmpty(item.IconUrl) && item.IconUrl.StartsWith("fa-"))
+                        {
+                            <i class="fa-solid @item.IconUrl text-3xl @(item.IsUnlocked ? "text-amber-600" : "text-slate-400")"></i>
+                        }
+                        else if (!string.IsNullOrEmpty(item.IconUrl))
+                        {
+                            <span class="text-3xl">@item.IconUrl</span>
                         }
                         else
                         {
-                            <svg class="w-10 h-10 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                            <i class="fa-solid fa-award text-3xl @(item.IsUnlocked ? "text-amber-500" : "text-slate-400")"></i>
                         }
                     </div>
                     <h4 class="font-bold text-slate-800 text-lg mb-1 leading-tight">@item.Title</h4>

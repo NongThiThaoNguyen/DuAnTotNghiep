@@ -13,5 +13,6 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task UpdateAsync(Schedule schedule);
         Task DeleteAsync(Schedule schedule);
         Task<List<LearningTopic>> GetActiveTopicsAsync();
+        Task<List<Schedule>> GetSchedulesByDateRangeAsync(int teacherId, DateTime start, DateTime end);
     }
 }

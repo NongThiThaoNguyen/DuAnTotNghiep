@@ -27,24 +27,24 @@
     </style>
 }
 
-<div class="max-w-5xl mx-auto py-6 px-4">
+<div class="max-w-5xl mx-auto py-3 px-4">
     <partial name="_OnboardingStepper" model="3" />
-    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-6 sm:p-10 border border-slate-200/80 mt-6">
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-5 sm:p-7 border border-slate-200/80 mt-2">
         
-        <h2 class="text-3xl font-bold mb-4 text-center text-slate-800">Bạn muốn cải thiện kỹ năng nào nhất?</h2>
-        <p class="text-slate-500 text-center mb-8">Chọn <span class="font-bold text-blue-600">tối thiểu 1</span> và <span class="font-bold text-blue-600">tối đa 4</span> kỹ năng. AI sẽ ưu tiên phân bổ bài học theo thứ tự bạn chọn.</p>
+        <h2 class="text-2xl font-bold mb-1 text-center text-slate-800">Bạn muốn cải thiện kỹ năng nào nhất?</h2>
+        <p class="text-slate-500 text-xs text-center mb-4">Chọn <span class="font-bold text-blue-600">tối thiểu 1</span> và <span class="font-bold text-blue-600">tối đa 4</span> kỹ năng. AI sẽ ưu tiên phân bổ bài học theo thứ tự bạn chọn.</p>
 
         <form method="post" asp-action="Skills" id="skillsForm">
             @Html.AntiForgeryToken()
             
-            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-6 text-sm font-medium text-center bg-red-50 py-3 rounded-lg"></div>
+            <div asp-validation-summary="ModelOnly" class="text-red-600 mb-4 text-sm font-medium text-center bg-red-50 py-2 rounded-lg"></div>
 
-            <div class="flex justify-between items-center mb-4">
-                <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">Danh sách kỹ năng</span>
-                <span class="text-sm font-bold px-3 py-1 bg-slate-100 text-slate-600 rounded-full"><span id="selectedCount">0</span> / 4</span>
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Danh sách kỹ năng</span>
+                <span class="text-xs font-bold px-2.5 py-0.5 bg-slate-100 text-slate-600 rounded-full"><span id="selectedCount">0</span> / 4</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-8">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 mb-5">
                 @if (ViewBag.Skills != null)
                 {
                     foreach (var skill in ViewBag.Skills)
@@ -54,20 +54,22 @@
                         <label class="cursor-pointer block relative skill-label">
                             <input type="checkbox" name="SelectedSkillCodes" value="@skill.SkillCode" class="hidden skill-checkbox" @(isChecked ? "checked" : "") />
                             
-                            <div class="skill-card-body h-full rounded-2xl p-5 bg-white relative overflow-hidden flex flex-col items-center text-center">
+                            <div class="skill-card-body h-full rounded-xl p-3.5 bg-white relative overflow-hidden flex flex-col items-center text-center justify-between">
                                 
-                                <div class="absolute top-3 right-3 text-blue-600 check-indicator">
-                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                <div class="absolute top-2.5 right-2.5 text-blue-600 check-indicator">
+                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
                                 </div>
 
-                                <div class="skill-icon-container w-16 h-16 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center text-2xl shadow-sm mb-4 transition-colors">
-                                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
-                                    </svg>
+                                <div class="w-full flex flex-col items-center">
+                                    <div class="skill-icon-container w-11 h-11 rounded-xl bg-slate-50 text-slate-500 flex items-center justify-center text-xl shadow-sm mb-2.5 transition-colors">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
+                                        </svg>
+                                    </div>
+                                    
+                                    <h6 class="font-bold text-slate-800 text-sm mb-1">@skill.SkillName</h6>
+                                    <p class="text-slate-500 text-[11px] leading-relaxed line-clamp-2">@skill.Description</p>
                                 </div>
-                                
-                                <h6 class="font-bold text-slate-800 text-lg mb-2">@skill.SkillName</h6>
-                                <p class="text-slate-500 text-xs leading-relaxed line-clamp-2">@skill.Description</p>
                             </div>
                         </label>
                     }
@@ -75,14 +77,14 @@
             </div>
 
             <div class="text-center">
-                <span asp-validation-for="SelectedSkillCodes" class="text-red-500 font-bold block text-sm" id="clientErrorMsg"></span>
+                <span asp-validation-for="SelectedSkillCodes" class="text-red-500 font-bold block text-xs" id="clientErrorMsg"></span>
             </div>
 
-            <div class="flex items-center justify-between mt-10 pt-6 border-t border-slate-100">
-                <a asp-action="Level" class="px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors">Quay lại</a>
-                <button type="submit" id="btnSubmit" class="px-8 py-3 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
+            <div class="flex items-center justify-between mt-5 pt-4 border-t border-slate-100">
+                <a asp-action="Level" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">Quay lại</a>
+                <button type="submit" id="btnSubmit" class="px-7 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
                     Tiếp tục
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                 </button>
             </div>
         </form>

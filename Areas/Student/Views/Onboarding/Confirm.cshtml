@@ -4,46 +4,46 @@
     var isScoreBased = Model.MainGoal?.GoalCode == "IELTS" || Model.MainGoal?.GoalCode == "TOEIC";
 }
 
-<div class="max-w-5xl mx-auto py-6 px-4">
+<div class="max-w-5xl mx-auto py-3 px-4">
     <partial name="_OnboardingStepper" model="5" />
-    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-6 sm:p-10 border border-slate-200/80 mt-6">
+    <div class="bg-white shadow-xl shadow-slate-200/50 rounded-2xl p-5 sm:p-7 border border-slate-200/80 mt-2">
         
-        <div class="text-center mb-12">
-            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg class="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="text-center mb-6">
+            <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg class="w-7 h-7 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                 </svg>
             </div>
-            <h2 class="text-3xl font-bold text-slate-800 mb-4">Hồ sơ học tập của bạn đã sẵn sàng!</h2>
-            <p class="text-slate-500">Hãy kiểm tra lại thông tin trước khi AI xây dựng lộ trình học tập cá nhân hóa dành riêng cho bạn.</p>
+            <h2 class="text-2xl font-bold text-slate-800 mb-1">Hồ sơ học tập của bạn đã sẵn sàng!</h2>
+            <p class="text-slate-500 text-xs">Hãy kiểm tra lại thông tin trước khi AI xây dựng lộ trình học tập cá nhân hóa dành riêng cho bạn.</p>
         </div>
 
         <!-- Profile Summary Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-5">
             
             <!-- Goal & Level -->
-            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                <h4 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <h4 class="font-bold text-slate-800 text-base mb-3 flex items-center gap-2">
+                    <svg class="w-4.5 h-4.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     Mục tiêu & Trình độ
                 </h4>
                 
-                <div class="space-y-4">
+                <div class="space-y-3 text-xs">
                     <div>
-                        <p class="text-sm text-slate-500 mb-1">Mục tiêu chính</p>
-                        <p class="font-semibold text-slate-800">@Model.MainGoal?.GoalName</p>
+                        <p class="text-slate-500 mb-0.5">Mục tiêu chính</p>
+                        <p class="font-semibold text-slate-800 text-sm">@Model.MainGoal?.GoalName</p>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <p class="text-sm text-slate-500 mb-1">Hiện tại</p>
-                            <span class="inline-block px-3 py-1 bg-slate-200 text-slate-700 rounded-full text-sm font-medium">
+                            <p class="text-slate-500 mb-0.5">Hiện tại</p>
+                            <span class="inline-block px-2.5 py-0.5 bg-slate-200 text-slate-700 rounded-full text-xs font-medium">
                                 @(Model.CurrentLevel?.Code ?? "Chưa đánh giá")
                             </span>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 mb-1">Mục tiêu</p>
-                            <span class="inline-block px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-bold">
+                            <p class="text-slate-500 mb-0.5">Mục tiêu</p>
+                            <span class="inline-block px-2.5 py-0.5 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">
                                 @if (isScoreBased)
                                 {
                                     @($"{Model.MainGoal?.GoalCode} {Model.TargetScore}")
@@ -59,33 +59,33 @@
             </div>
 
             <!-- Study Time & Skills -->
-            <div class="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                <h4 class="font-bold text-slate-800 text-lg mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <h4 class="font-bold text-slate-800 text-base mb-3 flex items-center gap-2">
+                    <svg class="w-4.5 h-4.5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     Thời gian & Kỹ năng
                 </h4>
                 
-                <div class="space-y-4">
-                    <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-3 text-xs">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <p class="text-sm text-slate-500 mb-1">Tần suất học</p>
+                            <p class="text-slate-500 mb-0.5">Tần suất học</p>
                             <p class="font-semibold text-slate-800">
                                 @Model.DailyStudyMinutes phút/ngày<br/>
-                                <span class="text-sm text-slate-500 font-normal">@Model.WeeklyStudyDays ngày/tuần</span>
+                                <span class="text-slate-500 font-normal">@Model.WeeklyStudyDays ngày/tuần</span>
                             </p>
                         </div>
                         <div>
-                            <p class="text-sm text-slate-500 mb-1">Khung giờ</p>
+                            <p class="text-slate-500 mb-0.5">Khung giờ</p>
                             <p class="font-semibold text-slate-800">@Model.PreferredStudyTime</p>
                         </div>
                     </div>
 
                     <div>
-                        <p class="text-sm text-slate-500 mb-2">Kỹ năng ưu tiên</p>
-                        <div class="flex flex-wrap gap-2">
+                        <p class="text-slate-500 mb-1.5">Kỹ năng ưu tiên</p>
+                        <div class="flex flex-wrap gap-1.5">
                             @foreach (var skill in Model.PrioritySkills)
                             {
-                                <span class="px-3 py-1 bg-white border border-slate-200 text-slate-700 rounded-full text-sm">
+                                <span class="px-2.5 py-0.5 bg-white border border-slate-200 text-slate-700 rounded-full text-xs">
                                     @skill.SkillName
                                 </span>
                             }
@@ -98,12 +98,12 @@
 
         @if (!string.IsNullOrWhiteSpace(Model.LearningNote))
         {
-            <div class="bg-amber-50 rounded-2xl p-6 border border-amber-100 mb-12">
-                <h4 class="font-bold text-amber-800 text-lg mb-2 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+            <div class="bg-amber-50 rounded-xl p-4 border border-amber-100 mb-5">
+                <h4 class="font-bold text-amber-800 text-sm mb-1 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
                     Ghi chú học tập
                 </h4>
-                <p class="text-slate-700">@Model.LearningNote</p>
+                <p class="text-slate-700 text-xs">@Model.LearningNote</p>
             </div>
         }
 
@@ -113,19 +113,19 @@
             
             @if (!ViewData.ModelState.IsValid)
             {
-                <div class="bg-red-50 text-red-600 p-4 rounded-xl mb-6 border border-red-100 flex items-center gap-3 justify-center">
-                    <svg class="w-6 h-6 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                <div class="bg-red-50 text-red-600 p-3 rounded-lg mb-4 border border-red-100 flex items-center gap-2.5 justify-center text-xs">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
                     <div asp-validation-summary="ModelOnly" class="font-medium font-bold"></div>
                 </div>
             }
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-8 border-t border-slate-100">
-                <a asp-action="StudyTime" class="w-full sm:w-auto text-center px-6 py-3 rounded-xl border border-slate-300 text-slate-600 font-medium hover:bg-slate-50 transition-colors">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mt-5 pt-4 border-t border-slate-100">
+                <a asp-action="StudyTime" class="w-full sm:w-auto text-center px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors">
                     Chỉnh sửa thông tin
                 </a>
                 
-                <button type="submit" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-blue-600 text-white font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
+                <button type="submit" class="w-full sm:w-auto px-7 py-2.5 rounded-xl bg-blue-600 text-white text-sm font-bold hover:bg-blue-700 shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2">
                     Xác nhận & Bắt đầu học
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                 </button>
             </div>
         </form>

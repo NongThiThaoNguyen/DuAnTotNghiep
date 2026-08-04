@@ -1,0 +1,562 @@
+@model DuAnTotNghiep.Models.ViewModels.Student.TopicDetailViewModel
+@{
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    ViewData["Title"] = Model.TopicTitle;
+
+    string diffLabel = Model.DifficultyLevel?.ToUpperInvariant() switch {
+        "BEGINNER"     => "Cơ bản",
+        "ELEMENTARY"   => "Sơ cấp",
+        "INTERMEDIATE" => "Trung cấp",
+        "ADVANCED"     => "Nâng cao",
+        _              => Model.DifficultyLevel ?? ""
+    };
+
+    string nodeTypeIcon(string? t) => (t ?? "").ToUpperInvariant() switch {
+        "LESSON"   => "fa-book-open",
+        "QUIZ"     => "fa-circle-question",
+        "PRACTICE" => "fa-dumbbell",
+        "AI_TUTOR" => "fa-robot",
+        _          => "fa-layer-group"
+    };
+    string nodeTypeLabel(string? t) => (t ?? "").ToUpperInvariant() switch {
+        "LESSON"   => "Bài học",
+        "QUIZ"     => "Bài kiểm tra",
+        "PRACTICE" => "Luyện tập",
+        "AI_TUTOR" => "Trợ lý AI",
+        _          => t ?? ""
+    };
+    string statusLabel(string s) => s?.ToUpperInvariant() switch {
+        "COMPLETED" => "Đã xong",
+        "AVAILABLE" => "Sẵn sàng",
+        _           => "Đang khóa"
+    };
+    string cogLabel(string c) => c?.ToUpperInvariant() switch {
+        "REMEMBER"   => "Ghi nhớ",
+        "UNDERSTAND" => "Hiểu",
+        "APPLY"      => "Vận dụng",
+        "ANALYZE"    => "Phân tích",
+        "EVALUATE"   => "Đánh giá",
+        "CREATE"     => "Sáng tạo",
+        _            => c ?? "Không xác định"
+    };
+}
+
+<style>
+/* ── Topic Detail Page ─────────────────────────────────────── */
+.td-hero {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%);
+    padding: 2.5rem 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    min-height: 200px;
+}
+.td-hero-img {
+    flex-shrink: 0;
+    width: 100px;
+    height: 100px;
+    border-radius: 16px;
+    object-fit: cover;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
+.td-hero-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+}
+.td-hero-img i {
+    font-size: 2.5rem;
+    color: rgba(255,255,255,0.7);
+}
+.td-hero-body {
+    flex: 1;
+    min-width: 0;
+}
+.td-hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.65);
+    margin-bottom: 0.6rem;
+}
+.td-hero h1 {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 0.6rem;
+    line-height: 1.25;
+}
+.td-hero-desc {
+    color: rgba(255,255,255,0.75);
+    font-size: 0.88rem;
+    line-height: 1.55;
+    margin: 0 0 1rem;
+}
+.td-hero-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.td-hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+.td-status-badge {
+    background: rgba(34,197,94,0.25);
+    border-color: rgba(34,197,94,0.4);
+    color: #86efac;
+}
+
+/* ── Grid layout ── */
+.td-layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 1.25rem;
+    align-items: start;
+}
+@@media (max-width: 900px) {
+    .td-layout { grid-template-columns: 1fr; }
+    .td-hero { flex-direction: column; text-align: center; }
+    .td-hero-meta { justify-content: center; }
+}
+
+/* ── Panel ── */
+.td-panel {
+    background: var(--rs-surface);
+    border: 1px solid var(--rs-line);
+    border-radius: 16px;
+    overflow: hidden;
+}
+.td-panel-header {
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid var(--rs-line);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.td-panel-header h2 {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--rs-ink);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+}
+.td-panel-header i {
+    font-size: 0.9rem;
+    color: #6366f1;
+}
+.td-panel-body {
+    padding: 1rem 1.25rem;
+}
+
+/* ── Activity list (child nodes) ── */
+.td-activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.td-activity-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1.5px solid var(--rs-line);
+    background: var(--rs-canvas);
+    text-decoration: none;
+    transition: all 0.15s ease;
+    color: var(--rs-ink);
+    position: relative;
+}
+.td-activity-item.is-clickable:hover {
+    border-color: #6366f1;
+    background: #f5f3ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99,102,241,0.12);
+}
+.td-activity-item.is-locked {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+.td-activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+}
+.td-activity-icon.type-lesson   { background: #eff6ff; color: #2563eb; }
+.td-activity-icon.type-quiz     { background: #fef3c7; color: #d97706; }
+.td-activity-icon.type-practice { background: #f0fdf4; color: #16a34a; }
+.td-activity-icon.type-ai_tutor { background: #fdf4ff; color: #9333ea; }
+.td-activity-icon.type-default  { background: #f8fafc; color: #64748b; }
+
+.td-activity-info {
+    flex: 1;
+    min-width: 0;
+}
+.td-activity-title {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--rs-ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.td-activity-meta {
+    font-size: 0.72rem;
+    color: var(--rs-ink-muted);
+    margin-top: 2px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.td-activity-status {
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+}
+.status-COMPLETED { background: #dcfce7; color: #15803d; }
+.status-AVAILABLE { background: #eff6ff; color: #1d4ed8; }
+.status-LOCKED    { background: #f1f5f9; color: #94a3b8; }
+
+/* ── Objectives ── */
+.td-objective-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.td-objective-item {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.84rem;
+    color: var(--rs-ink);
+    line-height: 1.5;
+}
+.td-objective-item::before {
+    content: "✓";
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 0.62rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+}
+.td-cog-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 6px;
+    background: #f1f5f9;
+    color: #64748b;
+    flex-shrink: 0;
+    margin-top: 3px;
+}
+
+/* ── Navigation ── */
+.td-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--rs-line);
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.td-nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    border: 1.5px solid var(--rs-line);
+    color: var(--rs-ink);
+    background: var(--rs-surface);
+    transition: all 0.15s ease;
+}
+.td-nav-btn:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+    background: #f5f3ff;
+}
+.td-nav-btn.is-primary {
+    background: #4f46e5;
+    border-color: #4338ca;
+    color: #fff;
+}
+.td-nav-btn.is-primary:hover {
+    background: #4338ca;
+    color: #fff;
+}
+.td-ai-reason {
+    margin-top: 1rem;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #fdf4ff, #eff6ff);
+    border: 1px solid #e9d5ff;
+    font-size: 0.8rem;
+    color: #6b21a8;
+    line-height: 1.5;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+}
+.td-ai-reason i { color: #9333ea; margin-top: 2px; flex-shrink: 0; }
+</style>
+
+<div style="max-width:1100px; margin:0 auto; padding: 0 4px;">
+
+    <!-- Hero Banner -->
+    <div class="td-hero">
+        <div class="td-hero-img">
+            @if (!string.IsNullOrEmpty(Model.ThumbnailUrl))
+            {
+                <img src="@Model.ThumbnailUrl" alt="@Model.TopicTitle" />
+            }
+            else
+            {
+                <i class="fa-solid fa-layer-group"></i>
+            }
+        </div>
+        <div class="td-hero-body">
+            <div class="td-hero-eyebrow">
+                <i class="fa-solid fa-road"></i>
+                @(string.IsNullOrEmpty(Model.PathPhase) ? "Lộ trình học tập" : Model.PathPhase) &bull; @Model.SkillName
+            </div>
+            <h1>@Model.TopicTitle</h1>
+            @if (!string.IsNullOrEmpty(Model.TopicDescription))
+            {
+                <p class="td-hero-desc">@Model.TopicDescription</p>
+            }
+            <div class="td-hero-meta">
+                @if (!string.IsNullOrEmpty(diffLabel))
+                {
+                    <span class="td-hero-badge">
+                        <i class="fa-solid fa-signal"></i> @diffLabel
+                    </span>
+                }
+                @if (Model.EstimatedMinutes.HasValue)
+                {
+                    <span class="td-hero-badge">
+                        <i class="fa-regular fa-clock"></i> @Model.EstimatedMinutes phút
+                    </span>
+                }
+                <span class="td-hero-badge td-status-badge">
+                    <i class="fa-solid fa-circle-check"></i>
+                    @(Model.NodeStatus == "COMPLETED" ? "Đã hoàn thành" : Model.NodeStatus == "AVAILABLE" ? "Đang học" : "Đang khóa")
+                </span>
+                @if (Model.ChildNodes.Count > 0)
+                {
+                    <span class="td-hero-badge">
+                        <i class="fa-solid fa-list"></i> @Model.ChildNodes.Count hoạt động học tập
+                    </span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Reason -->
+    @if (!string.IsNullOrEmpty(Model.AiReason))
+    {
+        <div class="td-ai-reason">
+            <i class="fa-solid fa-robot"></i>
+            <span><strong>AI gợi ý:</strong> @Model.AiReason</span>
+        </div>
+    }
+
+    <!-- Main Grid -->
+    <div class="td-layout" style="margin-top: 1.25rem;">
+
+        <!-- Left: Activity list -->
+        <div>
+            <div class="td-panel">
+                <div class="td-panel-header">
+                    <i class="fa-solid fa-list-check"></i>
+                    <h2>Hoạt động học tập (@Model.ChildNodes.Count)</h2>
+                </div>
+                <div class="td-panel-body">
+                    @if (!Model.ChildNodes.Any())
+                    {
+                        <p style="color:var(--rs-ink-muted); font-size:0.84rem; text-align:center; padding: 2rem 0;">
+                            Chưa có hoạt động học tập nào cho chủ đề này.
+                        </p>
+                    }
+                    <div class="td-activity-list">
+                        @foreach (var child in Model.ChildNodes)
+                        {
+                            var typeKey = child.NodeType.ToUpperInvariant();
+                            var statusKey = child.Status.ToUpperInvariant();
+                            var iconClass = typeKey switch {
+                                "LESSON"   => "type-lesson",
+                                "QUIZ"     => "type-quiz",
+                                "PRACTICE" => "type-practice",
+                                "AI_TUTOR" => "type-ai_tutor",
+                                _          => "type-default"
+                            };
+                            var clickable = child.IsClickable;
+                            var statusCss = statusKey == "COMPLETED" ? "status-COMPLETED" :
+                                            statusKey == "AVAILABLE"  ? "status-AVAILABLE"  : "status-LOCKED";
+
+                            if (clickable)
+                            {
+                                <a href="@child.TargetUrl" class="td-activity-item is-clickable">
+                                    <div class="td-activity-icon @iconClass">
+                                        <i class="fa-solid @nodeTypeIcon(child.NodeType)"></i>
+                                    </div>
+                                    <div class="td-activity-info">
+                                        <div class="td-activity-title">@child.Title</div>
+                                        <div class="td-activity-meta">
+                                            <span>@nodeTypeLabel(child.NodeType)</span>
+                                            @if (child.EstimatedMinutes.HasValue)
+                                            {
+                                                <span><i class="fa-regular fa-clock"></i> @child.EstimatedMinutes phút</span>
+                                            }
+                                            @if (child.ScheduledDate.HasValue)
+                                            {
+                                                <span><i class="fa-regular fa-calendar"></i> @child.ScheduledDate.Value.ToString("dd/MM/yyyy")</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <span class="td-activity-status @statusCss">@statusLabel(child.Status)</span>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="td-activity-item is-locked">
+                                    <div class="td-activity-icon @iconClass">
+                                        <i class="fa-solid fa-lock"></i>
+                                    </div>
+                                    <div class="td-activity-info">
+                                        <div class="td-activity-title">@child.Title</div>
+                                        <div class="td-activity-meta">
+                                            <span>@nodeTypeLabel(child.NodeType)</span>
+                                            @if (child.EstimatedMinutes.HasValue)
+                                            {
+                                                <span><i class="fa-regular fa-clock"></i> @child.EstimatedMinutes phút</span>
+                                            }
+                                        </div>
+                                    </div>
+                                    <span class="td-activity-status status-LOCKED">Đang khóa</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Objectives & info -->
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+
+            <!-- Learning Objectives -->
+            @if (Model.Objectives.Any())
+            {
+                <div class="td-panel">
+                    <div class="td-panel-header">
+                        <i class="fa-solid fa-bullseye"></i>
+                        <h2>Mục tiêu học tập</h2>
+                    </div>
+                    <div class="td-panel-body">
+                        <div class="td-objective-list">
+                            @foreach (var obj in Model.Objectives)
+                            {
+                                <div class="td-objective-item">
+                                    <span style="flex:1;">@obj.ObjectiveText</span>
+                                    <span class="td-cog-tag">@cogLabel(obj.CognitiveLevel)</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Progress summary -->
+            @{
+                var total = Model.ChildNodes.Count;
+                var done  = Model.ChildNodes.Count(n => n.Status?.ToUpperInvariant() == "COMPLETED");
+                var pct   = total > 0 ? (done * 100 / total) : 0;
+            }
+            @if (total > 0)
+            {
+                <div class="td-panel">
+                    <div class="td-panel-header">
+                        <i class="fa-solid fa-chart-simple"></i>
+                        <h2>Tiến độ chủ đề</h2>
+                    </div>
+                    <div class="td-panel-body">
+                        <div style="display:flex; justify-content:space-between; font-size:0.8rem; color:var(--rs-ink-muted); margin-bottom:8px;">
+                            <span>Hoàn thành @done / @total</span>
+                            <strong style="color:var(--rs-ink);">@pct%</strong>
+                        </div>
+                        <div style="height:8px; background:var(--rs-line); border-radius:10px; overflow:hidden;">
+                            <div style="height:100%; width:@pct%; background:linear-gradient(90deg,#6366f1,#8b5cf6); border-radius:10px; transition: width 0.6s ease;"></div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="td-nav">
+        <a asp-area="Student" asp-controller="LearningPath" asp-action="Index" class="td-nav-btn">
+            <i class="fa-solid fa-arrow-left"></i> Quay lại lộ trình
+        </a>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            @if (Model.PreviousNodeId.HasValue)
+            {
+                <a href="/Student/LearningPath/OpenNode/@Model.PreviousNodeId" class="td-nav-btn">
+                    <i class="fa-solid fa-chevron-left"></i> Node trước
+                </a>
+            }
+            @if (Model.NextNodeId.HasValue)
+            {
+                <a href="/Student/LearningPath/OpenNode/@Model.NextNodeId" class="td-nav-btn is-primary">
+                    Node tiếp <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+
+</div>
