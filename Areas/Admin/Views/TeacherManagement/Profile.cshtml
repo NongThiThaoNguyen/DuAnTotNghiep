@@ -2,27 +2,120 @@
 @{
     ViewData["Title"] = "Hồ sơ giáo viên";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var isActive = Model.Status == "ACTIVE";
 }
 
-<div class="space-y-6">
-    <a asp-action="Index" class="text-sm font-semibold text-blue-600">Quay lại</a>
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
-        <h1 class="text-2xl font-bold text-slate-900">@Model.FullName</h1>
-        <p class="text-sm text-slate-500">@Model.Email | @Model.Phone | @Model.Status</p>
-        <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 text-sm">
-            <div><dt class="font-semibold text-slate-500">Giới tính</dt><dd>@Model.Gender</dd></div>
-            <div><dt class="font-semibold text-slate-500">Quốc gia</dt><dd>@Model.Country</dd></div>
-            <div><dt class="font-semibold text-slate-500">Ngày sinh</dt><dd>@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa có")</dd></div>
-            <div><dt class="font-semibold text-slate-500">Bio</dt><dd>@Model.Bio</dd></div>
+<div class="space-y-6 max-w-5xl mx-auto">
+    <!-- Top Bar -->
+    <div class="flex items-center justify-between">
+        <a asp-action="Index" class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Quay lại danh sách giáo viên
+        </a>
+        <div class="flex items-center gap-3">
+            <a asp-action="Edit" asp-route-teacherId="@Model.TeacherId" class="inline-flex items-center px-3.5 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold text-sm rounded-xl transition-colors">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Chỉnh sửa
+            </a>
+            <a asp-action="Performance" asp-route-teacherId="@Model.TeacherId" class="inline-flex items-center px-3.5 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-sm rounded-xl transition-colors">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                Hồ sơ hiệu suất
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Profile Header Card -->
+    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-full bg-blue-100 text-blue-700 font-bold text-2xl flex items-center justify-center border-2 border-blue-200 uppercase">
+                    @Model.FullName.Substring(0, Math.Min(1, Model.FullName.Length))
+                </div>
+                <div>
+                    <div class="flex items-center gap-3">
+                        <h1 class="text-2xl font-bold text-slate-900">@Model.FullName</h1>
+                        @if (isActive)
+                        {
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-500"></span>Hoạt động
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">
+                                <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-rose-500"></span>Đã khóa
+                            </span>
+                        }
+                    </div>
+                    <p class="text-sm text-slate-500 mt-1">@Model.Email @(string.IsNullOrWhiteSpace(Model.Phone) ? "" : $" | {Model.Phone}")</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Topic phụ trách</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">@Model.AssignedTopicCount</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Quiz đã tạo</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">@Model.QuizCount</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Tài liệu đóng góp</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">@Model.ResourceCount</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Học viên tham gia</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1">@Model.StudentCount</div>
+            </div>
+        </div>
+
+        <!-- Detail Fields -->
+        <dl class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-6 border-t border-slate-100 text-sm">
+            <div>
+                <dt class="font-semibold text-slate-500 mb-1">Giới tính</dt>
+                <dd class="text-slate-900 font-medium">@(string.IsNullOrWhiteSpace(Model.Gender) ? "Chưa cập nhật" : Model.Gender)</dd>
+            </div>
+            <div>
+                <dt class="font-semibold text-slate-500 mb-1">Quốc gia</dt>
+                <dd class="text-slate-900 font-medium">@(string.IsNullOrWhiteSpace(Model.Country) ? "Chưa cập nhật" : Model.Country)</dd>
+            </div>
+            <div>
+                <dt class="font-semibold text-slate-500 mb-1">Ngày sinh</dt>
+                <dd class="text-slate-900 font-medium">@(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</dd>
+            </div>
+            <div>
+                <dt class="font-semibold text-slate-500 mb-1">Ngày tạo tài khoản</dt>
+                <dd class="text-slate-900 font-medium">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</dd>
+            </div>
+            <div class="md:col-span-2">
+                <dt class="font-semibold text-slate-500 mb-1">Tiểu sử / Mô tả chuyên môn</dt>
+                <dd class="text-slate-800 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    @(string.IsNullOrWhiteSpace(Model.Bio) ? "Chưa có tiểu sử giới thiệu." : Model.Bio)
+                </dd>
+            </div>
         </dl>
     </div>
-    <div class="bg-white border border-slate-200 rounded-xl p-6">
-        <h2 class="font-bold text-slate-900">Topic đang phụ trách</h2>
-        <div class="mt-3 flex flex-wrap gap-2">
-            @foreach (var topic in Model.AssignedTopics)
-            {
-                <span class="rounded-full bg-blue-50 text-blue-700 px-3 py-1 text-sm font-semibold">@topic</span>
-            }
-        </div>
+
+    <!-- Topic list card -->
+    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs">
+        <h2 class="font-bold text-slate-900 text-base mb-3">Topic đang phụ trách giảng dạy</h2>
+        @if (Model.AssignedTopics == null || !Model.AssignedTopics.Any())
+        {
+            <p class="text-sm text-slate-500">Giáo viên chưa được phân công phụ trách Topic nào.</p>
+        }
+        else
+        {
+            <div class="flex flex-wrap gap-2">
+                @foreach (var topic in Model.AssignedTopics)
+                {
+                    <span class="rounded-full bg-blue-50 text-blue-700 border border-blue-200/60 px-3 py-1 text-sm font-semibold">
+                        @topic
+                    </span>
+                }
+            </div>
+        }
     </div>
 </div>

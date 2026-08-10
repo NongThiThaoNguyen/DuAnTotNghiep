@@ -19,7 +19,7 @@ public class TeacherGradingService : ITeacherGradingService
         return await _context.PracticeSubmissions
             .AsNoTracking()
             .Include(s => s.Student)
-            .Include(s => s.PracticeTask)
+            .Include(s => s.PracticeTask).ThenInclude(pt => pt.Topic)
             .Where(s => s.Status == "SUBMITTED" &&
                 (s.PracticeTask.CreatedBy == teacherId || s.PracticeTask.Topic!.CreatedBy == teacherId))
             .OrderByDescending(s => s.SubmittedAt)
@@ -28,6 +28,7 @@ public class TeacherGradingService : ITeacherGradingService
                 Id = s.Id,
                 StudentName = s.Student.FullName,
                 TaskTitle = s.PracticeTask.Title,
+                TopicName = s.PracticeTask.Topic != null ? s.PracticeTask.Topic.Title : "",
                 SubmittedAt = s.SubmittedAt
             })
             .ToListAsync();
@@ -81,45 +82,104 @@ public class TeacherGradingService : ITeacherGradingService
             .ToListAsync();
 
         var rows = new List<GradeOverviewViewModel>();
-        foreach (var student in students)
+
+        if (topicId.HasValue)
         {
-            var quizScores = await _context.QuizAttempts
-                .AsNoTracking()
-                .Include(a => a.Quiz)
-                .Where(a => a.StudentId == student.Id && a.Score.HasValue && (!topicId.HasValue || a.Quiz.TopicId == topicId))
-                .Select(a => a.Score!.Value)
-                .ToListAsync();
+            var topicName = await _context.LearningTopics.AsNoTracking()
+                .Where(t => t.Id == topicId)
+                .Select(t => t.Title)
+                .FirstOrDefaultAsync() ?? string.Empty;
 
-            var practiceScores = await _context.PracticeSubmissions
-                .AsNoTracking()
-                .Include(s => s.PracticeTask)
-                .Where(s => s.StudentId == student.Id && s.Score.HasValue && (!topicId.HasValue || s.PracticeTask.TopicId == topicId))
-                .Select(s => s.Score!.Value)
-                .ToListAsync();
-
-            if (!quizScores.Any() && !practiceScores.Any())
+            foreach (var student in students)
             {
-                continue;
+                var quizScores = await _context.QuizAttempts
+                    .AsNoTracking()
+                    .Include(a => a.Quiz)
+                    .Where(a => a.StudentId == student.Id && a.Score.HasValue && a.Quiz.TopicId == topicId)
+                    .Select(a => a.Score!.Value)
+                    .ToListAsync();
+
+                var practiceScores = await _context.PracticeSubmissions
+                    .AsNoTracking()
+                    .Include(s => s.PracticeTask)
+                    .Where(s => s.StudentId == student.Id && s.Score.HasValue && s.PracticeTask.TopicId == topicId)
+                    .Select(s => s.Score!.Value)
+                    .ToListAsync();
+
+                if (!quizScores.Any() && !practiceScores.Any())
+                {
+                    continue;
+                }
+
+                var quizScore = quizScores.Any() ? quizScores.Average() : 0;
+                var practiceScore = practiceScores.Any() ? practiceScores.Average() : 0;
+                var total = quizScores.Any() && practiceScores.Any()
+                    ? (quizScore + practiceScore) / 2
+                    : quizScores.Any() ? quizScore : practiceScore;
+
+                rows.Add(new GradeOverviewViewModel
+                {
+                    StudentId = student.Id,
+                    StudentName = student.FullName,
+                    TopicName = topicName,
+                    QuizScore = quizScore,
+                    PracticeScore = practiceScore,
+                    TotalScore = total
+                });
             }
-
-            var topicName = topicId.HasValue
-                ? await _context.LearningTopics.AsNoTracking().Where(t => t.Id == topicId).Select(t => t.Title).FirstOrDefaultAsync() ?? string.Empty
-                : "Tat ca";
-            var quizScore = quizScores.Any() ? quizScores.Average() : 0;
-            var practiceScore = practiceScores.Any() ? practiceScores.Average() : 0;
-            var total = quizScores.Any() && practiceScores.Any()
-                ? (quizScore + practiceScore) / 2
-                : quizScores.Any() ? quizScore : practiceScore;
-
-            rows.Add(new GradeOverviewViewModel
+        }
+        else
+        {
+            foreach (var student in students)
             {
-                StudentId = student.Id,
-                StudentName = student.FullName,
-                TopicName = topicName,
-                QuizScore = quizScore,
-                PracticeScore = practiceScore,
-                TotalScore = total
-            });
+                var quizTopicMap = await _context.QuizAttempts
+                    .AsNoTracking()
+                    .Include(a => a.Quiz).ThenInclude(q => q.Topic)
+                    .Where(a => a.StudentId == student.Id && a.Score.HasValue)
+                    .GroupBy(a => new { TopicId = a.Quiz.TopicId, TopicTitle = a.Quiz.Topic != null ? a.Quiz.Topic.Title : "Khóa học" })
+                    .Select(g => new { g.Key.TopicId, g.Key.TopicTitle, Scores = g.Select(x => x.Score!.Value).ToList() })
+                    .ToListAsync();
+
+                var practiceTopicMap = await _context.PracticeSubmissions
+                    .AsNoTracking()
+                    .Include(s => s.PracticeTask).ThenInclude(pt => pt.Topic)
+                    .Where(s => s.StudentId == student.Id && s.Score.HasValue)
+                    .GroupBy(s => new { TopicId = s.PracticeTask.TopicId, TopicTitle = s.PracticeTask.Topic != null ? s.PracticeTask.Topic.Title : "Khóa học" })
+                    .Select(g => new { g.Key.TopicId, g.Key.TopicTitle, Scores = g.Select(x => x.Score!.Value).ToList() })
+                    .ToListAsync();
+
+                var topicKeys = quizTopicMap.Select(q => new { q.TopicId, q.TopicTitle })
+                    .Union(practiceTopicMap.Select(p => new { p.TopicId, p.TopicTitle }))
+                    .Distinct()
+                    .ToList();
+
+                if (!topicKeys.Any())
+                {
+                    continue;
+                }
+
+                foreach (var tk in topicKeys)
+                {
+                    var quizScores = quizTopicMap.FirstOrDefault(q => q.TopicId == tk.TopicId)?.Scores ?? new List<decimal>();
+                    var practiceScores = practiceTopicMap.FirstOrDefault(p => p.TopicId == tk.TopicId)?.Scores ?? new List<decimal>();
+
+                    var quizScore = quizScores.Any() ? quizScores.Average() : 0;
+                    var practiceScore = practiceScores.Any() ? practiceScores.Average() : 0;
+                    var total = quizScores.Any() && practiceScores.Any()
+                        ? (quizScore + practiceScore) / 2
+                        : quizScores.Any() ? quizScore : practiceScore;
+
+                    rows.Add(new GradeOverviewViewModel
+                    {
+                        StudentId = student.Id,
+                        StudentName = student.FullName,
+                        TopicName = string.IsNullOrWhiteSpace(tk.TopicTitle) ? "Khóa học" : tk.TopicTitle,
+                        QuizScore = quizScore,
+                        PracticeScore = practiceScore,
+                        TotalScore = total
+                    });
+                }
+            }
         }
 
         return rows;

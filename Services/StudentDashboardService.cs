@@ -100,7 +100,8 @@ namespace DuAnTotNghiep.Services
                 .Select(l => l.Score!.Value)
                 .ToList();
 
-            decimal averageQuizScore = quizScores.Any() ? quizScores.Average() : 0;
+            bool hasQuizAttempts = quizScores.Any();
+            decimal averageQuizScore = hasQuizAttempts ? quizScores.Average() : 0;
             averageQuizScore = Math.Round(averageQuizScore, 2);
 
             // Calculate Study Minutes This Week (Monday to Sunday)
@@ -146,6 +147,128 @@ namespace DuAnTotNghiep.Services
                 })
                 .ToList();
 
+            // 6. Fetch Enrolled Courses
+            var enrolledCourses = new List<EnrolledCourseViewModel>();
+            if (path != null && path.LearningPathNodes != null)
+            {
+                var topicIds = path.LearningPathNodes
+                    .Where(n => n.TopicId.HasValue)
+                    .Select(n => n.TopicId!.Value)
+                    .Distinct()
+                    .ToList();
+
+                if (topicIds.Any())
+                {
+                    var topics = await _context.LearningTopics
+                        .Include(t => t.Skill)
+                        .Include(t => t.OriginalLessons)
+                        .Where(t => topicIds.Contains(t.Id))
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    foreach (var t in topics)
+                    {
+                        var topicNodes = path.LearningPathNodes.Where(n => n.TopicId == t.Id).ToList();
+                        int totalNodes = topicNodes.Count > 0 ? topicNodes.Count : t.OriginalLessons.Count;
+                        int completedNodesCount = topicNodes.Count(n => n.Status == ProgressStatus.Completed);
+                        double topicProgress = totalNodes > 0 ? Math.Round((double)completedNodesCount / totalNodes * 100, 1) : 0;
+
+                        enrolledCourses.Add(new EnrolledCourseViewModel
+                        {
+                            Id = t.Id,
+                            Title = t.Title,
+                            SkillName = t.Skill?.SkillName ?? "Tổng quát",
+                            LessonCount = t.OriginalLessons.Count > 0 ? t.OriginalLessons.Count : totalNodes,
+                            ProgressPercent = topicProgress,
+                            TargetUrl = $"/Courses/Detail/{t.Id}"
+                        });
+                    }
+                }
+            }
+
+            if (!enrolledCourses.Any())
+            {
+                var studiedTopicIds = logs
+                    .Where(l => l.TopicId.HasValue)
+                    .Select(l => l.TopicId!.Value)
+                    .Distinct()
+                    .Take(4)
+                    .ToList();
+
+                if (studiedTopicIds.Any())
+                {
+                    var topics = await _context.LearningTopics
+                        .Include(t => t.Skill)
+                        .Include(t => t.OriginalLessons)
+                        .Where(t => studiedTopicIds.Contains(t.Id))
+                        .AsNoTracking()
+                        .ToListAsync();
+
+                    foreach (var t in topics)
+                    {
+                        enrolledCourses.Add(new EnrolledCourseViewModel
+                        {
+                            Id = t.Id,
+                            Title = t.Title,
+                            SkillName = t.Skill?.SkillName ?? "Tổng quát",
+                            LessonCount = t.OriginalLessons.Count,
+                            ProgressPercent = 0,
+                            TargetUrl = $"/Courses/Detail/{t.Id}"
+                        });
+                    }
+                }
+            }
+
+            // 7. Fetch Todo Items
+            var todoItems = new List<StudentTodoItemViewModel>();
+            if (path != null && path.LearningPathNodes != null)
+            {
+                var pendingNodes = path.LearningPathNodes
+                    .Where(n => n.Status != ProgressStatus.Completed)
+                    .OrderBy(n => n.Status == ProgressStatus.InProgress ? 0 : 1)
+                    .ThenBy(n => n.OrderIndex)
+                    .Take(5)
+                    .ToList();
+
+                foreach (var node in pendingNodes)
+                {
+                    todoItems.Add(new StudentTodoItemViewModel
+                    {
+                        Id = node.Id,
+                        Title = node.NodeTitle,
+                        Type = node.NodeType,
+                        DueDate = node.ScheduledDate.HasValue ? node.ScheduledDate.Value.ToDateTime(TimeOnly.MinValue) : null,
+                        IsOverdue = node.ScheduledDate.HasValue && node.ScheduledDate.Value < DateOnly.FromDateTime(DateTime.Now),
+                        TargetUrl = await _pathViewService.BuildNodeTargetUrlAsync(node)
+                    });
+                }
+            }
+
+            // 8. Fetch Upcoming Schedule
+            UpcomingScheduleViewModel? upcomingSchedule = null;
+            var now = DateTime.Now;
+            var nextSchedule = await _context.Schedules
+                .Include(s => s.Teacher)
+                .Include(s => s.Topic)
+                .Where(s => s.StartTime >= now || s.EndTime >= now)
+                .OrderBy(s => s.StartTime)
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (nextSchedule != null)
+            {
+                upcomingSchedule = new UpcomingScheduleViewModel
+                {
+                    Id = nextSchedule.Id,
+                    Title = nextSchedule.Title,
+                    StartTime = nextSchedule.StartTime,
+                    EndTime = nextSchedule.EndTime,
+                    Classroom = nextSchedule.Classroom,
+                    TeacherName = nextSchedule.Teacher?.FullName ?? "Giảng viên",
+                    TopicTitle = nextSchedule.Topic?.Title
+                };
+            }
+
             return new StudentDashboardViewModel
             {
                 StudentName = studentName,
@@ -156,6 +279,7 @@ namespace DuAnTotNghiep.Services
                 RankTier = rankTier,
                 CompletedLessons = completedLessons,
                 CompletedQuizzes = completedQuizzes,
+                HasQuizAttempts = hasQuizAttempts,
                 AverageQuizScore = averageQuizScore,
                 ProgressPercent = progressPercent,
                 StudyMinutesThisWeek = studyMinutesThisWeek,
@@ -163,7 +287,10 @@ namespace DuAnTotNghiep.Services
                 TargetLevel = targetLevel,
                 RecentActivities = recentActivities,
                 NextTask = nextTask,
-                AiRecommendation = aiRecommendation
+                AiRecommendation = aiRecommendation,
+                EnrolledCourses = enrolledCourses,
+                TodoItems = todoItems,
+                UpcomingSchedule = upcomingSchedule
             };
         }
 

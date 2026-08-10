@@ -22,11 +22,22 @@ public class UserProfileService : IUserProfileService
 
     public async Task<ProfileViewModel> GetProfileAsync(int userId)
     {
-        var user = await _context.Users
-            .AsNoTracking()
-            .Include(u => u.UserProfile)
-            .Include(u => u.UserSetting)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        User? user = null;
+        try
+        {
+            user = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.UserProfile)
+                .Include(u => u.UserSetting)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+        catch (Microsoft.Data.SqlClient.SqlException)
+        {
+            user = await _context.Users
+                .AsNoTracking()
+                .Include(u => u.UserProfile)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
 
         if (user == null)
             throw new NotFoundException("Người dùng không tồn tại.");
@@ -98,29 +109,36 @@ public class UserProfileService : IUserProfileService
 
     public async Task<AccountSettingViewModel> GetAccountSettingsAsync(int userId)
     {
-        var setting = await _context.UserSettings
-            .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.UserId == userId);
-
-        if (setting == null)
+        try
         {
-            return new AccountSettingViewModel
+            var setting = await _context.UserSettings
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.UserId == userId);
+
+            if (setting != null)
             {
-                Language = "vi-VN",
-                Timezone = "Asia/Ho_Chi_Minh",
-                EmailNotifications = true,
-                StudyReminderEnabled = true,
-                Theme = "light"
-            };
+                return new AccountSettingViewModel
+                {
+                    Language = setting.Language,
+                    Timezone = setting.Timezone,
+                    EmailNotifications = setting.EmailNotifications,
+                    StudyReminderEnabled = setting.StudyReminderEnabled,
+                    Theme = setting.Theme
+                };
+            }
+        }
+        catch (Microsoft.Data.SqlClient.SqlException)
+        {
+            // Table user_settings missing fallback
         }
 
         return new AccountSettingViewModel
         {
-            Language = setting.Language,
-            Timezone = setting.Timezone,
-            EmailNotifications = setting.EmailNotifications,
-            StudyReminderEnabled = setting.StudyReminderEnabled,
-            Theme = setting.Theme
+            Language = "vi-VN",
+            Timezone = "Asia/Ho_Chi_Minh",
+            EmailNotifications = true,
+            StudyReminderEnabled = true,
+            Theme = "light"
         };
     }
 
@@ -251,11 +269,22 @@ public class UserProfileService : IUserProfileService
 
     public async Task<AdminUserProfileViewModel> GetAdminUserProfileAsync(int userId)
     {
-        var user = await _context.Users
-            .Include(u => u.Role)
-            .Include(u => u.UserProfile)
-            .Include(u => u.UserSetting)
-            .FirstOrDefaultAsync(u => u.Id == userId);
+        User? user = null;
+        try
+        {
+            user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.UserProfile)
+                .Include(u => u.UserSetting)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
+        catch (Microsoft.Data.SqlClient.SqlException)
+        {
+            user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.UserProfile)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+        }
 
         if (user == null)
             throw new NotFoundException("Người dùng không tồn tại.");

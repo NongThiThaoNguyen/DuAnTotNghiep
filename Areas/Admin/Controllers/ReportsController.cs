@@ -15,9 +15,9 @@ public class ReportsController : Controller
         _reportService = reportService;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? period, DateTime? fromDate, DateTime? toDate)
     {
-        return View(await _reportService.GetOverviewAsync());
+        return View(await _reportService.GetOverviewAsync(period, fromDate, toDate));
     }
 
     public async Task<IActionResult> StudentProgress()

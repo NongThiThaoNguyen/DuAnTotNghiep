@@ -5,6 +5,7 @@ public class PendingSubmissionViewModel
     public int Id { get; set; }
     public string StudentName { get; set; } = string.Empty;
     public string TaskTitle { get; set; } = string.Empty;
+    public string TopicName { get; set; } = string.Empty;
     public DateTime SubmittedAt { get; set; }
 }
 

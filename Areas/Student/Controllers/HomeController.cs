@@ -19,15 +19,18 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
     {
         private readonly ILearningProfileService _profileService;
         private readonly IStudentProgressService _progressService;
+        private readonly IStudentDashboardService _dashboardService;
         private readonly ApplicationDbContext _context;
 
         public HomeController(
             ILearningProfileService profileService,
             IStudentProgressService progressService,
+            IStudentDashboardService dashboardService,
             ApplicationDbContext context)
         {
             _profileService = profileService;
             _progressService = progressService;
+            _dashboardService = dashboardService;
             _context = context;
         }
 
@@ -122,6 +125,10 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             var progressDashboard = await _progressService.GetDashboardAsync(userId);
             ViewBag.ProgressDashboard = progressDashboard;
 
+            var studentDashboardVm = await _dashboardService.GetDashboardAsync(userId);
+            ViewBag.StudentDashboardViewModel = studentDashboardVm;
+            ViewBag.HasQuizAttempts = studentDashboardVm.HasQuizAttempts;
+
             var quizScores = await _context.QuizAttempts
                 .Where(a => a.StudentId == userId && a.SubmittedAt.HasValue && a.Score.HasValue)
                 .Select(a => a.Score!.Value)
@@ -170,7 +177,7 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                     Type = "PLACEMENT_TEST",
                     Title = "Làm bài thi Placement Test",
                     Time = att.SubmittedAt ?? att.StartedAt,
-                    Detail = $"Điểm số: {att.TotalScore}đ - Trình độ: {att.EstimatedLevel?.Name ?? "Chưa rõ"} - Trạng thái: {att.Status}"
+                    Detail = $"Điểm số: {att.TotalScore}đ - Trình độ: {att.EstimatedLevel?.Name ?? "Chưa xác định"} - Trạng thái: {att.Status}"
                 });
             }
 

@@ -1,6 +1,7 @@
 @model List<DuAnTotNghiep.Models.ViewModels.Teacher.GradeOverviewViewModel>
 @{
     ViewData["Title"] = "Sổ điểm học viên";
+    var courseOptions = ViewBag.CourseOptions as List<string> ?? new List<string>();
 }
 
 <div class="teacher-page-header">
@@ -15,10 +16,39 @@
     </a>
 </div>
 
+<!-- Toolbar bộ lọc và xuất Excel -->
+<div class="teacher-toolbar mb-4">
+    <div class="teacher-toolbar-field is-wide">
+        <label for="studentSearchInput">Tìm kiếm học viên</label>
+        <div class="input-group">
+            <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+            <input type="text" id="studentSearchInput" class="form-control" placeholder="Nhập tên học viên..." />
+        </div>
+    </div>
+
+    <div class="teacher-toolbar-field">
+        <label for="courseFilterSelect">Khóa học</label>
+        <select id="courseFilterSelect" class="form-select">
+            <option value="">-- Tất cả khóa học --</option>
+            @foreach (var course in courseOptions)
+            {
+                <option value="@course">@course</option>
+            }
+        </select>
+    </div>
+
+    <div class="teacher-action-group align-self-end">
+        <button type="button" id="exportExcelBtn" class="btn btn-outline-success">
+            <i class="fa-solid fa-file-excel me-1"></i> 📥 Xuất Excel
+        </button>
+    </div>
+</div>
+
 <div class="teacher-table-wrap">
-    <table class="table align-middle mb-0">
+    <table class="table align-middle mb-0" id="gradesTable">
         <thead>
             <tr>
+                <th class="text-center" style="width: 70px;">STT</th>
                 <th>Học viên</th>
                 <th>Khóa học</th>
                 <th class="text-center">Điểm Quiz</th>
@@ -29,20 +59,103 @@
         <tbody>
             @if (!Model.Any())
             {
-                <tr>
-                    <td colspan="5" class="teacher-empty-row">Chưa có dữ liệu điểm.</td>
+                <tr id="emptyModelRow">
+                    <td colspan="6" class="teacher-empty-row">Chưa có dữ liệu điểm.</td>
                 </tr>
             }
-            @foreach (var row in Model)
+            else
             {
-                <tr>
-                    <td><strong>@row.StudentName</strong></td>
-                    <td>@row.TopicName</td>
-                    <td class="text-center teacher-number">@row.QuizScore.ToString("0.0")</td>
-                    <td class="text-center teacher-number">@row.PracticeScore.ToString("0.0")</td>
-                    <td class="text-end teacher-number"><strong>@row.TotalScore.ToString("0.0")</strong></td>
-                </tr>
+                int index = 1;
+                @foreach (var row in Model)
+                {
+                    <tr class="grade-row" data-student="@row.StudentName.ToLower()" data-course="@row.TopicName.ToLower()">
+                        <td class="text-center stt-cell">@index</td>
+                        <td><strong>@row.StudentName</strong></td>
+                        <td>@row.TopicName</td>
+                        <td class="text-center teacher-number">@row.QuizScore.ToString("0.0")</td>
+                        <td class="text-center teacher-number">@row.PracticeScore.ToString("0.0")</td>
+                        <td class="text-end teacher-number"><strong>@row.TotalScore.ToString("0.0")</strong></td>
+                    </tr>
+                    index++;
+                }
             }
+            <tr id="noDataRow" style="display: none;">
+                <td colspan="6" class="teacher-empty-row">Không tìm thấy học viên hoặc khóa học phù hợp.</td>
+            </tr>
         </tbody>
     </table>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('studentSearchInput');
+            const courseSelect = document.getElementById('courseFilterSelect');
+            const exportBtn = document.getElementById('exportExcelBtn');
+            const rows = document.querySelectorAll('.grade-row');
+            const noDataRow = document.getElementById('noDataRow');
+
+            function filterTable() {
+                const searchText = searchInput ? searchInput.value.trim().toLowerCase() : '';
+                const selectedCourse = courseSelect ? courseSelect.value.trim().toLowerCase() : '';
+                let visibleCount = 0;
+
+                rows.forEach(function (row) {
+                    const studentName = row.getAttribute('data-student') || '';
+                    const courseName = row.getAttribute('data-course') || '';
+
+                    const matchesStudent = !searchText || studentName.includes(searchText);
+                    const matchesCourse = !selectedCourse || courseName === selectedCourse || courseName.includes(selectedCourse);
+
+                    if (matchesStudent && matchesCourse) {
+                        row.style.display = '';
+                        visibleCount++;
+                        const sttCell = row.querySelector('.stt-cell');
+                        if (sttCell) {
+                            sttCell.textContent = visibleCount;
+                        }
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+
+                if (noDataRow) {
+                    if (rows.length > 0 && visibleCount === 0) {
+                        noDataRow.style.display = '';
+                    } else {
+                        noDataRow.style.display = 'none';
+                    }
+                }
+            }
+
+            if (searchInput) {
+                searchInput.addEventListener('input', filterTable);
+            }
+            if (courseSelect) {
+                courseSelect.addEventListener('change', filterTable);
+            }
+
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function () {
+                    let visibleRowsCount = 0;
+                    rows.forEach(function (row) {
+                        if (row.style.display !== 'none') {
+                            visibleRowsCount++;
+                        }
+                    });
+
+                    if (rows.length === 0 || visibleRowsCount === 0) {
+                        alert('Không có dữ liệu để xuất');
+                        return;
+                    }
+
+                    const searchVal = encodeURIComponent(searchInput ? searchInput.value.trim() : '');
+                    const courseVal = encodeURIComponent(courseSelect ? courseSelect.value.trim() : '');
+
+                    const exportUrl = `@Url.Action("ExportExcel", "Grades", new { area = "Teacher" })?searchName=${searchVal}&courseName=${courseVal}`;
+                    window.location.href = exportUrl;
+                });
+            }
+        });
+    </script>
+}

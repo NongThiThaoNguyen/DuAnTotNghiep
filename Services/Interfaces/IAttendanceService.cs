@@ -12,5 +12,9 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task SaveAttendanceAsync(int topicId, DateOnly date, List<StudentAttendanceViewModel> attendances);
         Task<List<Attendance>> GetAttendanceHistoryAsync(int? topicId, DateOnly? startDate, DateOnly? endDate);
         Task<List<LearningTopic>> GetActiveTopicsAsync();
+        Task<byte[]> ExportAttendanceToExcelAsync(int? topicId, DateOnly? date, DateOnly? startDate, DateOnly? endDate);
+        Task<byte[]> GenerateAttendanceExcelTemplateAsync(int topicId, DateOnly date);
+        Task<(int SuccessCount, List<string> Errors)> ImportAttendanceFromExcelAsync(int topicId, DateOnly date, System.IO.Stream fileStream);
+        Task<bool> UpdateAttendanceRecordAsync(int id, string status, string? remarks);
     }
 }

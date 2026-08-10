@@ -1,0 +1,133 @@
+@model AssignmentDetailsAdminViewModel
+@{
+    ViewData["Title"] = "Chi tiết bài tập - " + Model.Title;
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var isOpen = Model.Status == "ACTIVE" || Model.Status == "PUBLISHED";
+}
+
+<div class="space-y-6 max-w-5xl mx-auto">
+    <!-- Top Nav -->
+    <div class="flex items-center justify-between">
+        <a asp-action="Index" class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Quay lại danh sách bài tập
+        </a>
+        <div class="flex items-center gap-3">
+            <a asp-action="Edit" asp-route-assignmentId="@Model.AssignmentId" class="inline-flex items-center px-3.5 py-2 bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold text-sm rounded-xl transition-colors">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                Chỉnh sửa
+            </a>
+            <form asp-action="ToggleStatus" asp-route-assignmentId="@Model.AssignmentId" method="post" class="inline-block" onsubmit="return confirm('@(isOpen ? "Đóng bài tập này?" : "Mở lại bài tập này?")');">
+                @Html.AntiForgeryToken()
+                @if (isOpen)
+                {
+                    <button type="submit" class="px-3.5 py-2 bg-slate-100 text-slate-700 hover:bg-slate-200 font-semibold text-sm rounded-xl transition-colors">
+                        Đóng bài tập
+                    </button>
+                }
+                else
+                {
+                    <button type="submit" class="px-3.5 py-2 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-semibold text-sm rounded-xl transition-colors">
+                        Mở lại bài tập
+                    </button>
+                }
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Header Card -->
+    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100">
+            <div>
+                <div class="flex items-center gap-3">
+                    <h1 class="text-2xl font-bold text-slate-900">@Model.Title</h1>
+                    @if (isOpen)
+                    {
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">Hoạt động</span>
+                    }
+                    else
+                    {
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-100 text-rose-800">@Model.Status</span>
+                    }
+                </div>
+                <p class="text-sm text-slate-500 mt-1">Topic: <strong class="text-slate-700">@Model.TopicTitle</strong> | Khởi tạo bởi: <strong class="text-slate-700">@Model.TeacherName</strong></p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-blue-50 text-blue-700 text-xs font-semibold rounded-lg border border-blue-100">
+                    @Model.TaskType
+                </span>
+                <span class="px-3 py-1 bg-purple-50 text-purple-700 text-xs font-semibold rounded-lg border border-purple-100">
+                    @Model.DifficultyLevel
+                </span>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Tỷ lệ bài nộp (Submissions)</div>
+                <div class="text-xl font-bold text-blue-700 mt-1">@Model.SubmissionDisplayRatio</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Số lượt bài đã nộp</div>
+                <div class="text-xl font-bold text-slate-900 mt-1">@Model.SubmissionCount lượt</div>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4 border border-slate-100">
+                <div class="text-xs font-medium text-slate-500 uppercase tracking-wider">Ngày khởi tạo</div>
+                <div class="text-xl font-bold text-slate-900 mt-1">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+        </div>
+
+        <!-- Instruction / Prompt content -->
+        <div>
+            <h2 class="font-bold text-slate-900 text-base mb-2">Nội dung / Yêu cầu bài tập (Instruction)</h2>
+            <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-slate-800 text-sm leading-relaxed whitespace-pre-wrap">
+                @(string.IsNullOrWhiteSpace(Model.Instruction) ? "Chưa có hướng dẫn cho bài tập này." : Model.Instruction)
+            </div>
+        </div>
+    </div>
+
+    <!-- Submissions Table Card -->
+    <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
+        <h2 class="font-bold text-slate-900 text-lg">Danh sách bài học viên đã nộp (@Model.Submissions.Count)</h2>
+
+        @if (Model.Submissions == null || !Model.Submissions.Any())
+        {
+            <div class="p-8 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-100">
+                Chưa có học viên nào nộp bài tập này.
+            </div>
+        }
+        else
+        {
+            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <table class="min-w-full divide-y divide-slate-200 text-sm">
+                    <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500 tracking-wider">
+                        <tr>
+                            <th class="px-4 py-3">Học viên</th>
+                            <th class="px-4 py-3">Trạng thái chấm</th>
+                            <th class="px-4 py-3">Điểm số</th>
+                            <th class="px-4 py-3">Thời gian nộp</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 bg-white">
+                        @foreach (var sub in Model.Submissions)
+                        {
+                            <tr>
+                                <td class="px-4 py-3 font-semibold text-slate-900">@sub.StudentName</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700">
+                                        @sub.Status
+                                    </span>
+                                </td>
+                                <td class="px-4 py-3 font-bold text-slate-900">
+                                    @(sub.Score.HasValue ? sub.Score.Value.ToString("0.##") : "Chưa chấm")
+                                </td>
+                                <td class="px-4 py-3 text-slate-500">@sub.SubmittedAt.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>

@@ -141,6 +141,7 @@ public class TeacherListItemViewModel
     public int TeacherId { get; set; }
     public string FullName { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string Phone { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public int AssignedTopicCount { get; set; }
     public int ResourceCount { get; set; }
@@ -150,7 +151,34 @@ public class TeacherListItemViewModel
 
 public class TeacherManagementIndexViewModel
 {
+    public string? Keyword { get; set; }
+    public string? Status { get; set; }
     public List<TeacherListItemViewModel> Items { get; set; } = new();
+}
+
+public class CreateTeacherAdminViewModel
+{
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public string? Gender { get; set; }
+    public string? Country { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string? Bio { get; set; }
+}
+
+public class EditTeacherAdminViewModel
+{
+    public int TeacherId { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public string Status { get; set; } = "ACTIVE";
+    public string? Gender { get; set; }
+    public string? Country { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
+    public string? Bio { get; set; }
 }
 
 public class TeacherProfileAdminViewModel
@@ -164,6 +192,13 @@ public class TeacherProfileAdminViewModel
     public string? Gender { get; set; }
     public string? Country { get; set; }
     public DateOnly? DateOfBirth { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? LastLoginAt { get; set; }
+    public int AssignedTopicCount { get; set; }
+    public int QuizCount { get; set; }
+    public int ResourceCount { get; set; }
+    public int StudentCount { get; set; }
+    public int AssignmentCount { get; set; }
     public List<string> AssignedTopics { get; set; } = new();
 }
 
@@ -251,18 +286,55 @@ public class AssignmentManagementRowViewModel
 {
     public int AssignmentId { get; set; }
     public string Title { get; set; } = string.Empty;
+    public string TaskType { get; set; } = string.Empty;
+    public string DifficultyLevel { get; set; } = string.Empty;
     public string TopicTitle { get; set; } = string.Empty;
     public string TeacherName { get; set; } = "Không rõ";
     public string Status { get; set; } = string.Empty;
     public int SubmissionCount { get; set; }
+    public int TotalStudentCount { get; set; }
+    public string SubmissionDisplayRatio => $"{SubmissionCount} bài nộp / {TotalStudentCount} học viên";
     public DateTime CreatedAt { get; set; }
 }
 
 public class AssignmentManagementIndexViewModel : AdminPagedViewModel
 {
+    public string? Keyword { get; set; }
     public int? TopicId { get; set; }
+    public int? TeacherId { get; set; }
+    public string? Status { get; set; }
     public List<AdminOptionViewModel> Topics { get; set; } = new();
+    public List<AdminOptionViewModel> Teachers { get; set; } = new();
     public List<AssignmentManagementRowViewModel> Items { get; set; } = new();
+}
+
+public class EditAssignmentAdminViewModel
+{
+    public int AssignmentId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Instruction { get; set; } = string.Empty;
+    public string TaskType { get; set; } = string.Empty;
+    public string DifficultyLevel { get; set; } = "MEDIUM";
+    public int? TopicId { get; set; }
+    public string Status { get; set; } = "ACTIVE";
+    public List<AdminOptionViewModel> Topics { get; set; } = new();
+}
+
+public class AssignmentDetailsAdminViewModel
+{
+    public int AssignmentId { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Instruction { get; set; } = string.Empty;
+    public string TaskType { get; set; } = string.Empty;
+    public string DifficultyLevel { get; set; } = string.Empty;
+    public string TopicTitle { get; set; } = string.Empty;
+    public string TeacherName { get; set; } = "Không rõ";
+    public string Status { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+    public int SubmissionCount { get; set; }
+    public int TotalStudentCount { get; set; }
+    public string SubmissionDisplayRatio => $"{SubmissionCount} bài nộp / {TotalStudentCount} học viên";
+    public List<StudentAssignmentRowViewModel> Submissions { get; set; } = new();
 }
 
 public class AssignmentSubmissionsAdminViewModel
@@ -338,6 +410,54 @@ public class AdminReportsIndexViewModel
     public int TeacherCount { get; set; }
     public int AttendanceCount { get; set; }
     public int QuizAttemptCount { get; set; }
+
+    // Time filter
+    public string? Period { get; set; }
+    public DateTime? FromDate { get; set; }
+    public DateTime? ToDate { get; set; }
+
+    // Chart data: quiz attempts per day
+    public List<ChartDataPoint> QuizAttemptsOverTime { get; set; } = new();
+    // Chart data: attendance per day
+    public List<ChartDataPoint> AttendanceOverTime { get; set; } = new();
+    // Chart data: new students per day
+    public List<ChartDataPoint> NewStudentsOverTime { get; set; } = new();
+
+    // Course completion
+    public int TotalLearningPaths { get; set; }
+    public int CompletedLearningPaths { get; set; }
+    public decimal CourseCompletionRate { get; set; }
+
+    // Top 5 students by average quiz score
+    public List<TopStudentRowViewModel> TopStudents { get; set; } = new();
+
+    // Teacher performance summary
+    public List<TeacherPerformanceSummaryRow> TeacherPerformances { get; set; } = new();
+}
+
+public class ChartDataPoint
+{
+    public string Label { get; set; } = string.Empty;
+    public int Value { get; set; }
+}
+
+public class TopStudentRowViewModel
+{
+    public int StudentId { get; set; }
+    public string StudentName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public int AttemptCount { get; set; }
+    public decimal AverageScore { get; set; }
+}
+
+public class TeacherPerformanceSummaryRow
+{
+    public int TeacherId { get; set; }
+    public string TeacherName { get; set; } = string.Empty;
+    public int TopicCount { get; set; }
+    public int QuizCount { get; set; }
+    public int AssignmentCount { get; set; }
+    public int GradedSubmissionCount { get; set; }
 }
 
 public class ChatStatsViewModel

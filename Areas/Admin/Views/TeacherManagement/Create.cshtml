@@ -1,0 +1,91 @@
+@model CreateTeacherAdminViewModel
+@{
+    ViewData["Title"] = "Thêm giáo viên mới";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="space-y-6 max-w-4xl mx-auto">
+    <div class="flex items-center justify-between">
+        <div>
+            <a asp-action="Index" class="inline-flex items-center text-sm font-semibold text-blue-600 hover:text-blue-700 mb-2">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Quay lại danh sách
+            </a>
+            <h1 class="text-2xl font-bold text-slate-900">Thêm giáo viên mới</h1>
+        </div>
+    </div>
+
+    <form asp-action="Create" method="post" class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-6">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-xs text-rose-600 font-medium"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Full Name -->
+            <div>
+                <label asp-for="FullName" class="block text-sm font-semibold text-slate-700 mb-2">Họ và tên <span class="text-rose-500">*</span></label>
+                <input asp-for="FullName" required placeholder="Nhập họ và tên giáo viên" class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+                <span asp-validation-for="FullName" class="text-xs text-rose-600 mt-1 block"></span>
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label asp-for="Email" class="block text-sm font-semibold text-slate-700 mb-2">Địa chỉ Email <span class="text-rose-500">*</span></label>
+                <input asp-for="Email" type="email" required placeholder="example@domain.com" class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+                <span asp-validation-for="Email" class="text-xs text-rose-600 mt-1 block"></span>
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label asp-for="Password" class="block text-sm font-semibold text-slate-700 mb-2">Mật khẩu ban đầu <span class="text-rose-500">*</span></label>
+                <input asp-for="Password" type="password" required minlength="6" placeholder="Tối thiểu 6 ký tự" class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+                <span asp-validation-for="Password" class="text-xs text-rose-600 mt-1 block"></span>
+            </div>
+
+            <!-- Phone -->
+            <div>
+                <label asp-for="Phone" class="block text-sm font-semibold text-slate-700 mb-2">Số điện thoại</label>
+                <input asp-for="Phone" placeholder="0901234567" class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+                <span asp-validation-for="Phone" class="text-xs text-rose-600 mt-1 block"></span>
+            </div>
+
+            <!-- Gender -->
+            <div>
+                <label asp-for="Gender" class="block text-sm font-semibold text-slate-700 mb-2">Giới tính</label>
+                <select asp-for="Gender" class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
+                    <option value="">Chưa chọn</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Khác">Khác</option>
+                </select>
+            </div>
+
+            <!-- Country -->
+            <div>
+                <label asp-for="Country" class="block text-sm font-semibold text-slate-700 mb-2">Quốc gia</label>
+                <input asp-for="Country" placeholder="Việt Nam" class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+            </div>
+
+            <!-- Date of birth -->
+            <div>
+                <label asp-for="DateOfBirth" class="block text-sm font-semibold text-slate-700 mb-2">Ngày sinh</label>
+                <input asp-for="DateOfBirth" type="date" class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
+            </div>
+        </div>
+
+        <!-- Bio -->
+        <div>
+            <label asp-for="Bio" class="block text-sm font-semibold text-slate-700 mb-2">Tiểu sử / Giới thiệu bản thân</label>
+            <textarea asp-for="Bio" rows="3" placeholder="Nhập kinh nghiệm, bằng cấp, tiểu sử chuyên môn..." class="block w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"></textarea>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <a asp-action="Index" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition-colors">
+                Hủy bỏ
+            </a>
+            <button type="submit" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl transition-colors shadow-xs">
+                Tạo giáo viên
+            </button>
+        </div>
+    </form>
+</div>

@@ -69,6 +69,22 @@ BEGIN
         CONSTRAINT [FK_topic_prerequisites_prerequisite] FOREIGN KEY ([prerequisite_topic_id]) REFERENCES [dbo].[learning_topics] ([id])
     );
     CREATE UNIQUE NONCLUSTERED INDEX [UQ_topic_prerequisite] ON [dbo].[topic_prerequisites] ([topic_id] ASC, [prerequisite_topic_id] ASC);
+END
+
+IF NOT EXISTS (SELECT * FROM sys.tables WHERE name = 'user_settings')
+BEGIN
+    CREATE TABLE [dbo].[user_settings] (
+        [Id] INT IDENTITY(1,1) NOT NULL,
+        [UserId] INT NOT NULL,
+        [language] NVARCHAR(50) NOT NULL DEFAULT ('vi-VN'),
+        [timezone] NVARCHAR(50) NOT NULL DEFAULT ('Asia/Ho_Chi_Minh'),
+        [email_notifications] BIT NOT NULL DEFAULT (1),
+        [study_reminder_enabled] BIT NOT NULL DEFAULT (1),
+        [theme] NVARCHAR(20) NOT NULL DEFAULT ('light'),
+        CONSTRAINT [PK_user_settings] PRIMARY KEY CLUSTERED ([Id] ASC),
+        CONSTRAINT [FK_user_settings_users_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[users] ([id]) ON DELETE CASCADE
+    );
+    CREATE UNIQUE NONCLUSTERED INDEX [IX_user_settings_UserId] ON [dbo].[user_settings] ([UserId] ASC);
 END";
                 await _context.Database.ExecuteSqlRawAsync(sql);
             }
