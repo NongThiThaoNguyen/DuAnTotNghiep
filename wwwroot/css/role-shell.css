@@ -33,7 +33,7 @@
   --rs-font-sans: "Noto Sans", Arial, sans-serif;
   --rs-z-overlay: 40;
   --rs-z-sidebar: 50;
-  --rs-z-modal: 100;
+  --rs-z-modal: 1060;
 }
 
 .role-shell {
