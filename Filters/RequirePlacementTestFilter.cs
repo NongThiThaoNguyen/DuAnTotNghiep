@@ -36,7 +36,8 @@ namespace DuAnTotNghiep.Filters
             if (string.Equals(controllerName, "Account", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(controllerName, "Onboarding", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(controllerName, "Profile", StringComparison.OrdinalIgnoreCase) ||
-                string.Equals(controllerName, "PlacementTest", StringComparison.OrdinalIgnoreCase))
+                string.Equals(controllerName, "PlacementTest", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(controllerName, "ClassEnrollment", StringComparison.OrdinalIgnoreCase))
             {
                 await next();
                 return;

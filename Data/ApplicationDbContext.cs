@@ -143,6 +143,12 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<Schedule> Schedules { get; set; }
 
+    public virtual DbSet<Classroom> Classrooms { get; set; }
+
+    public virtual DbSet<Enrollment> Enrollments { get; set; }
+
+    public virtual DbSet<ClassSchedule> ClassSchedules { get; set; }
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (!optionsBuilder.IsConfigured)
@@ -2427,6 +2433,81 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.LessonId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_student_notes_lessons");
+        });
+
+        // ── Classroom ──
+        modelBuilder.Entity<Classroom>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("classrooms");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ClassName).HasMaxLength(255).HasColumnName("class_name");
+            entity.Property(e => e.LevelId).HasColumnName("level_id");
+            entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
+            entity.Property(e => e.MaxStudents).HasDefaultValue(30).HasColumnName("max_students");
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("ACTIVE").HasColumnName("status");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
+            entity.Property(e => e.EndDate).HasColumnName("end_date");
+            entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("updated_at");
+
+            entity.HasOne(d => d.Level).WithMany()
+                .HasForeignKey(d => d.LevelId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_classrooms_levels");
+
+            entity.HasOne(d => d.Teacher).WithMany()
+                .HasForeignKey(d => d.TeacherId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasConstraintName("FK_classrooms_teachers");
+        });
+
+        // ── Enrollment ──
+        modelBuilder.Entity<Enrollment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("enrollments");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.StudentId).HasColumnName("student_id");
+            entity.Property(e => e.ClassroomId).HasColumnName("classroom_id");
+            entity.Property(e => e.Status).HasMaxLength(50).HasDefaultValue("ACTIVE").HasColumnName("status");
+            entity.Property(e => e.EnrolledAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("enrolled_at");
+            entity.Property(e => e.DroppedAt).HasColumnName("dropped_at");
+
+            entity.HasIndex(e => new { e.StudentId, e.ClassroomId })
+                .IsUnique()
+                .HasDatabaseName("UQ_enrollments_student_classroom");
+
+            entity.HasOne(d => d.Student).WithMany(p => p.Enrollments)
+                .HasForeignKey(d => d.StudentId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_enrollments_students");
+
+            entity.HasOne(d => d.Classroom).WithMany(p => p.Enrollments)
+                .HasForeignKey(d => d.ClassroomId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_enrollments_classrooms");
+        });
+
+        // ── ClassSchedule ──
+        modelBuilder.Entity<ClassSchedule>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.ToTable("class_schedules");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ClassroomId).HasColumnName("classroom_id");
+            entity.Property(e => e.DayOfWeek).HasColumnName("day_of_week");
+            entity.Property(e => e.StartTime).HasColumnName("start_time");
+            entity.Property(e => e.EndTime).HasColumnName("end_time");
+
+            entity.HasOne(d => d.Classroom).WithMany(p => p.ClassSchedules)
+                .HasForeignKey(d => d.ClassroomId)
+                .OnDelete(DeleteBehavior.Cascade)
+                .HasConstraintName("FK_class_schedules_classrooms");
         });
 
         OnModelCreatingPartial(modelBuilder);

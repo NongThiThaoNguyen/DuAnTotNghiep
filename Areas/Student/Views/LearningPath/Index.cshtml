@@ -12,12 +12,12 @@
     @if (TempData["ErrorMessage"] != null)
     {
         <div class="lp-alert" role="alert">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="width:18px;height:18px;flex-shrink:0">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="12" y1="8" x2="12" y2="12" />
                 <line x1="12" y1="16" x2="12.01" y2="16" />
             </svg>
-            @TempData["ErrorMessage"]
+            <span>@TempData["ErrorMessage"]</span>
         </div>
     }
 
@@ -35,14 +35,14 @@
             <p class="lp-empty__text">
                 Hệ thống AI sẽ tạo lộ trình học tập cá nhân hoá dựa trên kết quả kiểm tra đầu vào và phân tích năng lực của bạn.
             </p>
-            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:8px;">
+            <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
                 <a class="lp-btn-primary" asp-area="Student" asp-controller="LearningPath" asp-action="Generate">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                     Tạo lộ trình AI
                 </a>
-                <a class="lp-btn-primary" style="background:#64748b;" asp-area="Student" asp-controller="Home" asp-action="Index">
+                <a class="lp-btn-primary" style="background:#64748b;box-shadow:0 4px 14px rgba(100,116,139,0.25);" asp-area="Student" asp-controller="Home" asp-action="Index">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9-9 9 9M5 10v10h5v-6h4v6h5V10" />
                     </svg>
@@ -50,7 +50,6 @@
                 </a>
             </div>
         </div>
-
     }
     else
     {
@@ -58,7 +57,7 @@
         <header class="lp-header">
             <div class="lp-header__left">
                 <p class="lp-header__eyebrow">
-                    @(Model.GeneratedByAi ? "AI Study English - Lộ trình AI" : "AI Study English")
+                    @(Model.GeneratedByAi ? "AI Study English · Lộ trình AI" : "AI Study English")
                 </p>
                 <h1 class="lp-header__title">@Model.PathTitle</h1>
                 @if (!string.IsNullOrWhiteSpace(Model.PathDescription))
@@ -67,7 +66,7 @@
                 }
                 @if (!string.IsNullOrWhiteSpace(Model.AiPlanSummary))
                 {
-                    <p class="lp-header__description" style="margin-top:6px; color:#475569;">@Model.AiPlanSummary</p>
+                    <p class="lp-header__description" style="margin-top:6px;">@Model.AiPlanSummary</p>
                 }
             </div>
             <div class="lp-header__meta">
@@ -132,7 +131,7 @@
                                     }
                                     @if (task.IsOverdue)
                                     {
-                                        <span class="lp-task__time" style="color:#EF4444; font-weight:600;">Trễ hạn</span>
+                                        <span class="lp-task__time" style="color:#ef4444; font-weight:700;">Trễ hạn</span>
                                     }
                                 </span>
                                 @if (!string.IsNullOrWhiteSpace(task.AiReason))
@@ -146,7 +145,12 @@
             }
             else
             {
-                <p class="lp-today-empty">Không có nhiệm vụ nào được lên lịch cho hôm nay. Tiếp tục lộ trình phía dưới nhé.</p>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" style="flex-shrink:0">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="lp-today-empty">Không có nhiệm vụ nào được lên lịch cho hôm nay. Tiếp tục lộ trình phía dưới nhé.</p>
+                </div>
             }
         </section>
 

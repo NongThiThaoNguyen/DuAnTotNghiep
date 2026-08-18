@@ -3,233 +3,410 @@
 @{
     ViewData["Title"] = Model.TestTitle;
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
+
+    // Gather all questions across all sections for pagination & palette
+    var allQuestionsList = new List<(int Index, int SectionId, string SectionTitle, string SkillName, string? Instruction, DuAnTotNghiep.Models.ViewModels.PlacementTest.TestQuestionViewModel Question)>();
+    int globalIndex = 1;
+    if (Model.Sections != null)
+    {
+        foreach (var sec in Model.Sections)
+        {
+            if (sec.Questions != null)
+            {
+                foreach (var q in sec.Questions)
+                {
+                    allQuestionsList.Add((globalIndex++, sec.SectionId, sec.SectionTitle, sec.SkillName, sec.Instruction, q));
+                }
+            }
+        }
+    }
+    int totalQuestions = allQuestionsList.Count;
+    int initialAnsweredCount = allQuestionsList.Count(x => !string.IsNullOrWhiteSpace(x.Question.ExistingAnswer));
+    double initialPercent = totalQuestions > 0 ? Math.Round((double)initialAnsweredCount / totalQuestions * 100) : 0;
 }
 
-<div class="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-    <!-- Header -->
-    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
-        <div class="p-6 sm:flex sm:items-center sm:justify-between">
-            <div class="sm:flex-auto">
-                <h1 class="text-2xl font-bold text-slate-900">@Model.TestTitle</h1>
-                <div class="mt-2 flex items-center text-sm text-slate-500">
-                    <span class="mr-4">Trạng thái: <span class="font-medium text-indigo-600">@Model.Status</span></span>
-                    <span id="autoSaveIndicator" class="text-slate-400"></span>
+<div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 font-sans space-y-6">
+
+    <!-- Sticky Header & Progress Bar -->
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4 sm:p-6 sticky top-4 z-30 space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl sm:text-2xl font-black text-slate-900 leading-tight">@Model.TestTitle</h1>
+                <div class="flex items-center gap-3 mt-1 text-xs">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                        Placement Test
+                    </span>
+                    <span id="autoSaveIndicator" class="text-slate-400 font-medium">Trạng thái: Đã sẵn sàng</span>
                 </div>
             </div>
-            <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-                <div class="bg-slate-50 rounded-lg p-4 border border-slate-100 text-center">
-                    <div class="text-sm font-medium text-slate-500 mb-1">Thời gian còn lại</div>
-                    <div id="countdown" class="text-3xl font-mono font-bold text-slate-800">
-                        --:--
+
+            <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
+                <!-- Countdown Timer -->
+                <div class="bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 flex items-center gap-3 shrink-0">
+                    <svg class="w-5 h-5 text-indigo-600 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="text-left">
+                        <span class="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">Thời gian còn lại</span>
+                        <div id="countdown" class="text-xl font-mono font-black text-slate-800 leading-none">--:--</div>
                     </div>
                 </div>
+
+                <!-- Action Button -->
+                <button type="button" onclick="openSubmitModal()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md shadow-indigo-600/15 cursor-pointer shrink-0 flex items-center gap-2">
+                    <span>Nộp bài</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Real-time Progress Bar -->
+        <div class="space-y-1.5 pt-2 border-t border-slate-100">
+            <div class="flex justify-between items-center text-xs font-bold text-slate-600">
+                <span>Tiến độ bài làm: <span id="answeredCountText" class="text-indigo-600 font-black">@initialAnsweredCount</span> / @totalQuestions câu</span>
+                <span id="answeredPercentText" class="text-indigo-600 font-black">@initialPercent%</span>
+            </div>
+            <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                <div id="progressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: @initialPercent%"></div>
             </div>
         </div>
     </div>
 
-    <form id="testForm" asp-action="Submit" method="post">
+    <!-- Main Test Layout (2 Columns) -->
+    <form id="testForm" asp-action="Submit" method="post" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         <input type="hidden" name="attemptId" value="@Model.AttemptId" />
 
-        <!-- Main Content -->
-        @if (Model.Sections == null || !Model.Sections.Any())
+        @if (totalQuestions == 0)
         {
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md mb-6">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-yellow-800">Thông báo từ hệ thống</h3>
-                        <div class="mt-2 text-sm text-yellow-700">
-                            <p>Không có dữ liệu phần thi. Bài kiểm tra này có thể chưa được cấu hình câu hỏi.</p>
-                        </div>
+            <div class="lg:col-span-3 bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-2xl shadow-sm">
+                <div class="flex items-start">
+                    <svg class="h-6 w-6 text-yellow-500 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <div>
+                        <h3 class="text-base font-bold text-yellow-800">Không có dữ liệu bài thi</h3>
+                        <p class="text-sm text-yellow-700 mt-1">Bài kiểm tra này chưa được cấu hình câu hỏi. Vui lòng liên hệ quản trị viên.</p>
                     </div>
                 </div>
             </div>
         }
         else
         {
-            int questionCounter = 1;
-            foreach (var testSection in Model.Sections)
-            {
-                <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-8">
-                    <div class="bg-slate-50 px-6 py-4 border-b border-slate-200">
-                        <h2 class="text-xl font-bold text-slate-800">Section @testSection.OrderIndex - @testSection.SectionTitle</h2>
-                        <div class="flex items-center space-x-2 mt-1">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
-                                @testSection.SkillName
-                            </span>
+            <!-- Left/Center Column: Question Display Card -->
+            <div class="lg:col-span-2 space-y-6">
+                @for (int i = 0; i < allQuestionsList.Count; i++)
+                {
+                    var item = allQuestionsList[i];
+                    var q = item.Question;
+                    bool isAnswered = !string.IsNullOrWhiteSpace(q.ExistingAnswer);
+
+                    <div id="question-card-@item.Index" class="question-card bg-white rounded-2xl border border-slate-200 shadow-sm p-6 space-y-6 @(item.Index == 1 ? "" : "hidden")" data-question-index="@item.Index" data-question-id="@q.QuestionId">
+                        
+                        <!-- Section Badge & Header -->
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div class="flex items-center gap-2">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-extrabold bg-blue-50 text-blue-700 border border-blue-100">
+                                    @item.SectionTitle
+                                </span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700">
+                                    @item.SkillName
+                                </span>
+                            </div>
+                            <span class="text-xs font-bold text-slate-400">Câu @item.Index / @totalQuestions</span>
                         </div>
-                        @if (!string.IsNullOrEmpty(testSection.Instruction))
+
+                        @if (!string.IsNullOrEmpty(item.Instruction))
                         {
-                            <p class="mt-3 text-sm text-slate-600 italic">@testSection.Instruction</p>
+                            <div class="p-3.5 bg-slate-50/70 border border-slate-150 rounded-xl text-xs text-slate-600 italic">
+                                💡 <span class="font-semibold text-slate-700">Hướng dẫn:</span> @item.Instruction
+                            </div>
                         }
-                    </div>
-                    
-                    <div class="p-6">
-                        @if (testSection.Questions == null || !testSection.Questions.Any())
-                        {
-                            <p class="text-slate-500 italic">Section data unavailable (no questions).</p>
-                        }
-                        else
-                        {
-                            foreach (var question in testSection.Questions)
-                            {
-                                <div class="mb-8 border-b border-slate-100 pb-6 last:border-0 last:pb-0">
-                                    <div class="flex items-start">
-                                        <div class="flex-shrink-0 mt-0.5">
-                                            <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-slate-100 text-slate-700 font-bold text-sm">
-                                                @questionCounter
-                                            </span>
-                                        </div>
-                                        <div class="ml-4 w-full">
-                                            @if (question.QuestionType == "MCQ")
-                                            {
-                                                <partial name="Partials/_QuestionMcq" model="question" />
-                                            }
-                                            else if (question.QuestionType == "TRUE_FALSE")
-                                            {
-                                                <partial name="Partials/_QuestionTrueFalse" model="question" />
-                                            }
-                                            else if (question.QuestionType == "SHORT_ANSWER")
-                                            {
-                                                <partial name="Partials/_QuestionShortAnswer" model="question" />
-                                            }
-                                            else if (question.QuestionType == "LISTENING" || !string.IsNullOrEmpty(question.AudioUrl))
-                                            {
-                                                <partial name="Partials/_QuestionListening" model="question" />
-                                            }
-                                            else
-                                            {
-                                                // Default fallback to MCQ if not recognized
-                                                <partial name="Partials/_QuestionMcq" model="question" />
-                                            }
-                                        </div>
-                                    </div>
+
+                        <!-- Question Content -->
+                        <div class="space-y-4">
+                            <div class="flex items-start gap-3">
+                                <span class="w-8 h-8 rounded-xl bg-indigo-600 text-white font-extrabold text-sm flex items-center justify-center shrink-0 shadow-sm">
+                                    @item.Index
+                                </span>
+                                <div class="text-base font-bold text-slate-900 pt-0.5 leading-relaxed">
+                                    @Html.Raw(q.QuestionText)
                                 </div>
-                                questionCounter++;
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(q.ImageUrl))
+                            {
+                                <div class="mt-3">
+                                    <img src="@q.ImageUrl" alt="Question Image" class="max-w-full max-h-80 h-auto rounded-xl border border-slate-200 shadow-sm object-cover" />
+                                </div>
                             }
-                        }
+
+                            @if (!string.IsNullOrEmpty(q.AudioUrl))
+                            {
+                                <div class="mt-3 p-4 bg-indigo-50/50 rounded-xl border border-indigo-100">
+                                    <span class="text-xs font-bold text-indigo-700 block mb-2">🔊 File nghe Audio:</span>
+                                    <audio controls class="w-full rounded-lg">
+                                        <source src="@q.AudioUrl" type="audio/mpeg">
+                                        Trình duyệt của bạn không hỗ trợ phát audio.
+                                    </audio>
+                                </div>
+                            }
+
+                            <!-- Options List -->
+                            <div class="space-y-3 mt-4">
+                                @if (q.QuestionType == "SHORT_ANSWER")
+                                {
+                                    <div class="mt-2">
+                                        <input type="text" 
+                                               name="answers[@q.QuestionId]" 
+                                               value="@q.ExistingAnswer" 
+                                               placeholder="Nhập câu trả lời của bạn..." 
+                                               class="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm font-medium text-slate-900 outline-none transition-all" />
+                                    </div>
+                                }
+                                else
+                                {
+                                    foreach (var opt in q.Options)
+                                    {
+                                        bool isChecked = (q.ExistingAnswer == opt.Id.ToString());
+                                        string activeStyle = isChecked ? "border-indigo-600 bg-indigo-50/60 ring-2 ring-indigo-500/30" : "border-slate-200 hover:border-indigo-300 bg-white";
+
+                                        <label class="mcq-option-label flex items-start p-4 rounded-xl border cursor-pointer transition-all duration-200 group @activeStyle">
+                                            <input type="radio" 
+                                                   name="answers[@q.QuestionId]" 
+                                                   value="@opt.Id" 
+                                                   class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500 mt-0.5 shrink-0" 
+                                                   @(isChecked ? "checked" : "") />
+                                            <span class="ml-3 text-sm font-semibold text-slate-800 group-hover:text-indigo-900 leading-snug">@opt.Text</span>
+                                        </label>
+                                    }
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Card Footer Navigation -->
+                        <div class="flex items-center justify-between pt-6 border-t border-slate-100">
+                            <button type="button" 
+                                    onclick="goToQuestion(@(item.Index - 1))" 
+                                    class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition-all flex items-center gap-1.5 cursor-pointer @(item.Index == 1 ? "opacity-40 cursor-not-allowed pointer-events-none" : "")">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                                Câu trước
+                            </button>
+
+                            <div class="text-xs font-medium text-slate-400">
+                                <span>@item.Index</span> / <span>@totalQuestions</span>
+                            </div>
+
+                            @if (item.Index < totalQuestions)
+                            {
+                                <button type="button" 
+                                        onclick="goToQuestion(@(item.Index + 1))" 
+                                        class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                    Câu tiếp theo
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                                </button>
+                            }
+                            else
+                            {
+                                <button type="button" 
+                                        onclick="openSubmitModal()" 
+                                        class="px-5 py-2.5 rounded-xl bg-green-600 hover:bg-green-700 text-white font-bold text-xs transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+                                    Hoàn thành & Nộp bài
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Right Column: Question Palette Drawer / Grid -->
+            <div class="lg:col-span-1 bg-white rounded-2xl border border-slate-200 shadow-sm p-5 space-y-5 sticky top-28">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 class="font-extrabold text-slate-900 text-sm flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                        Danh sách câu hỏi
+                    </h3>
+                    <span class="text-[11px] font-bold text-slate-400">@totalQuestions câu</span>
+                </div>
+
+                <!-- Palette Legend -->
+                <div class="grid grid-cols-2 gap-2 text-[10px] font-semibold">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-indigo-600 border border-indigo-600 inline-block"></span>
+                        <span class="text-slate-600">Đã chọn</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded bg-slate-100 border border-slate-300 inline-block"></span>
+                        <span class="text-slate-600">Chưa làm</span>
                     </div>
                 </div>
-            }
-        }
 
-        <!-- Submit Area -->
-        <div class="flex justify-end mt-8">
-            <button id="btnSubmit" type="submit" class="inline-flex items-center px-8 py-3 border border-transparent text-lg font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
-                Submit Test
-                <svg class="ml-2 -mr-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
+                <!-- Question Grid Buttons -->
+                <div class="grid grid-cols-5 gap-2 max-h-96 overflow-y-auto p-1">
+                    @for (int i = 0; i < allQuestionsList.Count; i++)
+                    {
+                        var item = allQuestionsList[i];
+                        bool isAnswered = !string.IsNullOrWhiteSpace(item.Question.ExistingAnswer);
+                        string statusBg = isAnswered 
+                            ? "bg-indigo-600 text-white font-black border-indigo-600 shadow-xs" 
+                            : "bg-slate-50 text-slate-700 hover:bg-slate-100 font-bold border-slate-200";
+                        string currentRing = (item.Index == 1) ? "ring-2 ring-indigo-500 ring-offset-1" : "";
+
+                        <button type="button" 
+                                id="palette-btn-@item.Index" 
+                                onclick="goToQuestion(@item.Index)" 
+                                class="palette-btn w-full h-10 rounded-xl border text-xs flex items-center justify-center transition-all cursor-pointer @statusBg @currentRing" 
+                                data-index="@item.Index">
+                            @item.Index
+                        </button>
+                    }
+                </div>
+
+                <!-- Submit Action in Sidebar -->
+                <div class="pt-3 border-t border-slate-100">
+                    <button type="button" 
+                            onclick="openSubmitModal()" 
+                            class="w-full py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md shadow-indigo-600/15 cursor-pointer text-center flex items-center justify-center gap-2">
+                        <span>Nộp bài thi</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </div>
+            </div>
+        }
+    </form>
+</div>
+
+<!-- Submit Confirmation Modal -->
+<div id="submitModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs hidden p-4">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full p-6 space-y-5 animate-in fade-in zoom-in-95 duration-200">
+        <div class="flex items-center gap-3 text-indigo-600">
+            <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <h3 class="text-lg font-black text-slate-900">Xác nhận nộp bài</h3>
+        </div>
+
+        <div class="space-y-3 text-sm text-slate-600">
+            <p>Bạn có chắc chắn muốn nộp bài thi Placement Test?</p>
+
+            <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-slate-500 font-medium">Tổng số câu hỏi:</span>
+                    <span class="font-bold text-slate-800">@totalQuestions câu</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500 font-medium">Số câu đã trả lời:</span>
+                    <span id="modalAnsweredText" class="font-bold text-indigo-600">@initialAnsweredCount câu</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-500 font-medium">Số câu chưa trả lời:</span>
+                    <span id="modalUnansweredText" class="font-bold text-amber-600">@(totalQuestions - initialAnsweredCount) câu</span>
+                </div>
+            </div>
+
+            <div id="unansweredWarning" class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 font-semibold flex items-center gap-2 @(totalQuestions - initialAnsweredCount == 0 ? "hidden" : "")">
+                ⚠️ <span>Bạn vẫn còn câu hỏi chưa trả lời!</span>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+            <button type="button" onclick="closeSubmitModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs transition-colors cursor-pointer">
+                Quay lại làm tiếp
+            </button>
+            <button type="button" onclick="confirmSubmit()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md shadow-indigo-600/15 cursor-pointer">
+                Nộp bài ngay
             </button>
         </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
     <script>
+        let currentQuestionIndex = 1;
+        const totalQuestions = @totalQuestions;
+        const attemptId = "@Model.AttemptId";
+        let isSubmitting = false;
+
         document.addEventListener('DOMContentLoaded', function() {
+            // Timer setup
             var timeLimitMinutes = @(Model.EndTime.HasValue ? 1 : 0);
             if (timeLimitMinutes === 0) {
                 document.getElementById('countdown').innerText = "Không giới hạn";
-                return;
-            }
+            } else {
+                var serverTimeMs = new Date('@Model.ServerTime.ToString("o")').getTime();
+                var endTimeMs = new Date('@Model.EndTime?.ToString("o")').getTime();
+                var clientLoadTimeMs = new Date().getTime();
+                var distance = endTimeMs - serverTimeMs;
 
-            var serverTimeMs = new Date('@Model.ServerTime.ToString("o")').getTime();
-            var endTimeMs = new Date('@Model.EndTime?.ToString("o")').getTime();
-            var clientLoadTimeMs = new Date().getTime();
-            
-            // Calculate how much time is left in milliseconds
-            var distance = endTimeMs - serverTimeMs;
-            var isSubmitting = false;
+                function updateCountdown() {
+                    if (isSubmitting) return;
 
-            function updateCountdown() {
-                if (isSubmitting) return;
+                    var currentClientMs = new Date().getTime();
+                    var elapsedSinceLoad = currentClientMs - clientLoadTimeMs;
+                    var currentDistance = distance - elapsedSinceLoad;
 
-                var currentClientMs = new Date().getTime();
-                var elapsedSinceLoad = currentClientMs - clientLoadTimeMs;
-                var currentDistance = distance - elapsedSinceLoad;
-
-                if (currentDistance <= 0) {
-                    isSubmitting = true;
-                    document.getElementById('countdown').innerText = "00:00";
-                    document.getElementById('countdown').classList.add('text-red-600');
-                    
-                    // Timeout actions
-                    if (typeof timerInterval !== 'undefined') {
-                        clearInterval(timerInterval);
+                    if (currentDistance <= 0) {
+                        isSubmitting = true;
+                        document.getElementById('countdown').innerText = "00:00";
+                        document.getElementById('countdown').classList.add('text-red-600');
+                        
+                        alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài.");
+                        confirmSubmit();
+                        return;
                     }
-                    
-                    // Replace alert with a non-blocking UI update if possible, or just one alert
-                    alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài.");
-                    
-                    // Auto submit
-                    document.getElementById('btnSubmit').disabled = true;
-                    document.getElementById('btnSubmit').innerHTML = "Đang nộp bài...";
-                    document.getElementById('testForm').submit();
-                    return;
+
+                    var minutes = Math.floor(currentDistance / (1000 * 60));
+                    var seconds = Math.floor((currentDistance % (1000 * 60)) / 1000);
+
+                    var minStr = minutes < 10 ? "0" + minutes : minutes;
+                    var secStr = seconds < 10 ? "0" + seconds : seconds;
+
+                    document.getElementById('countdown').innerText = minStr + ":" + secStr;
+
+                    if (minutes < 5) {
+                        document.getElementById('countdown').classList.add('text-orange-500');
+                    }
                 }
 
-                var minutes = Math.floor(currentDistance / (1000 * 60));
-                var seconds = Math.floor((currentDistance % (1000 * 60)) / 1000);
-
-                var minStr = minutes < 10 ? "0" + minutes : minutes;
-                var secStr = seconds < 10 ? "0" + seconds : seconds;
-
-                document.getElementById('countdown').innerText = minStr + ":" + secStr;
-
-                if (minutes < 5) {
-                    document.getElementById('countdown').classList.add('text-orange-500');
-                }
+                updateCountdown();
+                setInterval(updateCountdown, 1000);
             }
 
-            updateCountdown();
-            var timerInterval;
-            if (!isSubmitting) {
-                timerInterval = setInterval(updateCountdown, 1000);
-            }
-
-            // Auto Save & Visual Highlight Logic
+            // Auto Save & Option selection listener
             const form = document.getElementById('testForm');
-            const attemptId = document.querySelector('input[name="attemptId"]').value;
             const indicator = document.getElementById('autoSaveIndicator');
 
             form.addEventListener('change', function(e) {
                 const target = e.target;
-                if (target && target.tagName === 'INPUT') {
-                    // Update visual selection styles for radio options
-                    if (target.type === 'radio') {
-                        const nameAttr = target.getAttribute('name');
-                        if (nameAttr) {
-                            const groupRadios = form.querySelectorAll(`input[name="${CSS.escape(nameAttr)}"]`);
-                            groupRadios.forEach(radio => {
-                                const parentLabel = radio.closest('.mcq-option-label') || radio.closest('label');
-                                if (parentLabel) {
-                                    if (radio.checked) {
-                                        parentLabel.classList.add('border-indigo-600', 'bg-indigo-50/60', 'ring-1', 'ring-indigo-600');
-                                        parentLabel.classList.remove('border-slate-300', 'border-slate-200');
-                                    } else {
-                                        parentLabel.classList.remove('border-indigo-600', 'bg-indigo-50/60', 'ring-1', 'ring-indigo-600');
-                                        parentLabel.classList.add('border-slate-200');
-                                    }
-                                }
-                            });
-                        }
-                    }
-
+                if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')) {
                     const nameAttr = target.getAttribute('name');
-                    if(nameAttr && nameAttr.startsWith('answers[')) {
-                        // Extract question id from answers[123]
+                    if (nameAttr && nameAttr.startsWith('answers[')) {
                         const match = nameAttr.match(/answers\[(\d+)\]/);
-                        if(match && match[1]) {
+                        if (match && match[1]) {
                             const questionId = match[1];
                             const answerValue = target.value;
 
-                            indicator.innerText = "Trạng thái lưu: Đang lưu...";
-                            indicator.className = "text-slate-500 italic";
+                            // Update radio visual styling
+                            if (target.type === 'radio') {
+                                const groupRadios = form.querySelectorAll(`input[name="${CSS.escape(nameAttr)}"]`);
+                                groupRadios.forEach(radio => {
+                                    const parentLabel = radio.closest('.mcq-option-label');
+                                    if (parentLabel) {
+                                        if (radio.checked) {
+                                            parentLabel.classList.add('border-indigo-600', 'bg-indigo-50/60', 'ring-2', 'ring-indigo-500/30');
+                                            parentLabel.classList.remove('border-slate-200', 'bg-white');
+                                        } else {
+                                            parentLabel.classList.remove('border-indigo-600', 'bg-indigo-50/60', 'ring-2', 'ring-indigo-500/30');
+                                            parentLabel.classList.add('border-slate-200', 'bg-white');
+                                        }
+                                    }
+                                });
+                            }
+
+                            // Update Palette Button & Progress Bar
+                            updateProgressAndPalette();
+
+                            // AJAX Auto Save
+                            indicator.innerText = "Trạng thái: Đang lưu...";
+                            indicator.className = "text-amber-500 font-medium italic";
 
                             fetch('/Student/PlacementTest/SaveAnswer', {
                                 method: 'POST',
@@ -242,40 +419,126 @@
                                     answerValue: answerValue
                                 })
                             })
-                            .then(response => response.json())
+                            .then(res => res.json())
                             .then(data => {
-                                if(data.success) {
+                                if (data.success) {
                                     const date = new Date(data.savedAt);
                                     const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                                    indicator.innerText = "Đã lưu lúc " + timeStr;
-                                    indicator.className = "text-green-600";
+                                    indicator.innerText = "Đã tự động lưu lúc " + timeStr;
+                                    indicator.className = "text-emerald-600 font-medium";
                                 } else {
                                     indicator.innerText = "Lỗi lưu: " + data.message;
-                                    indicator.className = "text-red-500";
+                                    indicator.className = "text-red-500 font-medium";
                                 }
                             })
-                            .catch(error => {
-                                indicator.innerText = "Lỗi mạng, không thể lưu tạm!";
-                                indicator.className = "text-red-500";
-                                console.error('Error auto-saving:', error);
+                            .catch(err => {
+                                indicator.innerText = "Lỗi kết nối mạng!";
+                                indicator.className = "text-red-500 font-medium";
+                                console.error('Auto save error:', err);
                             });
                         }
                     }
                 }
             });
+        });
 
-            // Prevent manual submit without confirmation
-            form.addEventListener('submit', function(e) {
-                if (!isSubmitting) {
-                    if (!confirm('Bạn có chắc muốn nộp bài? Sau khi nộp sẽ không thể chỉnh sửa.')) {
-                        e.preventDefault();
-                    } else {
-                        isSubmitting = true;
-                        document.getElementById('btnSubmit').disabled = true;
-                        document.getElementById('btnSubmit').innerHTML = "Đang nộp bài...";
+        // Question Navigation Logic
+        function goToQuestion(index) {
+            if (index < 1 || index > totalQuestions) return;
+
+            // Hide previous card
+            const currentCard = document.getElementById(`question-card-${currentQuestionIndex}`);
+            if (currentCard) currentCard.classList.add('hidden');
+
+            // Show target card
+            const targetCard = document.getElementById(`question-card-${index}`);
+            if (targetCard) targetCard.classList.remove('hidden');
+
+            // Update palette ring
+            const prevBtn = document.getElementById(`palette-btn-${currentQuestionIndex}`);
+            if (prevBtn) prevBtn.classList.remove('ring-2', 'ring-indigo-500', 'ring-offset-1');
+
+            const targetBtn = document.getElementById(`palette-btn-${index}`);
+            if (targetBtn) targetBtn.classList.add('ring-2', 'ring-indigo-500', 'ring-offset-1');
+
+            currentQuestionIndex = index;
+
+            // Smooth scroll to top of card on mobile
+            if (window.innerWidth < 1024) {
+                targetCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Progress and Palette status calculation
+        function updateProgressAndPalette() {
+            let answered = 0;
+            const cards = document.querySelectorAll('.question-card');
+
+            cards.forEach(card => {
+                const idx = card.getAttribute('data-question-index');
+                const inputs = card.querySelectorAll('input[type="radio"]:checked, input[type="text"]');
+                let hasValue = false;
+
+                inputs.forEach(input => {
+                    if (input.type === 'radio' && input.checked) hasValue = true;
+                    if (input.type === 'text' && input.value.trim() !== '') hasValue = true;
+                });
+
+                const btn = document.getElementById(`palette-btn-${idx}`);
+                if (hasValue) {
+                    answered++;
+                    if (btn) {
+                        btn.classList.add('bg-indigo-600', 'text-white', 'font-black', 'border-indigo-600', 'shadow-xs');
+                        btn.classList.remove('bg-slate-50', 'text-slate-700', 'border-slate-200');
+                    }
+                } else {
+                    if (btn) {
+                        btn.classList.remove('bg-indigo-600', 'text-white', 'font-black', 'border-indigo-600', 'shadow-xs');
+                        btn.classList.add('bg-slate-50', 'text-slate-700', 'border-slate-200');
                     }
                 }
             });
-        });
+
+            const percent = totalQuestions > 0 ? Math.round((answered / totalQuestions) * 100) : 0;
+
+            document.getElementById('answeredCountText').innerText = answered;
+            document.getElementById('answeredPercentText').innerText = percent + '%';
+            document.getElementById('progressBar').style.width = percent + '%';
+
+            // Modal text update
+            document.getElementById('modalAnsweredText').innerText = answered + ' câu';
+            document.getElementById('modalUnansweredText').innerText = (totalQuestions - answered) + ' câu';
+
+            const warning = document.getElementById('unansweredWarning');
+            if (totalQuestions - answered > 0) {
+                warning.classList.remove('hidden');
+            } else {
+                warning.classList.add('hidden');
+            }
+        }
+
+        // Submit Modal Controls
+        function openSubmitModal() {
+            updateProgressAndPalette();
+            document.getElementById('submitModal').classList.remove('hidden');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.add('hidden');
+        }
+
+        function confirmSubmit() {
+            isSubmitting = true;
+            closeSubmitModal();
+
+            const form = document.getElementById('testForm');
+            const submitBtns = document.querySelectorAll('button[onclick="openSubmitModal()"]');
+            submitBtns.forEach(btn => {
+                btn.disabled = true;
+                btn.innerText = "Đang nộp bài...";
+            });
+
+            form.submit();
+        }
     </script>
 }

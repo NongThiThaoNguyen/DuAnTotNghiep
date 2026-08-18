@@ -83,6 +83,7 @@ builder.Services.AddScoped<IPlacementTestSectionService, PlacementTestSectionSer
 builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionService>();
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
+builder.Services.AddScoped<IClassEnrollmentService, ClassEnrollmentService>();
 builder.Services.AddScoped<ILearningTopicService, LearningTopicService>();
 builder.Services.AddScoped<IReferenceSourceService, ReferenceSourceService>();
 builder.Services.AddScoped<IValidateLicenseService, ValidateLicenseService>();
@@ -169,6 +170,7 @@ builder.Services.AddSingleton<IAiLoggingService, AiLoggingService>();
 // Đăng ký Seeder
 builder.Services.AddScoped<DatabaseSeeder>();
 builder.Services.AddScoped<AILearnSeeder>();
+builder.Services.AddScoped<ClassroomSeeder>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IM4SchemaService, DuAnTotNghiep.Services.M4SchemaService>();
 
 // Đăng ký Authentication
@@ -249,6 +251,9 @@ using (var scope = app.Services.CreateScope())
 
         var aiSeeder = scope.ServiceProvider.GetRequiredService<AILearnSeeder>();
         await aiSeeder.SeedAsync();
+
+        var classroomSeeder = scope.ServiceProvider.GetRequiredService<ClassroomSeeder>();
+        await classroomSeeder.SeedAsync();
     }
     catch (Exception ex)
     {

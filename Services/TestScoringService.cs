@@ -32,62 +32,87 @@ namespace DuAnTotNghiep.Services
                 throw new Exception("Attempt not found");
             }
 
-            var questionIds = attempt.TestAnswers.Select(a => a.QuestionId).ToList();
-            
-            // 2. Fetch questions from QuestionBank
-            var questions = await _dbContext.QuestionBanks
-                .Where(q => questionIds.Contains(q.Id))
-                .ToDictionaryAsync(q => q.Id);
-                
-            // 3. Fetch point allocation from PlacementTestQuestion mapping
+            // 2. Fetch all placement test questions for this test along with options
             var ptQuestions = await _dbContext.PlacementTestQuestions
-                .Where(pq => pq.Section.PlacementTestId == attempt.PlacementTestId && questionIds.Contains(pq.QuestionId))
-                .ToDictionaryAsync(pq => pq.QuestionId);
+                .Include(pq => pq.Question)
+                .ThenInclude(q => q.QuestionOptions)
+                .Where(pq => pq.Section.PlacementTestId == attempt.PlacementTestId)
+                .ToListAsync();
+
+            var existingAnswers = attempt.TestAnswers.ToDictionary(a => a.QuestionId);
 
             int correctCount = 0;
             int wrongCount = 0;
             decimal totalScore = 0;
 
-            // 4. Evaluate each answer
-            foreach (var answer in attempt.TestAnswers)
+            // 3. Evaluate each question in the test
+            foreach (var ptq in ptQuestions)
             {
-                if (!questions.TryGetValue(answer.QuestionId, out var question))
-                {
-                    continue; // Question missing in bank
-                }
+                var question = ptq.Question;
+                decimal pointValue = ptq.Points;
 
-                decimal pointValue = ptQuestions.TryGetValue(answer.QuestionId, out var ptq) ? ptq.Points : 1m;
+                if (!existingAnswers.TryGetValue(question.Id, out var answer))
+                {
+                    // Create answer record for un-answered question
+                    answer = new TestAnswer
+                    {
+                        AttemptId = attemptId,
+                        QuestionId = question.Id,
+                        IsCorrect = false,
+                        Score = 0,
+                        AnsweredAt = DateTime.UtcNow
+                    };
+                    _dbContext.TestAnswers.Add(answer);
+                    wrongCount++;
+                    continue;
+                }
 
                 bool isCorrect = false;
 
                 if (question.QuestionType == "MCQ" || question.QuestionType == "TRUE_FALSE" || question.QuestionType == "LISTENING")
                 {
-                    // Check logic based on correct answer id string vs SelectedOptionId
-                    // CorrectAnswer is expected to hold OptionId or the text depending on DB setup.
-                    // Usually for MCQ, CorrectAnswer holds OptionId or OptionText. 
-                    // Let's assume CorrectAnswer holds the OptionId as string.
-                    if (answer.SelectedOptionId.HasValue && question.CorrectAnswer == answer.SelectedOptionId.Value.ToString())
+                    if (answer.SelectedOptionId.HasValue)
                     {
-                        isCorrect = true;
+                        var selectedOption = question.QuestionOptions.FirstOrDefault(o => o.Id == answer.SelectedOptionId.Value);
+                        if (selectedOption != null)
+                        {
+                            if (selectedOption.IsCorrect)
+                            {
+                                isCorrect = true;
+                            }
+                            else if (!string.IsNullOrEmpty(question.CorrectAnswer))
+                            {
+                                var trimmedCorrect = question.CorrectAnswer.Trim();
+                                if (selectedOption.OptionText.Trim().Equals(trimmedCorrect, StringComparison.OrdinalIgnoreCase) ||
+                                    selectedOption.Id.ToString() == trimmedCorrect)
+                                {
+                                    isCorrect = true;
+                                }
+                            }
+                        }
                     }
-                    else if (!string.IsNullOrEmpty(answer.AnswerText) && question.CorrectAnswer?.Trim().Equals(answer.AnswerText.Trim(), StringComparison.OrdinalIgnoreCase) == true)
+                    else if (!string.IsNullOrEmpty(answer.AnswerText) && !string.IsNullOrEmpty(question.CorrectAnswer))
                     {
-                        isCorrect = true;
+                        if (answer.AnswerText.Trim().Equals(question.CorrectAnswer.Trim(), StringComparison.OrdinalIgnoreCase))
+                        {
+                            isCorrect = true;
+                        }
                     }
                 }
                 else if (question.QuestionType == "SHORT_ANSWER")
                 {
-                    // Basic exact string match
-                    if (!string.IsNullOrEmpty(answer.AnswerText) && question.CorrectAnswer?.Trim().Equals(answer.AnswerText.Trim(), StringComparison.OrdinalIgnoreCase) == true)
+                    if (!string.IsNullOrEmpty(answer.AnswerText) && !string.IsNullOrEmpty(question.CorrectAnswer))
                     {
-                        isCorrect = true;
+                        if (answer.AnswerText.Trim().Equals(question.CorrectAnswer.Trim(), StringComparison.OrdinalIgnoreCase))
+                        {
+                            isCorrect = true;
+                        }
                     }
                 }
 
-                // Cập nhật answer entity
                 answer.IsCorrect = isCorrect;
                 answer.Score = isCorrect ? pointValue : 0;
-                
+
                 if (isCorrect)
                 {
                     correctCount++;
@@ -97,10 +122,10 @@ namespace DuAnTotNghiep.Services
                 {
                     wrongCount++;
                 }
+
+                _dbContext.TestAnswers.Update(answer);
             }
 
-            // Save changes on answers
-            _dbContext.TestAnswers.UpdateRange(attempt.TestAnswers);
             await _dbContext.SaveChangesAsync();
 
             return new ScoreResultDto
@@ -119,27 +144,31 @@ namespace DuAnTotNghiep.Services
 
             if (attempt == null) return new List<SkillScoreDto>();
 
-            var questionIds = attempt.TestAnswers.Select(a => a.QuestionId).ToList();
-
             var ptQuestions = await _dbContext.PlacementTestQuestions
                 .Include(pq => pq.Section)
                 .ThenInclude(s => s.Skill)
-                .Where(pq => pq.Section.PlacementTestId == attempt.PlacementTestId && questionIds.Contains(pq.QuestionId))
+                .Where(pq => pq.Section.PlacementTestId == attempt.PlacementTestId)
                 .ToListAsync();
 
-            var result = new List<SkillScoreDto>();
+            var answersDict = attempt.TestAnswers.ToDictionary(a => a.QuestionId);
 
+            var result = new List<SkillScoreDto>();
             var skillGroups = ptQuestions.GroupBy(pq => pq.Section.Skill);
 
             foreach (var group in skillGroups)
             {
                 var skill = group.Key;
-                var qIdsInSkill = group.Select(pq => pq.QuestionId).ToList();
-                
-                var answersInSkill = attempt.TestAnswers.Where(a => qIdsInSkill.Contains(a.QuestionId)).ToList();
-                
                 decimal maxScore = group.Sum(pq => pq.Points);
-                decimal earnedScore = answersInSkill.Sum(a => a.Score ?? 0);
+                decimal earnedScore = 0;
+
+                foreach (var pq in group)
+                {
+                    if (answersDict.TryGetValue(pq.QuestionId, out var ans))
+                    {
+                        earnedScore += ans.Score ?? 0;
+                    }
+                }
+
                 decimal percentage = maxScore > 0 ? (earnedScore / maxScore) * 100 : 0;
 
                 result.Add(new SkillScoreDto
@@ -163,17 +192,15 @@ namespace DuAnTotNghiep.Services
 
             if (attempt == null) return new List<TopicScoreDto>();
 
-            var questionIds = attempt.TestAnswers.Select(a => a.QuestionId).ToList();
-
             var ptQuestions = await _dbContext.PlacementTestQuestions
                 .Include(pq => pq.Question)
                 .ThenInclude(q => q.Topic)
-                .Where(pq => pq.Section.PlacementTestId == attempt.PlacementTestId && questionIds.Contains(pq.QuestionId))
+                .Where(pq => pq.Section.PlacementTestId == attempt.PlacementTestId)
                 .ToListAsync();
 
-            var result = new List<TopicScoreDto>();
+            var answersDict = attempt.TestAnswers.ToDictionary(a => a.QuestionId);
 
-            // Lọc ra những câu hỏi có Topic khác null
+            var result = new List<TopicScoreDto>();
             var topicGroups = ptQuestions
                 .Where(pq => pq.Question.Topic != null)
                 .GroupBy(pq => pq.Question.Topic!);
@@ -181,12 +208,17 @@ namespace DuAnTotNghiep.Services
             foreach (var group in topicGroups)
             {
                 var topic = group.Key;
-                var qIdsInTopic = group.Select(pq => pq.QuestionId).ToList();
-                
-                var answersInTopic = attempt.TestAnswers.Where(a => qIdsInTopic.Contains(a.QuestionId)).ToList();
-                
                 decimal maxScore = group.Sum(pq => pq.Points);
-                decimal earnedScore = answersInTopic.Sum(a => a.Score ?? 0);
+                decimal earnedScore = 0;
+
+                foreach (var pq in group)
+                {
+                    if (answersDict.TryGetValue(pq.QuestionId, out var ans))
+                    {
+                        earnedScore += ans.Score ?? 0;
+                    }
+                }
+
                 decimal percentage = maxScore > 0 ? (earnedScore / maxScore) * 100 : 0;
 
                 result.Add(new TopicScoreDto
@@ -217,32 +249,61 @@ namespace DuAnTotNghiep.Services
 
             decimal percentage = (totalScore / maxScore) * 100;
 
-            // Simple rule: <40% A1, <60% A2, <80% B1, >=80% B2
-            string levelCode = "A1";
-            string description = "Người dùng ở trình độ cơ bản (Beginner).";
-            if (percentage >= 80)
+            // Level mapping according to user requirement:
+            // 0–39% Beginner
+            // 40–59% Elementary
+            // 60–74% Intermediate
+            // 75–89% Upper-Intermediate
+            // 90–100% Advanced
+            string levelCode;
+            string levelName;
+            string description;
+
+            if (percentage >= 90)
             {
-                levelCode = "B2";
-                description = "Người dùng ở trình độ trung cấp trên (Upper-Intermediate).";
+                levelCode = "ADVANCED";
+                levelName = "Advanced";
+                description = "Trình độ cao cấp (Advanced).";
+            }
+            else if (percentage >= 75)
+            {
+                levelCode = "UPPER_INTERMEDIATE";
+                levelName = "Upper-Intermediate";
+                description = "Trình độ trung cấp trên (Upper-Intermediate).";
             }
             else if (percentage >= 60)
             {
-                levelCode = "B1";
-                description = "Người dùng ở trình độ trung cấp (Intermediate).";
+                levelCode = "INTERMEDIATE";
+                levelName = "Intermediate";
+                description = "Trình độ trung cấp (Intermediate).";
             }
             else if (percentage >= 40)
             {
-                levelCode = "A2";
-                description = "Người dùng ở trình độ sơ cấp (Pre-Intermediate).";
+                levelCode = "ELEMENTARY";
+                levelName = "Elementary";
+                description = "Trình độ sơ cấp (Elementary).";
+            }
+            else
+            {
+                levelCode = "BEGINNER";
+                levelName = "Beginner";
+                description = "Trình độ người mới bắt đầu (Beginner).";
             }
 
+            // Find matching level entity in DB by Code or Name
             var level = await _dbContext.EnglishProficiencyLevels
-                .FirstOrDefaultAsync(l => l.Code == levelCode);
+                .FirstOrDefaultAsync(l => l.Code == levelCode || 
+                                          l.Name == levelName ||
+                                          (levelCode == "BEGINNER" && (l.Code == "A1" || l.Name == "Beginner")) ||
+                                          (levelCode == "ELEMENTARY" && (l.Code == "A2" || l.Name == "Elementary")) ||
+                                          (levelCode == "INTERMEDIATE" && (l.Code == "B1" || l.Name == "Intermediate")) ||
+                                          (levelCode == "UPPER_INTERMEDIATE" && (l.Code == "B2" || l.Name == "Upper Intermediate" || l.Name == "Upper-Intermediate")) ||
+                                          (levelCode == "ADVANCED" && (l.Code == "C1" || l.Code == "C2" || l.Name == "Advanced")));
 
             return new EstimatedLevelDto
             {
                 LevelId = level?.Id,
-                LevelName = level?.Name,
+                LevelName = levelName,
                 Percentage = percentage,
                 Description = description
             };
