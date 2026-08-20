@@ -489,11 +489,22 @@ namespace DuAnTotNghiep.Services
                 var scoreResult = await _scoringService.GradeAttemptAsync(attemptId);
                 var estimatedLevel = await _scoringService.EstimateLevelAsync(attemptId);
 
-                // Lưu kết quả điểm vào Attempt
+                // Lưu kết quả điểm vào Attempt và cập nhật Level vào StudentLearningProfile
                 attempt.TotalScore = scoreResult.TotalScore;
                 attempt.EstimatedLevelId = estimatedLevel.LevelId;
                 attempt.Status = "GRADED";
                 _dbContext.TestAttempts.Update(attempt);
+
+                if (estimatedLevel.LevelId.HasValue)
+                {
+                    var profile = await _dbContext.StudentLearningProfiles
+                        .FirstOrDefaultAsync(p => p.UserId == studentId);
+                    if (profile != null)
+                    {
+                        profile.CurrentLevelId = estimatedLevel.LevelId.Value;
+                        _dbContext.StudentLearningProfiles.Update(profile);
+                    }
+                }
                 
                 await _dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -579,6 +590,8 @@ namespace DuAnTotNghiep.Services
                 MaxScore = attempt.PlacementTest.TotalScore,
                 Percentage = estimatedLevel.Percentage,
                 EstimatedLevel = estimatedLevel.LevelName ?? "Chưa đánh giá",
+                LevelDescription = estimatedLevel.Description ?? "Đã hoàn thành đánh giá năng lực.",
+                StatusText = "Chờ chọn lớp",
                 SkillScores = skillScores.OrderByDescending(s => s.Percentage).ToList(),
                 TopicScores = topicScores.OrderByDescending(t => t.Percentage).ToList(),
                 WeakestSkill = weakestSkill,

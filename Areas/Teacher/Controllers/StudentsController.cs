@@ -17,11 +17,19 @@ namespace DuAnTotNghiep.Areas.Teacher.Controllers
             _studentService = studentService;
         }
 
+        private int GetTeacherId()
+        {
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            int.TryParse(userIdStr, out int userId);
+            return userId;
+        }
+
         // GET: Teacher/Students
         public async Task<IActionResult> Index(string? keyword, int page = 1, int pageSize = 12)
         {
-            int totalItems = await _studentService.GetTotalStudentsAsync(keyword);
-            var items = await _studentService.GetStudentsAsync(keyword, page, pageSize);
+            int teacherId = GetTeacherId();
+            int totalItems = await _studentService.GetTotalStudentsAsync(keyword, teacherId);
+            var items = await _studentService.GetStudentsAsync(keyword, page, pageSize, teacherId);
 
             ViewBag.Keyword = keyword;
             ViewBag.CurrentPage = page;

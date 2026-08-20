@@ -1,0 +1,282 @@
+{
+  "course": {
+    "title": "Hướng dẫn tổng quan về 12 Thì (Tenses Masterclass)",
+    "level": "Beginner",
+    "lessons": [
+      {
+        "order": 1,
+        "title": "Bài học 1: Tổng quan về 12 Thì",
+        "duration": 15,
+        "objective": "Hiểu hệ thống 12 thì tiếng Anh và cách xác định thời gian của hành động.",
+        "sections": [
+          {
+            "title": "1. Hệ thống 12 thì",
+            "content": "12 thì được tạo từ 3 mốc thời gian: Quá khứ, Hiện tại, Tương lai và 4 dạng: Đơn, Tiếp diễn, Hoàn thành, Hoàn thành tiếp diễn.",
+            "table": [
+              [
+                "Dạng",
+                "Quá khứ",
+                "Hiện tại",
+                "Tương lai"
+              ],
+              [
+                "Đơn",
+                "Past Simple",
+                "Present Simple",
+                "Future Simple"
+              ],
+              [
+                "Tiếp diễn",
+                "Past Continuous",
+                "Present Continuous",
+                "Future Continuous"
+              ],
+              [
+                "Hoàn thành",
+                "Past Perfect",
+                "Present Perfect",
+                "Future Perfect"
+              ],
+              [
+                "Hoàn thành tiếp diễn",
+                "Past Perfect Continuous",
+                "Present Perfect Continuous",
+                "Future Perfect Continuous"
+              ]
+            ]
+          },
+          {
+            "title": "2. Mẹo nhận biết nhanh",
+            "content": [
+              "Simple: nói về sự thật, thói quen hoặc hành động đơn lẻ.",
+              "Continuous: nhấn mạnh hành động đang diễn ra.",
+              "Perfect: nhấn mạnh sự hoàn thành hoặc kết quả.",
+              "Perfect Continuous: nhấn mạnh khoảng thời gian hành động diễn ra."
+            ]
+          },
+          {
+            "title": "3. Ví dụ",
+            "examples": [
+              {
+                "english": "I study English every day.",
+                "vietnamese": "Tôi học tiếng Anh mỗi ngày.",
+                "explanation": "Thói quen → Present Simple."
+              },
+              {
+                "english": "I am studying English now.",
+                "vietnamese": "Tôi đang học tiếng Anh bây giờ.",
+                "explanation": "Hành động đang diễn ra → Present Continuous."
+              },
+              {
+                "english": "I have studied English for two years.",
+                "vietnamese": "Tôi đã học tiếng Anh được hai năm.",
+                "explanation": "Hành động bắt đầu trong quá khứ và còn liên quan hiện tại → Present Perfect."
+              }
+            ]
+          }
+        ],
+        "exercises": [
+          {
+            "question": "Chọn thì phù hợp: She ___ to school every day. (go)",
+            "answer": "goes"
+          },
+          {
+            "question": "Chọn thì phù hợp: They ___ dinner now. (have)",
+            "answer": "are having"
+          },
+          {
+            "question": "Chọn thì phù hợp: I ___ this book already. (read)",
+            "answer": "have read"
+          }
+        ],
+        "summary": [
+          "Xác định thời gian trước: quá khứ, hiện tại hay tương lai.",
+          "Sau đó xác định dạng: đơn, tiếp diễn, hoàn thành hoặc hoàn thành tiếp diễn.",
+          "Không cần học thuộc 12 thì cùng lúc; hãy học theo từng nhóm."
+        ]
+      },
+      {
+        "order": 2,
+        "title": "Bài học 2: Phân biệt Present Simple và Present Continuous",
+        "duration": 16,
+        "objective": "Phân biệt hành động thường xuyên với hành động đang xảy ra tại thời điểm nói.",
+        "sections": [
+          {
+            "title": "1. Present Simple",
+            "content": "Dùng cho thói quen, lịch trình và sự thật hiển nhiên.",
+            "formula": "S + V(s/es) + O",
+            "examples": [
+              {
+                "english": "Tom plays football every Sunday.",
+                "vietnamese": "Tom chơi bóng đá mỗi Chủ nhật.",
+                "explanation": "Thói quen lặp lại."
+              },
+              {
+                "english": "Water boils at 100°C.",
+                "vietnamese": "Nước sôi ở 100°C.",
+                "explanation": "Sự thật hiển nhiên."
+              }
+            ],
+            "signals": [
+              "every day",
+              "usually",
+              "often",
+              "always",
+              "sometimes",
+              "never"
+            ]
+          },
+          {
+            "title": "2. Present Continuous",
+            "content": "Dùng cho hành động đang diễn ra tại thời điểm nói hoặc quanh thời điểm hiện tại.",
+            "formula": "S + am/is/are + V-ing + O",
+            "examples": [
+              {
+                "english": "Tom is playing football now.",
+                "vietnamese": "Tom đang chơi bóng đá bây giờ.",
+                "explanation": "Hành động đang xảy ra."
+              },
+              {
+                "english": "I am studying for my exam this week.",
+                "vietnamese": "Tôi đang học cho kỳ thi trong tuần này.",
+                "explanation": "Hoạt động tạm thời quanh hiện tại."
+              }
+            ],
+            "signals": [
+              "now",
+              "right now",
+              "at the moment",
+              "today",
+              "this week"
+            ]
+          },
+          {
+            "title": "3. So sánh nhanh",
+            "table": [
+              [
+                "Present Simple",
+                "Present Continuous"
+              ],
+              [
+                "I work every day.",
+                "I am working now."
+              ],
+              [
+                "Thói quen",
+                "Đang diễn ra"
+              ],
+              [
+                "usually, often, every...",
+                "now, at the moment"
+              ]
+            ]
+          }
+        ],
+        "exercises": [
+          {
+            "question": "My brother ___ football every Saturday. (play)",
+            "answer": "plays"
+          },
+          {
+            "question": "Look! The baby ___. (sleep)",
+            "answer": "is sleeping"
+          },
+          {
+            "question": "We usually ___ dinner at 7 p.m. (have)",
+            "answer": "have"
+          },
+          {
+            "question": "She ___ a book at the moment. (read)",
+            "answer": "is reading"
+          }
+        ],
+        "summary": [
+          "Thói quen/lặp lại → Present Simple.",
+          "Đang xảy ra → Present Continuous.",
+          "Luôn nhìn vào ngữ cảnh, không chỉ nhìn một từ khóa."
+        ]
+      },
+      {
+        "order": 3,
+        "title": "Bài học 3: Thực hành và Bài tập tổng hợp về Tenses",
+        "duration": 18,
+        "objective": "Áp dụng kiến thức về các thì vào câu thực tế và tự sửa lỗi.",
+        "sections": [
+          {
+            "title": "1. Chọn thì theo ngữ cảnh",
+            "content": "Đọc toàn bộ câu trước khi chọn thì. Xác định thời điểm, tính chất của hành động và các từ chỉ thời gian."
+          },
+          {
+            "title": "2. Sửa lỗi thường gặp",
+            "examples": [
+              {
+                "wrong": "She go to school every day.",
+                "correct": "She goes to school every day.",
+                "explanation": "Chủ ngữ She ở Present Simple cần động từ thêm s/es."
+              },
+              {
+                "wrong": "They is studying now.",
+                "correct": "They are studying now.",
+                "explanation": "They đi với are trong Present Continuous."
+              },
+              {
+                "wrong": "I am go to school every day.",
+                "correct": "I go to school every day.",
+                "explanation": "Thói quen dùng Present Simple, không dùng am + V nguyên mẫu."
+              }
+            ]
+          },
+          {
+            "title": "3. Hội thoại thực tế",
+            "dialogue": [
+              {
+                "speaker": "A",
+                "text": "What do you usually do after school?"
+              },
+              {
+                "speaker": "B",
+                "text": "I usually go home and do my homework."
+              },
+              {
+                "speaker": "A",
+                "text": "What are you doing now?"
+              },
+              {
+                "speaker": "B",
+                "text": "I am studying English."
+              }
+            ],
+            "translation": "A hỏi về thói quen dùng Present Simple; khi hỏi việc đang diễn ra dùng Present Continuous."
+          }
+        ],
+        "exercises": [
+          {
+            "question": "He ___ coffee every morning. (drink)",
+            "answer": "drinks"
+          },
+          {
+            "question": "Listen! Someone ___. (sing)",
+            "answer": "is singing"
+          },
+          {
+            "question": "They ___ to school by bus every day. (go)",
+            "answer": "go"
+          },
+          {
+            "question": "I ___ my homework right now. (do)",
+            "answer": "am doing"
+          },
+          {
+            "question": "Sửa lỗi: She are watching TV now.",
+            "answer": "She is watching TV now."
+          }
+        ],
+        "summary": [
+          "Đọc ngữ cảnh trước khi chọn thì.",
+          "Kiểm tra chủ ngữ và trợ động từ.",
+          "Sau khi chọn thì, kiểm tra lại dạng của động từ."
+        ]
+      }
+    ]
+  }
+}

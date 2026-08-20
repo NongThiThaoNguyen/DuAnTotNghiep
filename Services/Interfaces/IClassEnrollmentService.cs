@@ -33,5 +33,46 @@ namespace DuAnTotNghiep.Services.Interfaces
         /// Kiểm tra Student đã hoàn thành Placement Test chưa
         /// </summary>
         Task<bool> HasCompletedPlacementTestAsync(int studentId);
+
+        // ─────────────────────────────────────────────────────────────
+        // PHẦN 4: CHỌN GIÁO VIÊN
+        // ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Lấy danh sách giáo viên phụ trách lớp cùng level với lớp Student đã chọn
+        /// Chỉ khả dụng khi Enrollment ở trạng thái PENDING_TEACHER
+        /// </summary>
+        Task<TeacherSelectionViewModel?> GetTeacherSelectionAsync(int studentId);
+
+        /// <summary>
+        /// Student chọn giáo viên → cập nhật ClassroomId sang lớp của GV đó
+        /// Đổi Enrollment.Status → AWAITING_CONFIRMATION
+        /// </summary>
+        Task<(bool Success, string? ErrorMessage)> SelectTeacherAsync(int studentId, int classroomId);
+
+        /// <summary>
+        /// Chọn giáo viên ngẫu nhiên trong danh sách phù hợp
+        /// </summary>
+        Task<(bool Success, string? ErrorMessage)> SelectRandomTeacherAsync(int studentId);
+
+        /// <summary>
+        /// Lấy thông tin xác nhận sau khi Student đã chọn giáo viên (AWAITING_CONFIRMATION)
+        /// </summary>
+        Task<TeacherSelectedSuccessViewModel?> GetTeacherSelectedSuccessAsync(int studentId);
+
+        // ─────────────────────────────────────────────────────────────
+        // PHẦN 5: XÁC NHẬN PHÂN LỚP VÀ CẬP NHẬT DANH SÁCH
+        // ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Xác nhận đăng ký cuối cùng: Đổi Enrollment.Status → ACTIVE, User.Status → STUDYING,
+        /// Cập nhật trạng thái Onboarding → COMPLETED
+        /// </summary>
+        Task<(bool Success, string? ErrorMessage)> ConfirmFinalEnrollmentAsync(int studentId);
+
+        /// <summary>
+        /// Lấy thông tin thành công chính thức sau khi bấm "Xác nhận đăng ký"
+        /// </summary>
+        Task<TeacherSelectedSuccessViewModel?> GetFinalSuccessInfoAsync(int studentId);
     }
 }

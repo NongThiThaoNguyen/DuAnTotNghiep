@@ -1,0 +1,223 @@
+@model DuAnTotNghiep.Models.ViewModels.Student.TeacherSelectedSuccessViewModel
+@{
+    ViewData["Title"] = "Đăng ký thành công - Đang học";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/class-enrollment.css" asp-append-version="true" />
+    <style>
+        .fs-container {
+            max-width: 620px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        .fs-card {
+            background: #fff;
+            border-radius: 1.75rem;
+            box-shadow: 0 10px 45px rgba(0,0,0,.12);
+            overflow: hidden;
+        }
+        .fs-top {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 3rem 2rem 2.5rem;
+            text-align: center;
+            position: relative;
+            color: #fff;
+        }
+        .fs-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: rgba(255,255,255,.2);
+            backdrop-filter: blur(4px);
+            padding: .4rem 1rem;
+            border-radius: 2rem;
+            font-size: .85rem;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            margin-bottom: 1.25rem;
+        }
+        .fs-icon-wrap {
+            width: 88px;
+            height: 88px;
+            border-radius: 50%;
+            background: #fff;
+            color: #059669;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.25rem;
+            font-size: 2.5rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,.15);
+        }
+        .fs-top h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 0 0 .5rem;
+        }
+        .fs-top p {
+            color: rgba(255,255,255,.9);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .fs-body {
+            padding: 2.25rem 2rem 1.5rem;
+        }
+        .fs-detail-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.25rem;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .fs-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: .75rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .fs-row:last-child { border-bottom: none; }
+        .fs-row-left {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            color: #64748b;
+            font-size: .9rem;
+            font-weight: 500;
+        }
+        .fs-row-left i {
+            color: #059669;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .fs-row-val {
+            font-size: .95rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        .fs-status-tag {
+            background: #dcfce7;
+            color: #15803d;
+            padding: .3rem .8rem;
+            border-radius: .5rem;
+            font-size: .85rem;
+            font-weight: 700;
+        }
+
+        .fs-footer {
+            padding: 0 2rem 2.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .85rem;
+        }
+        .fs-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            padding: .9rem 1.5rem;
+            border-radius: .85rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .fs-btn:hover { transform: translateY(-2px); }
+        .fs-btn-primary {
+            background: linear-gradient(135deg,#10b981,#059669);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(16,185,129,.35);
+        }
+        .fs-btn-primary:hover { box-shadow: 0 6px 22px rgba(16,185,129,.45); color: #fff; }
+        .fs-btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+        }
+        .fs-btn-secondary:hover { background: #e2e8f0; color: #1e293b; }
+    </style>
+}
+
+<div class="ce-page">
+    <div class="fs-container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="mb-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-circle-check"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="fs-card">
+            <div class="fs-top">
+                <div class="fs-badge">
+                    <i class="fa-solid fa-circle-check"></i> Đăng ký thành công
+                </div>
+                <div class="fs-icon-wrap">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <h1>Chào mừng học viên chính thức!</h1>
+                <p>Bạn đã hoàn tất đăng ký lớp học và giáo viên phụ trách</p>
+            </div>
+
+            <div class="fs-body">
+                <div class="fs-detail-card">
+                    <div class="fs-row">
+                        <div class="fs-row-left">
+                            <i class="fa-solid fa-user"></i>
+                            <span>Học viên</span>
+                        </div>
+                        <span class="fs-row-val">@Model.StudentName</span>
+                    </div>
+                    <div class="fs-row">
+                        <div class="fs-row-left">
+                            <i class="fa-solid fa-chalkboard"></i>
+                            <span>Lớp học</span>
+                        </div>
+                        <span class="fs-row-val">@Model.ClassName</span>
+                    </div>
+                    <div class="fs-row">
+                        <div class="fs-row-left">
+                            <i class="fa-solid fa-user-tie"></i>
+                            <span>Giáo viên</span>
+                        </div>
+                        <span class="fs-row-val">@Model.TeacherName</span>
+                    </div>
+                    <div class="fs-row">
+                        <div class="fs-row-left">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>Trình độ</span>
+                        </div>
+                        <span class="fs-row-val">@Model.LevelName</span>
+                    </div>
+                    <div class="fs-row">
+                        <div class="fs-row-left">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span>Lịch học</span>
+                        </div>
+                        <span class="fs-row-val">@Model.ScheduleDisplay</span>
+                    </div>
+                    <div class="fs-row">
+                        <div class="fs-row-left">
+                            <i class="fa-solid fa-signal"></i>
+                            <span>Trạng thái</span>
+                        </div>
+                        <span class="fs-status-tag">@Model.Status</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fs-footer">
+                <a href="@Url.Action("Index", "Dashboard", new { area = "Student" })" class="fs-btn fs-btn-primary">
+                    <i class="fa-solid fa-rocket"></i> Vào học ngay (Bảng điều khiển)
+                </a>
+                <a href="@Url.Action("Index", "Home")" class="fs-btn fs-btn-secondary">
+                    <i class="fa-solid fa-house"></i> Về trang chủ
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

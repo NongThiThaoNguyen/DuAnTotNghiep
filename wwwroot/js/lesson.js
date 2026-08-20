@@ -49,24 +49,34 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    /* ── 3. WEB SPEECH API — PRONUNCIATION WITH LIVE WORD HIGHLIGHTING ── */
+    /* ── 3. AUDIO PLAYBACK & SPEECH — PRONUNCIATION WITH MP3 SUPPORT ── */
     const pronounceBtns = document.querySelectorAll('.c26-pronounce-btn.btn-pronounce');
 
-    if (pronounceBtns.length > 0 && 'speechSynthesis' in window) {
+    if (pronounceBtns.length > 0) {
         let voices = [];
         let currentUtterance = null;
+        let activeAudio = null;
         let activeBtn = null;
         let activeTargetElem = null;
         let originalHtml = '';
 
         function loadVoices() {
-            voices = window.speechSynthesis.getVoices();
+            if ('speechSynthesis' in window) {
+                voices = window.speechSynthesis.getVoices();
+            }
         }
         loadVoices();
-        window.speechSynthesis.onvoiceschanged = loadVoices;
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+        }
 
         function resetSpeechState() {
-            if (currentUtterance) {
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio.currentTime = 0;
+                activeAudio = null;
+            }
+            if (currentUtterance && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 currentUtterance = null;
             }
@@ -103,8 +113,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Reset any existing playback
                 resetSpeechState();
 
+                const audioUrl = this.getAttribute('data-audio');
                 const wordToSay = this.getAttribute('data-word');
-                if (!wordToSay) return;
+
+                if (audioUrl) {
+                    activeBtn = this;
+                    this.classList.add('speaking');
+                    this.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 10a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                        </svg>
+                        Dừng
+                    `;
+                    activeAudio = new Audio(audioUrl);
+                    activeAudio.onended = function () {
+                        resetSpeechState();
+                    };
+                    activeAudio.onerror = function () {
+                        resetSpeechState();
+                    };
+                    activeAudio.play().catch(function () {
+                        resetSpeechState();
+                    });
+                    return;
+                }
+
+                if (!wordToSay || !('speechSynthesis' in window)) return;
 
                 // Locate the target text element (e.g. .c26-example-english in the card)
                 const card = this.closest('.c26-example-card') || this.closest('.c26-example-body') || this.parentElement.parentElement;

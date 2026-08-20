@@ -34,6 +34,7 @@ public class LessonGrammarExampleViewModel
     public string Example { get; set; } = "";
     public string Translation { get; set; } = "";
     public string? Explanation { get; set; }
+    public string? AudioUrl { get; set; }
 }
 
 public class LessonResourceViewModel

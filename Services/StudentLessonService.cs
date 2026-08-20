@@ -144,63 +144,105 @@ namespace DuAnTotNghiep.Services
                     Explanation = "Dùng cụm 'the figure for...' để tránh lặp lại danh từ chính nhiều lần."
                 });
             }
-            else if (title.Contains("Present Simple") || title.Contains("Hiện tại đơn"))
+            else if (title.Contains("12 Thì") || title.Contains("Tenses") || title.Contains("Present Simple") || title.Contains("Hiện tại đơn"))
             {
-                if (title.Contains("Tổng quan") || title.Contains("Bài 1"))
+                if (title.Contains("Tổng quan") || title.Contains("Bài 1") || title.Contains("Bài học 1"))
                 {
                     list.Add(new LessonGrammarExampleViewModel
                     {
-                        Title = "1. Diễn tả thói quen hằng ngày (Daily Routines)",
-                        Syntax = "S + Adverb of Frequency (usually/always) + V(s/es)",
-                        Example = "I usually drink warm water every morning after waking up.",
-                        Translation = "Tôi thường uống nước ấm mỗi sáng sau khi thức dậy.",
-                        Explanation = "Trạng từ 'usually' đứng trước động từ thường 'drink' và đi kèm 'every morning' để diễn tả thói quen."
+                        Title = "1. Thói quen (Present Simple)",
+                        Syntax = "S + V(s/es) + O",
+                        Example = "I study English every day.",
+                        Translation = "Tôi học tiếng Anh mỗi ngày.",
+                        Explanation = "Thói quen → Present Simple.",
+                        AudioUrl = "/audio/tenses_b1_ex1.mp3"
                     });
                     list.Add(new LessonGrammarExampleViewModel
                     {
-                        Title = "2. Diễn tả sự thật hiển nhiên (General Truths)",
-                        Syntax = "Subject (Nature/Science) + V(s/es) + Complement",
-                        Example = "The sun rises in the East and sets in the West.",
-                        Translation = "Mặt trời mọc ở hướng Đông và lặn ở hướng Tây.",
-                        Explanation = "Sử dụng Hiện tại đơn cho quy luật thiên nhiên và sự thật vĩnh cửu."
+                        Title = "2. Hành động đang diễn ra (Present Continuous)",
+                        Syntax = "S + am/is/are + V-ing + O",
+                        Example = "I am studying English now.",
+                        Translation = "Tôi đang học tiếng Anh bây giờ.",
+                        Explanation = "Hành động đang diễn ra → Present Continuous.",
+                        AudioUrl = "/audio/tenses_b1_ex2.mp3"
+                    });
+                    list.Add(new LessonGrammarExampleViewModel
+                    {
+                        Title = "3. Hành động liên quan hiện tại (Present Perfect)",
+                        Syntax = "S + have/has + V3/ed + O",
+                        Example = "I have studied English for two years.",
+                        Translation = "Tôi đã học tiếng Anh được hai năm.",
+                        Explanation = "Hành động bắt đầu trong quá khứ và còn liên quan hiện tại → Present Perfect.",
+                        AudioUrl = "/audio/tenses_b1_ex3.mp3"
                     });
                 }
-                else if (title.Contains("Cấu trúc") || title.Contains("Bài 2"))
+                else if (title.Contains("Phân biệt") || title.Contains("Bài 2") || title.Contains("Bài học 2") || title.Contains("Cấu trúc"))
                 {
                     list.Add(new LessonGrammarExampleViewModel
                     {
-                        Title = "1. Quy tắc thêm đuôi -es với động từ tận cùng -ch",
-                        Syntax = "He / She / It + V(-es)",
-                        Example = "She watches her favorite cartoon every afternoon.",
-                        Translation = "Cô ấy xem bộ phim hoạt hình yêu thích mỗi buổi chiều.",
-                        Explanation = "Động từ 'watch' kết thúc bằng 'ch' nên phải thêm '-es' khi đi với chủ ngữ số ít 'She'."
+                        Title = "1. Present Simple - Thói quen lặp lại",
+                        Syntax = "S + V(s/es) + O",
+                        Example = "Tom plays football every Sunday.",
+                        Translation = "Tom chơi bóng đá mỗi Chủ nhật.",
+                        Explanation = "Thói quen lặp lại.",
+                        AudioUrl = "/audio/tenses_b2_ex1.mp3"
                     });
                     list.Add(new LessonGrammarExampleViewModel
                     {
-                        Title = "2. Cấu trúc câu hỏi nghi vấn với Trợ động từ Does",
-                        Syntax = "Does + He/She/It + V-bare?",
-                        Example = "Does Peter study English on Tuesday nights?",
-                        Translation = "Peter có học tiếng Anh vào tối thứ Ba không?",
-                        Explanation = "Khi đã mượn trợ động từ 'Does', động từ chính 'study' bắt buộc ở dạng nguyên mẫu."
+                        Title = "2. Present Simple - Sự thật hiển nhiên",
+                        Syntax = "S + V(s/es) + O",
+                        Example = "Water boils at 100°C.",
+                        Translation = "Nước sôi ở 100°C.",
+                        Explanation = "Sự thật hiển nhiên.",
+                        AudioUrl = "/audio/tenses_b2_ex2.mp3"
+                    });
+                    list.Add(new LessonGrammarExampleViewModel
+                    {
+                        Title = "3. Present Continuous - Hành động đang xảy ra",
+                        Syntax = "S + am/is/are + V-ing + O",
+                        Example = "Tom is playing football now.",
+                        Translation = "Tom đang chơi bóng đá bây giờ.",
+                        Explanation = "Hành động đang xảy ra.",
+                        AudioUrl = "/audio/tenses_b2_ex3.mp3"
+                    });
+                    list.Add(new LessonGrammarExampleViewModel
+                    {
+                        Title = "4. Present Continuous - Hoạt động tạm thời",
+                        Syntax = "S + am/is/are + V-ing + O",
+                        Example = "I am studying for my exam this week.",
+                        Translation = "Tôi đang học cho kỳ thi trong tuần này.",
+                        Explanation = "Hoạt động tạm thời quanh hiện tại.",
+                        AudioUrl = "/audio/tenses_b2_ex4.mp3"
                     });
                 }
-                else if (title.Contains("Thực hành") || title.Contains("Bài 3"))
+                else if (title.Contains("Thực hành") || title.Contains("Bài 3") || title.Contains("Bài học 3"))
                 {
                     list.Add(new LessonGrammarExampleViewModel
                     {
-                        Title = "1. Mẫu câu hỏi giao tiếp về thời gian sinh hoạt",
-                        Syntax = "What time + do/does + S + V-bare?",
-                        Example = "What time do you usually wake up in the morning?",
-                        Translation = "Cậu thường thức dậy lúc mấy giờ vào buổi sáng?",
-                        Explanation = "Mẫu câu hỏi thói quen phổ biến nhất trong giao tiếp hằng ngày."
+                        Title = "1. Sửa lỗi Present Simple (Thêm s/es)",
+                        Syntax = "She / He / It + V(s/es)",
+                        Example = "She goes to school every day.",
+                        Translation = "Cô ấy đi học mỗi ngày. (Sai: She go to school every day.)",
+                        Explanation = "Chủ ngữ She ở Present Simple cần động từ thêm s/es.",
+                        AudioUrl = "/audio/tenses_b3_ex1.mp3"
                     });
                     list.Add(new LessonGrammarExampleViewModel
                     {
-                        Title = "2. Mẫu câu phủ định phản hồi thói quen",
-                        Syntax = "S + do/does + NOT + V-bare, so + Clause",
-                        Example = "My sister does not like spicy food, so she always orders salad.",
-                        Translation = "Chị tôi không thích đồ ăn cay, nên chị ấy luôn gọi món salad.",
-                        Explanation = "Mượn 'does not' cho chủ ngữ số ít 'My sister', động từ 'like' giữ nguyên mẫu."
+                        Title = "2. Sửa lỗi Present Continuous (To Be)",
+                        Syntax = "They / We / You + are + V-ing",
+                        Example = "They are studying now.",
+                        Translation = "Họ đang học bây giờ. (Sai: They is studying now.)",
+                        Explanation = "They đi với are trong Present Continuous.",
+                        AudioUrl = "/audio/tenses_b3_ex2.mp3"
+                    });
+                    list.Add(new LessonGrammarExampleViewModel
+                    {
+                        Title = "3. Sửa lỗi Thói quen vs Tiếp diễn",
+                        Syntax = "I / You / We / They + V-bare",
+                        Example = "I go to school every day.",
+                        Translation = "Tôi đi học mỗi ngày. (Sai: I am go to school every day.)",
+                        Explanation = "Thói quen dùng Present Simple, không dùng am + V nguyên mẫu.",
+                        AudioUrl = "/audio/tenses_b3_ex3.mp3"
                     });
                 }
                 else
@@ -211,7 +253,8 @@ namespace DuAnTotNghiep.Services
                         Syntax = "S + Adverb of Frequency (always/usually) + V(s/es)",
                         Example = "She always drinks green tea in the morning before working.",
                         Translation = "Cô ấy luôn uống trà xanh vào buổi sáng trước khi làm việc.",
-                        Explanation = "Trạng từ chỉ tần suất luôn đứng trước động từ thường và đứng sau To Be."
+                        Explanation = "Trạng từ chỉ tần suất luôn đứng trước động từ thường và đứng sau To Be.",
+                        AudioUrl = "/audio/tenses_b1_ex1.mp3"
                     });
                     list.Add(new LessonGrammarExampleViewModel
                     {
@@ -219,7 +262,8 @@ namespace DuAnTotNghiep.Services
                         Syntax = "S + V(s/es) + Object",
                         Example = "Water boils at 100 degrees Celsius under normal pressure.",
                         Translation = "Nước sôi ở 100 độ C dưới áp suất bình thường.",
-                        Explanation = "Không sử dụng thì tiếp diễn cho các quy luật tự nhiên và sự thật khoa học."
+                        Explanation = "Không sử dụng thì tiếp diễn cho các quy luật tự nhiên và sự thật khoa học.",
+                        AudioUrl = "/audio/tenses_b2_ex2.mp3"
                     });
                 }
             }
@@ -476,19 +520,36 @@ namespace DuAnTotNghiep.Services
 
         private List<LessonResourceViewModel> GenerateResources(OriginalLesson lesson)
         {
+            string title = lesson.Title ?? "";
+            string audioUrl = "/audio/tenses_b1_ex1.mp3";
+            if (title.Contains("Bài 2") || title.Contains("Bài học 2") || title.Contains("Phân biệt"))
+            {
+                audioUrl = "/audio/tenses_b2_ex1.mp3";
+            }
+            else if (title.Contains("Bài 3") || title.Contains("Bài học 3") || title.Contains("Thực hành"))
+            {
+                audioUrl = "/audio/tenses_b3_ex1.mp3";
+            }
+
             return new List<LessonResourceViewModel>
             {
                 new LessonResourceViewModel
                 {
                     Title = $"Tài liệu tóm tắt bài giảng - {lesson.Title}.pdf",
                     FileType = "PDF",
-                    FileUrl = "#"
+                    FileUrl = "/document/Tenses_Masterclass_Bai_1.pdf"
                 },
                 new LessonResourceViewModel
                 {
                     Title = $"Audio luyện phát âm & ví dụ - {lesson.Title}.mp3",
                     FileType = "MP3",
-                    FileUrl = "#"
+                    FileUrl = audioUrl
+                },
+                new LessonResourceViewModel
+                {
+                    Title = $"Nội dung bài học (JSON) - {lesson.Title}.json",
+                    FileType = "JSON",
+                    FileUrl = "/noi_dung_tenses_masterclass.json"
                 }
             };
         }

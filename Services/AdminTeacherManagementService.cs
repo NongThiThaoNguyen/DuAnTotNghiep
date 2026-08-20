@@ -97,9 +97,9 @@ public class AdminTeacherManagementService : IAdminTeacherManagementService
             .Distinct()
             .ToListAsync();
 
-        var studentCount = await _context.Attendances.AsNoTracking()
-            .Where(a => topicIds.Contains(a.TopicId))
-            .Select(a => a.StudentId)
+        var studentCount = await _context.Enrollments.AsNoTracking()
+            .Where(e => e.Classroom.TeacherId == teacherId && e.Status == "ACTIVE")
+            .Select(e => e.StudentId)
             .Distinct()
             .CountAsync();
 

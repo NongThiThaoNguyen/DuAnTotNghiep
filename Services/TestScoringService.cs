@@ -253,41 +253,34 @@ namespace DuAnTotNghiep.Services
             // 0–39% Beginner
             // 40–59% Elementary
             // 60–74% Intermediate
-            // 75–89% Upper-Intermediate
-            // 90–100% Advanced
+            // 75–100% Upper-Intermediate
             string levelCode;
             string levelName;
             string description;
 
-            if (percentage >= 90)
-            {
-                levelCode = "ADVANCED";
-                levelName = "Advanced";
-                description = "Trình độ cao cấp (Advanced).";
-            }
-            else if (percentage >= 75)
+            if (percentage >= 75)
             {
                 levelCode = "UPPER_INTERMEDIATE";
                 levelName = "Upper-Intermediate";
-                description = "Trình độ trung cấp trên (Upper-Intermediate).";
+                description = "Trình độ trung cấp nâng cao (Upper-Intermediate). Khả năng giao tiếp và sử dụng tiếng Anh linh hoạt, thành thạo trong các chủ đề phức tạp.";
             }
             else if (percentage >= 60)
             {
                 levelCode = "INTERMEDIATE";
                 levelName = "Intermediate";
-                description = "Trình độ trung cấp (Intermediate).";
+                description = "Trình độ trung cấp (Intermediate). Khả năng hiểu và diễn đạt các chủ đề quen thuộc, đáp ứng tốt nhu cầu giao tiếp, học tập và làm việc cơ bản.";
             }
             else if (percentage >= 40)
             {
                 levelCode = "ELEMENTARY";
                 levelName = "Elementary";
-                description = "Trình độ sơ cấp (Elementary).";
+                description = "Trình độ sơ cấp (Elementary). Khả năng sử dụng các mẫu câu đơn giản và giao tiếp cơ bản trong các tình huống hằng ngày.";
             }
             else
             {
                 levelCode = "BEGINNER";
                 levelName = "Beginner";
-                description = "Trình độ người mới bắt đầu (Beginner).";
+                description = "Trình độ người mới bắt đầu (Beginner). Bắt đầu làm quen với nền tảng từ vựng và cấu trúc giao tiếp căn bản nhất.";
             }
 
             // Find matching level entity in DB by Code or Name
@@ -297,8 +290,7 @@ namespace DuAnTotNghiep.Services
                                           (levelCode == "BEGINNER" && (l.Code == "A1" || l.Name == "Beginner")) ||
                                           (levelCode == "ELEMENTARY" && (l.Code == "A2" || l.Name == "Elementary")) ||
                                           (levelCode == "INTERMEDIATE" && (l.Code == "B1" || l.Name == "Intermediate")) ||
-                                          (levelCode == "UPPER_INTERMEDIATE" && (l.Code == "B2" || l.Name == "Upper Intermediate" || l.Name == "Upper-Intermediate")) ||
-                                          (levelCode == "ADVANCED" && (l.Code == "C1" || l.Code == "C2" || l.Name == "Advanced")));
+                                          (levelCode == "UPPER_INTERMEDIATE" && (l.Code == "B2" || l.Name == "Upper Intermediate" || l.Name == "Upper-Intermediate")));
 
             return new EstimatedLevelDto
             {

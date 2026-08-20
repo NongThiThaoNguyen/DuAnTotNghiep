@@ -1,0 +1,228 @@
+@model DuAnTotNghiep.Models.ViewModels.Student.TeacherSelectedSuccessViewModel
+@{
+    ViewData["Title"] = "Xác nhận đăng ký phân lớp và giáo viên";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/class-enrollment.css" asp-append-version="true" />
+    <style>
+        .tc-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 0 1rem;
+        }
+        .tc-card {
+            background: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 8px 40px rgba(0,0,0,.1);
+            overflow: hidden;
+        }
+        .tc-card-top {
+            background: linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+        .tc-icon-wrap {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            color: #fff;
+        }
+        .tc-card-top h1 {
+            color: #fff;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin: 0 0 .5rem;
+        }
+        .tc-card-top p {
+            color: rgba(255,255,255,.85);
+            font-size: .95rem;
+            margin: 0;
+        }
+
+        .tc-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .4rem;
+            background: rgba(255,255,255,.25);
+            color: #fff;
+            font-size: .85rem;
+            font-weight: 600;
+            padding: .35rem .9rem;
+            border-radius: 2rem;
+            margin-top: .85rem;
+        }
+
+        .tc-body {
+            padding: 2rem;
+        }
+        .tc-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: .9rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .tc-row:last-child { border-bottom: none; }
+        .tc-row-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: .75rem;
+            background: linear-gradient(135deg,#667eea,#764ba2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .tc-row-label {
+            display: block;
+            font-size: .78rem;
+            color: #94a3b8;
+            font-weight: 500;
+            margin-bottom: .25rem;
+        }
+        .tc-row-value {
+            display: block;
+            font-size: 1rem;
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        .tc-footer {
+            padding: 1.5rem 2rem 2.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: .85rem;
+            background: #fafafa;
+            border-top: 1px solid #f1f5f9;
+        }
+        .tc-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: .6rem;
+            padding: .85rem 1.5rem;
+            border-radius: .85rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform .2s, box-shadow .2s;
+            cursor: pointer;
+            border: none;
+        }
+        .tc-btn:hover { transform: translateY(-2px); }
+        .tc-btn-confirm {
+            background: linear-gradient(135deg,#10b981,#059669);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(16,185,129,.35);
+        }
+        .tc-btn-confirm:hover { box-shadow: 0 6px 22px rgba(16,185,129,.45); color: #fff; }
+        .tc-btn-outline {
+            border: 1.5px solid #cbd5e1;
+            color: #475569;
+            background: #fff;
+        }
+        .tc-btn-outline:hover { border-color: #667eea; color: #667eea; }
+
+        /* confetti floating dots */
+        .tc-confetti-wrap { position: relative; }
+        .tc-dot {
+            position: absolute;
+            border-radius: 50%;
+            animation: tcFloat 3s ease-in-out infinite;
+        }
+        .tc-dot-1 { width:10px;height:10px;background:#fbbf24;top:10px;left:20px;animation-delay:0s; }
+        .tc-dot-2 { width:8px;height:8px;background:#34d399;top:20px;right:30px;animation-delay:.4s; }
+        .tc-dot-3 { width:6px;height:6px;background:#f87171;bottom:15px;left:40px;animation-delay:.8s; }
+        .tc-dot-4 { width:7px;height:7px;background:#a78bfa;bottom:10px;right:50px;animation-delay:1.2s; }
+        @@keyframes tcFloat {
+            0%,100% { transform: translateY(0) rotate(0); opacity:.8; }
+            50% { transform: translateY(-8px) rotate(180deg); opacity:1; }
+        }
+    </style>
+}
+
+<div class="ce-page">
+    <div class="tc-container">
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="mb-4 p-4 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation"></i>
+                @TempData["ErrorMessage"]
+            </div>
+        }
+
+        <div class="tc-card tc-confetti-wrap">
+            <div class="tc-dot tc-dot-1"></div>
+            <div class="tc-dot tc-dot-2"></div>
+            <div class="tc-dot tc-dot-3"></div>
+            <div class="tc-dot tc-dot-4"></div>
+
+            <div class="tc-card-top">
+                <div class="tc-icon-wrap">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <h1>Xác nhận phân lớp &amp; Giáo viên</h1>
+                <p>Vui lòng kiểm tra thông tin và nhấn <strong>"Xác nhận đăng ký"</strong> để chính thức tham gia học tập</p>
+                <div class="tc-status-badge">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                    Trạng thái: <strong>@Model.Status</strong>
+                </div>
+            </div>
+
+            <div class="tc-body">
+                <div class="tc-row">
+                    <div class="tc-row-icon"><i class="fa-solid fa-chalkboard"></i></div>
+                    <div>
+                        <span class="tc-row-label">Lớp học</span>
+                        <span class="tc-row-value">@Model.ClassName</span>
+                    </div>
+                </div>
+                <div class="tc-row">
+                    <div class="tc-row-icon"><i class="fa-solid fa-user-tie"></i></div>
+                    <div>
+                        <span class="tc-row-label">Giáo viên phụ trách</span>
+                        <span class="tc-row-value">@Model.TeacherName</span>
+                    </div>
+                </div>
+                <div class="tc-row">
+                    <div class="tc-row-icon"><i class="fa-solid fa-layer-group"></i></div>
+                    <div>
+                        <span class="tc-row-label">Trình độ</span>
+                        <span class="tc-row-value">@Model.LevelName</span>
+                    </div>
+                </div>
+                <div class="tc-row">
+                    <div class="tc-row-icon"><i class="fa-solid fa-calendar-days"></i></div>
+                    <div>
+                        <span class="tc-row-label">Lịch học</span>
+                        <span class="tc-row-value">@Model.ScheduleDisplay</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tc-footer">
+                <form asp-area="Student" asp-controller="ClassEnrollment" asp-action="ConfirmFinal" method="post" style="margin:0">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="tc-btn tc-btn-confirm" style="width:100%">
+                        <i class="fa-solid fa-check-double"></i>
+                        <span>Xác nhận đăng ký</span>
+                    </button>
+                </form>
+
+                <a href="@Url.Action("SelectTeacher", "ClassEnrollment", new { area = "Student" })" class="tc-btn tc-btn-outline">
+                    <i class="fa-solid fa-rotate-left"></i> Chọn lại giáo viên
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

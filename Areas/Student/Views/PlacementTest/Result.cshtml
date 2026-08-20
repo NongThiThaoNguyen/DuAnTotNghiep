@@ -67,7 +67,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <!-- Overall Score Card -->
             <div class="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-2xl border border-slate-150 text-center space-y-2">
-                <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Tổng điểm đạt được</span>
+                <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Tổng điểm kiểm tra</span>
                 <div class="text-5xl font-black text-indigo-600 tracking-tight">
                     @Model.TotalScore.ToString("0.#") <span class="text-2xl text-slate-400 font-bold">/ @Model.MaxScore.ToString("0.#")</span>
                 </div>
@@ -78,11 +78,17 @@
 
             <!-- Estimated Level Card -->
             <div class="flex flex-col items-center justify-center p-8 bg-slate-50 rounded-2xl border border-slate-150 text-center space-y-3">
-                <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Trình độ xếp loại</span>
+                <span class="text-xs font-extrabold text-slate-400 uppercase tracking-wider">Trình độ được đánh giá</span>
                 <div class="px-8 py-3.5 rounded-2xl bg-gradient-to-r @levelColor shadow-md font-black text-2xl tracking-wide">
                     @Model.EstimatedLevel
                 </div>
-                <span class="text-xs text-slate-500 font-medium max-w-xs">Xếp loại dựa trên thang phần trăm bài kiểm tra thực tế.</span>
+                <p class="text-xs text-slate-600 font-medium max-w-sm text-center leading-relaxed">
+                    @(string.IsNullOrEmpty(Model.LevelDescription) ? "Đã xếp loại trình độ dựa trên điểm kiểm tra thực tế." : Model.LevelDescription)
+                </p>
+                <div class="mt-2 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-50 text-amber-700 border border-amber-200">
+                    <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                    Trạng thái: @Model.StatusText
+                </div>
             </div>
         </div>
 
@@ -181,8 +187,8 @@
             Về Dashboard
         </a>
 
-        <a href="/Student/LearningPath" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-md shadow-indigo-600/15 text-center cursor-pointer flex items-center justify-center gap-2">
-            <span>Xem lộ trình học cá nhân (AI Learning Path)</span>
+        <a href="/Student/ClassEnrollment" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-sm transition-all shadow-lg shadow-indigo-600/25 text-center cursor-pointer flex items-center justify-center gap-2">
+            <span>Tiến hành Chọn Lớp học phù hợp</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </a>
     </div>

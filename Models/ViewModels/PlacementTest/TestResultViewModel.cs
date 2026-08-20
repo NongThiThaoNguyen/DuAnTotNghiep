@@ -22,6 +22,9 @@ namespace DuAnTotNghiep.Models.ViewModels.PlacementTest
         public string? WeakestSkill { get; set; }
         public string? WeakestTopic { get; set; }
 
+        public string LevelDescription { get; set; } = "";
+        public string StatusText { get; set; } = "Chờ chọn lớp";
+
         public string AiAnalysisStatus { get; set; } = "Analyzing";
         public bool AiCompleted { get; set; }
         public DateTime? SubmittedAt { get; set; }

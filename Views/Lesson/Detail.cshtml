@@ -259,16 +259,28 @@
                                 <!-- Number badge + title -->
                                 <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
                                     <span class="c26-example-num">@exNum</span>
-                                    <button class="c26-pronounce-btn btn-pronounce"
-                                            data-word="@ex.Example"
-                                            type="button"
-                                            aria-label="Nghe phát âm">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                  d="M15.536 8.464a5 5 0 0 1 0 7.072M12 6v12m-4.243-1.757A9 9 0 0 1 12 3m0 18a9 9 0 0 1-4.243-2.757"/>
-                                        </svg>
-                                        Nghe
-                                    </button>
+                                    <div style="display:flex;align-items:center;gap:8px;">
+                                        <button class="c26-pronounce-btn btn-pronounce"
+                                                data-word="@ex.Example"
+                                                data-audio="@ex.AudioUrl"
+                                                type="button"
+                                                aria-label="Nghe phát âm">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M15.536 8.464a5 5 0 0 1 0 7.072M12 6v12m-4.243-1.757A9 9 0 0 1 12 3m0 18a9 9 0 0 1-4.243-2.757"/>
+                                            </svg>
+                                            Nghe
+                                        </button>
+                                        @if (!string.IsNullOrEmpty(ex.AudioUrl))
+                                        {
+                                            <a href="@ex.AudioUrl" class="c26-btn c26-btn-outline c26-btn-sm" download title="Tải file MP3">
+                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:13px;height:13px;">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15V3m0 12l-4-4m4 4l4-4M3 21h18"/>
+                                                </svg>
+                                                Tải MP3
+                                            </a>
+                                        }
+                                    </div>
                                 </div>
 
                                 <h4 class="c26-example-title">@ex.Title</h4>
@@ -347,6 +359,7 @@
                         {
                             "PDF"  => ("c26-resource-icon-pdf",  "fa-file-pdf"),
                             "MP3"  => ("c26-resource-icon-mp3",  "fa-file-audio"),
+                            "JSON" => ("c26-resource-icon-doc",  "fa-file-code"),
                             "DOCX" or "DOC" => ("c26-resource-icon-doc", "fa-file-word"),
                             _ => ("c26-resource-icon-file", "fa-file")
                         };

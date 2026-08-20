@@ -98,6 +98,145 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
                 return RedirectToAction("Index");
             }
 
+            // Nếu đang PENDING_TEACHER → cần chọn giáo viên
+            vm.NeedsTeacherSelection = true;
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // PHẦN 4: CHỌN GIÁO VIÊN
+        // ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// GET: /Student/ClassEnrollment/SelectTeacher
+        /// Hiển thị trang chọn giáo viên
+        /// </summary>
+        public async Task<IActionResult> SelectTeacher()
+        {
+            int userId = GetUserId();
+
+            // Nếu đã AWAITING_CONFIRMATION → chuyển đến trang xác nhận
+            var confirmed = await _enrollmentService.GetTeacherSelectedSuccessAsync(userId);
+            if (confirmed != null)
+                return RedirectToAction("TeacherConfirmed");
+
+            var vm = await _enrollmentService.GetTeacherSelectionAsync(userId);
+            if (vm == null)
+            {
+                TempData["ErrorMessage"] = "Bạn cần chọn lớp trước khi chọn giáo viên.";
+                return RedirectToAction("Index");
+            }
+
+            return View(vm);
+        }
+
+        /// <summary>
+        /// POST: /Student/ClassEnrollment/PickTeacher
+        /// Xử lý khi Student chọn giáo viên cụ thể
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PickTeacher(int classroomId)
+        {
+            int userId = GetUserId();
+
+            var (success, errorMessage) = await _enrollmentService.SelectTeacherAsync(userId, classroomId);
+
+            if (!success)
+            {
+                TempData["ErrorMessage"] = errorMessage;
+                return RedirectToAction("SelectTeacher");
+            }
+
+            return RedirectToAction("TeacherConfirmed");
+        }
+
+        /// <summary>
+        /// POST: /Student/ClassEnrollment/RandomTeacher
+        /// Hệ thống tự chọn giáo viên ngẫu nhiên
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RandomTeacher()
+        {
+            int userId = GetUserId();
+
+            var (success, errorMessage) = await _enrollmentService.SelectRandomTeacherAsync(userId);
+
+            if (!success)
+            {
+                TempData["ErrorMessage"] = errorMessage;
+                return RedirectToAction("SelectTeacher");
+            }
+
+            return RedirectToAction("TeacherConfirmed");
+        }
+
+        /// <summary>
+        /// GET: /Student/ClassEnrollment/TeacherConfirmed
+        /// Trang xác nhận đã chọn giáo viên (AWAITING_CONFIRMATION)
+        /// </summary>
+        public async Task<IActionResult> TeacherConfirmed()
+        {
+            int userId = GetUserId();
+
+            // Nếu đã confirm rồi (ACTIVE) → sang thẳng FinalSuccess
+            var finalInfo = await _enrollmentService.GetFinalSuccessInfoAsync(userId);
+            if (finalInfo != null)
+            {
+                return RedirectToAction("FinalSuccess");
+            }
+
+            var vm = await _enrollmentService.GetTeacherSelectedSuccessAsync(userId);
+            if (vm == null)
+            {
+                TempData["ErrorMessage"] = "Không tìm thấy thông tin xác nhận. Vui lòng thử lại.";
+                return RedirectToAction("SelectTeacher");
+            }
+
+            return View(vm);
+        }
+
+        // ─────────────────────────────────────────────────────────────
+        // PHẦN 5: XÁC NHẬN PHÂN LỚP VÀ CẬP NHẬT DANH SÁCH
+        // ─────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// POST: /Student/ClassEnrollment/ConfirmFinal
+        /// Xử lý bấm "Xác nhận đăng ký" -> Chuyển Enrollment -> ACTIVE, Student -> STUDYING
+        /// </summary>
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ConfirmFinal()
+        {
+            int userId = GetUserId();
+
+            var (success, errorMessage) = await _enrollmentService.ConfirmFinalEnrollmentAsync(userId);
+            if (!success)
+            {
+                TempData["ErrorMessage"] = errorMessage;
+                return RedirectToAction("TeacherConfirmed");
+            }
+
+            TempData["SuccessMessage"] = "Xác nhận phân lớp và giáo viên thành công!";
+            return RedirectToAction("FinalSuccess");
+        }
+
+        /// <summary>
+        /// GET: /Student/ClassEnrollment/FinalSuccess
+        /// Trang kết quả chính thức sau khi bấm "Xác nhận đăng ký"
+        /// </summary>
+        public async Task<IActionResult> FinalSuccess()
+        {
+            int userId = GetUserId();
+
+            var vm = await _enrollmentService.GetFinalSuccessInfoAsync(userId);
+            if (vm == null)
+            {
+                return RedirectToAction("Index");
+            }
+
             return View(vm);
         }
     }

@@ -17,11 +17,13 @@ namespace DuAnTotNghiep.Services
             _context = context;
         }
 
-        public async Task<int> GetTotalStudentsAsync(string? keyword)
+        public async Task<int> GetTotalStudentsAsync(string? keyword, int? teacherId = null)
         {
             var query = _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Role.RoleCode == "STUDENT")
+                .Where(u => u.Role.RoleCode == "STUDENT" &&
+                    _context.Enrollments.Any(e => e.StudentId == u.Id && e.Status == "ACTIVE" &&
+                        (!teacherId.HasValue || e.Classroom.TeacherId == teacherId.Value)))
                 .AsNoTracking();
 
             if (!string.IsNullOrEmpty(keyword))
@@ -31,11 +33,13 @@ namespace DuAnTotNghiep.Services
             return await query.CountAsync();
         }
 
-        public async Task<List<User>> GetStudentsAsync(string? keyword, int page, int pageSize)
+        public async Task<List<User>> GetStudentsAsync(string? keyword, int page, int pageSize, int? teacherId = null)
         {
             var query = _context.Users
                 .Include(u => u.Role)
-                .Where(u => u.Role.RoleCode == "STUDENT")
+                .Where(u => u.Role.RoleCode == "STUDENT" &&
+                    _context.Enrollments.Any(e => e.StudentId == u.Id && e.Status == "ACTIVE" &&
+                        (!teacherId.HasValue || e.Classroom.TeacherId == teacherId.Value)))
                 .AsNoTracking();
 
             if (!string.IsNullOrEmpty(keyword))

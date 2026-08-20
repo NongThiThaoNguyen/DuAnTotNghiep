@@ -1,6 +1,6 @@
 @model DuAnTotNghiep.Models.ViewModels.Student.EnrollmentSuccessViewModel
 @{
-    ViewData["Title"] = "Đăng ký thành công";
+    ViewData["Title"] = "Đã chọn lớp thành công";
 }
 
 @section Styles {
@@ -23,8 +23,8 @@
             <div class="ce-confetti ce-confetti-6"></div>
         </div>
 
-        <h1 class="ce-success-title">Đăng ký thành công!</h1>
-        <p class="ce-success-subtitle">Chúc mừng bạn đã đăng ký vào lớp học. Hãy bắt đầu hành trình học tập của mình!</p>
+        <h1 class="ce-success-title">Đã chọn lớp học thành công!</h1>
+        <p class="ce-success-subtitle">Lựa chọn lớp học của bạn đã được ghi nhận. Hệ thống sẵn sàng để chuyển sang bước chọn giáo viên.</p>
 
         <!-- Enrollment Details -->
         <div class="ce-success-card">
@@ -50,16 +50,6 @@
 
             <div class="ce-success-detail">
                 <div class="ce-success-detail-icon">
-                    <i class="fa-solid fa-user-tie"></i>
-                </div>
-                <div>
-                    <span class="ce-success-detail-label">Giáo viên</span>
-                    <span class="ce-success-detail-value">@Model.TeacherName</span>
-                </div>
-            </div>
-
-            <div class="ce-success-detail">
-                <div class="ce-success-detail-icon">
                     <i class="fa-solid fa-calendar-days"></i>
                 </div>
                 <div>
@@ -79,13 +69,31 @@
             </div>
         </div>
 
+        <!-- Next Step Banner -->
+        @if (Model.NeedsTeacherSelection)
+        {
+            <div class="ce-next-step-banner">
+                <div class="ce-next-step-icon">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div class="ce-next-step-content">
+                    <span class="ce-next-step-label">Bước tiếp theo</span>
+                    <span class="ce-next-step-text">Chọn giáo viên phù hợp với bạn</span>
+                </div>
+                <i class="fa-solid fa-arrow-right ce-next-step-arrow"></i>
+            </div>
+        }
+
         <!-- Actions -->
         <div class="ce-success-actions">
-            <a href="@Url.Action("Index", "Home")" class="ce-btn ce-btn-primary ce-btn-large">
+            @if (Model.NeedsTeacherSelection)
+            {
+                <a href="@Url.Action("SelectTeacher", "ClassEnrollment", new { area = "Student" })" class="ce-btn ce-btn-primary ce-btn-large">
+                    <i class="fa-solid fa-user-tie"></i> Chọn giáo viên ngay
+                </a>
+            }
+            <a href="@Url.Action("Index", "Home")" class="ce-btn ce-btn-secondary">
                 <i class="fa-solid fa-house"></i> Về trang chủ
-            </a>
-            <a href="@Url.Action("Index", "LearningPath")" class="ce-btn ce-btn-secondary">
-                <i class="fa-solid fa-route"></i> Xem lộ trình học
             </a>
         </div>
     </div>

@@ -6,8 +6,8 @@ namespace DuAnTotNghiep.Services.Interfaces
 {
     public interface ITeacherStudentService
     {
-        Task<int> GetTotalStudentsAsync(string? keyword);
-        Task<List<User>> GetStudentsAsync(string? keyword, int page, int pageSize);
+        Task<int> GetTotalStudentsAsync(string? keyword, int? teacherId = null);
+        Task<List<User>> GetStudentsAsync(string? keyword, int page, int pageSize, int? teacherId = null);
         Task<User?> GetStudentByIdAsync(int id);
         Task<List<StudentProgressSnapshot>> GetStudentProgressSnapshotsAsync(int studentId, int take = 10);
         Task<List<LearningPathNode>> GetStudentLearningPathNodesAsync(int studentId);
