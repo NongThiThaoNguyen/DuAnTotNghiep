@@ -319,7 +319,16 @@
 @section Scripts {
     <script>
         function requestReview(topicId) {
-            if (confirm("Bạn có muốn ghi nhận yêu cầu ôn tập cho chủ đề này không?")) {
+            const confirmFn = window.adminConfirm ? window.adminConfirm({
+                title: 'Xác nhận ôn tập',
+                message: 'Bạn có muốn ghi nhận yêu cầu ôn tập cho chủ đề này không?',
+                variant: 'info',
+                confirmText: 'Đồng ý',
+                cancelText: 'Hủy'
+            }) : Promise.resolve(true);
+
+            confirmFn.then(confirmed => {
+                if (!confirmed) return;
                 fetch('/Student/Progress/Record', {
                     method: 'POST',
                     headers: {
@@ -335,15 +344,18 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert("Đã gửi yêu cầu ôn tập thành công!");
-                        location.reload();
+                        if (window.showToast) window.showToast('success', 'Đã gửi yêu cầu ôn tập thành công!');
+                        else if (window.adminAlert) window.adminAlert({ title: 'Thành công', message: 'Đã gửi yêu cầu ôn tập thành công!', variant: 'success' });
+                        setTimeout(() => location.reload(), 1000);
                     } else {
-                        alert("Có lỗi xảy ra: " + data.message);
+                        if (window.showToast) window.showToast('error', 'Có lỗi xảy ra: ' + data.message);
+                        else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: 'Có lỗi xảy ra: ' + data.message, variant: 'danger' });
                     }
                 })
                 .catch(err => {
                     console.error(err);
-                    alert("Không thể kết nối đến server.");
+                    if (window.showToast) window.showToast('error', 'Không thể kết nối đến server.');
+                    else if (window.adminAlert) window.adminAlert({ title: 'Lỗi kết nối', message: 'Không thể kết nối đến server.', variant: 'danger' });
                 });
             }
         }

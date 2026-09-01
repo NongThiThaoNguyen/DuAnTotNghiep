@@ -9,9 +9,9 @@
     var studentValues = System.Text.Json.JsonSerializer.Serialize(Model.NewStudentsOverTime.Select(p => p.Value));
 }
 
-<div class="space-y-6">
+<div class="space-y-5">
     <!-- Top Header & Export Buttons -->
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-4">
         <div>
             <h1 class="text-2xl font-bold text-slate-900">Báo cáo & Thống kê Admin</h1>
             <p class="text-sm text-slate-500 mt-1">Tổng quan chỉ số hoạt động, hiệu suất học tập và thống kê hệ thống thực tế.</p>
@@ -19,191 +19,203 @@
         <div class="flex flex-wrap items-center gap-2">
             <!-- Export Excel Options Dropdown -->
             <details class="relative inline-block text-left" id="exportDetails">
-                <summary class="inline-flex items-center px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl transition-colors cursor-pointer select-none shadow-xs list-none">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    Xuất Báo cáo Excel
-                    <svg class="w-4 h-4 ml-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                <summary class="rs-filter-btn-primary cursor-pointer select-none list-none">
+                    <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    Xuất Excel
+                    <svg class="w-3.5 h-3.5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
                 </summary>
                 <div class="origin-top-right absolute right-0 mt-2 w-56 rounded-xl shadow-lg bg-white ring-1 ring-black/5 border border-slate-200 divide-y divide-slate-100 z-50">
                     <div class="py-1">
-                        <a asp-controller="Export" asp-action="ExportStudentReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Học viên (.xlsx)</a>
-                        <a asp-controller="Export" asp-action="ExportTeacherReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Giáo viên (.xlsx)</a>
-                        <a asp-controller="Export" asp-action="ExportAttendanceReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Điểm danh (.xlsx)</a>
-                        <a asp-controller="Export" asp-action="ExportUsers" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Danh sách Người dùng (.xlsx)</a>
+                        <a asp-controller="Export" asp-action="ExportStudentReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Học viên (.xlsx)</a>
+                        <a asp-controller="Export" asp-action="ExportTeacherReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Giáo viên (.xlsx)</a>
+                        <a asp-controller="Export" asp-action="ExportAttendanceReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Điểm danh (.xlsx)</a>
+                        <a asp-controller="Export" asp-action="ExportUsers" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Danh sách Người dùng (.xlsx)</a>
                     </div>
                 </div>
             </details>
 
             <!-- Print / Export PDF -->
-            <button onclick="window.print()" type="button" class="inline-flex items-center px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl transition-colors shadow-xs">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-                In / Xuất PDF
+            <button onclick="window.print()" type="button" class="rs-filter-btn-secondary">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
+                In / PDF
             </button>
         </div>
     </div>
 
-    <!-- Time Filter Bar -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-        <form method="get" asp-action="Index" class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-2">
-                <span class="text-sm font-semibold text-slate-700 mr-1">Bộ lọc thời gian:</span>
-                <a asp-action="Index" asp-route-period="7days" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors @(Model.Period == "7days" ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200")">
-                    7 ngày gần nhất
-                </a>
-                <a asp-action="Index" asp-route-period="30days" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-colors @(Model.Period == "30days" || string.IsNullOrEmpty(Model.Period) ? "bg-blue-600 text-white" : "bg-slate-100 text-slate-700 hover:bg-slate-200")">
-                    30 ngày gần nhất
-                </a>
-            </div>
+    <!-- Time Filter Bar (Unified RS-FILTER-BAR) -->
+    <form method="get" asp-action="Index" class="rs-filter-bar justify-between">
+        <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="rs-filter-label mr-1" style="margin-bottom:0;">Khoảng thời gian:</span>
+            <a asp-action="Index" asp-route-period="7days" class="px-3 py-1 rounded-md text-xs font-semibold transition-colors @(Model.Period == "7days" ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")">
+                7 ngày qua
+            </a>
+            <a asp-action="Index" asp-route-period="30days" class="px-3 py-1 rounded-md text-xs font-semibold transition-colors @(Model.Period == "30days" || string.IsNullOrEmpty(Model.Period) ? "bg-slate-800 text-white" : "bg-slate-100 text-slate-600 hover:bg-slate-200")">
+                30 ngày qua
+            </a>
+        </div>
 
-            <!-- Custom date range option -->
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <input type="hidden" name="period" value="custom" />
-                <input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" />
-                <span class="text-slate-400 text-xs">-</span>
-                <input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500" />
-                <button type="submit" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-lg transition-colors">
-                    Áp dụng
-                </button>
-            </div>
-        </form>
-    </div>
+        <!-- Custom date range option -->
+        <div class="flex items-center gap-2">
+            <input type="hidden" name="period" value="custom" />
+            <input type="date" name="fromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" style="height: 2rem; font-size: 0.75rem;" />
+            <span class="text-slate-400 text-xs">-</span>
+            <input type="date" name="toDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" style="height: 2rem; font-size: 0.75rem;" />
+            <button type="submit" class="rs-filter-btn-primary" style="height: 2rem; font-size: 0.75rem; padding: 0 0.65rem;">
+                Áp dụng
+            </button>
+        </div>
+    </form>
 
-    <!-- Metrics Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <a asp-action="StudentProgress" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-blue-300 hover:shadow-md transition-all">
+    <!-- METRICS GRID: 4 Compact Cards in 1 Row -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- Học viên -->
+        <a asp-action="StudentProgress" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-400 transition-all flex flex-col justify-between" style="min-height: 5.8rem;">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Học viên</span>
-                <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                <span class="rs-filter-label" style="margin-bottom:0;">Học viên</span>
+                <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"></path></svg>
                 </span>
             </div>
-            <div class="text-3xl font-bold text-slate-900 mt-2">@Model.StudentCount</div>
-            <p class="text-xs text-slate-400 mt-1">Xem tiến độ học tập →</p>
+            <div>
+                <div class="text-2xl font-bold text-slate-900 leading-tight">@Model.StudentCount.ToString("N0")</div>
+                <span class="text-[11px] text-slate-400 hover:underline">Xem tiến độ →</span>
+            </div>
         </a>
 
-        <a asp-action="TeacherActivity" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-emerald-300 hover:shadow-md transition-all">
+        <!-- Giáo viên -->
+        <a asp-action="TeacherActivity" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-400 transition-all flex flex-col justify-between" style="min-height: 5.8rem;">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Giáo viên</span>
-                <span class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <span class="rs-filter-label" style="margin-bottom:0;">Giáo viên</span>
+                <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 </span>
             </div>
-            <div class="text-3xl font-bold text-slate-900 mt-2">@Model.TeacherCount</div>
-            <p class="text-xs text-slate-400 mt-1">Xem hiệu suất giảng dạy →</p>
+            <div>
+                <div class="text-2xl font-bold text-slate-900 leading-tight">@Model.TeacherCount.ToString("N0")</div>
+                <span class="text-[11px] text-slate-400 hover:underline">Xem hiệu suất →</span>
+            </div>
         </a>
 
-        <a asp-action="AttendanceSummary" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-purple-300 hover:shadow-md transition-all">
+        <!-- Lượt điểm danh -->
+        <a asp-action="AttendanceSummary" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-400 transition-all flex flex-col justify-between" style="min-height: 5.8rem;">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Lượt điểm danh</span>
-                <span class="w-8 h-8 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
+                <span class="rs-filter-label" style="margin-bottom:0;">Lượt điểm danh</span>
+                <span class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                 </span>
             </div>
-            <div class="text-3xl font-bold text-slate-900 mt-2">@Model.AttendanceCount</div>
-            <p class="text-xs text-slate-400 mt-1">Trong khoảng thời gian đã lọc →</p>
+            <div>
+                <div class="text-2xl font-bold text-slate-900 leading-tight">@Model.AttendanceCount.ToString("N0")</div>
+                <span class="text-[11px] text-slate-400 hover:underline">Trong kỳ lọc →</span>
+            </div>
         </a>
 
-        <a asp-action="QuizPerformance" class="bg-white border border-slate-200 rounded-xl p-5 hover:border-amber-300 hover:shadow-md transition-all">
+        <!-- Quiz Attempts -->
+        <a asp-action="QuizPerformance" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-400 transition-all flex flex-col justify-between" style="min-height: 5.8rem;">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Quiz Attempts</span>
-                <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <span class="rs-filter-label" style="margin-bottom:0;">Quiz Attempts</span>
+                <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                 </span>
             </div>
-            <div class="text-3xl font-bold text-slate-900 mt-2">@Model.QuizAttemptCount</div>
-            <p class="text-xs text-slate-400 mt-1">Trong khoảng thời gian đã lọc →</p>
+            <div>
+                <div class="text-2xl font-bold text-slate-900 leading-tight">@Model.QuizAttemptCount.ToString("N0")</div>
+                <span class="text-[11px] text-slate-400 hover:underline">Trong kỳ lọc →</span>
+            </div>
         </a>
     </div>
 
     <!-- Chart & Course Completion Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
         <!-- Main Line Chart -->
-        <div class="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="font-bold text-slate-900 text-lg">Biểu đồ thống kê theo thời gian</h2>
-                <div class="flex items-center gap-4 text-xs font-semibold">
-                    <span class="inline-flex items-center text-blue-600"><span class="w-2.5 h-2.5 rounded-full bg-blue-600 mr-1.5"></span>Quiz Attempts</span>
-                    <span class="inline-flex items-center text-purple-600"><span class="w-2.5 h-2.5 rounded-full bg-purple-600 mr-1.5"></span>Điểm danh</span>
-                    <span class="inline-flex items-center text-emerald-600"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600 mr-1.5"></span>Học viên mới</span>
-                </div>
+        <div class="lg:col-span-2 bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                <h2 class="font-bold text-slate-900 text-sm">Biểu đồ thống kê theo thời gian</h2>
+                <span class="text-xs text-slate-400 font-medium">Xu hướng lượt làm bài, điểm danh và học viên</span>
             </div>
-            <div class="h-72 w-full">
+            <div class="relative w-full h-64">
                 <canvas id="overviewChart"></canvas>
+                <div id="overviewChartEmptyMsg" class="hidden absolute inset-0 bg-white/90 backdrop-blur-xs flex items-center justify-center text-center p-4">
+                    <div>
+                        <svg class="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path></svg>
+                        <p class="text-xs font-semibold text-slate-600">Chưa có dữ liệu thống kê trong khoảng thời gian đã chọn</p>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- Course Completion Card -->
-        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs flex flex-col justify-between space-y-6">
+        <!-- Course Completion Card (Compact) -->
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs flex flex-col justify-between">
             <div>
-                <h2 class="font-bold text-slate-900 text-lg mb-1">Tỷ lệ hoàn thành khóa học</h2>
-                <p class="text-xs text-slate-500">Thống kê tiến độ hoàn thành các Lộ trình học tập (Student Learning Paths) trên hệ thống.</p>
-            </div>
+                <div class="border-b border-slate-100 pb-3 mb-3">
+                    <h2 class="font-bold text-slate-900 text-sm">Tỷ lệ hoàn thành khóa học</h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Tiến độ hoàn thành lộ trình học tập của học viên</p>
+                </div>
 
-            <div class="space-y-4">
-                <div class="text-center py-4">
-                    <div class="text-5xl font-extrabold text-blue-600">@Model.CourseCompletionRate%</div>
-                    <div class="text-xs font-medium text-slate-500 mt-2">Tỷ lệ hoàn thành trung bình</div>
+                <div class="text-center py-2">
+                    <div class="text-4xl font-extrabold text-blue-600 tracking-tight">@Model.CourseCompletionRate%</div>
+                    <div class="text-xs font-medium text-slate-500 mt-1">Tỷ lệ hoàn thành trung bình</div>
                 </div>
 
                 <!-- Progress Bar -->
-                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
-                    <div class="bg-blue-600 h-3 rounded-full transition-all duration-500" style="width: @Model.CourseCompletionRate%"></div>
+                <div class="w-full bg-slate-100 rounded-full h-2.5 overflow-hidden my-3">
+                    <div class="bg-blue-600 h-2.5 rounded-full transition-all duration-500" style="width: @Model.CourseCompletionRate%"></div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-3 text-center pt-2">
-                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <div class="text-xs text-slate-500">Tổng lộ trình</div>
-                        <div class="text-lg font-bold text-slate-900">@Model.TotalLearningPaths</div>
+                <div class="grid grid-cols-2 gap-2 text-center pt-1">
+                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                        <div class="text-[11px] text-slate-400 uppercase font-semibold">Tổng lộ trình</div>
+                        <div class="text-base font-bold text-slate-900 mt-0.5">@Model.TotalLearningPaths</div>
                     </div>
-                    <div class="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                        <div class="text-xs text-slate-500">Đã hoàn thành</div>
-                        <div class="text-lg font-bold text-emerald-600">@Model.CompletedLearningPaths</div>
+                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                        <div class="text-[11px] text-slate-400 uppercase font-semibold">Hoàn thành</div>
+                        <div class="text-base font-bold text-emerald-600 mt-0.5">@Model.CompletedLearningPaths</div>
                     </div>
                 </div>
             </div>
 
-            <a asp-action="StudentProgress" class="block w-full py-2 text-center text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
-                Xem chi tiết danh sách tiến độ →
+            <a asp-action="StudentProgress" class="block w-full py-2 text-center text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors mt-4">
+                Xem chi tiết tiến độ học viên →
             </a>
         </div>
     </div>
 
     <!-- Tables Grid: Top 5 Students & Teacher Performance -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <!-- Top 5 Students -->
-        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="font-bold text-slate-900 text-base">Top 5 học viên theo điểm trung bình Quiz</h2>
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h2 class="font-bold text-slate-900 text-sm">Top 5 học viên theo điểm trung bình Quiz</h2>
                 <a asp-action="QuizPerformance" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Xem tất cả</a>
             </div>
 
             @if (Model.TopStudents == null || !Model.TopStudents.Any())
             {
-                <div class="p-6 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-100 text-xs">
+                <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-lg border border-slate-100 text-xs">
                     Chưa có kết quả làm Quiz của học viên nào.
                 </div>
             }
             else
             {
-                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
                     <table class="min-w-full divide-y divide-slate-200 text-xs">
                         <thead class="bg-slate-50 text-left font-semibold uppercase text-slate-500">
                             <tr>
-                                <th class="px-3.5 py-3">Học viên</th>
-                                <th class="px-3.5 py-3 text-center">Số lượt Quiz</th>
-                                <th class="px-3.5 py-3 text-right">Điểm trung bình</th>
+                                <th scope="col" class="px-3 py-2.5">Học viên</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">Lượt Quiz</th>
+                                <th scope="col" class="px-3 py-2.5 text-right">Điểm trung bình</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
                             @foreach (var student in Model.TopStudents)
                             {
                                 <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="px-3.5 py-3">
+                                    <td class="px-3 py-2.5">
                                         <div class="font-semibold text-slate-900">@student.StudentName</div>
                                         <div class="text-slate-400 text-[11px]">@student.Email</div>
                                     </td>
-                                    <td class="px-3.5 py-3 text-center font-medium text-slate-700">@student.AttemptCount</td>
-                                    <td class="px-3.5 py-3 text-right font-bold text-emerald-600">@student.AverageScore.ToString("0.##") / 10</td>
+                                    <td class="px-3 py-2.5 text-center font-medium text-slate-700">@student.AttemptCount</td>
+                                    <td class="px-3 py-2.5 text-right font-bold text-emerald-600">@student.AverageScore.ToString("0.##") / 10</td>
                                 </tr>
                             }
                         </tbody>
@@ -213,40 +225,40 @@
         </div>
 
         <!-- Teacher Performance Summary -->
-        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-4">
-            <div class="flex items-center justify-between">
-                <h2 class="font-bold text-slate-900 text-base">Thống kê hiệu suất Giáo viên</h2>
+        <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-xs space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                <h2 class="font-bold text-slate-900 text-sm">Thống kê hiệu suất Giáo viên</h2>
                 <a asp-action="TeacherActivity" class="text-xs font-semibold text-blue-600 hover:text-blue-700">Xem tất cả</a>
             </div>
 
             @if (Model.TeacherPerformances == null || !Model.TeacherPerformances.Any())
             {
-                <div class="p-6 text-center text-slate-500 bg-slate-50 rounded-xl border border-slate-100 text-xs">
+                <div class="p-6 text-center text-slate-400 bg-slate-50 rounded-lg border border-slate-100 text-xs">
                     Chưa có dữ liệu giáo viên.
                 </div>
             }
             else
             {
-                <div class="overflow-x-auto border border-slate-200 rounded-xl">
+                <div class="overflow-x-auto border border-slate-200 rounded-lg">
                     <table class="min-w-full divide-y divide-slate-200 text-xs">
                         <thead class="bg-slate-50 text-left font-semibold uppercase text-slate-500">
                             <tr>
-                                <th class="px-3.5 py-3">Giáo viên</th>
-                                <th class="px-3.5 py-3 text-center">Topic</th>
-                                <th class="px-3.5 py-3 text-center">Quiz</th>
-                                <th class="px-3.5 py-3 text-center">Bài tập</th>
-                                <th class="px-3.5 py-3 text-center">Đã chấm</th>
+                                <th scope="col" class="px-3 py-2.5">Giáo viên</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">Topic</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">Quiz</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">Bài tập</th>
+                                <th scope="col" class="px-3 py-2.5 text-center">Đã chấm</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 bg-white">
                             @foreach (var teacher in Model.TeacherPerformances)
                             {
                                 <tr class="hover:bg-slate-50/80 transition-colors">
-                                    <td class="px-3.5 py-3 font-semibold text-slate-900">@teacher.TeacherName</td>
-                                    <td class="px-3.5 py-3 text-center font-medium text-slate-700">@teacher.TopicCount</td>
-                                    <td class="px-3.5 py-3 text-center font-medium text-slate-700">@teacher.QuizCount</td>
-                                    <td class="px-3.5 py-3 text-center font-medium text-slate-700">@teacher.AssignmentCount</td>
-                                    <td class="px-3.5 py-3 text-center font-bold text-emerald-600">@teacher.GradedSubmissionCount</td>
+                                    <td class="px-3 py-2.5 font-semibold text-slate-900">@teacher.TeacherName</td>
+                                    <td class="px-3 py-2.5 text-center font-medium text-slate-700">@teacher.TopicCount</td>
+                                    <td class="px-3 py-2.5 text-center font-medium text-slate-700">@teacher.QuizCount</td>
+                                    <td class="px-3 py-2.5 text-center font-medium text-slate-700">@teacher.AssignmentCount</td>
+                                    <td class="px-3 py-2.5 text-center font-bold text-emerald-600">@teacher.GradedSubmissionCount</td>
                                 </tr>
                             }
                         </tbody>
@@ -261,38 +273,50 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        var ctx = document.getElementById('overviewChart').getContext('2d');
+        var canvasEl = document.getElementById('overviewChart');
+        if (!canvasEl) return;
+
         var chartLabels = @Html.Raw(chartLabels);
         var quizValues = @Html.Raw(quizValues);
         var attendanceValues = @Html.Raw(attendanceValues);
         var studentValues = @Html.Raw(studentValues);
 
+        var hasData = (quizValues && quizValues.some(function(v) { return v > 0; })) ||
+                      (attendanceValues && attendanceValues.some(function(v) { return v > 0; })) ||
+                      (studentValues && studentValues.some(function(v) { return v > 0; }));
+
+        var emptyMsg = document.getElementById('overviewChartEmptyMsg');
+        if (!hasData && emptyMsg) {
+            emptyMsg.classList.remove('hidden');
+        }
+
+        var ctx = canvasEl.getContext('2d');
         new Chart(ctx, {
             type: 'line',
             data: {
-                labels: chartLabels,
+                labels: (chartLabels && chartLabels.length > 0) ? chartLabels : ['Chưa có dữ liệu'],
                 datasets: [
                     {
                         label: 'Quiz Attempts',
-                        data: quizValues,
+                        data: (quizValues && quizValues.length > 0) ? quizValues : [0],
                         borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.08)',
                         tension: 0.3,
                         fill: true
                     },
                     {
                         label: 'Điểm danh',
-                        data: attendanceValues,
+                        data: (attendanceValues && attendanceValues.length > 0) ? attendanceValues : [0],
                         borderColor: '#9333ea',
-                        backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                        backgroundColor: 'rgba(147, 51, 234, 0.08)',
                         tension: 0.3,
                         fill: true
                     },
                     {
                         label: 'Học viên mới',
-                        data: studentValues,
+                        data: (studentValues && studentValues.length > 0) ? studentValues : [0],
                         borderColor: '#059669',
-                        backgroundColor: 'rgba(5, 150, 105, 0.1)',
+                        backgroundColor: 'rgba(5, 150, 105, 0.08)',
                         tension: 0.3,
                         fill: true
                     }
@@ -303,18 +327,28 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: false
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            boxWidth: 10,
+                            usePointStyle: true,
+                            font: { size: 11, weight: '600' }
+                        }
                     }
                 },
                 scales: {
                     y: {
                         beginAtZero: true,
                         ticks: {
-                            stepSize: 1
+                            stepSize: 1,
+                            precision: 0
                         }
                     }
                 }
             }
+        });
+
+        // Dropdown menu close listener
         document.addEventListener('click', function (e) {
             var details = document.getElementById('exportDetails');
             if (details && !details.contains(e.target)) {
@@ -323,3 +357,4 @@
         });
     });
 </script>
+

@@ -17,6 +17,10 @@ Console.WriteLine("CONNECTION STRING IS: " + builder.Configuration.GetConnection
 // Load .env file
 DotNetEnv.Env.Load();
 builder.Configuration.AddEnvironmentVariables();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>(optional: true);
+}
 
 // Add services to the container.
 builder.Services.AddControllersWithViews(options =>
@@ -29,6 +33,16 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<AiProviderSettings>(builder.Configuration.GetSection("AI"));
+builder.Services.Configure<GeminiSettings>(builder.Configuration.GetSection("Gemini"));
+
+builder.Services.AddHttpClient<IGeminiService, GeminiService>((serviceProvider, client) =>
+{
+    var settings = serviceProvider.GetRequiredService<Microsoft.Extensions.Options.IOptions<GeminiSettings>>().Value;
+    var timeout = settings.TimeoutSeconds > 0 ? settings.TimeoutSeconds : 30;
+    client.Timeout = TimeSpan.FromSeconds(timeout);
+});
+builder.Services.AddScoped<IAIProvider, GeminiService>();
+
 builder.Services.AddHttpClient("AiProvider", client =>
 {
     var endpoint = builder.Configuration["AI:Endpoint"];

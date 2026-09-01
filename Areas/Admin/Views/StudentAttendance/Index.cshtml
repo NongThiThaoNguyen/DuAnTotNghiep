@@ -23,28 +23,41 @@
         <p class="text-sm text-slate-500">Xem lịch sử điểm danh theo học viên, topic và khoảng ngày.</p>
     </div>
 
-    <form method="get" class="grid grid-cols-1 md:grid-cols-6 gap-3 bg-white border border-slate-200 rounded-xl p-4">
-        <select name="studentId" class="rounded-lg border-slate-300 text-sm md:col-span-2">
-            <option value="">Tất cả học viên</option>
-            @foreach (var student in Model.Students)
-            {
-                <option value="@student.Id" selected="@(Model.StudentId == student.Id ? "selected" : null)">@student.Text</option>
-            }
-        </select>
-        <select name="topicId" class="rounded-lg border-slate-300 text-sm md:col-span-2">
-            <option value="">Tất cả topic</option>
-            @foreach (var topic in Model.Topics)
-            {
-                <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
-            }
-        </select>
-        <input type="date" name="from" value="@(Model.From?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
-        <input type="date" name="to" value="@(Model.To?.ToString("yyyy-MM-dd"))" class="rounded-lg border-slate-300 text-sm" />
-        <div class="md:col-span-6 flex flex-wrap items-center gap-2">
-            <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
-            <a asp-action="Index" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa lọc</a>
+    <form method="get" class="rs-filter-bar">
+        <div class="rs-filter-field rs-filter-field-lg">
+            <label class="rs-filter-label">Học viên</label>
+            <select name="studentId">
+                <option value="">Tất cả học viên</option>
+                @foreach (var student in Model.Students)
+                {
+                    <option value="@student.Id" selected="@(Model.StudentId == student.Id ? "selected" : null)">@student.Text</option>
+                }
+            </select>
+        </div>
+        <div class="rs-filter-field rs-filter-field-lg">
+            <label class="rs-filter-label">Topic</label>
+            <select name="topicId">
+                <option value="">Tất cả topic</option>
+                @foreach (var topic in Model.Topics)
+                {
+                    <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
+                }
+            </select>
+        </div>
+        <div class="rs-filter-field rs-filter-field-sm">
+            <label class="rs-filter-label">Từ ngày</label>
+            <input type="date" name="from" value="@(Model.From?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="rs-filter-field rs-filter-field-sm">
+            <label class="rs-filter-label">Đến ngày</label>
+            <input type="date" name="to" value="@(Model.To?.ToString("yyyy-MM-dd"))" />
+        </div>
+        <div class="rs-filter-actions">
+            <button type="submit" class="rs-filter-btn-primary">Lọc</button>
+            <a asp-action="Index" class="rs-filter-btn-secondary">Xóa lọc</a>
         </div>
     </form>
+
 
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems bản ghi.</p>

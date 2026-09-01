@@ -23,24 +23,33 @@
         <p class="text-sm text-slate-500">Theo dõi quiz thường theo topic, giáo viên, số câu hỏi và lượt làm.</p>
     </div>
 
-    <form method="get" class="grid grid-cols-1 gap-3 bg-white border border-slate-200 rounded-xl p-4 md:grid-cols-4">
-        <select name="topicId" class="rounded-lg border-slate-300 text-sm">
-            <option value="">Tất cả topic</option>
-            @foreach (var topic in Model.Topics)
-            {
-                <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
-            }
-        </select>
-        <select name="teacherId" class="rounded-lg border-slate-300 text-sm">
-            <option value="">Tất cả giáo viên</option>
-            @foreach (var teacher in Model.Teachers)
-            {
-                <option value="@teacher.Id" selected="@(Model.TeacherId == teacher.Id ? "selected" : null)">@teacher.Text</option>
-            }
-        </select>
-        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
-        <a asp-action="Index" class="rounded-lg border border-slate-200 px-4 py-2 text-center text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa lọc</a>
+    <form method="get" class="rs-filter-bar">
+        <div class="rs-filter-field rs-filter-field-lg">
+            <label class="rs-filter-label">Topic</label>
+            <select name="topicId">
+                <option value="">Tất cả topic</option>
+                @foreach (var topic in Model.Topics)
+                {
+                    <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
+                }
+            </select>
+        </div>
+        <div class="rs-filter-field rs-filter-field-lg">
+            <label class="rs-filter-label">Giáo viên</label>
+            <select name="teacherId">
+                <option value="">Tất cả giáo viên</option>
+                @foreach (var teacher in Model.Teachers)
+                {
+                    <option value="@teacher.Id" selected="@(Model.TeacherId == teacher.Id ? "selected" : null)">@teacher.Text</option>
+                }
+            </select>
+        </div>
+        <div class="rs-filter-actions">
+            <button type="submit" class="rs-filter-btn-primary">Lọc</button>
+            <a asp-action="Index" class="rs-filter-btn-secondary">Xóa lọc</a>
+        </div>
     </form>
+
 
     <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems quiz.</p>
 

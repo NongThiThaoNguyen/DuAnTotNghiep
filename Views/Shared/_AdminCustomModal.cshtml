@@ -1,0 +1,258 @@
+<!-- Admin Custom Modal Component -->
+<div id="rsCustomModal" class="rs-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="rsModalTitle">
+    <div class="rs-modal-container">
+        <div class="rs-modal-header">
+            <div id="rsModalIcon" class="rs-modal-icon danger">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+            </div>
+            <div class="rs-modal-title-group">
+                <h3 id="rsModalTitle" class="rs-modal-title">Xác nhận thao tác</h3>
+                <p id="rsModalMessage" class="rs-modal-message">Bạn có chắc chắn muốn xóa dữ liệu này không?</p>
+            </div>
+            <button type="button" id="rsModalCloseBtn" class="rs-modal-close-btn" aria-label="Đóng">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        <div class="rs-modal-footer">
+            <button type="button" id="rsModalCancelBtn" class="rs-modal-btn rs-modal-btn-secondary">Hủy</button>
+            <button type="button" id="rsModalConfirmBtn" class="rs-modal-btn rs-modal-btn-danger">Xóa</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var modal = document.getElementById('rsCustomModal');
+        var modalIcon = document.getElementById('rsModalIcon');
+        var modalTitle = document.getElementById('rsModalTitle');
+        var modalMessage = document.getElementById('rsModalMessage');
+        var modalCloseBtn = document.getElementById('rsModalCloseBtn');
+        var modalCancelBtn = document.getElementById('rsModalCancelBtn');
+        var modalConfirmBtn = document.getElementById('rsModalConfirmBtn');
+
+        var currentResolver = null;
+
+        var ICONS = {
+            danger: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>',
+            warning: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+            info: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+            success: '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>'
+        };
+
+        function closeModal(result) {
+            if (!modal) return;
+            modal.classList.remove('is-open');
+            if (currentResolver) {
+                currentResolver(!!result);
+                currentResolver = null;
+            }
+        }
+
+        window.adminConfirm = function (opts) {
+            opts = opts || {};
+            var title = opts.title || 'Xác nhận thao tác';
+            var message = opts.message || 'Bạn có chắc chắn muốn thực hiện thao tác này?';
+            var variant = opts.variant || 'danger';
+            var confirmText = opts.confirmText || (variant === 'danger' ? 'Xóa' : 'Xác nhận');
+            var cancelText = opts.cancelText || 'Hủy';
+
+            return new Promise(function (resolve) {
+                currentResolver = resolve;
+
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                modalCancelBtn.style.display = 'inline-flex';
+                modalCancelBtn.textContent = cancelText;
+                modalConfirmBtn.textContent = confirmText;
+                modalConfirmBtn.disabled = false;
+
+                // Update icon & button styles
+                modalIcon.className = 'rs-modal-icon ' + variant;
+                modalIcon.innerHTML = ICONS[variant] || ICONS.danger;
+
+                if (variant === 'danger') {
+                    modalConfirmBtn.className = 'rs-modal-btn rs-modal-btn-danger';
+                } else {
+                    modalConfirmBtn.className = 'rs-modal-btn rs-modal-btn-primary';
+                }
+
+                modal.classList.add('is-open');
+            });
+        };
+
+        window.adminAlert = function (opts) {
+            if (typeof opts === 'string') {
+                opts = { message: opts };
+            }
+            opts = opts || {};
+            var title = opts.title || 'Thông báo';
+            var message = opts.message || '';
+            var variant = opts.variant || 'info';
+            var okText = opts.okText || 'Đóng';
+
+            return new Promise(function (resolve) {
+                currentResolver = resolve;
+
+                modalTitle.textContent = title;
+                modalMessage.textContent = message;
+                modalCancelBtn.style.display = 'none';
+                modalConfirmBtn.textContent = okText;
+                modalConfirmBtn.disabled = false;
+
+                modalIcon.className = 'rs-modal-icon ' + variant;
+                modalIcon.innerHTML = ICONS[variant] || ICONS.info;
+                modalConfirmBtn.className = 'rs-modal-btn rs-modal-btn-primary';
+
+                modal.classList.add('is-open');
+            });
+        };
+
+        // Override native browser alert to use custom modal
+        window.alert = function (msg) {
+            window.adminAlert({
+                title: 'Thông báo',
+                message: String(msg || ''),
+                variant: 'info',
+                okText: 'Đóng'
+            });
+        };
+
+        // Override native browser confirm
+        window.confirm = function (msg) {
+            var confirmMsg = String(msg || '');
+            var isDelete = /xóa|delete|remove|khóa|archive|hủy|tắt|tạm dừng/i.test(confirmMsg);
+            window.adminConfirm({
+                title: 'Xác nhận thao tác',
+                message: confirmMsg,
+                variant: isDelete ? 'danger' : 'warning',
+                confirmText: isDelete ? 'Xóa' : 'Xác nhận',
+                cancelText: 'Hủy'
+            });
+            return false;
+        };
+
+        // Override native browser prompt
+        window.prompt = function (msg, defaultText) {
+            window.adminAlert({
+                title: 'Thông báo',
+                message: String(msg || ''),
+                variant: 'info',
+                okText: 'Đóng'
+            });
+            return null;
+        };
+
+        // Event listeners
+        if (modalCloseBtn) modalCloseBtn.addEventListener('click', function () { closeModal(false); });
+        if (modalCancelBtn) modalCancelBtn.addEventListener('click', function () { closeModal(false); });
+        if (modalConfirmBtn) modalConfirmBtn.addEventListener('click', function () { closeModal(true); });
+
+        // Close on Esc key
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && modal && modal.classList.contains('is-open')) {
+                closeModal(false);
+            }
+        });
+
+        // Global Event Interceptor for form submits and link clicks using confirm()
+        document.addEventListener('submit', function (e) {
+            var form = e.target;
+            if (!form) return;
+
+            var onsubmitAttr = form.getAttribute('onsubmit') || '';
+            var dataConfirmMsg = form.getAttribute('data-confirm');
+
+            var confirmMsg = dataConfirmMsg;
+            if (!confirmMsg && onsubmitAttr.indexOf('confirm(') !== -1) {
+                // Extract text from confirm('...')
+                var match = onsubmitAttr.match(/confirm\(\s*['"]([^'"]+)['"]\s*\)/);
+                if (match && match[1]) {
+                    confirmMsg = match[1];
+                }
+            }
+
+            if (confirmMsg) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // Clear inline onsubmit to prevent recursive loop on programmatic form.submit()
+                var savedOnsubmit = form.onsubmit;
+                form.onsubmit = null;
+                form.removeAttribute('onsubmit');
+
+                var isDelete = /xóa|delete|remove|khóa|archive|hủy|tắt|tạm dừng/i.test(confirmMsg);
+
+                window.adminConfirm({
+                    title: 'Xác nhận thao tác',
+                    message: confirmMsg,
+                    variant: isDelete ? 'danger' : 'warning',
+                    confirmText: isDelete ? 'Xóa' : 'Xác nhận',
+                    cancelText: 'Hủy'
+                }).then(function (confirmed) {
+                    if (confirmed) {
+                        form.submit();
+                    } else {
+                        // restore if cancelled
+                        form.onsubmit = savedOnsubmit;
+                        if (onsubmitAttr) form.setAttribute('onsubmit', onsubmitAttr);
+                    }
+                });
+            }
+        }, true);
+
+        // Global Interceptor for button/link clicks with onclick containing confirm() or data-confirm
+        document.addEventListener('click', function (e) {
+            var target = e.target.closest('a, button');
+            if (!target) return;
+
+            // If it's a submit button inside a form with confirm, let form submit handler deal with it
+            if (target.type === 'submit' && target.form && (target.form.getAttribute('onsubmit') || target.form.getAttribute('data-confirm'))) {
+                return;
+            }
+
+            var onclickAttr = target.getAttribute('onclick') || '';
+            var dataConfirmMsg = target.getAttribute('data-confirm');
+
+            var confirmMsg = dataConfirmMsg;
+            if (!confirmMsg && onclickAttr.indexOf('confirm(') !== -1) {
+                var match = onclickAttr.match(/confirm\(\s*['"]([^'"]+)['"]\s*\)/);
+                if (match && match[1]) {
+                    confirmMsg = match[1];
+                }
+            }
+
+            if (confirmMsg) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                var savedOnclick = target.onclick;
+                target.onclick = null;
+                target.removeAttribute('onclick');
+
+                var isDelete = /xóa|delete|remove|khóa|archive|hủy|tắt|tạm dừng/i.test(confirmMsg);
+
+                window.adminConfirm({
+                    title: 'Xác nhận thao tác',
+                    message: confirmMsg,
+                    variant: isDelete ? 'danger' : 'warning',
+                    confirmText: isDelete ? 'Xóa' : 'Xác nhận',
+                    cancelText: 'Hủy'
+                }).then(function (confirmed) {
+                    if (confirmed) {
+                        if (target.tagName === 'A' && target.href) {
+                            window.location.href = target.href;
+                        } else if (target.form) {
+                            target.form.submit();
+                        }
+                    } else {
+                        target.onclick = savedOnclick;
+                        if (onclickAttr) target.setAttribute('onclick', onclickAttr);
+                    }
+                });
+            }
+        }, true);
+
+    })();
+</script>

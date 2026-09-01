@@ -348,8 +348,13 @@
                         document.getElementById('countdown').innerText = "00:00";
                         document.getElementById('countdown').classList.add('text-red-600');
                         
-                        alert("Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài.");
-                        confirmSubmit();
+                        if (window.adminAlert) {
+                            window.adminAlert({ title: 'Hết giờ', message: 'Đã hết thời gian làm bài! Hệ thống sẽ tự động nộp bài.', variant: 'warning', okText: 'Nộp bài' }).then(() => {
+                                confirmSubmit();
+                            });
+                        } else {
+                            confirmSubmit();
+                        }
                         return;
                     }
 

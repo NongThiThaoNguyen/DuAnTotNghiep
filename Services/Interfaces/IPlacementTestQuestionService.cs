@@ -11,5 +11,9 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task ReorderQuestionsAsync(int sectionId, List<QuestionOrderDto> items);
         Task<List<QuestionBankItemDto>> SearchAvailableQuestionsAsync(QuestionFilterDto filter);
         Task<List<PlacementTestQuestionDto>> GetSectionQuestionsAsync(int sectionId);
+        Task<byte[]> GenerateQuestionExcelTemplateAsync();
+        Task<QuestionExcelPreviewResultDto> PreviewQuestionsExcelAsync(int sectionId, System.IO.Stream excelStream);
+        Task<int> ImportQuestionsFromExcelAsync(int sectionId, List<QuestionExcelRowDto> validRows);
+        Task CreateAndAttachQuestionAsync(CreateAndAttachQuestionDto dto);
     }
 }

@@ -16,17 +16,20 @@ namespace DuAnTotNghiep.Services
     public class AiTutorService : IAiTutorService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IGeminiService _geminiService;
         private readonly IAIProvider _aiProvider;
         private readonly IConfiguration _config;
         private readonly ILogger<AiTutorService> _logger;
 
         public AiTutorService(
             ApplicationDbContext context,
+            IGeminiService geminiService,
             IAIProvider aiProvider,
             IConfiguration config,
             ILogger<AiTutorService> logger)
         {
             _context = context;
+            _geminiService = geminiService;
             _aiProvider = aiProvider;
             _config = config;
             _logger = logger;
@@ -90,7 +93,9 @@ namespace DuAnTotNghiep.Services
                 .FirstOrDefaultAsync(p => p.UserId == userId);
             
             var levelStr = profile?.CurrentLevel?.Name ?? profile?.CurrentLevel?.Code ?? "Beginner";
-            var systemPrompt = $"You are an English tutor. The student's English level is {levelStr}. Respond in Vietnamese, but provide English examples where appropriate. Keep responses educational, helpful, and friendly.";
+            var systemPrompt = $"You are a helpful, encouraging English AI Tutor. The student's English level is {levelStr}. " +
+                               $"Answer the student's question clearly and accurately. Respond in Vietnamese, but provide English examples where appropriate. " +
+                               $"Be friendly, educational, and concise.";
 
             // 3. Build past messages context (last 10 messages)
             var pastMessages = await _context.AiTutorMessages
@@ -108,32 +113,90 @@ namespace DuAnTotNghiep.Services
             contextBuilder.AppendLine($"STUDENT: {message}");
             var userPrompt = contextBuilder.ToString();
 
-            // 4. Call AI Provider or Fallback
-            string replyText = "";
-            bool isFallback = false;
+            // 4. Resolve API Key & Settings for Gemini (filtering out empty/whitespace strings)
+            var candidateKeys = new[]
+            {
+                _config["Gemini:ApiKey"],
+                _config["GoogleAI:ApiKey"],
+                _config["AI:ApiKey"],
+                _config["OpenAI:ApiKey"],
+                Environment.GetEnvironmentVariable("Gemini__ApiKey"),
+                Environment.GetEnvironmentVariable("GoogleAI__ApiKey")
+            };
 
-            var apiKey = _config["AI:ApiKey"] ?? _config["OpenAI:ApiKey"];
-            var isGemini = apiKey?.StartsWith("AIzaSy") == true || 
-                           (_config["AI:Endpoint"]?.Contains("generativelanguage") == true);
-            var targetModel = isGemini ? (_config["AI:Model"] ?? "gemini-2.5-flash") : (_config["AI:Model"] ?? "gpt-4o-mini");
+            var apiKey = candidateKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k));
 
             if (!string.IsNullOrWhiteSpace(apiKey))
             {
-                try
-                {
-                    replyText = await _aiProvider.GenerateAsync(systemPrompt, userPrompt, "CHAT", null, userId, targetModel);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "AI generation failed. Falling back to offline simulated reply.");
-                    replyText = GetSimulatedTutorReply(message);
-                    isFallback = true;
-                }
+                _logger.LogInformation("[Diagnostic] Gemini API Key: FOUND (Length: {Length})", apiKey.Length);
             }
             else
             {
+                _logger.LogWarning("[Diagnostic] Gemini API Key: MISSING");
+            }
+
+            var enableOfflineMock = _config.GetValue<bool>("Gemini:EnableOfflineMock", false)
+                                 || _config.GetValue<bool>("AI:EnableOfflineMock", false);
+
+            string replyText = "";
+            bool isFallback = false;
+            
+            var candidateModels = new[]
+            {
+                _config["Gemini:Model"],
+                _config["GoogleAI:Model"],
+                _config["AI:Model"]
+            };
+            string modelUsed = candidateModels.FirstOrDefault(m => !string.IsNullOrWhiteSpace(m)) ?? "gemini-3.6-flash";
+
+            if (!string.IsNullOrWhiteSpace(apiKey) && !enableOfflineMock)
+            {
+                try
+                {
+                    _logger.LogInformation("Gửi câu hỏi từ Student {UserId} đến Google Gemini API via IGeminiService", userId);
+
+                    var result = await _geminiService.SendGenerateContentAsync(userPrompt, systemPrompt, modelUsed);
+
+                    if (result.IsSuccess && !string.IsNullOrWhiteSpace(result.Content))
+                    {
+                        replyText = result.Content;
+                        modelUsed = result.Model ?? modelUsed;
+                    }
+                    else
+                    {
+                        var errorMsg = $"Gemini API thất bại [HTTP {result.HttpStatusCode}]: {result.ErrorMessage}";
+                        _logger.LogError(errorMsg);
+                        throw new InvalidOperationException(errorMsg);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Lỗi kết nối Gemini API khi xử lý tin nhắn AI Tutor.");
+
+                    if (enableOfflineMock)
+                    {
+                        _logger.LogWarning("Fallback về Chế độ Offline simulated reply do EnableOfflineMock = true.");
+                        replyText = GetSimulatedTutorReply(message);
+                        isFallback = true;
+                    }
+                    else
+                    {
+                        // Throw real exception to display on client
+                        throw;
+                    }
+                }
+            }
+            else if (enableOfflineMock)
+            {
+                _logger.LogInformation("Sử dụng Chế độ Offline simulated reply (do EnableOfflineMock = true).");
                 replyText = GetSimulatedTutorReply(message);
                 isFallback = true;
+            }
+            else
+            {
+                var noKeyMsg = "Chưa cấu hình Gemini API Key. Vui lòng thiết lập Gemini:ApiKey bằng User Secrets, .env hoặc appsettings.json.";
+                _logger.LogError(noKeyMsg);
+                throw new InvalidOperationException(noKeyMsg);
             }
 
             // 5. Save AI response
@@ -142,7 +205,7 @@ namespace DuAnTotNghiep.Services
                 ConversationId = conversationId,
                 SenderType = "AI",
                 MessageText = replyText,
-                AiModel = isFallback ? (isGemini ? "gemini-1.5-flash (Offline)" : "gpt-4o-mini (Offline)") : targetModel,
+                AiModel = isFallback ? $"{modelUsed} (Offline)" : modelUsed,
                 TokenUsage = isFallback ? 0 : 180,
                 CreatedAt = DateTime.UtcNow
             };

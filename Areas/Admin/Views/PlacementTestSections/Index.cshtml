@@ -158,15 +158,18 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            alert(data.message);
+                            if (window.showToast) window.showToast('success', data.message || 'Lưu thứ tự thành công.');
+                            else if (window.adminAlert) window.adminAlert({ title: 'Thành công', message: data.message || 'Lưu thứ tự thành công.', variant: 'success' });
                             document.getElementById('saveOrderBtn').classList.add('hidden');
                         } else {
-                            alert('Lỗi: ' + data.message);
+                            if (window.showToast) window.showToast('error', 'Lỗi: ' + data.message);
+                            else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: 'Lỗi: ' + data.message, variant: 'danger' });
                         }
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Đã xảy ra lỗi khi lưu thứ tự.');
+                        if (window.showToast) window.showToast('error', 'Đã xảy ra lỗi khi lưu thứ tự.');
+                        else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: 'Đã xảy ra lỗi khi lưu thứ tự.', variant: 'danger' });
                     });
                 });
             }

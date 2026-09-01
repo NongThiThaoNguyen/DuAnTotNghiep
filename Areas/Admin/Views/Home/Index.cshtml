@@ -4,7 +4,7 @@
     Layout = "_AdminLayout";
 }
 
-<div class="admin-dashboard space-y-8">
+<div class="admin-dashboard space-y-5">
     <!-- Header Page -->
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
@@ -23,7 +23,7 @@
     </div>
 
     <!-- General Stats Grid -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-6">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <!-- Card 1: Users -->
         <div class="rs-stat-card flex flex-col justify-between">
             <div class="flex items-center justify-between">
@@ -35,7 +35,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-3xl font-bold text-slate-900">@Model.TotalUsers.ToString("N0")</span>
+                <span class="text-2xl font-bold text-slate-900">@Model.TotalUsers.ToString("N0")</span>
                 <div class="flex items-center gap-2 mt-1.5 text-xs">
                     <span class="text-slate-500 font-medium">Học sinh: <strong class="text-slate-700">@Model.TotalStudents</strong></span>
                     <span class="text-slate-300">|</span>
@@ -57,7 +57,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-3xl font-bold text-slate-900">@Model.ActiveLearningStudents.ToString("N0")</span>
+                <span class="text-2xl font-bold text-slate-900">@Model.ActiveLearningStudents.ToString("N0")</span>
                 <div class="flex items-center gap-2 mt-1.5 text-xs text-slate-500 font-medium">
                     <span>Hoàn thành: <strong class="text-slate-700">@Model.CompletedLearningPaths</strong> (@Model.LearningPathCompletionRate.ToString("0.##")%)</span>
                 </div>
@@ -75,7 +75,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-3xl font-bold text-slate-900">@Model.PlacementAttemptsLast30Days.ToString("N0")</span>
+                <span class="text-2xl font-bold text-slate-900">@Model.PlacementAttemptsLast30Days.ToString("N0")</span>
                 <div class="flex items-center gap-2 mt-1.5 text-xs text-slate-500 font-medium">
                     <span>Tổng lượt làm: <strong class="text-slate-700">@Model.TotalPlacementAttempts</strong> | Đề: <strong class="text-slate-700">@Model.TotalPlacementTests</strong></span>
                 </div>
@@ -93,7 +93,7 @@
                 </div>
             </div>
             <div class="mt-4">
-                <span class="text-3xl font-bold text-slate-900">@Model.UnreadNotifications.ToString("N0")</span>
+                <span class="text-2xl font-bold text-slate-900">@Model.UnreadNotifications.ToString("N0")</span>
                 <div class="flex items-center gap-2 mt-1.5 text-xs text-slate-500 font-medium">
                     <span>AI chờ duyệt: <strong class="text-slate-700">@Model.PendingAiContents</strong> | Phân tích: <strong class="text-slate-700">@Model.TotalAiAnalyses</strong></span>
                 </div>
@@ -101,63 +101,60 @@
         </div>
     </div>
 
-    <!-- Secondary Stats Grid (Remaining 4 counters) -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 2xl:grid-cols-4 gap-6">
-        <!-- Learning Paths -->
-        <div class="rs-list-card p-5 flex items-center gap-4">
+    <!-- Secondary Stats: Compact KPI Strip (4 items, 1 row) -->
+    <div class="rs-kpi-strip">
+        <!-- Lộ trình học tập -->
+        <div class="rs-kpi-item">
             <div class="rs-icon-box shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
                 </svg>
             </div>
             <div>
-                <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Lộ trình học tập</span>
-                <span class="text-xl font-bold text-slate-800">@Model.TotalLearningPaths.ToString("N0")</span>
+                <span class="rs-kpi-label">Lộ trình học tập</span>
+                <span class="rs-kpi-value">@Model.TotalLearningPaths.ToString("N0")</span>
             </div>
         </div>
-
-        <!-- Question Bank -->
-        <div class="rs-list-card p-5 flex items-center gap-4">
+        <!-- Ngân hàng câu hỏi -->
+        <div class="rs-kpi-item">
             <div class="rs-icon-box shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"></path>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
             <div>
-                <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Ngân hàng câu hỏi</span>
-                <span class="text-xl font-bold text-slate-800">@Model.TotalQuestionBank.ToString("N0")</span>
+                <span class="rs-kpi-label">Ngân hàng câu hỏi</span>
+                <span class="rs-kpi-value">@Model.TotalQuestionBank.ToString("N0")</span>
             </div>
         </div>
-
-        <!-- Reference Sources -->
-        <div class="rs-list-card p-5 flex items-center gap-4">
+        <!-- Nguồn tài liệu -->
+        <div class="rs-kpi-item">
             <div class="rs-icon-box shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
                 </svg>
             </div>
             <div>
-                <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Nguồn tài liệu</span>
-                <span class="text-xl font-bold text-slate-800">@Model.TotalReferenceSources.ToString("N0")</span>
+                <span class="rs-kpi-label">Nguồn tài liệu</span>
+                <span class="rs-kpi-value">@Model.TotalReferenceSources.ToString("N0")</span>
             </div>
         </div>
-
-        <!-- Other Indicator -->
-        <div class="rs-list-card p-5 flex items-center gap-4">
-            <div class="rs-icon-box rs-icon-box-danger shrink-0">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"></path>
+        <!-- AI chờ duyệt -->
+        <div class="rs-kpi-item">
+            <div class="rs-icon-box rs-icon-box-warning shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
             <div>
-                <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider block">Mức độ tương tác</span>
-                <span class="text-xl font-bold text-slate-800">Hiệu quả</span>
+                <span class="rs-kpi-label">AI chờ duyệt</span>
+                <span class="rs-kpi-value">@Model.PendingAiContents.ToString("N0")</span>
             </div>
         </div>
     </div>
 
     <!-- Charts Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
         <!-- Chart 1: Người dùng đăng ký theo tháng -->
         <div class="rs-chart-card p-6">
             <h3 class="text-lg font-bold text-slate-900 mb-4">Người dùng đăng ký theo tháng</h3>
@@ -283,7 +280,7 @@
     </div>
 
     <!-- Lists Section (Recent / New Items) -->
-    <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-5">
         <!-- 1. Học viên mới đăng ký -->
         <div class="rs-list-card p-6">
             <div class="rs-section-title">

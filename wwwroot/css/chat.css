@@ -152,32 +152,22 @@
     50% { transform: scale(1.3); opacity: 1; }
 }
 
-/* Suggest questions section */
-.chat-suggestions-container {
-    padding: 12px 24px;
-    background-color: #FFFFFF;
-    border-top: 1px solid var(--border-color);
+/* Language notice bar */
+.chat-notice-bar {
     display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 4px 8px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.85;
+    user-select: none;
 }
 
-.chat-suggestion-chip {
-    padding: 8px 16px;
-    background-color: var(--body-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 18px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    cursor: pointer;
-    transition: all var(--transition-speed);
-}
-
-.chat-suggestion-chip:hover {
-    background-color: var(--primary-color);
-    color: #FFFFFF;
-    border-color: var(--primary-color);
+.chat-notice-icon {
+    color: #f59e0b;
+    font-size: 0.75rem;
+    flex-shrink: 0;
 }
 
 /* Input form bar */
@@ -231,4 +221,10 @@
 .chat-send-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 15px rgba(108, 99, 255, 0.45);
+}
+
+/* Reset button spinning animation */
+@keyframes spin {
+    0%   { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

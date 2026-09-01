@@ -257,16 +257,24 @@
                 
                 @if(Model.SectionCount > 0 && Model.Status != "ARCHIVED")
                 {
-                    <div class="flex items-center gap-3">
-                        <select id="sectionSelector" class="rounded-lg border-slate-300 text-sm py-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <select id="sectionSelector" class="rounded-lg border-slate-300 text-sm py-1.5 px-3">
                             <option value="">-- Chọn Section để quản lý --</option>
                             @foreach (var sec in sections)
                             {
                                 <option value="@sec.Id">Part @sec.OrderIndex: @sec.SectionName</option>
                             }
                         </select>
-                        <button id="btnOpenQuestionModal" class="px-4 py-2 bg-emerald-600 text-white hover:bg-emerald-700 font-medium rounded-lg text-sm transition-colors hidden">
+                        <button id="btnOpenQuestionModal" class="px-3.5 py-1.5 bg-emerald-600 text-white hover:bg-emerald-700 font-medium rounded-lg text-xs transition-colors hidden inline-flex items-center gap-1">
                             + Thêm Câu hỏi
+                        </button>
+                        <a id="btnDownloadTemplate" href="/Admin/PlacementTestQuestions/DownloadQuestionTemplate" class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-lg text-xs transition-colors hidden inline-flex items-center gap-1.5 border border-slate-200">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            Tải file Excel
+                        </a>
+                        <button id="btnOpenImportExcelModal" type="button" onclick="openExcelImportModal()" class="px-3.5 py-1.5 bg-blue-600 text-white hover:bg-blue-700 font-medium rounded-lg text-xs transition-colors hidden inline-flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                            Import câu hỏi từ Excel
                         </button>
                     </div>
                 }
@@ -311,54 +319,74 @@
         </div>
     </div>
 
-    <!-- Modal Select Question -->
+    <!-- Modal Thêm câu hỏi (2 Tabs) -->
     <div id="questionModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-slate-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeQuestionModal()"></div>
+        <div class="flex items-center justify-center min-h-screen px-4 py-6">
+            <!-- Backdrop -->
+            <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeQuestionModal()"></div>
 
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-
-            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl leading-6 font-bold text-slate-900" id="modal-title">Chọn câu hỏi từ Ngân hàng</h3>
-                        <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-500">
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            <!-- Modal Content -->
+            <div class="relative bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all w-full max-w-4xl mx-auto">
+                <!-- Modal Header with Tabs -->
+                <div class="bg-white px-6 pt-5 pb-0 border-b border-slate-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-bold text-slate-900" id="modal-title">Thêm câu hỏi vào Section</h3>
+                        <button onclick="closeQuestionModal()" class="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 transition-colors">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                         </button>
                     </div>
-                    
-                    <div class="mb-4 flex gap-2 items-end">
-                        <div class="flex-1">
-                            <label class="block text-xs text-slate-500 mb-1">Từ khóa</label>
-                            <input type="text" id="filterKeyword" class="w-full rounded border-slate-300 text-sm" placeholder="Tìm nội dung câu hỏi...">
+                    <!-- Tab Navigation -->
+                    <div class="flex gap-1">
+                        <button id="tabBtnBank" onclick="switchQuestionTab('bank')"
+                            class="px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors border-blue-600 text-blue-700 bg-blue-50/50">
+                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                            Chọn từ Ngân hàng
+                        </button>
+                        <button id="tabBtnCreate" onclick="switchQuestionTab('create')"
+                            class="px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50">
+                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            Tạo câu hỏi mới
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tab Content: Ngân hàng câu hỏi -->
+                <div id="tabContentBank" class="p-6">
+                    <div class="mb-4 flex gap-2 items-end flex-wrap">
+                        <div class="flex-1 min-w-[180px]">
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Từ khóa</label>
+                            <input type="text" id="filterKeyword" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Tìm nội dung câu hỏi...">
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">Loại</label>
-                            <select id="filterType" class="rounded border-slate-300 text-sm">
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Loại</label>
+                            <select id="filterType" class="rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Tất cả</option>
                                 <option value="MULTIPLE_CHOICE">Trắc nghiệm</option>
                                 <option value="FILL_BLANK">Điền từ</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs text-slate-500 mb-1">Độ khó</label>
-                            <select id="filterDifficulty" class="rounded border-slate-300 text-sm">
+                            <label class="block text-xs font-medium text-slate-500 mb-1">Độ khó</label>
+                            <select id="filterDifficulty" class="rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500">
                                 <option value="">Tất cả</option>
                                 <option value="BASIC">Cơ bản</option>
                                 <option value="MEDIUM">Trung bình</option>
                                 <option value="ADVANCED">Nâng cao</option>
                             </select>
                         </div>
-                        <button id="btnSearchQuestions" onclick="loadAvailableQuestions()" class="px-4 py-2 bg-slate-800 text-white text-sm rounded hover:bg-slate-700">Lọc</button>
+                        <button id="btnSearchQuestions" onclick="loadAvailableQuestions()" class="px-4 py-2 bg-slate-800 text-white text-sm rounded-lg hover:bg-slate-700 transition-colors">
+                            <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            Lọc
+                        </button>
                     </div>
 
-                    <div class="max-h-96 overflow-y-auto border border-slate-200 rounded-lg">
+                    <div class="max-h-80 overflow-y-auto border border-slate-200 rounded-xl">
                         <table class="min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50 sticky top-0 shadow-sm">
                                 <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500">Câu hỏi</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-slate-500 w-24">Độ khó</th>
-                                    <th class="px-4 py-3 text-right text-xs font-medium text-slate-500 w-48">Thao tác</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Câu hỏi</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase w-24">Độ khó</th>
+                                    <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase w-48">Thao tác</th>
                                 </tr>
                             </thead>
                             <tbody id="availableQuestionsTbody" class="bg-white divide-y divide-slate-200">
@@ -366,6 +394,173 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+
+                <!-- Tab Content: Tạo câu hỏi mới -->
+                <div id="tabContentCreate" class="p-6 hidden">
+                    <form id="createQuestionForm" onsubmit="return false;">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Nội dung câu hỏi <span class="text-red-500">*</span></label>
+                                <textarea id="newQuestionText" rows="3" required
+                                    class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                    placeholder="Nhập nội dung câu hỏi..."></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Loại câu hỏi</label>
+                                <select id="newQuestionType" onchange="toggleNewQuestionOptions()"
+                                    class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="MULTIPLE_CHOICE">Trắc nghiệm (A/B/C/D)</option>
+                                    <option value="FILL_BLANK">Điền từ</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Độ khó</label>
+                                <select id="newDifficultyLevel"
+                                    class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="BASIC">Cơ bản</option>
+                                    <option value="MEDIUM" selected>Trung bình</option>
+                                    <option value="ADVANCED">Nâng cao</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Điểm <span class="text-red-500">*</span></label>
+                                <input type="number" id="newPoints" value="10" min="0.01" step="0.01"
+                                    class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-600 mb-1">Đáp án đúng <span class="text-red-500">*</span></label>
+                                <input type="text" id="newCorrectAnswer" required
+                                    class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500"
+                                    placeholder="A, B, C hoặc D (trắc nghiệm) / Đáp án (điền từ)">
+                            </div>
+                        </div>
+
+                        <!-- Options A/B/C/D cho trắc nghiệm -->
+                        <div id="newOptionsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4 p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <div class="md:col-span-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">Các lựa chọn đáp án</div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">A</label>
+                                <input type="text" id="newOptionA" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Đáp án A">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">B</label>
+                                <input type="text" id="newOptionB" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Đáp án B">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">C</label>
+                                <input type="text" id="newOptionC" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Đáp án C">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-slate-500 mb-1">D</label>
+                                <input type="text" id="newOptionD" class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500" placeholder="Đáp án D">
+                            </div>
+                        </div>
+
+                        <div class="mb-2">
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">Giải thích (không bắt buộc)</label>
+                            <textarea id="newExplanation" rows="2"
+                                class="w-full rounded-lg border-slate-300 text-sm focus:ring-blue-500 focus:border-blue-500 resize-none"
+                                placeholder="Giải thích đáp án đúng (nếu có)..."></textarea>
+                        </div>
+                    </form>
+
+                    <!-- Footer for Create Tab -->
+                    <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100 mt-4">
+                        <button type="button" onclick="closeQuestionModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium rounded-lg text-sm transition-colors">
+                            Hủy
+                        </button>
+                        <button type="button" id="btnSaveNewQuestion" onclick="saveNewQuestion()" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg text-sm transition-colors shadow-sm">
+                            <svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Tạo & Thêm vào Section
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Import Question From Excel -->
+    <div id="excelImportModal" class="fixed inset-0 z-50 hidden" aria-labelledby="excel-modal-title" role="dialog" aria-modal="true">
+        @Html.AntiForgeryToken()
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" aria-hidden="true" onclick="closeExcelImportModal()"></div>
+
+            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                <!-- Modal Header -->
+                <div class="bg-white px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-900" id="excel-modal-title">Import câu hỏi từ Excel</h3>
+                        <p class="text-xs text-slate-500 mt-0.5" id="excelModalSubtitle">Section: <span id="excelTargetSectionName" class="font-semibold text-blue-600">--</span></p>
+                    </div>
+                    <button onclick="closeExcelImportModal()" type="button" class="text-slate-400 hover:text-slate-600 p-1">
+                        <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+                    <!-- Step 1: File Select Box -->
+                    <div class="border-2 border-dashed border-slate-200 hover:border-blue-400 bg-slate-50/50 rounded-xl p-6 text-center transition-colors">
+                        <input type="file" id="excelFileInput" accept=".xlsx,.xls" class="hidden" onchange="handleExcelFileSelect(this)" />
+                        <svg class="w-10 h-10 mx-auto text-slate-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        <p class="text-sm font-medium text-slate-700">Kéo thả file Excel vào đây hoặc <label for="excelFileInput" class="text-blue-600 font-semibold cursor-pointer hover:underline">Chọn file từ máy tính</label></p>
+                        <p class="text-xs text-slate-400 mt-1">Chấp nhận định dạng .xlsx, .xls</p>
+                        <div id="selectedFileNameDisplay" class="hidden mt-3 inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-xs font-semibold">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span id="selectedFileNameText">filename.xlsx</span>
+                        </div>
+                    </div>
+
+                    <!-- Error Alert Box -->
+                    <div id="excelErrorAlert" class="hidden p-4 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5">
+                            <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Phát hiện lỗi dữ liệu cần khắc phục trước khi Import:
+                        </div>
+                        <ul id="excelErrorList" class="list-disc list-inside space-y-1 pl-2"></ul>
+                    </div>
+
+                    <!-- Preview Area -->
+                    <div id="excelPreviewContainer" class="hidden space-y-3">
+                        <div class="flex items-center justify-between text-xs font-semibold text-slate-700">
+                            <span>Danh sách xem trước (<span id="previewTotalCount">0</span> câu hỏi)</span>
+                            <div class="flex items-center gap-3">
+                                <span class="text-emerald-600 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span> Hợp lệ: <strong id="previewValidCount">0</strong></span>
+                                <span class="text-red-600 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-500"></span> Lỗi: <strong id="previewErrorCount">0</strong></span>
+                            </div>
+                        </div>
+
+                        <div class="max-h-64 overflow-y-auto border border-slate-200 rounded-xl">
+                            <table class="min-w-full divide-y divide-slate-200 text-xs">
+                                <thead class="bg-slate-50 sticky top-0 font-semibold text-slate-500 uppercase">
+                                    <tr>
+                                        <th class="px-3 py-2 text-center w-12">Dòng</th>
+                                        <th class="px-3 py-2 text-left">Nội dung câu hỏi</th>
+                                        <th class="px-3 py-2 text-center w-24">Loại</th>
+                                        <th class="px-3 py-2 text-center w-20">Độ khó</th>
+                                        <th class="px-3 py-2 text-right w-16">Điểm</th>
+                                        <th class="px-3 py-2 text-left">Đáp án đúng</th>
+                                        <th class="px-3 py-2 text-center w-24">Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="excelPreviewTbody" class="bg-white divide-y divide-slate-100"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer -->
+                <div class="bg-slate-50 px-6 py-3.5 border-t border-slate-200 flex items-center justify-end gap-2">
+                    <button type="button" onclick="closeExcelImportModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium rounded-lg text-xs transition-colors">
+                        Hủy
+                    </button>
+                    <button type="button" id="btnPreviewExcel" onclick="uploadAndPreviewExcel()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg text-xs transition-colors disabled:opacity-50" disabled>
+                        Tải & Xem trước
+                    </button>
+                    <button type="button" id="btnConfirmImportExcel" onclick="confirmImportExcel()" class="hidden px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs transition-colors">
+                        Xác nhận Import
+                    </button>
                 </div>
             </div>
         </div>
@@ -379,6 +574,7 @@
             const hasAttempt = @(Model.AttemptCount > 0 ? "true" : "false");
             let currentSectionId = 0;
             let sortableInstance = null;
+            let currentPreviewRows = [];
 
             document.addEventListener('DOMContentLoaded', function () {
                 const sectionSelector = document.getElementById('sectionSelector');
@@ -388,22 +584,221 @@
                         if(currentSectionId > 0) {
                             document.getElementById('questionsContainer').classList.add('hidden');
                             document.getElementById('questionsTableWrapper').classList.remove('hidden');
-                            document.getElementById('btnOpenQuestionModal').classList.remove('hidden');
+                            document.getElementById('btnOpenQuestionModal')?.classList.remove('hidden');
+                            document.getElementById('btnDownloadTemplate')?.classList.remove('hidden');
+                            document.getElementById('btnOpenImportExcelModal')?.classList.remove('hidden');
                             document.getElementById('currentSectionTitle').innerText = this.options[this.selectedIndex].text;
                             loadSectionQuestions();
                         } else {
                             document.getElementById('questionsContainer').classList.remove('hidden');
                             document.getElementById('questionsTableWrapper').classList.add('hidden');
-                            document.getElementById('btnOpenQuestionModal').classList.add('hidden');
+                            document.getElementById('btnOpenQuestionModal')?.classList.add('hidden');
+                            document.getElementById('btnDownloadTemplate')?.classList.add('hidden');
+                            document.getElementById('btnOpenImportExcelModal')?.classList.add('hidden');
                         }
                     });
                 }
 
                 document.getElementById('btnOpenQuestionModal')?.addEventListener('click', function() {
                     document.getElementById('questionModal').classList.remove('hidden');
+                    switchQuestionTab('bank');
+                    resetCreateForm();
                     loadAvailableQuestions();
                 });
             });
+
+            function openExcelImportModal() {
+                if (!currentSectionId || currentSectionId <= 0) {
+                    if (window.adminAlert) {
+                        window.adminAlert({ title: 'Thông báo', message: 'Vui lòng chọn một Section trước khi thực hiện Import.', variant: 'warning' });
+                    }
+                    return;
+                }
+                const select = document.getElementById('sectionSelector');
+                const secName = select ? select.options[select.selectedIndex].text : '';
+                document.getElementById('excelTargetSectionName').innerText = secName;
+
+                // Reset modal
+                document.getElementById('excelFileInput').value = '';
+                document.getElementById('selectedFileNameDisplay').classList.add('hidden');
+                document.getElementById('excelErrorAlert').classList.add('hidden');
+                document.getElementById('excelPreviewContainer').classList.add('hidden');
+                document.getElementById('btnPreviewExcel').disabled = true;
+                document.getElementById('btnPreviewExcel').classList.remove('hidden');
+                document.getElementById('btnConfirmImportExcel').classList.add('hidden');
+                currentPreviewRows = [];
+
+                document.getElementById('excelImportModal').classList.remove('hidden');
+            }
+
+            function closeExcelImportModal() {
+                document.getElementById('excelImportModal').classList.add('hidden');
+            }
+
+            function handleExcelFileSelect(input) {
+                if (input.files && input.files[0]) {
+                    const file = input.files[0];
+                    document.getElementById('selectedFileNameText').innerText = file.name;
+                    document.getElementById('selectedFileNameDisplay').classList.remove('hidden');
+                    document.getElementById('btnPreviewExcel').disabled = false;
+                } else {
+                    document.getElementById('selectedFileNameDisplay').classList.add('hidden');
+                    document.getElementById('btnPreviewExcel').disabled = true;
+                }
+            }
+
+            function uploadAndPreviewExcel() {
+                const fileInput = document.getElementById('excelFileInput');
+                if (!fileInput.files || !fileInput.files[0]) return;
+
+                const formData = new FormData();
+                formData.append('file', fileInput.files[0]);
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+                const btn = document.getElementById('btnPreviewExcel');
+                btn.disabled = true;
+                btn.innerText = 'Đang đọc file...';
+
+                fetch(`/Admin/PlacementTestQuestions/PreviewExcel/${currentSectionId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    body: formData
+                })
+                .then(r => r.json())
+                .then(res => {
+                    btn.disabled = false;
+                    btn.innerText = 'Tải & Xem trước';
+
+                    if (!res.success) {
+                        if (window.adminAlert) {
+                            window.adminAlert({ title: 'Lỗi đọc file', message: res.message || 'Lỗi đọc file Excel.', variant: 'danger' });
+                        }
+                        return;
+                    }
+
+                    const data = res.data;
+                    currentPreviewRows = data.rows || [];
+
+                    document.getElementById('previewTotalCount').innerText = data.totalRows;
+                    document.getElementById('previewValidCount').innerText = data.validCount;
+                    document.getElementById('previewErrorCount').innerText = data.errorCount;
+
+                    const tbody = document.getElementById('excelPreviewTbody');
+                    tbody.innerHTML = '';
+                    const errorList = document.getElementById('excelErrorList');
+                    errorList.innerHTML = '';
+
+                    let hasError = false;
+
+                    currentPreviewRows.forEach(row => {
+                        const tr = document.createElement('tr');
+                        if (!row.isValid) {
+                            tr.className = 'bg-red-50/80 text-red-900';
+                            hasError = true;
+                            row.errors.forEach(err => {
+                                errorList.innerHTML += `<li>${err}</li>`;
+                            });
+                        } else {
+                            tr.className = 'hover:bg-slate-50';
+                        }
+
+                        const statusBadge = row.isValid
+                            ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700">Hợp lệ</span>'
+                            : '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700">Lỗi</span>';
+
+                        tr.innerHTML = `
+                            <td class="px-3 py-2 text-center font-semibold">${row.rowNumber}</td>
+                            <td class="px-3 py-2">
+                                <div class="font-medium line-clamp-1">${row.questionText}</div>
+                                ${row.explanation ? `<div class="text-[10px] text-slate-400">Giải thích: ${row.explanation}</div>` : ''}
+                            </td>
+                            <td class="px-3 py-2 text-center font-mono text-[11px]">${row.questionType}</td>
+                            <td class="px-3 py-2 text-center font-medium">${row.difficultyLevel}</td>
+                            <td class="px-3 py-2 text-right font-bold text-blue-600">${row.points}</td>
+                            <td class="px-3 py-2">
+                                <span class="font-semibold">${row.correctAnswer}</span>
+                                ${row.optionA ? `<span class="text-[10px] text-slate-500 block">A: ${row.optionA} | B: ${row.optionB}</span>` : ''}
+                            </td>
+                            <td class="px-3 py-2 text-center">${statusBadge}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+
+                    document.getElementById('excelPreviewContainer').classList.remove('hidden');
+
+                    if (hasError) {
+                        document.getElementById('excelErrorAlert').classList.remove('hidden');
+                        document.getElementById('btnConfirmImportExcel').classList.add('hidden');
+                    } else {
+                        document.getElementById('excelErrorAlert').classList.add('hidden');
+                        document.getElementById('btnConfirmImportExcel').classList.remove('hidden');
+                        document.getElementById('btnPreviewExcel').classList.add('hidden');
+                    }
+                })
+                .catch(err => {
+                    btn.disabled = false;
+                    btn.innerText = 'Tải & Xem trước';
+                    if (window.adminAlert) {
+                        window.adminAlert({ title: 'Lỗi hệ thống', message: 'Lỗi kết nối máy chủ: ' + err, variant: 'danger' });
+                    }
+                });
+            }
+
+            function confirmImportExcel() {
+                if (!currentPreviewRows || currentPreviewRows.length === 0) {
+                    if (window.adminAlert) window.adminAlert({ title: 'Thông báo', message: 'Không có dữ liệu để import.', variant: 'warning' });
+                    return;
+                }
+
+                const validRows = currentPreviewRows.filter(r => r.isValid);
+                if (validRows.length === 0) {
+                    if (window.adminAlert) window.adminAlert({ title: 'Thông báo', message: 'Tất cả dòng đều bị lỗi, không thể import.', variant: 'danger' });
+                    return;
+                }
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+                const btn = document.getElementById('btnConfirmImportExcel');
+                btn.disabled = true;
+                btn.innerText = 'Đang import...';
+
+                fetch(`/Admin/PlacementTestQuestions/ImportExcel/${currentSectionId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(validRows)
+                })
+                .then(r => r.json())
+                .then(res => {
+                    btn.disabled = false;
+                    btn.innerText = 'Xác nhận Import';
+
+                    if (res.success) {
+                        closeExcelImportModal();
+                        if (window.showToast) {
+                            window.showToast('success', res.message || 'Đã import thành công.');
+                        } else if (window.adminAlert) {
+                            window.adminAlert({ title: 'Import thành công', message: res.message || 'Đã import thành công.', variant: 'success' });
+                        }
+                        loadSectionQuestions();
+                    } else {
+                        if (window.adminAlert) {
+                            window.adminAlert({ title: 'Lỗi Import', message: res.message || 'Lỗi trong quá trình import.', variant: 'danger' });
+                        }
+                    }
+                })
+                .catch(err => {
+                    btn.disabled = false;
+                    btn.innerText = 'Xác nhận Import';
+                    if (window.adminAlert) {
+                        window.adminAlert({ title: 'Lỗi hệ thống', message: 'Lỗi kết nối máy chủ: ' + err, variant: 'danger' });
+                    }
+                });
+            }
 
             function closeQuestionModal() {
                 document.getElementById('questionModal').classList.add('hidden');
@@ -486,11 +881,12 @@
                 .then(r => r.json())
                 .then(res => {
                     if (res.success) {
-                        alert("Lưu thứ tự thành công!");
+                        if (window.showToast) window.showToast('success', 'Lưu thứ tự thành công!');
+                        else if (window.adminAlert) window.adminAlert({ title: 'Thành công', message: 'Lưu thứ tự thành công!', variant: 'success' });
                         document.getElementById('btnSaveQuestionOrder').classList.add('hidden');
                         loadSectionQuestions();
                     } else {
-                        alert(res.message);
+                        if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: res.message, variant: 'danger' });
                     }
                 });
             });
@@ -534,7 +930,8 @@
             function attachQuestion(qId) {
                 const pts = parseFloat(document.getElementById(`pts_${qId}`).value);
                 if (isNaN(pts) || pts <= 0) {
-                    alert('Điểm không hợp lệ'); return;
+                    if (window.adminAlert) window.adminAlert({ title: 'Thông báo', message: 'Điểm không hợp lệ', variant: 'warning' });
+                    return;
                 }
 
                 fetch('/Admin/PlacementTestQuestions/Attach', {
@@ -556,27 +953,154 @@
                         loadAvailableQuestions();
                         loadSectionQuestions();
                     } else {
-                        alert(res.message);
+                        if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: res.message, variant: 'danger' });
                     }
                 });
             }
 
             function removeQuestion(qId) {
-                if(!confirm("Xác nhận gỡ câu hỏi khỏi bài thi?")) return;
+                window.adminConfirm({
+                    title: "Xác nhận thao tác",
+                    message: "Xác nhận gỡ câu hỏi khỏi bài thi?",
+                    variant: "danger",
+                    confirmText: "Gỡ",
+                    cancelText: "Hủy"
+                }).then(function (confirmed) {
+                    if (!confirmed) return;
 
-                fetch(`/Admin/PlacementTestQuestions/Remove/${currentSectionId}/${qId}`, {
+                    fetch(`/Admin/PlacementTestQuestions/Remove/${currentSectionId}/${qId}`, {
+                        method: 'POST',
+                        headers: {
+                            'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                        }
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.success) {
+                            loadSectionQuestions();
+                        } else {
+                            window.adminAlert({ title: "Thông báo", message: res.message, variant: "danger" });
+                        }
+                    });
+                });
+            }
+
+            // ============ Tab Switching ============
+            function switchQuestionTab(tab) {
+                const tabBtnBank = document.getElementById('tabBtnBank');
+                const tabBtnCreate = document.getElementById('tabBtnCreate');
+                const tabContentBank = document.getElementById('tabContentBank');
+                const tabContentCreate = document.getElementById('tabContentCreate');
+
+                if (tab === 'bank') {
+                    tabBtnBank.className = 'px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors border-blue-600 text-blue-700 bg-blue-50/50';
+                    tabBtnCreate.className = 'px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50';
+                    tabContentBank.classList.remove('hidden');
+                    tabContentCreate.classList.add('hidden');
+                } else {
+                    tabBtnCreate.className = 'px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors border-blue-600 text-blue-700 bg-blue-50/50';
+                    tabBtnBank.className = 'px-4 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors border-transparent text-slate-500 hover:text-slate-700 hover:bg-slate-50';
+                    tabContentCreate.classList.remove('hidden');
+                    tabContentBank.classList.add('hidden');
+                }
+            }
+
+            function toggleNewQuestionOptions() {
+                const type = document.getElementById('newQuestionType').value;
+                const container = document.getElementById('newOptionsContainer');
+                if (type === 'MULTIPLE_CHOICE') {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+
+            function resetCreateForm() {
+                document.getElementById('newQuestionText').value = '';
+                document.getElementById('newQuestionType').value = 'MULTIPLE_CHOICE';
+                document.getElementById('newDifficultyLevel').value = 'MEDIUM';
+                document.getElementById('newPoints').value = '10';
+                document.getElementById('newCorrectAnswer').value = '';
+                document.getElementById('newOptionA').value = '';
+                document.getElementById('newOptionB').value = '';
+                document.getElementById('newOptionC').value = '';
+                document.getElementById('newOptionD').value = '';
+                document.getElementById('newExplanation').value = '';
+                document.getElementById('newOptionsContainer').classList.remove('hidden');
+            }
+
+            function saveNewQuestion() {
+                const questionText = document.getElementById('newQuestionText').value.trim();
+                const questionType = document.getElementById('newQuestionType').value;
+                const difficultyLevel = document.getElementById('newDifficultyLevel').value;
+                const points = parseFloat(document.getElementById('newPoints').value);
+                const correctAnswer = document.getElementById('newCorrectAnswer').value.trim();
+
+                // Validate
+                if (!questionText) {
+                    if (window.adminAlert) window.adminAlert({ title: 'Thiếu thông tin', message: 'Vui lòng nhập nội dung câu hỏi.', variant: 'warning' });
+                    return;
+                }
+                if (!correctAnswer) {
+                    if (window.adminAlert) window.adminAlert({ title: 'Thiếu thông tin', message: 'Vui lòng nhập đáp án đúng.', variant: 'warning' });
+                    return;
+                }
+                if (isNaN(points) || points <= 0) {
+                    if (window.adminAlert) window.adminAlert({ title: 'Thiếu thông tin', message: 'Điểm phải lớn hơn 0.', variant: 'warning' });
+                    return;
+                }
+                if (!currentSectionId || currentSectionId <= 0) {
+                    if (window.adminAlert) window.adminAlert({ title: 'Thiếu thông tin', message: 'Vui lòng chọn Section trước khi tạo câu hỏi.', variant: 'warning' });
+                    return;
+                }
+
+                const payload = {
+                    SectionId: currentSectionId,
+                    QuestionText: questionText,
+                    QuestionType: questionType,
+                    DifficultyLevel: difficultyLevel,
+                    Points: points,
+                    CorrectAnswer: correctAnswer,
+                    OptionA: document.getElementById('newOptionA').value.trim() || null,
+                    OptionB: document.getElementById('newOptionB').value.trim() || null,
+                    OptionC: document.getElementById('newOptionC').value.trim() || null,
+                    OptionD: document.getElementById('newOptionD').value.trim() || null,
+                    Explanation: document.getElementById('newExplanation').value.trim() || null
+                };
+
+                const btn = document.getElementById('btnSaveNewQuestion');
+                btn.disabled = true;
+                btn.innerHTML = '<svg class="w-4 h-4 inline-block mr-1.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Đang lưu...';
+
+                const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+                fetch('/Admin/PlacementTestQuestions/CreateAndAttach', {
                     method: 'POST',
                     headers: {
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    }
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': token
+                    },
+                    body: JSON.stringify(payload)
                 })
                 .then(r => r.json())
                 .then(res => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tạo & Thêm vào Section';
+
                     if (res.success) {
+                        if (window.showToast) window.showToast('success', res.message || 'Tạo và thêm câu hỏi thành công.');
+                        else if (window.adminAlert) window.adminAlert({ title: 'Thành công', message: res.message || 'Tạo và thêm câu hỏi thành công.', variant: 'success' });
+                        resetCreateForm();
+                        closeQuestionModal();
                         loadSectionQuestions();
                     } else {
-                        alert(res.message);
+                        if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: res.message || 'Không thể tạo câu hỏi.', variant: 'danger' });
                     }
+                })
+                .catch(err => {
+                    btn.disabled = false;
+                    btn.innerHTML = '<svg class="w-4 h-4 inline-block mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> Tạo & Thêm vào Section';
+                    if (window.adminAlert) window.adminAlert({ title: 'Lỗi hệ thống', message: 'Lỗi kết nối máy chủ: ' + err, variant: 'danger' });
                 });
             }
         </script>

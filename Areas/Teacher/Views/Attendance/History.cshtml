@@ -327,13 +327,15 @@
                                 btn.textContent = 'Lưu';
                             }, 1500);
                         } else {
-                            alert(data.message || 'Lỗi khi cập nhật!');
+                            if (window.showToast) window.showToast('error', data.message || 'Lỗi khi cập nhật!');
+                            else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: data.message || 'Lỗi khi cập nhật!', variant: 'danger' });
                         }
                     })
                     .catch(err => {
                         btn.disabled = false;
                         btn.textContent = 'Lưu';
-                        alert('Lỗi kết nối khi lưu!');
+                        if (window.showToast) window.showToast('error', 'Lỗi kết nối khi lưu!');
+                        else if (window.adminAlert) window.adminAlert({ title: 'Lỗi kết nối', message: 'Lỗi kết nối khi lưu!', variant: 'danger' });
                     });
                 });
             });

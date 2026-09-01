@@ -87,20 +87,30 @@
             if (response.ok) {
                 window.location.reload();
             } else {
-                alert('Có lỗi xảy ra khi lưu ghi chú.');
+                if (window.showToast) window.showToast('error', 'Có lỗi xảy ra khi lưu ghi chú.');
+                else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: 'Có lỗi xảy ra khi lưu ghi chú.', variant: 'danger' });
                 btnSave.disabled = false;
                 btnSave.innerText = 'Lưu Ghi chú';
             }
         } catch (error) {
             console.error('Error saving note:', error);
-            alert('Có lỗi xảy ra.');
+            if (window.showToast) window.showToast('error', 'Có lỗi xảy ra.');
+            else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: 'Có lỗi xảy ra.', variant: 'danger' });
             btnSave.disabled = false;
             btnSave.innerText = 'Lưu Ghi chú';
         }
     }
 
     async function deleteNote(id) {
-        if (!confirm('Bạn có chắc chắn muốn xóa ghi chú này không?')) return;
+        const confirmed = window.adminConfirm ? await window.adminConfirm({
+            title: 'Xác nhận xóa',
+            message: 'Bạn có chắc chắn muốn xóa ghi chú này không?',
+            variant: 'danger',
+            confirmText: 'Xóa',
+            cancelText: 'Hủy'
+        }) : true;
+
+        if (!confirmed) return;
 
         try {
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
@@ -118,11 +128,13 @@
             if (response.ok) {
                 window.location.reload();
             } else {
-                alert('Có lỗi xảy ra khi xóa ghi chú.');
+                if (window.showToast) window.showToast('error', 'Có lỗi xảy ra khi xóa ghi chú.');
+                else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: 'Có lỗi xảy ra khi xóa ghi chú.', variant: 'danger' });
             }
         } catch (error) {
             console.error('Error deleting note:', error);
-            alert('Có lỗi xảy ra.');
+            if (window.showToast) window.showToast('error', 'Có lỗi xảy ra.');
+            else if (window.adminAlert) window.adminAlert({ title: 'Lỗi', message: 'Có lỗi xảy ra.', variant: 'danger' });
         }
     }
 </script>

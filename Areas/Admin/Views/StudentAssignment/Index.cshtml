@@ -24,16 +24,21 @@
         <p class="text-sm text-slate-500">Xem nhanh bài nộp, trạng thái chấm và điểm của học viên.</p>
     </div>
 
-    <form method="get" class="flex flex-col gap-3 bg-white border border-slate-200 rounded-xl p-4 sm:flex-row sm:items-center">
-        <select name="studentId" class="rounded-lg border-slate-300 text-sm sm:min-w-72">
-            <option value="">Tất cả học viên</option>
-            @foreach (var student in Model.Students)
-            {
-                <option value="@student.Id" selected="@(Model.StudentId == student.Id ? "selected" : null)">@student.Text</option>
-            }
-        </select>
-        <button type="submit" class="rounded-lg bg-blue-600 px-4 py-2 text-white text-sm font-semibold hover:bg-blue-700">Lọc</button>
-        <a asp-action="Index" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Xóa lọc</a>
+    <form method="get" class="rs-filter-bar">
+        <div class="rs-filter-field rs-filter-field-lg">
+            <label class="rs-filter-label">Học viên</label>
+            <select name="studentId">
+                <option value="">Tất cả học viên</option>
+                @foreach (var student in Model.Students)
+                {
+                    <option value="@student.Id" selected="@(Model.StudentId == student.Id ? "selected" : null)">@student.Text</option>
+                }
+            </select>
+        </div>
+        <div class="rs-filter-actions">
+            <button type="submit" class="rs-filter-btn-primary">Lọc</button>
+            <a asp-action="Index" class="rs-filter-btn-secondary">Xóa lọc</a>
+        </div>
     </form>
 
     <p class="text-sm text-slate-500">Hiển thị @firstItem-@lastItem trong @Model.TotalItems bài nộp.</p>

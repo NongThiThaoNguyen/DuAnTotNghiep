@@ -101,5 +101,70 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 return BadRequest(new { success = false, message = ex.Message });
             }
         }
+
+        [HttpGet("DownloadQuestionTemplate")]
+        public async Task<IActionResult> DownloadQuestionTemplate()
+        {
+            var bytes = await _questionService.GenerateQuestionExcelTemplateAsync();
+            return File(bytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Mau_Import_Cau_Hoi_Placement_Test.xlsx");
+        }
+
+        [HttpPost("PreviewExcel/{sectionId}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> PreviewExcel(int sectionId, Microsoft.AspNetCore.Http.IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { success = false, message = "Vui lòng chọn file Excel hợp lệ (.xlsx/.xls)." });
+
+            var ext = System.IO.Path.GetExtension(file.FileName).ToLower();
+            if (ext != ".xlsx" && ext != ".xls")
+                return BadRequest(new { success = false, message = "Chỉ chấp nhận file định dạng Excel (.xlsx, .xls)." });
+
+            try
+            {
+                using var stream = file.OpenReadStream();
+                var previewResult = await _questionService.PreviewQuestionsExcelAsync(sectionId, stream);
+                return Ok(new { success = true, data = previewResult });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("ImportExcel/{sectionId}")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ImportExcel(int sectionId, [FromBody] List<QuestionExcelRowDto> rows)
+        {
+            if (rows == null || !rows.Any())
+                return BadRequest(new { success = false, message = "Danh sách câu hỏi cần import trống." });
+
+            try
+            {
+                var count = await _questionService.ImportQuestionsFromExcelAsync(sectionId, rows);
+                return Ok(new { success = true, count = count, message = $"Đã import thành công {count} câu hỏi vào Section." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost("CreateAndAttach")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAndAttach([FromBody] CreateAndAttachQuestionDto dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ." });
+
+            try
+            {
+                await _questionService.CreateAndAttachQuestionAsync(dto);
+                return Ok(new { success = true, message = "Tạo và thêm câu hỏi mới vào Section thành công." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

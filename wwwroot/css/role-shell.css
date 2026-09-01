@@ -908,8 +908,8 @@
 }
 
 .rs-stat-card {
-  min-height: 9.5rem;
-  padding: 1.25rem;
+  min-height: 6.5rem;
+  padding: 1rem;
 }
 
 .rs-stat-card__label {
@@ -922,10 +922,216 @@
 
 .rs-stat-card__value {
   color: var(--rs-ink);
-  font-size: 2rem;
+  font-size: 1.65rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   line-height: 1.1;
+}
+
+/* Compact KPI strip for secondary stats */
+.rs-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .rs-kpi-strip {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.rs-kpi-item {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-line);
+  border-radius: var(--rs-radius-panel);
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.rs-kpi-item .rs-icon-box {
+  width: 2rem;
+  height: 2rem;
+  flex-shrink: 0;
+}
+
+.rs-kpi-label {
+  color: var(--rs-ink-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  display: block;
+}
+
+.rs-kpi-value {
+  color: var(--rs-ink);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  display: block;
+}
+
+/* ==============================================
+   RS-FILTER-BAR — Admin unified filter design
+   ============================================== */
+.rs-filter-bar {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-line);
+  border-radius: var(--rs-radius-panel);
+  padding: 0.75rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+/* label above a filter field */
+.rs-filter-label {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--rs-ink-muted);
+  margin-bottom: 0.25rem;
+}
+
+/* wrapper for label + control pair */
+.rs-filter-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 160px;
+  min-width: 140px;
+}
+
+.rs-filter-field.rs-filter-field-sm {
+  flex: 1 1 120px;
+  min-width: 110px;
+}
+
+.rs-filter-field.rs-filter-field-lg {
+  flex: 2 1 220px;
+  min-width: 180px;
+}
+
+/* Unified input / select / date inside filter */
+.rs-filter-bar input[type="text"],
+.rs-filter-bar input[type="search"],
+.rs-filter-bar input[type="date"],
+.rs-filter-bar select,
+.rs-filter-input,
+.rs-filter-select {
+  width: 100%;
+  height: 2.25rem;
+  padding: 0 0.75rem;
+  font-size: 0.8125rem;
+  color: var(--rs-ink);
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-line);
+  border-radius: var(--rs-radius-control);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.rs-filter-bar input[type="text"]:focus,
+.rs-filter-bar input[type="search"]:focus,
+.rs-filter-bar input[type="date"]:focus,
+.rs-filter-bar select:focus {
+  border-color: var(--rs-brass-deep);
+  box-shadow: 0 0 0 3px rgb(154 106 47 / 0.12);
+}
+
+/* native select arrow fix */
+.rs-filter-bar select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1.1em;
+  padding-right: 2rem;
+}
+
+/* Button group at end of filter */
+.rs-filter-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+/* Primary filter submit button */
+.rs-filter-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.25rem;
+  padding: 0 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--rs-brass-deep);
+  border: 1px solid var(--rs-brass-deep);
+  border-radius: var(--rs-radius-control);
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.rs-filter-btn-primary:hover {
+  opacity: 0.88;
+  color: #fff;
+}
+
+/* Secondary/clear filter button */
+.rs-filter-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 2.25rem;
+  padding: 0 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--rs-ink-muted);
+  background: var(--rs-surface-muted);
+  border: 1px solid var(--rs-line);
+  border-radius: var(--rs-radius-control);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.rs-filter-btn-secondary:hover {
+  background: var(--rs-line);
+  color: var(--rs-ink);
+}
+
+/* Responsive: on very small screens stack everything */
+@media (max-width: 479px) {
+  .rs-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .rs-filter-field,
+  .rs-filter-field.rs-filter-field-sm,
+  .rs-filter-field.rs-filter-field-lg {
+    flex: 1 1 100%;
+    min-width: 0;
+  }
+  .rs-filter-actions {
+    width: 100%;
+  }
+  .rs-filter-btn-primary,
+  .rs-filter-btn-secondary {
+    flex: 1;
+    justify-content: center;
+  }
 }
 
 .rs-icon-box {
@@ -1678,9 +1884,183 @@
   overflow: hidden;
 }
 
-.rs-notification-item-time {
-  font-size: 0.7rem;
-  color: #94a3b8;
-  margin-top: 0.3rem;
+
+
+/* ==========================================================================
+   Admin Custom Modal Component (System-wide reusable dialogs)
+   ========================================================================== */
+.rs-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s;
 }
+
+.rs-modal-backdrop.is-open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.rs-modal-container {
+  background: var(--rs-surface, #ffffff);
+  border: 1px solid var(--rs-line, #e2e8f0);
+  border-radius: var(--rs-radius-panel, 1rem);
+  box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.15), 0 10px 15px -5px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  max-width: 440px;
+  overflow: hidden;
+  transform: scale(0.95) translateY(8px);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rs-modal-backdrop.is-open .rs-modal-container {
+  transform: scale(1) translateY(0);
+}
+
+.rs-modal-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 1.25rem 1.25rem 0.75rem;
+}
+
+.rs-modal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.rs-modal-icon.danger {
+  background: rgba(225, 29, 72, 0.1);
+  color: #e11d48;
+}
+
+.rs-modal-icon.warning {
+  background: rgba(217, 119, 6, 0.1);
+  color: #d97706;
+}
+
+.rs-modal-icon.info {
+  background: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+.rs-modal-icon.success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #059669;
+}
+
+.rs-modal-title-group {
+  flex: 1;
+  min-width: 0;
+  padding-top: 0.2rem;
+}
+
+.rs-modal-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--rs-ink, #0f172a);
+  margin: 0;
+  line-height: 1.3;
+}
+
+.rs-modal-message {
+  font-size: 0.875rem;
+  color: var(--rs-ink-muted, #475569);
+  margin-top: 0.4rem;
+  line-height: 1.5;
+}
+
+.rs-modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  padding: 0.25rem;
+  cursor: pointer;
+  border-radius: 0.375rem;
+  transition: color 0.15s, background 0.15s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rs-modal-close-btn:hover {
+  color: var(--rs-ink, #0f172a);
+  background: var(--rs-surface-muted, #f1f5f9);
+}
+
+.rs-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem 1.25rem;
+  background: var(--rs-surface, #ffffff);
+}
+
+.rs-modal-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2.35rem;
+  padding: 0 1.15rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border-radius: var(--rs-radius-control, 0.5rem);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 1px solid transparent;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.rs-modal-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rs-modal-btn-secondary {
+  background: var(--rs-surface-muted, #f8fafc);
+  border-color: var(--rs-line, #e2e8f0);
+  color: var(--rs-ink-muted, #475569);
+}
+
+.rs-modal-btn-secondary:hover:not(:disabled) {
+  background: var(--rs-line, #e2e8f0);
+  color: var(--rs-ink, #0f172a);
+}
+
+.rs-modal-btn-danger {
+  background: #e11d48;
+  border-color: #e11d48;
+  color: #ffffff;
+}
+
+.rs-modal-btn-danger:hover:not(:disabled) {
+  background: #be123c;
+  border-color: #be123c;
+}
+
+.rs-modal-btn-primary {
+  background: var(--rs-brass-deep, #9a6a2f);
+  border-color: var(--rs-brass-deep, #9a6a2f);
+  color: #ffffff;
+}
+
+.rs-modal-btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
 

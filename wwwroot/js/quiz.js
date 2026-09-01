@@ -22,8 +22,13 @@ document.addEventListener("DOMContentLoaded", function () {
             if (timerSeconds === 0) {
                 if (timerMinutes === 0) {
                     clearInterval(timerInterval);
-                    alert("Hết thời gian làm bài!");
-                    document.getElementById("quizForm")?.submit();
+                    if (window.adminAlert) {
+                        window.adminAlert({ title: 'Hết giờ', message: 'Hết thời gian làm bài!', variant: 'warning', okText: 'Nộp bài' }).then(() => {
+                            document.getElementById("quizForm")?.submit();
+                        });
+                    } else {
+                        document.getElementById("quizForm")?.submit();
+                    }
                     return;
                 }
                 timerMinutes--;
@@ -68,7 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
             if (!answered) {
-                alert("Vui lòng trả lời đầy đủ các câu hỏi trước khi nộp bài!");
+                if (window.adminAlert) {
+                    window.adminAlert({ title: 'Chưa hoàn thành', message: 'Vui lòng trả lời đầy đủ các câu hỏi trước khi nộp bài!', variant: 'warning' });
+                } else if (window.showToast) {
+                    window.showToast('warning', 'Vui lòng trả lời đầy đủ các câu hỏi trước khi nộp bài!');
+                }
                 return;
             }
 

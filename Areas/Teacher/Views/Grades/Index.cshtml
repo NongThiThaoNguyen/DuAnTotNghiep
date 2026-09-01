@@ -145,7 +145,8 @@
                     });
 
                     if (rows.length === 0 || visibleRowsCount === 0) {
-                        alert('Không có dữ liệu để xuất');
+                        if (window.showToast) window.showToast('warning', 'Không có dữ liệu để xuất');
+                        else if (window.adminAlert) window.adminAlert({ title: 'Thông báo', message: 'Không có dữ liệu để xuất', variant: 'warning' });
                         return;
                     }
 

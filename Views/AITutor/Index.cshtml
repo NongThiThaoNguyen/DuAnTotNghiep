@@ -3,10 +3,12 @@
 @{
     Layout = "_AILearnLayout";
     ViewData["Title"] = "AI Tutor";
-    var apiKey = Configuration["AI:ApiKey"] ?? Configuration["OpenAI:ApiKey"] ?? "";
-    var isOnline = !string.IsNullOrEmpty(apiKey);
-    var isGemini = apiKey.StartsWith("AIzaSy");
-    var modelName = isGemini ? (Configuration["AI:Model"] ?? "Gemini 1.5 Flash") : "GPT-4o Mini";
+    var candidateKeys = new[] { Configuration["Gemini:ApiKey"], Configuration["GoogleAI:ApiKey"], Configuration["AI:ApiKey"], Configuration["OpenAI:ApiKey"] };
+    var apiKey = candidateKeys.FirstOrDefault(k => !string.IsNullOrWhiteSpace(k)) ?? "";
+    var enableOfflineMock = Configuration.GetValue<bool>("Gemini:EnableOfflineMock", false) || Configuration.GetValue<bool>("AI:EnableOfflineMock", false);
+    var isOnline = !string.IsNullOrWhiteSpace(apiKey) && !enableOfflineMock;
+    var candidateModels = new[] { Configuration["Gemini:Model"], Configuration["GoogleAI:Model"], Configuration["AI:Model"] };
+    var modelName = candidateModels.FirstOrDefault(m => !string.IsNullOrWhiteSpace(m)) ?? "gemini-3.6-flash";
     var rawStudentAvatarUrl = ViewBag.StudentAvatarUrl as string;
     var studentAvatarUrl = string.IsNullOrWhiteSpace(rawStudentAvatarUrl)
         || rawStudentAvatarUrl.Contains("/default-images/avatar.png", StringComparison.OrdinalIgnoreCase)
@@ -70,8 +72,8 @@
             </div>
         </div>
         <div>
-            <button class="btn btn-sm btn-outline-secondary" onclick="window.location.reload();">
-                <i class="fa-solid fa-arrows-rotate me-1"></i>Làm mới
+            <button class="btn btn-sm btn-outline-secondary" id="btnResetChat" title="Bắt đầu cuộc trò chuyện mới" onclick="resetChat();">
+                <i class="fa-solid fa-arrows-rotate me-1" id="resetIcon"></i>Làm mới
             </button>
         </div>
     </div>
@@ -105,16 +107,14 @@
         }
     </div>
 
-    <!-- Question Suggestions -->
-    <div class="chat-suggestions-container">
-        @foreach (var sug in Model.SuggestedQuestions)
-        {
-            <div class="chat-suggestion-chip">@sug</div>
-        }
-    </div>
+
 
     <!-- Input bar -->
     <div class="chat-input-bar">
+        <div class="chat-notice-bar">
+            <i class="fa-solid fa-triangle-exclamation chat-notice-icon"></i>
+            <span>Lưu ý: Vui lòng không sử dụng từ ngữ tục tĩu hoặc phát ngôn phản cảm.</span>
+        </div>
         <form class="chat-input-form" id="chatForm">
             <input type="text" placeholder="Nhập câu hỏi tiếng Anh của bạn tại đây..." id="chatInput" autocomplete="off" required />
             <button type="submit" class="chat-send-btn">

@@ -3,103 +3,135 @@
     ViewData["Title"] = "Nhật ký sử dụng AI";
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>Nhật ký sử dụng AI</h2>
-    <a asp-controller="Export" asp-action="ExportAiUsageLogs" class="btn btn-success">
-        <i class="bi bi-file-earmark-excel"></i> Xuất Excel
+<!-- Top Header Bar -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+    <div>
+        <h2 class="text-xl font-bold text-slate-900">Nhật ký sử dụng AI</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Theo dõi lịch sử gọi AI, token sử dụng và ước tính chi phí hệ thống</p>
+    </div>
+    <a asp-controller="Export" asp-action="ExportAiUsageLogs" class="inline-flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium rounded-lg text-xs transition-colors shadow-xs self-start sm:self-auto">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+        Xuất Excel
     </a>
 </div>
 
-<form method="get" class="row g-3 mb-4">
-    <div class="col-md-2">
-        <label class="form-label">Module</label>
-        <input name="module" value="@ViewBag.Module" class="form-control" />
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Model</label>
-        <input name="model" value="@ViewBag.Model" class="form-control" />
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Từ ngày</label>
-        <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control" />
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Đến ngày</label>
-        <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control" />
-    </div>
-    <div class="col-md-2">
-        <label class="form-label">Trạng thái</label>
-        <select name="status" class="form-select">
-            <option value="">Tất cả</option>
-            <option value="SUCCESS" selected="@(ViewBag.Status == "SUCCESS")">SUCCESS</option>
-            <option value="TIMEOUT" selected="@(ViewBag.Status == "TIMEOUT")">TIMEOUT</option>
-            <option value="SCHEMA_ERROR" selected="@(ViewBag.Status == "SCHEMA_ERROR")">SCHEMA_ERROR</option>
-            <option value="FAILED" selected="@(ViewBag.Status == "FAILED")">FAILED</option>
-        </select>
-    </div>
-    <div class="col-md-2 d-flex align-items-end">
-        <button class="btn btn-primary w-100">Lọc</button>
-    </div>
-</form>
+<!-- Filter Bar Compact -->
+<div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs mb-4">
+    <form method="get" class="flex flex-wrap items-end gap-3">
+        <div class="flex-1 min-w-[130px]">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Module</label>
+            <input name="module" value="@ViewBag.Module" class="w-full rounded-lg border-slate-300 text-xs py-1.5 focus:ring-blue-500 focus:border-blue-500" placeholder="Module..." />
+        </div>
+        <div class="flex-1 min-w-[130px]">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Model</label>
+            <input name="model" value="@ViewBag.Model" class="w-full rounded-lg border-slate-300 text-xs py-1.5 focus:ring-blue-500 focus:border-blue-500" placeholder="Model..." />
+        </div>
+        <div class="w-full sm:w-36">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Từ ngày</label>
+            <input type="date" name="fromDate" value="@ViewBag.FromDate" class="w-full rounded-lg border-slate-300 text-xs py-1.5 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div class="w-full sm:w-36">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Đến ngày</label>
+            <input type="date" name="toDate" value="@ViewBag.ToDate" class="w-full rounded-lg border-slate-300 text-xs py-1.5 focus:ring-blue-500 focus:border-blue-500" />
+        </div>
+        <div class="w-full sm:w-36">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Trạng thái</label>
+            <select name="status" class="w-full rounded-lg border-slate-300 text-xs py-1.5 focus:ring-blue-500 focus:border-blue-500">
+                <option value="">Tất cả</option>
+                <option value="SUCCESS" selected="@(ViewBag.Status == "SUCCESS")">SUCCESS</option>
+                <option value="TIMEOUT" selected="@(ViewBag.Status == "TIMEOUT")">TIMEOUT</option>
+                <option value="SCHEMA_ERROR" selected="@(ViewBag.Status == "SCHEMA_ERROR")">SCHEMA_ERROR</option>
+                <option value="FAILED" selected="@(ViewBag.Status == "FAILED")">FAILED</option>
+            </select>
+        </div>
+        <div class="w-full sm:w-auto">
+            <button type="submit" class="w-full sm:w-auto px-4 py-1.5 bg-slate-800 hover:bg-slate-900 text-white font-semibold rounded-lg text-xs transition-colors shadow-xs">
+                Lọc
+            </button>
+        </div>
+    </form>
+</div>
 
-<div class="row mb-4">
-    <div class="col-md-4">
-        <div class="card border-info">
-            <div class="card-body">
-                <h6 class="card-title">Tổng token</h6>
-                <h4 class="mb-0">@ViewBag.TotalTokens</h4>
-            </div>
+<!-- Compact Stats Bar -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        </div>
+        <div>
+            <div class="text-xs font-medium text-slate-500">Tổng token</div>
+            <div class="text-lg font-bold text-slate-900">@ViewBag.TotalTokens</div>
         </div>
     </div>
-    <div class="col-md-4">
-        <div class="card border-success">
-            <div class="card-body">
-                <h6 class="card-title">Tổng chi phí</h6>
-                <h4 class="mb-0">@String.Format("{0:C}", ViewBag.TotalCost)</h4>
-            </div>
+
+    <div class="bg-white p-3.5 rounded-xl border border-slate-200 shadow-xs flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </div>
+        <div>
+            <div class="text-xs font-medium text-slate-500">Tổng chi phí</div>
+            <div class="text-lg font-bold text-emerald-600">@String.Format("{0:C}", ViewBag.TotalCost)</div>
         </div>
     </div>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Module</th>
-            <th>Model</th>
-            <th>Trạng thái</th>
-            <th>Input</th>
-            <th>Output</th>
-            <th>Chi phí</th>
-            <th>Thời gian</th>
-            <th>Ngày tạo</th>
-            <th>Lỗi</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (!Model.Any())
-        {
-            <tr><td colspan="10" class="text-center">Chưa có dữ liệu.</td></tr>
-        }
-        else
-        {
-            int i = 0;
-            foreach (var item in Model)
-            {
-                i++;
+<!-- AI Logs Table -->
+<div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs divide-y divide-slate-200">
+            <thead class="bg-slate-50 text-slate-500 font-semibold uppercase tracking-wider">
                 <tr>
-                    <td>@i</td>
-                    <td>@item.ModuleCode</td>
-                    <td>@item.AiModel</td>
-                    <td><span class="badge bg-secondary">@item.RequestStatus</span></td>
-                    <td>@item.InputTokens</td>
-                    <td>@item.OutputTokens</td>
-                    <td>@item.CostEstimate</td>
-                    <td>@item.DurationMs ms</td>
-                    <td>@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
-                    <td>@item.ErrorMessage</td>
+                    <th class="px-4 py-3 text-center w-12">#</th>
+                    <th class="px-4 py-3">Module</th>
+                    <th class="px-4 py-3">Model</th>
+                    <th class="px-4 py-3 text-center">Trạng thái</th>
+                    <th class="px-4 py-3 text-right">Input</th>
+                    <th class="px-4 py-3 text-right">Output</th>
+                    <th class="px-4 py-3 text-right">Chi phí</th>
+                    <th class="px-4 py-3 text-right">Thời gian</th>
+                    <th class="px-4 py-3">Ngày tạo</th>
+                    <th class="px-4 py-3">Lỗi</th>
                 </tr>
-            }
-        }
-    </tbody>
-</table>
+            </thead>
+            <tbody class="divide-y divide-slate-100 bg-white">
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="10" class="px-4 py-8 text-center text-slate-400">Chưa có dữ liệu nhật ký AI.</td>
+                    </tr>
+                }
+                else
+                {
+                    int i = 0;
+                    foreach (var item in Model)
+                    {
+                        i++;
+                        var status = (string)(item.RequestStatus ?? "");
+                        var badgeClass = status switch {
+                            "SUCCESS" => "bg-emerald-100 text-emerald-700",
+                            "TIMEOUT" => "bg-amber-100 text-amber-700",
+                            "SCHEMA_ERROR" => "bg-purple-100 text-purple-700",
+                            "FAILED" => "bg-red-100 text-red-700",
+                            _ => "bg-slate-100 text-slate-700"
+                        };
+
+                        <tr class="hover:bg-slate-50/80 transition-colors">
+                            <td class="px-4 py-3 text-center font-medium text-slate-500">@i</td>
+                            <td class="px-4 py-3 font-semibold text-slate-800">@item.ModuleCode</td>
+                            <td class="px-4 py-3 font-mono text-[11px] text-slate-600">@item.AiModel</td>
+                            <td class="px-4 py-3 text-center">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider @badgeClass">@item.RequestStatus</span>
+                            </td>
+                            <td class="px-4 py-3 text-right font-mono text-slate-700">@item.InputTokens</td>
+                            <td class="px-4 py-3 text-right font-mono text-slate-700">@item.OutputTokens</td>
+                            <td class="px-4 py-3 text-right font-semibold text-emerald-600">@item.CostEstimate</td>
+                            <td class="px-4 py-3 text-right font-mono text-slate-500">@item.DurationMs ms</td>
+                            <td class="px-4 py-3 whitespace-nowrap text-slate-500">@item.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                            <td class="px-4 py-3 text-red-600 text-[11px] max-w-xs truncate" title="@item.ErrorMessage">@item.ErrorMessage</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

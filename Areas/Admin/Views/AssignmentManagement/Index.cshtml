@@ -30,97 +30,86 @@
     }
 }
 
-<div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h1 class="text-2xl font-bold text-slate-900">Quản lý bài tập toàn hệ thống</h1>
-            <p class="text-sm text-slate-500 mt-1">Theo dõi bài tập, giáo viên khởi tạo, số bài nộp và trạng thái lưu hành.</p>
-        </div>
-    </div>
-
+<div class="space-y-5">
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-medium">
-            @TempData["SuccessMessage"]
+        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center gap-3 shadow-xs">
+            <svg class="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+            <span>@TempData["SuccessMessage"]</span>
         </div>
     }
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-sm font-medium">
-            @TempData["ErrorMessage"]
+        <div class="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm font-medium flex items-center gap-3 shadow-xs">
+            <svg class="w-5 h-5 text-rose-600 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+            <span>@TempData["ErrorMessage"]</span>
         </div>
     }
 
-    <!-- Search & Filters -->
-    <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-        <form method="get" asp-action="Index" class="space-y-4">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <!-- Keyword search -->
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    </div>
-                    <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm tên bài tập..." class="block w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all" />
-                </div>
-
-                <!-- Topic Filter -->
-                <div>
-                    <select name="topicId" class="block w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-                        <option value="">Tất cả Topic</option>
-                        @foreach (var topic in Model.Topics)
-                        {
-                            <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Teacher Filter -->
-                <div>
-                    <select name="teacherId" class="block w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-                        <option value="">Tất cả Giáo viên</option>
-                        @foreach (var teacher in Model.Teachers)
-                        {
-                            <option value="@teacher.Id" selected="@(Model.TeacherId == teacher.Id ? "selected" : null)">@teacher.Text</option>
-                        }
-                    </select>
-                </div>
-
-                <!-- Status Filter -->
-                <div>
-                    <select name="status" class="block w-full py-2 px-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all">
-                        <option value="">Tất cả Trạng thái</option>
-                        <option value="ACTIVE" selected="@(Model.Status == "ACTIVE" ? "selected" : null)">Hoạt động / Đang mở</option>
-                        <option value="CLOSED" selected="@(Model.Status == "CLOSED" ? "selected" : null)">Đã đóng</option>
-                        <option value="DRAFT" selected="@(Model.Status == "DRAFT" ? "selected" : null)">Bản nháp</option>
-                        <option value="ARCHIVED" selected="@(Model.Status == "ARCHIVED" ? "selected" : null)">Đã lưu trữ</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="flex items-center justify-between pt-2 border-t border-slate-100">
-                <p class="text-sm text-slate-500">Hiển thị <span class="font-semibold text-slate-700">@firstItem-@lastItem</span> trong tổng số <span class="font-semibold text-slate-700">@Model.TotalItems</span> bài tập.</p>
-                <div class="flex gap-2">
-                    <button type="submit" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white font-medium text-sm rounded-lg transition-colors">
-                        Lọc dữ liệu
-                    </button>
-                    @if (!string.IsNullOrWhiteSpace(Model.Keyword) || Model.TopicId.HasValue || Model.TeacherId.HasValue || !string.IsNullOrWhiteSpace(Model.Status))
-                    {
-                        <a asp-action="Index" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium text-sm rounded-lg transition-colors">
-                            Xóa lọc
-                        </a>
-                    }
-                </div>
-            </div>
-        </form>
+    <!-- Header Page -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-slate-200 pb-4">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Quản lý bài tập toàn hệ thống</h1>
+            <p class="text-sm text-slate-500 mt-1">Theo dõi danh sách bài tập, giáo viên khởi tạo, số bài nộp và trạng thái lưu hành.</p>
+        </div>
     </div>
 
-    <!-- Table -->
-    <div class="overflow-hidden bg-white border border-slate-200 rounded-xl shadow-xs">
+    <!-- KHU VỰC FILTER (COMPACT UNIFIED RS-FILTER-BAR) -->
+    <form method="get" asp-action="Index" class="rs-filter-bar">
+        <div class="rs-filter-field rs-filter-field-lg">
+            <label class="rs-filter-label">Tìm kiếm</label>
+            <input type="text" name="keyword" value="@Model.Keyword" placeholder="Tìm tên bài tập..." />
+        </div>
+        <div class="rs-filter-field">
+            <label class="rs-filter-label">Topic</label>
+            <select name="topicId">
+                <option value="">Tất cả Topic</option>
+                @foreach (var topic in Model.Topics)
+                {
+                    <option value="@topic.Id" selected="@(Model.TopicId == topic.Id ? "selected" : null)">@topic.Text</option>
+                }
+            </select>
+        </div>
+        <div class="rs-filter-field">
+            <label class="rs-filter-label">Giáo viên</label>
+            <select name="teacherId">
+                <option value="">Tất cả Giáo viên</option>
+                @foreach (var teacher in Model.Teachers)
+                {
+                    <option value="@teacher.Id" selected="@(Model.TeacherId == teacher.Id ? "selected" : null)">@teacher.Text</option>
+                }
+            </select>
+        </div>
+        <div class="rs-filter-field">
+            <label class="rs-filter-label">Trạng thái</label>
+            <select name="status">
+                <option value="">Tất cả Trạng thái</option>
+                <option value="ACTIVE" selected="@(Model.Status == "ACTIVE" ? "selected" : null)">Đang mở</option>
+                <option value="CLOSED" selected="@(Model.Status == "CLOSED" ? "selected" : null)">Đã đóng</option>
+                <option value="DRAFT" selected="@(Model.Status == "DRAFT" ? "selected" : null)">Bản nháp</option>
+                <option value="ARCHIVED" selected="@(Model.Status == "ARCHIVED" ? "selected" : null)">Đã lưu trữ</option>
+            </select>
+        </div>
+        <div class="rs-filter-actions">
+            <button type="submit" class="rs-filter-btn-primary">Lọc dữ liệu</button>
+            @if (!string.IsNullOrWhiteSpace(Model.Keyword) || Model.TopicId.HasValue || Model.TeacherId.HasValue || !string.IsNullOrWhiteSpace(Model.Status))
+            {
+                <a asp-action="Index" class="rs-filter-btn-secondary">Xóa lọc</a>
+            }
+        </div>
+    </form>
+
+    <!-- BẢNG DỮ LIỆU BÀI TẬP -->
+    <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-xs">
+        <div class="px-4 py-3 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-900">Danh sách bài tập</h2>
+            <span class="text-xs text-slate-500">Hiển thị <strong class="text-slate-800">@firstItem-@lastItem</strong> trong <strong class="text-slate-800">@Model.TotalItems</strong> bài tập</span>
+        </div>
+
         @if (Model.Items == null || !Model.Items.Any())
         {
-            <div class="p-8 text-center text-slate-500">
-                <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+            <div class="p-10 text-center text-slate-500">
+                <svg class="w-12 h-12 mx-auto text-slate-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 01-2-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 Không tìm thấy bài tập nào phù hợp với bộ lọc.
             </div>
         }
@@ -130,12 +119,12 @@
                 <table class="min-w-full divide-y divide-slate-200 text-sm">
                     <thead class="bg-slate-50 text-left text-xs font-semibold uppercase text-slate-500 tracking-wider">
                         <tr>
-                            <th class="px-4 py-3.5">Bài tập</th>
-                            <th class="px-4 py-3.5">Topic</th>
-                            <th class="px-4 py-3.5">Giáo viên khởi tạo</th>
-                            <th class="px-4 py-3.5 text-center">Tỷ lệ bài nộp (Submissions)</th>
-                            <th class="px-4 py-3.5">Trạng thái</th>
-                            <th class="px-4 py-3.5 text-right">Thao tác</th>
+                            <th scope="col" class="px-4 py-3">Bài tập</th>
+                            <th scope="col" class="px-4 py-3">Topic</th>
+                            <th scope="col" class="px-4 py-3">Giáo viên khởi tạo</th>
+                            <th scope="col" class="px-4 py-3 text-center">Tỷ lệ nộp bài</th>
+                            <th scope="col" class="px-4 py-3">Trạng thái</th>
+                            <th scope="col" class="px-4 py-3 text-right">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100 bg-white">
@@ -143,73 +132,68 @@
                         {
                             var isOpen = item.Status == "ACTIVE" || item.Status == "PUBLISHED";
                             <tr class="hover:bg-slate-50/80 transition-colors">
-                                <td class="px-4 py-3.5">
-                                    <div class="font-semibold text-slate-900">@item.Title</div>
+                                <td class="px-4 py-3">
+                                    <div class="font-semibold text-slate-900 line-clamp-2">@item.Title</div>
                                     <div class="flex items-center gap-2 mt-1">
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-slate-100 text-slate-600">
+                                        <span class="rs-badge text-[10px] px-1.5 py-0.5">
                                             @item.TaskType
                                         </span>
                                         <span class="text-xs text-slate-400">@item.CreatedAt.ToString("dd/MM/yyyy")</span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3.5 text-slate-700 font-medium">@item.TopicTitle</td>
-                                <td class="px-4 py-3.5 text-slate-700">@item.TeacherName</td>
-                                <td class="px-4 py-3.5 text-center">
-                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-100">
+                                <td class="px-4 py-3 text-slate-700 font-medium whitespace-nowrap">@item.TopicTitle</td>
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <div class="font-semibold text-slate-900">@item.TeacherName</div>
+                                </td>
+                                <td class="px-4 py-3 text-center whitespace-nowrap">
+                                    <span class="rs-badge rs-badge-info text-xs">
                                         @item.SubmissionDisplayRatio
                                     </span>
                                 </td>
-                                <td class="px-4 py-3.5">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium @StatusBadgeClass(item.Status)">
+                                <td class="px-4 py-3 whitespace-nowrap">
+                                    <span class="rs-badge @StatusBadgeClass(item.Status) text-xs">
                                         @StatusText(item.Status)
                                     </span>
                                 </td>
-                                <td class="px-4 py-3.5 text-right whitespace-nowrap space-x-1.5">
-                                    <!-- Xem chi tiết -->
-                                    <a asp-action="Details" asp-route-assignmentId="@item.AssignmentId" class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-blue-700 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-                                        Chi tiết
-                                    </a>
+                                <td class="px-4 py-3 text-right whitespace-nowrap">
+                                    <div class="inline-flex items-center gap-1">
+                                        <!-- Xem chi tiết -->
+                                        <a asp-action="Details" asp-route-assignmentId="@item.AssignmentId" class="rs-filter-btn-secondary px-2 text-xs" style="height: 1.85rem;" title="Xem chi tiết">
+                                            Chi tiết
+                                        </a>
 
-                                    <!-- Sửa -->
-                                    <a asp-action="Edit" asp-route-assignmentId="@item.AssignmentId" class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-amber-700 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors">
-                                        Sửa
-                                    </a>
+                                        <!-- Xem Submissions -->
+                                        <a asp-action="Submissions" asp-route-assignmentId="@item.AssignmentId" class="rs-filter-btn-secondary px-2 text-xs" style="height: 1.85rem;" title="Xem bài nộp">
+                                            Bài nộp
+                                        </a>
 
-                                    <!-- Đóng / Mở -->
-                                    <form asp-action="ToggleStatus" asp-route-assignmentId="@item.AssignmentId" method="post" class="inline-block" onsubmit="return confirm('@(isOpen ? "Bạn có chắc chắn muốn ĐÓNG bài tập này?" : "Bạn có chắc chắn muốn MỞ LẠI bài tập này?")');">
-                                        @Html.AntiForgeryToken()
-                                        @if (isOpen)
-                                        {
-                                            <button type="submit" class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-slate-700 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">
-                                                Đóng
+                                        <!-- Sửa -->
+                                        <a asp-action="Edit" asp-route-assignmentId="@item.AssignmentId" class="rs-filter-btn-secondary px-2 text-xs" style="height: 1.85rem;" title="Chỉnh sửa">
+                                            Sửa
+                                        </a>
+
+                                        <!-- Đóng / Mở -->
+                                        <form asp-action="ToggleStatus" asp-route-assignmentId="@item.AssignmentId" method="post" class="inline" onsubmit="return confirm('@(isOpen ? "Bạn có chắc chắn muốn ĐÓNG bài tập này?" : "Bạn có chắc chắn muốn MỞ LẠI bài tập này?")');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="rs-filter-btn-secondary px-2 text-xs" style="height: 1.85rem;" title="@(isOpen ? "Đóng bài tập" : "Mở lại bài tập")">
+                                                @(isOpen ? "Đóng" : "Mở lại")
                                             </button>
-                                        }
-                                        else
-                                        {
-                                            <button type="submit" class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-emerald-700 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors">
-                                                Mở lại
+                                        </form>
+
+                                        <!-- Xóa -->
+                                        <form asp-action="Delete" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài tập này? Nếu đã có bài nộp, hệ thống sẽ lưu trữ bài tập để bảo toàn lịch sử.');">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="assignmentId" value="@item.AssignmentId" />
+                                            <input type="hidden" name="keyword" value="@Model.Keyword" />
+                                            <input type="hidden" name="topicId" value="@Model.TopicId" />
+                                            <input type="hidden" name="teacherId" value="@Model.TeacherId" />
+                                            <input type="hidden" name="status" value="@Model.Status" />
+                                            <input type="hidden" name="page" value="@Model.CurrentPage" />
+                                            <button type="submit" class="rs-filter-btn-secondary px-2 text-xs text-rose-600 hover:text-rose-700" style="height: 1.85rem;" title="Xóa bài tập">
+                                                Xóa
                                             </button>
-                                        }
-                                    </form>
-
-                                    <!-- Xem Submissions -->
-                                    <a asp-action="Submissions" asp-route-assignmentId="@item.AssignmentId" class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-purple-700 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                                        Bài nộp
-                                    </a>
-
-                                    <!-- Xóa -->
-                                    <form asp-action="Delete" method="post" class="inline-block" onsubmit="return confirm('Bạn có chắc chắn muốn xóa bài tập này? Nếu đã có bài nộp, hệ thống sẽ lưu trữ bài tập để bảo toàn lịch sử.');">
-                                        @Html.AntiForgeryToken()
-                                        <input type="hidden" name="assignmentId" value="@item.AssignmentId" />
-                                        <input type="hidden" name="keyword" value="@Model.Keyword" />
-                                        <input type="hidden" name="topicId" value="@Model.TopicId" />
-                                        <input type="hidden" name="teacherId" value="@Model.TeacherId" />
-                                        <input type="hidden" name="status" value="@Model.Status" />
-                                        <input type="hidden" name="page" value="@Model.CurrentPage" />
-                                        <button type="submit" class="inline-flex items-center px-2.5 py-1 text-xs font-semibold text-rose-700 bg-rose-50 rounded-lg hover:bg-rose-100 transition-colors">
-                                            Xóa
-                                        </button>
-                                    </form>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }
@@ -217,31 +201,33 @@
                 </table>
             </div>
         }
-    </div>
 
-    <!-- Pagination -->
-    @if (Model.TotalPages > 1)
-    {
-        <div class="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-xs">
-            <a asp-action="Index"
-               asp-route-keyword="@Model.Keyword"
-               asp-route-topicId="@Model.TopicId"
-               asp-route-teacherId="@Model.TeacherId"
-               asp-route-status="@Model.Status"
-               asp-route-page="@(Model.CurrentPage - 1)"
-               class="font-semibold text-slate-600 hover:text-blue-600 px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors @(Model.CurrentPage <= 1 ? "pointer-events-none opacity-40" : "")">
-                ← Trang trước
-            </a>
-            <span class="font-medium text-slate-600">Trang <strong class="text-slate-900">@Model.CurrentPage</strong> / @Model.TotalPages</span>
-            <a asp-action="Index"
-               asp-route-keyword="@Model.Keyword"
-               asp-route-topicId="@Model.TopicId"
-               asp-route-teacherId="@Model.TeacherId"
-               asp-route-status="@Model.Status"
-               asp-route-page="@(Model.CurrentPage + 1)"
-               class="font-semibold text-slate-600 hover:text-blue-600 px-3 py-1 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors @(Model.CurrentPage >= Model.TotalPages ? "pointer-events-none opacity-40" : "")">
-                Trang sau →
-            </a>
-        </div>
-    }
+        <!-- Pagination -->
+        @if (Model.TotalPages > 1)
+        {
+            <div class="px-4 py-3 border-t border-slate-200 bg-white flex items-center justify-between text-xs">
+                <span class="text-slate-500">Trang <strong class="text-slate-900">@Model.CurrentPage</strong> / @Model.TotalPages</span>
+                <div class="inline-flex gap-1">
+                    <a asp-action="Index"
+                       asp-route-keyword="@Model.Keyword"
+                       asp-route-topicId="@Model.TopicId"
+                       asp-route-teacherId="@Model.TeacherId"
+                       asp-route-status="@Model.Status"
+                       asp-route-page="@(Model.CurrentPage - 1)"
+                       class="px-2.5 py-1 rounded-md border text-xs font-semibold transition-colors @(Model.CurrentPage <= 1 ? "pointer-events-none opacity-40 bg-white text-slate-400 border-slate-200" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50")">
+                        ← Trước
+                    </a>
+                    <a asp-action="Index"
+                       asp-route-keyword="@Model.Keyword"
+                       asp-route-topicId="@Model.TopicId"
+                       asp-route-teacherId="@Model.TeacherId"
+                       asp-route-status="@Model.Status"
+                       asp-route-page="@(Model.CurrentPage + 1)"
+                       class="px-2.5 py-1 rounded-md border text-xs font-semibold transition-colors @(Model.CurrentPage >= Model.TotalPages ? "pointer-events-none opacity-40 bg-white text-slate-400 border-slate-200" : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50")">
+                        Sau →
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
 </div>
