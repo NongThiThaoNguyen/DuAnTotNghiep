@@ -28,7 +28,6 @@
                     <div class="py-1">
                         <a asp-controller="Export" asp-action="ExportStudentReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Học viên (.xlsx)</a>
                         <a asp-controller="Export" asp-action="ExportTeacherReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Giáo viên (.xlsx)</a>
-                        <a asp-controller="Export" asp-action="ExportAttendanceReport" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Báo cáo Điểm danh (.xlsx)</a>
                         <a asp-controller="Export" asp-action="ExportUsers" onclick="document.getElementById('exportDetails').removeAttribute('open')" class="block px-4 py-2 text-xs text-slate-700 hover:bg-slate-50 hover:text-emerald-700 font-medium">Danh sách Người dùng (.xlsx)</a>
                     </div>
                 </div>
@@ -96,17 +95,17 @@
             </div>
         </a>
 
-        <!-- Lượt điểm danh -->
-        <a asp-action="AttendanceSummary" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-400 transition-all flex flex-col justify-between" style="min-height: 5.8rem;">
+        <!-- Lịch giáo viên -->
+        <a asp-controller="TeacherSchedules" asp-action="Index" class="bg-white border border-slate-200 rounded-xl p-4 hover:border-slate-400 transition-all flex flex-col justify-between" style="min-height: 5.8rem;">
             <div class="flex items-center justify-between">
-                <span class="rs-filter-label" style="margin-bottom:0;">Lượt điểm danh</span>
+                <span class="rs-filter-label" style="margin-bottom:0;">Lịch phân công</span>
                 <span class="w-7 h-7 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </span>
             </div>
             <div>
-                <div class="text-2xl font-bold text-slate-900 leading-tight">@Model.AttendanceCount.ToString("N0")</div>
-                <span class="text-[11px] text-slate-400 hover:underline">Trong kỳ lọc →</span>
+                <div class="text-2xl font-bold text-slate-900 leading-tight">Online</div>
+                <span class="text-[11px] text-slate-400 hover:underline">Quản lý lịch dạy →</span>
             </div>
         </a>
 

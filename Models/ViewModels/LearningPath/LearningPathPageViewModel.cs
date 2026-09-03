@@ -14,5 +14,10 @@ namespace DuAnTotNghiep.Models.ViewModels.LearningPath
         public List<PathNodeViewModel> Nodes { get; set; } = new();
         public List<TodayTaskViewModel> TodayTasks { get; set; } = new();
         public PathProgressSummaryViewModel Progress { get; set; } = new();
+        public bool IsPathCompleted { get; set; }
+        public bool CanTakeLevelUpAssessment { get; set; }
+        public string? CurrentLevelName { get; set; }
+        public string? NextLevelName { get; set; }
+        public int? NextLevelId { get; set; }
     }
 }

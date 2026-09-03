@@ -537,7 +537,13 @@ table.tt-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
                                 <div style="color:#6b7280;font-size:.72rem;">@item.StartTime.ToString("HH:mm") – @item.EndTime.ToString("HH:mm")</div>
                             </td>
                             <td>
-                                @if (isOnline)
+                                @if (!string.IsNullOrWhiteSpace(item.MeetUrl))
+                                {
+                                    <a href="@item.MeetUrl" target="_blank" class="pill pill-online" style="text-decoration:none;" title="Tham gia Google Meet">
+                                        <i class="fa-solid fa-video" style="font-size:.62rem;"></i> Google Meet
+                                    </a>
+                                }
+                                else if (isOnline)
                                 {
                                     <span class="pill pill-online"><i class="fa-solid fa-video" style="font-size:.62rem;"></i>@(item.Classroom ?? "Online")</span>
                                 }
@@ -562,6 +568,13 @@ table.tt-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
                             </td>
                             <td style="text-align:right;">
                                 <div style="display:flex;justify-content:flex-end;gap:6px;">
+                                    @if (!string.IsNullOrWhiteSpace(item.MeetUrl))
+                                    {
+                                        <a href="@item.MeetUrl" target="_blank"
+                                           style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:8px;background:#dcfce7;color:#15803d;font-size:.72rem;font-weight:700;text-decoration:none;border:1px solid #86efac;" title="Tham gia Google Meet ngay">
+                                            <i class="fa-solid fa-video" style="font-size:.6rem;"></i> Vào Meet
+                                        </a>
+                                    }
                                     <a href="/Teacher/Schedule/Edit/@item.Id"
                                        style="display:inline-flex;align-items:center;gap:4px;padding:5px 12px;border-radius:8px;background:#eff6ff;color:#2563eb;font-size:.72rem;font-weight:700;text-decoration:none;border:1px solid #bfdbfe;">
                                         <i class="fa-solid fa-pen-to-square" style="font-size:.6rem;"></i> Sửa

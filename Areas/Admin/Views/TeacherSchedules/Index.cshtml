@@ -284,9 +284,17 @@
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-slate-700">@item.TopicName</td>
                                 <td class="px-4 py-3 whitespace-nowrap">
-                                    <span class="rs-badge rs-badge-info text-xs">
-                                        @(string.IsNullOrWhiteSpace(item.Classroom) ? "Online" : item.Classroom)
-                                    </span>
+                                    <div class="flex flex-col gap-1">
+                                        <span class="rs-badge rs-badge-info text-xs self-start">
+                                            @(string.IsNullOrWhiteSpace(item.Classroom) ? "Phòng Online" : item.Classroom)
+                                        </span>
+                                        @if (!string.IsNullOrWhiteSpace(item.MeetUrl))
+                                        {
+                                            <a href="@item.MeetUrl" target="_blank" class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                                                🎥 Google Meet
+                                            </a>
+                                        }
+                                    </div>
                                 </td>
                                 <td class="px-4 py-3 whitespace-nowrap text-right">
                                     <div class="inline-flex items-center gap-1.5">

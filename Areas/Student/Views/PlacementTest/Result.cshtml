@@ -187,10 +187,62 @@
             Về Dashboard
         </a>
 
+        <button type="button" onclick="document.getElementById('retakeModal').classList.remove('hidden')" class="w-full sm:w-auto px-6 py-3 rounded-xl border-2 border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-800 font-extrabold text-xs transition-all text-center cursor-pointer flex items-center justify-center gap-2 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Làm lại bài kiểm tra
+        </button>
+
         <a href="/Student/ClassEnrollment" class="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-sm transition-all shadow-lg shadow-indigo-600/25 text-center cursor-pointer flex items-center justify-center gap-2">
             <span>Tiến hành Chọn Lớp học phù hợp</span>
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
         </a>
     </div>
 
+</div>
+
+<!-- Modal xác nhận thi lại -->
+<div id="retakeModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm" onclick="document.getElementById('retakeModal').classList.add('hidden')"></div>
+    <div class="relative bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 space-y-6 animate-[fadeIn_0.2s_ease-out]">
+        <div class="flex items-center gap-3">
+            <div class="bg-amber-100 text-amber-600 p-3 rounded-2xl">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <div>
+                <h3 class="text-lg font-black text-slate-900">Xác nhận làm lại bài kiểm tra</h3>
+                <p class="text-xs text-slate-500 mt-0.5">Placement Test</p>
+            </div>
+        </div>
+
+        <div class="space-y-3 text-sm text-slate-600 leading-relaxed">
+            <p>Bạn có chắc chắn muốn <strong class="text-slate-900">làm lại bài kiểm tra đầu vào</strong> không?</p>
+            <ul class="space-y-2 text-xs">
+                <li class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Kết quả bài thi mới sẽ được sử dụng để đánh giá lại trình độ của bạn.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>AI sẽ phân tích lại năng lực và cập nhật lộ trình học tập cho bạn.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <svg class="w-4 h-4 text-green-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Kết quả lần thi trước vẫn được lưu trong lịch sử.</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="flex items-center gap-3 pt-2">
+            <button type="button" onclick="document.getElementById('retakeModal').classList.add('hidden')" class="flex-1 px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 font-bold text-sm transition-all">
+                Hủy
+            </button>
+            <form asp-area="Student" asp-controller="PlacementTest" asp-action="Retake" method="post" class="flex-1">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="testId" value="@Model.PlacementTestId" />
+                <button type="submit" class="w-full px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-extrabold text-sm transition-all shadow-lg shadow-amber-500/25">
+                    Làm lại ngay
+                </button>
+            </form>
+        </div>
+    </div>
 </div>

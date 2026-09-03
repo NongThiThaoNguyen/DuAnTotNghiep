@@ -274,33 +274,6 @@ namespace DuAnTotNghiep.Services
             return SaveWorkbook(workbook, worksheet);
         }
 
-        public async Task<byte[]> ExportAttendanceReportAsync()
-        {
-            var report = await _reportService.GetAttendanceSummaryAsync();
-
-            using var workbook = new XLWorkbook();
-            var worksheet = workbook.Worksheets.Add("Attendance Summary");
-            worksheet.Cell(1, 1).Value = "Topic";
-            worksheet.Cell(1, 2).Value = "Có mặt";
-            worksheet.Cell(1, 3).Value = "Vắng";
-            worksheet.Cell(1, 4).Value = "Đi muộn";
-            worksheet.Cell(1, 5).Value = "Tỷ lệ tham gia";
-            StyleHeader(worksheet);
-
-            var row = 2;
-            foreach (var item in report.Items)
-            {
-                worksheet.Cell(row, 1).Value = item.TopicTitle;
-                worksheet.Cell(row, 2).Value = item.PresentCount;
-                worksheet.Cell(row, 3).Value = item.AbsentCount;
-                worksheet.Cell(row, 4).Value = item.LateCount;
-                worksheet.Cell(row, 5).Value = item.AttendanceRate;
-                row++;
-            }
-
-            return SaveWorkbook(workbook, worksheet);
-        }
-
         private static void StyleHeader(IXLWorksheet worksheet)
         {
             var headerRow = worksheet.Row(1);

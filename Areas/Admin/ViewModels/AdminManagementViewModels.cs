@@ -21,6 +21,7 @@ public class StudentListItemViewModel
     public string Email { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string LevelName { get; set; } = "Chưa có";
+    public string EvaluationScore { get; set; } = "Chưa có";
     public string PathStatus { get; set; } = "Chưa có";
     public decimal AttendanceRate { get; set; }
     public DateTime CreatedAt { get; set; }

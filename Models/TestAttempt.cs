@@ -18,6 +18,12 @@ public partial class TestAttempt
 
     public decimal? TotalScore { get; set; }
 
+    public int FullscreenExitCount { get; set; } = 0;
+
+    public int TabSwitchCount { get; set; } = 0;
+
+    public string? ViolationLog { get; set; }
+
     public int? EstimatedLevelId { get; set; }
 
     [Required]

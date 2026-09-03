@@ -14,11 +14,16 @@ namespace DuAnTotNghiep.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IGamificationService _gamificationService;
+        private readonly IPathViewService _pathViewService;
 
-        public StudentQuizService(ApplicationDbContext context, IGamificationService gamificationService)
+        public StudentQuizService(
+            ApplicationDbContext context,
+            IGamificationService gamificationService,
+            IPathViewService pathViewService)
         {
             _context = context;
             _gamificationService = gamificationService;
+            _pathViewService = pathViewService;
         }
 
         public async Task<QuizViewModel?> GetQuizForTakingAsync(int topicId)
@@ -215,19 +220,26 @@ namespace DuAnTotNghiep.Services
                 .Select(n => (int?)n.Id)
                 .FirstOrDefaultAsync();
 
-            // Save Activity Log
-            var log = new StudyActivityLog
+            if (nodeId.HasValue)
             {
-                StudentId = userId,
-                ActivityType = "QUIZ",
-                TopicId = quiz.TopicId,
-                LearningPathNodeId = nodeId,
-                DurationMinutes = 10,
-                Score = score,
-                CreatedAt = DateTime.UtcNow
-            };
-            await _context.StudyActivityLogs.AddAsync(log);
-            await _context.SaveChangesAsync();
+                await _pathViewService.MarkNodeCompletedAsync(nodeId.Value, userId, "QUIZ", 10, score, $"Quiz: {quiz.Title}");
+            }
+            else
+            {
+                // Save Activity Log if no direct node mapped
+                var log = new StudyActivityLog
+                {
+                    StudentId = userId,
+                    ActivityType = "QUIZ",
+                    TopicId = quiz.TopicId,
+                    LearningPathNodeId = null,
+                    DurationMinutes = 10,
+                    Score = score,
+                    CreatedAt = DateTime.UtcNow
+                };
+                await _context.StudyActivityLogs.AddAsync(log);
+                await _context.SaveChangesAsync();
+            }
 
             // Gamification hook
             await _gamificationService.CheckAndGrantAchievementsAsync(userId);

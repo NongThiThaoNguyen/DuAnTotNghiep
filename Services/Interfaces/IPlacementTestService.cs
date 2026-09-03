@@ -10,8 +10,9 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task<PlacementTestSuggestionViewModel?> BuildPlacementTestSuggestionAsync(int userId);
         Task<PlacementTestDto?> GetAvailableTestForStudentAsync(int studentId);
         Task<TestAttemptDto> StartAttemptAsync(int studentId, int placementTestId);
+        Task<TestAttemptDto> StartRetakeAttemptAsync(int studentId, int placementTestId);
         Task<TestAttemptDto?> GetCurrentAttemptAsync(int studentId, int placementTestId);
-        Task<bool> CanStartAttemptAsync(int studentId, int placementTestId);
+        Task<bool> CanStartAttemptAsync(int studentId, int placementTestId, bool allowRetake = false);
         Task<TestTakingViewModel?> GetTestTakingViewModelAsync(int attemptId, int studentId);
         Task<SaveAnswerResultDto> SaveAnswerAsync(SaveAnswerInputDto input, int studentId);
         Task<SubmitResultDto> SubmitAttemptAsync(int attemptId, int studentId, List<AnswerInputDto> answers);

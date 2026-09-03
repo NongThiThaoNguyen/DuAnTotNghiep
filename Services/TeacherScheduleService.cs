@@ -12,10 +12,12 @@ namespace DuAnTotNghiep.Services
     public class TeacherScheduleService : ITeacherScheduleService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IGoogleMeetService _meetService;
 
-        public TeacherScheduleService(ApplicationDbContext context)
+        public TeacherScheduleService(ApplicationDbContext context, IGoogleMeetService meetService)
         {
             _context = context;
+            _meetService = meetService;
         }
 
         public async Task<List<Schedule>> GetSchedulesAsync(int teacherId, string? keyword, int page, int pageSize)
@@ -66,10 +68,20 @@ namespace DuAnTotNghiep.Services
         {
             _context.Add(schedule);
             await _context.SaveChangesAsync();
+
+            if (string.IsNullOrWhiteSpace(schedule.MeetUrl))
+            {
+                schedule.MeetUrl = _meetService.GenerateMeetUrl(schedule.Id, schedule.Title);
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task UpdateAsync(Schedule schedule)
         {
+            if (string.IsNullOrWhiteSpace(schedule.MeetUrl))
+            {
+                schedule.MeetUrl = _meetService.GenerateMeetUrl(schedule.Id, schedule.Title);
+            }
             _context.Update(schedule);
             await _context.SaveChangesAsync();
         }

@@ -127,9 +127,18 @@ else
             {
                 <span class="lp-node-card__topic">@Model.TopicName</span>
             }
+            @if (Model.IsCompetencyGated)
+            {
+                <div class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-amber-50 text-amber-700 text-[10px] font-extrabold border border-amber-200 mt-1">
+                    <svg class="w-3 h-3 text-amber-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
+                    <span>Yêu cầu năng lực Khóa A &ge; 70% @(Model.CurrentCompetencyScore.HasValue ? $"(Hiện tại: {Model.CurrentCompetencyScore.Value:0.#}%)" : "")</span>
+                </div>
+            }
             @if (isLocked)
             {
-                <span class="lp-node-card__reason" style="color:#94A3B8; font-style:italic;">Hoàn thành bài trước để mở khóa</span>
+                <span class="lp-node-card__reason" style="color:#94A3B8; font-style:italic;">
+                    @(string.IsNullOrWhiteSpace(reason) ? "Hoàn thành bài trước để mở khóa" : reason)
+                </span>
             }
             else if (!string.IsNullOrWhiteSpace(reason))
             {

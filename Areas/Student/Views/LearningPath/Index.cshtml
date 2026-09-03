@@ -81,6 +81,27 @@
             </div>
         </header>
 
+        @if (Model.CanTakeLevelUpAssessment)
+        {
+            @* --- Level-Up Promotion Banner --- *@
+            <div class="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 my-6">
+                <div class="space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-xs font-black uppercase tracking-wider">
+                        <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                        Lộ trình đã hoàn thành 100%
+                    </div>
+                    <h2 class="text-2xl font-black">Sẵn sàng thăng hạng lên trình độ @Model.NextLevelName!</h2>
+                    <p class="text-indigo-100 text-sm max-w-xl">
+                        Bạn đã hoàn thành tất cả các khóa học trong lộ trình @Model.CurrentLevelName. Hãy làm bài test đánh giá năng lực thăng hạng để mở khóa lộ trình mới.
+                    </p>
+                </div>
+                <a asp-action="LevelUpAssessment" class="px-8 py-4 rounded-2xl bg-white text-indigo-700 font-black text-sm hover:bg-indigo-50 shadow-lg transition-all transform hover:scale-105 shrink-0 flex items-center gap-2">
+                    <span>Làm bài Đánh giá Thăng hạng</span>
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </a>
+            </div>
+        }
+
         @* --- Progress -------------------------------------------- *@
         <section class="lp-section" aria-labelledby="progress-heading">
             <p class="lp-section__eyebrow">Tiến độ</p>

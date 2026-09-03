@@ -430,6 +430,230 @@ public class AILearnSeeder
                 }
             }
         }
+
+        // 11. Seed 3 Tenses Courses Sequence (Khóa A -> Khóa B -> Khóa C with Prerequisites)
+        await SeedTenses3CoursesSequenceAsync(grammarSkill, beginnerLevel, intermediateLevel, teacherUser?.Id);
+    }
+
+    private async Task SeedTenses3CoursesSequenceAsync(
+        EnglishSkill grammarSkill,
+        EnglishProficiencyLevel beginnerLevel,
+        EnglishProficiencyLevel intermediateLevel,
+        int? teacherUserId)
+    {
+        // 1. Khóa A - Tenses Nền Tảng (A1)
+        var courseA = await _context.LearningTopics.FirstOrDefaultAsync(t => t.TopicCode == "COURSE_TENSES_A");
+        if (courseA == null)
+        {
+            courseA = new LearningTopic
+            {
+                TopicCode = "COURSE_TENSES_A",
+                Title = "Khóa A: Thì Hiện Tại & Quá Khứ Cơ Bản",
+                Description = "Khóa học nền tảng cung cấp toàn bộ kiến thức về Present Simple và Past Simple. Dành cho mọi học viên bắt đầu.",
+                SkillId = grammarSkill.Id,
+                LevelId = beginnerLevel.Id,
+                DifficultyLevel = "BEGINNER",
+                Status = "ACTIVE",
+                OrderIndex = 101,
+                CreatedBy = teacherUserId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            _context.LearningTopics.Add(courseA);
+            await _context.SaveChangesAsync();
+        }
+
+        // 2. Khóa B - Tenses Nâng Cao (A2 - Gated by Competency >= 70%)
+        var courseB = await _context.LearningTopics.FirstOrDefaultAsync(t => t.TopicCode == "COURSE_TENSES_B");
+        if (courseB == null)
+        {
+            courseB = new LearningTopic
+            {
+                TopicCode = "COURSE_TENSES_B",
+                Title = "Khóa B: Các Thì Tiếp Diễn & Hoàn Thành Nâng Cao",
+                Description = "Khóa học mở rộng về Continuous & Perfect Tenses. Yêu cầu đạt tối thiểu 70% ở Khóa A.",
+                SkillId = grammarSkill.Id,
+                LevelId = intermediateLevel.Id,
+                DifficultyLevel = "INTERMEDIATE",
+                Status = "ACTIVE",
+                OrderIndex = 102,
+                CreatedBy = teacherUserId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            _context.LearningTopics.Add(courseB);
+            await _context.SaveChangesAsync();
+        }
+
+        // Prerequisite: Course B requires Course A
+        if (!await _context.TopicPrerequisites.AnyAsync(tp => tp.TopicId == courseB.Id && tp.PrerequisiteTopicId == courseA.Id))
+        {
+            _context.TopicPrerequisites.Add(new TopicPrerequisite
+            {
+                TopicId = courseB.Id,
+                PrerequisiteTopicId = courseA.Id,
+                CreatedAt = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        // 3. Khóa C - Tenses Chuyên Sâu (B1)
+        var courseC = await _context.LearningTopics.FirstOrDefaultAsync(t => t.TopicCode == "COURSE_TENSES_C");
+        if (courseC == null)
+        {
+            courseC = new LearningTopic
+            {
+                TopicCode = "COURSE_TENSES_C",
+                Title = "Khóa C: Ứng Dụng 12 Thì Trong Giao Tiếp Học Thuật",
+                Description = "Làm chủ và kết hợp linh hoạt 12 thì tiếng Anh trong văn cảnh học thuật và thi cử. Yêu cầu hoàn thành Khóa B.",
+                SkillId = grammarSkill.Id,
+                LevelId = intermediateLevel.Id,
+                DifficultyLevel = "ADVANCED",
+                Status = "ACTIVE",
+                OrderIndex = 103,
+                CreatedBy = teacherUserId,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            _context.LearningTopics.Add(courseC);
+            await _context.SaveChangesAsync();
+        }
+
+        // Prerequisite: Course C requires Course B
+        if (!await _context.TopicPrerequisites.AnyAsync(tp => tp.TopicId == courseC.Id && tp.PrerequisiteTopicId == courseB.Id))
+        {
+            _context.TopicPrerequisites.Add(new TopicPrerequisite
+            {
+                TopicId = courseC.Id,
+                PrerequisiteTopicId = courseB.Id,
+                CreatedAt = DateTime.UtcNow
+            });
+            await _context.SaveChangesAsync();
+        }
+
+        await SeedTensesCourseLessonsAsync(courseA, courseB, courseC, teacherUserId);
+    }
+
+    private async Task SeedTensesCourseLessonsAsync(
+        LearningTopic courseA,
+        LearningTopic courseB,
+        LearningTopic courseC,
+        int? teacherUserId)
+    {
+        var lessonsByCourse = new Dictionary<int, (string Title, string Summary, string Content)[]>
+        {
+            [courseA.Id] = new[]
+            {
+                ("A1. Present Simple: Thói quen và sự thật", "Dùng Present Simple để nói về thói quen, lịch trình và sự thật hiển nhiên.", """
+                <h3>Mục tiêu</h3><p>Sau bài học, bạn có thể mô tả lịch sinh hoạt, nói về sự thật và hỏi đáp về thói quen hằng ngày.</p>
+                <h3>Công thức</h3><ul><li>Khẳng định: <strong>S + V/V(s/es) + O</strong>.</li><li>Phủ định: <strong>S + do/does not + V nguyên mẫu</strong>.</li><li>Nghi vấn: <strong>Do/Does + S + V nguyên mẫu?</strong></li></ul>
+                <p>Với <em>he, she, it</em>, động từ thường thêm <strong>-s</strong> hoặc <strong>-es</strong>: work → works, watch → watches, study → studies.</p>
+                <h3>Khi nào sử dụng?</h3><ol><li>Thói quen: <em>I review vocabulary every evening.</em></li><li>Sự thật: <em>Water boils at 100 degrees Celsius.</em></li><li>Lịch trình cố định: <em>The class starts at 8 a.m.</em></li></ol>
+                <h3>Dấu hiệu nhận biết</h3><p><em>always, usually, often, sometimes, rarely, never, every day, on Mondays</em>.</p>
+                <h3>Lỗi thường gặp</h3><p><strong>Sai:</strong> She go to school every day. <strong>Đúng:</strong> She goes to school every day.</p><p><strong>Sai:</strong> Does he likes music? <strong>Đúng:</strong> Does he like music?</p>
+                <h3>Tự luyện</h3><ol><li>Viết 5 câu mô tả lịch học của bạn.</li><li>Đổi 2 câu sang dạng phủ định.</li><li>Đặt 3 câu hỏi dùng Do/Does và tự trả lời.</li></ol>
+                """),
+                ("A2. Past Simple: Hành động đã kết thúc", "Kể lại hành động đã xảy ra và kết thúc trong quá khứ.", """
+                <h3>Mục tiêu</h3><p>Bạn có thể kể lại một ngày đã qua, một chuyến đi hoặc một sự kiện đã kết thúc.</p>
+                <h3>Công thức</h3><ul><li>Khẳng định: <strong>S + V2/ed + O</strong>.</li><li>Phủ định: <strong>S + did not + V nguyên mẫu</strong>.</li><li>Nghi vấn: <strong>Did + S + V nguyên mẫu?</strong></li></ul>
+                <p>Động từ có quy tắc thêm <strong>-ed</strong>: play → played, visit → visited. Động từ bất quy tắc cần học theo nhóm: go → went, buy → bought, see → saw, take → took.</p>
+                <h3>Cách dùng</h3><p>Dùng Past Simple khi hành động đã hoàn tất tại một thời điểm xác định: <em>We visited Hue last summer.</em> / <em>She finished the report yesterday.</em></p>
+                <h3>Dấu hiệu nhận biết</h3><p><em>yesterday, last night, last week, two days ago, in 2020, when I was a child</em>.</p>
+                <h3>Phát âm đuôi -ed</h3><p>Đọc /t/ sau âm vô thanh như <em>watched</em>, /d/ sau âm hữu thanh như <em>played</em>, và /ɪd/ sau âm /t/ hoặc /d/ như <em>wanted</em>.</p>
+                <h3>Lỗi thường gặp</h3><p><strong>Sai:</strong> She did not went home. <strong>Đúng:</strong> She did not go home.</p><p><strong>Sai:</strong> Did you visited Da Nang? <strong>Đúng:</strong> Did you visit Da Nang?</p>
+                <h3>Tự luyện</h3><p>Viết một đoạn 80 từ về ngày hôm qua. Gạch chân các từ chỉ thời gian và kiểm tra mỗi động từ đã chia đúng chưa.</p>
+                """),
+                ("A3. Phân biệt Present Simple và Past Simple", "Chọn đúng thì khi kể thói quen hiện tại và sự kiện đã hoàn thành.", """
+                <h3>Nguyên tắc chọn thì</h3><p>Hãy hỏi: hành động có lặp lại hoặc còn đúng ở hiện tại không? Nếu có, dùng Present Simple. Hành động đã xảy ra và kết thúc tại một thời điểm trong quá khứ thì dùng Past Simple.</p>
+                <table class="table table-bordered"><thead><tr><th>Present Simple</th><th>Past Simple</th></tr></thead><tbody><tr><td>I work on Mondays.</td><td>I worked last Monday.</td></tr><tr><td>She lives in Hanoi.</td><td>She lived in Hanoi in 2020.</td></tr><tr><td>They play football every week.</td><td>They played football yesterday.</td></tr></tbody></table>
+                <h3>Hội thoại mẫu</h3><p><strong>A:</strong> What do you usually do after class?<br><strong>B:</strong> I usually review my notes.<br><strong>A:</strong> What did you do yesterday?<br><strong>B:</strong> I reviewed the lesson and completed the exercises.</p>
+                <h3>Chiến lược làm bài</h3><ol><li>Tìm trạng từ thời gian.</li><li>Xác định hành động là thói quen hay sự kiện đơn lẻ.</li><li>Kiểm tra chủ ngữ và dạng động từ.</li><li>Với câu hỏi có did/does, dùng động từ nguyên mẫu.</li></ol>
+                <h3>Bài tổng hợp</h3><p>Viết 6 câu: 3 câu về thói quen hiện tại và 3 câu về một ngày trong quá khứ. Sau đó đổi một câu mỗi nhóm sang dạng phủ định.</p>
+                """)
+            },
+            [courseB.Id] = new[]
+            {
+                ("B1. Present Continuous trong tình huống thực tế", "Mô tả hành động đang diễn ra và kế hoạch gần trong tương lai.", """
+                <h3>Cấu trúc</h3><ul><li>Khẳng định: <strong>S + am/is/are + V-ing</strong>.</li><li>Phủ định: <strong>S + am/is/are not + V-ing</strong>.</li><li>Nghi vấn: <strong>Am/Is/Are + S + V-ing?</strong></li></ul>
+                <h3>Cách dùng</h3><p>Dùng cho hành động đang xảy ra: <em>Look! The students are taking a test.</em>; hoạt động tạm thời: <em>I am staying with my aunt this week.</em>; kế hoạch đã sắp xếp: <em>We are meeting the teacher tomorrow.</em></p>
+                <h3>Quy tắc thêm -ing</h3><p>make → making, run → running, lie → lying. Không tự động thêm -ing cho các động từ chỉ trạng thái như <em>know, believe, understand, need</em>.</p>
+                <h3>Phân biệt nhanh</h3><p><em>I work from home</em> nói về thói quen; <em>I am working from home today</em> nói về tình huống tạm thời hôm nay.</p>
+                <h3>Thực hành</h3><p>Viết 4 câu về những việc đang xảy ra quanh bạn và 2 câu về kế hoạch cuối tuần.</p>
+                """),
+                ("B2. Present Perfect: Kinh nghiệm và kết quả", "Nối một hành động trong quá khứ với hiện tại bằng already, yet, just, for và since.", """
+                <h3>Công thức</h3><p><strong>S + have/has + V3</strong>. Phủ định dùng <strong>have/has not + V3</strong>, câu hỏi đảo <strong>Have/Has</strong> lên đầu.</p>
+                <h3>Ba cách dùng chính</h3><ol><li>Kinh nghiệm: <em>Have you ever visited Singapore?</em></li><li>Kết quả hiện tại: <em>I have lost my key, so I cannot open the door.</em></li><li>Hành động bắt đầu trong quá khứ và còn tiếp diễn: <em>She has lived here since 2022.</em></li></ol>
+                <h3>Từ đi kèm</h3><p><em>already</em> thường dùng trong câu khẳng định, <em>yet</em> trong phủ định/nghi vấn, <em>just</em> cho việc vừa xảy ra, <em>for</em> đi với khoảng thời gian, <em>since</em> đi với mốc bắt đầu.</p>
+                <h3>Present Perfect và Past Simple</h3><p><em>I have seen that film</em> không nói thời điểm cụ thể. <em>I saw that film last Friday</em> có thời điểm đã kết thúc nên dùng Past Simple.</p>
+                <h3>Thực hành</h3><p>Viết 3 câu về kinh nghiệm, 2 câu dùng for/since và 2 câu so sánh với Past Simple.</p>
+                """),
+                ("B3. Past Continuous và Past Perfect", "Mô tả bối cảnh đang diễn ra và hành động xảy ra trước một hành động khác trong quá khứ.", """
+                <h3>Past Continuous</h3><p>Công thức <strong>was/were + V-ing</strong>, dùng để mô tả bối cảnh hoặc hành động đang diễn ra tại một thời điểm quá khứ: <em>I was reading when he called.</em></p>
+                <h3>Past Perfect</h3><p>Công thức <strong>had + V3</strong>, dùng cho hành động xảy ra trước một hành động khác trong quá khứ: <em>They had left before we arrived.</em></p>
+                <h3>When và while</h3><p><em>When</em> thường nối một hành động ngắn với một hành động đang diễn ra. <em>While</em> nhấn mạnh hai hành động cùng diễn ra: <em>While I was cooking, my brother was setting the table.</em></p>
+                <h3>Dòng thời gian</h3><p><strong>Past Perfect</strong> → hành động sớm hơn; <strong>Past Simple</strong> → hành động sau; <strong>Past Continuous</strong> → bối cảnh đang diễn ra.</p>
+                <h3>Thực hành</h3><p>Viết một câu dùng <em>when</em>, một câu dùng <em>while</em> và một câu dùng <em>before</em> để kể lại một sự cố trong ngày hôm qua.</p>
+                """)
+            },
+            [courseC.Id] = new[]
+            {
+                ("C1. Hệ thống 12 thì trong văn cảnh học thuật", "Chọn thì theo quan hệ thời gian, tiến trình và kết quả trong văn viết học thuật.", """
+                <h3>Khung tư duy 4 nhóm</h3><p>Trước khi chọn thì, xác định hành động thuộc nhóm <strong>Simple</strong> (sự thật/sự kiện), <strong>Continuous</strong> (đang diễn ra), <strong>Perfect</strong> (đã hoàn tất hoặc có kết quả) hay <strong>Perfect Continuous</strong> (nhấn mạnh thời lượng).</p>
+                <h3>Văn phong học thuật</h3><p>Present Simple dùng cho nhận định và sự thật: <em>This study examines language anxiety.</em> Present Perfect dùng cho nghiên cứu trước đây có liên hệ hiện tại: <em>Researchers have identified a trend.</em> Past Simple dùng cho phương pháp hoặc kết quả của một nghiên cứu cụ thể: <em>The team collected data in 2024.</em></p>
+                <h3>Phân tích đoạn văn</h3><p><em>Since the project began, the team has improved the process. Last year, it tested a new model, and it is now preparing a larger study.</em> Câu đầu dùng Present Perfect vì dự án bắt đầu trước đây và còn liên quan hiện tại; câu hai dùng Past Simple vì có mốc last year; mệnh đề cuối dùng Present Continuous vì đang chuẩn bị.</p>
+                <h3>Bài tập</h3><p>Đọc một đoạn báo cáo ngắn, gạch chân động từ và ghi lý do tác giả chọn mỗi thì. Sau đó viết lại đoạn đó ở một mốc thời gian khác.</p>
+                """),
+                ("C2. Perfect Continuous và sắc thái thời lượng", "Dùng các thì hoàn thành tiếp diễn để nhấn mạnh thời lượng và nguyên nhân của kết quả.", """
+                <h3>Cấu trúc</h3><ul><li>Present Perfect Continuous: <strong>have/has been + V-ing</strong>.</li><li>Past Perfect Continuous: <strong>had been + V-ing</strong>.</li><li>Future Perfect Continuous: <strong>will have been + V-ing</strong>.</li></ul>
+                <h3>Sắc thái nghĩa</h3><p>Perfect nhấn mạnh kết quả: <em>The team has completed the survey.</em> Perfect Continuous nhấn mạnh quá trình hoặc thời lượng: <em>The team has been collecting data for six months.</em></p>
+                <h3>Trong báo cáo</h3><p>Dùng cấu trúc này khi muốn giải thích nguyên nhân của một kết quả hiện tại: <em>The machine is hot because it has been running all morning.</em> Với Past Perfect Continuous: <em>The participants had been working for two hours before the break.</em></p>
+                <h3>Lưu ý</h3><p>Không dùng dạng tiếp diễn tự nhiên với mọi động từ. Các động từ trạng thái như <em>own, know, understand, believe</em> thường dùng dạng Simple hoặc Perfect.</p>
+                <h3>Thực hành</h3><p>Viết một đoạn 100 từ mô tả tiến độ dự án. Phải dùng ít nhất một câu Present Perfect, một câu Present Perfect Continuous và giải thích sự khác nhau.</p>
+                """),
+                ("C3. Tổng hợp thì trong bài viết và báo cáo", "Vận dụng linh hoạt 12 thì để mô tả quy trình, xu hướng, nghiên cứu và giả thuyết.", """
+                <h3>Đoạn báo cáo mẫu</h3><p><em>Since the project began, the team has improved the process. Last year, it tested a new model, and it is now preparing a larger study. By the end of next year, the researchers will have collected enough evidence to compare the two approaches.</em></p>
+                <h3>Cách kiểm tra bài viết</h3><ol><li>Khoanh các mốc thời gian và từ nối.</li><li>Vẽ dòng thời gian cho các hành động.</li><li>Kiểm tra sự hòa hợp chủ ngữ - động từ.</li><li>Kiểm tra V2/V3 và trợ động từ.</li><li>Đảm bảo việc đổi thì có lý do về thời gian hoặc ý nghĩa.</li></ol>
+                <h3>Lỗi nâng cao</h3><p>Tránh dùng Present Perfect với thời điểm đã kết thúc như <em>yesterday</em>. Tránh dùng Past Simple khi muốn nhấn mạnh kết quả còn ảnh hưởng hiện tại. Không đổi thì tùy ý giữa các câu trong cùng một mốc thời gian.</p>
+                <h3>Nhiệm vụ cuối khóa</h3><p>Viết báo cáo 150 từ về quá trình học tiếng Anh của bạn, gồm: thói quen hiện tại, một thay đổi trong quá khứ, thành quả đến hiện tại và kế hoạch sắp tới. Đánh dấu ít nhất 8 động từ và giải thích lựa chọn thì.</p>
+                """)
+            }
+        };
+
+        foreach (var entry in lessonsByCourse)
+        {
+            var existingLessons = await _context.OriginalLessons
+                .Where(lesson => lesson.TopicId == entry.Key)
+                .OrderBy(lesson => lesson.Id)
+                .ToListAsync();
+
+            for (var index = 0; index < entry.Value.Length; index++)
+            {
+                var data = entry.Value[index];
+                var lesson = index < existingLessons.Count ? existingLessons[index] : new OriginalLesson
+                {
+                    TopicId = entry.Key,
+                    SourceType = "SYSTEM",
+                    IsAiGenerated = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                lesson.Title = data.Title;
+                lesson.Summary = data.Summary;
+                lesson.Content = data.Content;
+                lesson.ContentType = "ARTICLE";
+                lesson.EstimatedMinutes = 20 + index * 5;
+                lesson.ReviewStatus = "APPROVED";
+                lesson.CreatedBy = teacherUserId;
+                lesson.UpdatedAt = DateTime.UtcNow;
+
+                if (index >= existingLessons.Count)
+                {
+                    _context.OriginalLessons.Add(lesson);
+                }
+            }
+        }
+
+        await _context.SaveChangesAsync();
     }
 
     private async Task CreateTablesIfNotExistAsync()
@@ -481,6 +705,41 @@ public class AILearnSeeder
 
             await _context.Database.ExecuteSqlRawAsync(createAchievementsSql);
             await _context.Database.ExecuteSqlRawAsync(createUserAchievementsSql);
+        }
+
+        // Ensure Exam Mode columns exist on quizzes, quiz_attempts, test_attempts
+        try
+        {
+            string ensureExamColumnsSql = @"
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[quizzes]') AND name = 'is_exam_mode')
+                    ALTER TABLE [dbo].[quizzes] ADD [is_exam_mode] BIT NOT NULL CONSTRAINT [DF_quizzes_is_exam_mode] DEFAULT 0;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[quizzes]') AND name = 'max_violations')
+                    ALTER TABLE [dbo].[quizzes] ADD [max_violations] INT NOT NULL CONSTRAINT [DF_quizzes_max_violations] DEFAULT 3;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[quiz_attempts]') AND name = 'fullscreen_exit_count')
+                    ALTER TABLE [dbo].[quiz_attempts] ADD [fullscreen_exit_count] INT NOT NULL CONSTRAINT [DF_quiz_attempts_fullscreen_exit] DEFAULT 0;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[quiz_attempts]') AND name = 'tab_switch_count')
+                    ALTER TABLE [dbo].[quiz_attempts] ADD [tab_switch_count] INT NOT NULL CONSTRAINT [DF_quiz_attempts_tab_switch] DEFAULT 0;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[quiz_attempts]') AND name = 'violation_log')
+                    ALTER TABLE [dbo].[quiz_attempts] ADD [violation_log] NVARCHAR(MAX) NULL;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[test_attempts]') AND name = 'fullscreen_exit_count')
+                    ALTER TABLE [dbo].[test_attempts] ADD [fullscreen_exit_count] INT NOT NULL CONSTRAINT [DF_test_attempts_fullscreen_exit] DEFAULT 0;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[test_attempts]') AND name = 'tab_switch_count')
+                    ALTER TABLE [dbo].[test_attempts] ADD [tab_switch_count] INT NOT NULL CONSTRAINT [DF_test_attempts_tab_switch] DEFAULT 0;
+
+                IF NOT EXISTS (SELECT 1 FROM sys.columns WHERE object_id = OBJECT_ID(N'[dbo].[test_attempts]') AND name = 'violation_log')
+                    ALTER TABLE [dbo].[test_attempts] ADD [violation_log] NVARCHAR(MAX) NULL;
+            ";
+            await _context.Database.ExecuteSqlRawAsync(ensureExamColumnsSql);
+        }
+        catch
+        {
+            // Table alteration fallback if permissions restricted
         }
     }
 
@@ -578,6 +837,14 @@ public class AILearnSeeder
             if (existingLessons.Count > lessonData.Count)
             {
                 var lessonsToRemove = existingLessons.Skip(lessonData.Count).ToList();
+                var lessonIdsToRemove = lessonsToRemove.Select(lesson => lesson.Id).ToList();
+                var referencingNodes = await _context.LearningPathNodes
+                    .Where(node => node.LessonId.HasValue && lessonIdsToRemove.Contains(node.LessonId.Value))
+                    .ToListAsync();
+                foreach (var node in referencingNodes)
+                {
+                    node.LessonId = null;
+                }
                 _context.OriginalLessons.RemoveRange(lessonsToRemove);
             }
         }

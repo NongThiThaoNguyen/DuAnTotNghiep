@@ -54,6 +54,7 @@ namespace DuAnTotNghiep.Models.ViewModels.Student
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
         public string? Classroom { get; set; }
+        public string? MeetUrl { get; set; }
         public string? TeacherName { get; set; }
         public string? TopicTitle { get; set; }
     }

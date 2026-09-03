@@ -19,5 +19,11 @@ namespace DuAnTotNghiep.Models.ViewModels.LearningPath
         public DateOnly? ScheduledDate { get; set; }
         public string? TopicName { get; set; }
         public string? PathPhase { get; set; }
+        public int? RequiredNodeId { get; set; }
+        public string? RequiredNodeTitle { get; set; }
+        public string? CourseName { get; set; }
+        public bool IsCompetencyGated { get; set; }
+        public decimal? RequiredCompetencyScore { get; set; }
+        public decimal? CurrentCompetencyScore { get; set; }
     }
 }

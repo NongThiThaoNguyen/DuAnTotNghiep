@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Phòng Thi Trực Tuyến · AI Study English</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/DuAnTotNghiep.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/fullscreen-exam.css" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="exam-body min-h-screen antialiased select-none font-sans overflow-x-hidden">
+    <!-- Main Exam Container -->
+    <div id="examContainer" class="exam-container min-h-screen flex flex-col">
+        @RenderBody()
+    </div>
+
+    <!-- Exam Violation Overlay Modal (Triggered when user exits Fullscreen or switches tab) -->
+    <div id="examViolationOverlay" class="exam-violation-overlay fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-xl flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-red-500/30 rounded-3xl p-8 max-w-lg w-full text-center shadow-2xl shadow-red-500/10 space-y-6 animate-pulse-slow">
+            <div class="w-20 h-20 rounded-2xl bg-red-500/10 text-red-400 border border-red-500/20 flex items-center justify-center mx-auto shadow-inner">
+                <svg class="w-10 h-10 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <div class="space-y-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 text-red-400 text-xs font-black uppercase tracking-wider">
+                    Cảnh báo vi phạm quy chế thi
+                </span>
+                <h2 id="violationTitle" class="text-2xl font-black text-white">Bạn đã rời khỏi chế độ làm bài!</h2>
+                <p id="violationMessage" class="text-slate-300 text-sm leading-relaxed">
+                    Hệ thống ghi nhận bạn đã thoát chế độ toàn màn hình hoặc chuyển sang cửa sổ/ứng dụng khác. Mọi thao tác đều được lưu lại trong nhật ký phòng thi.
+                </p>
+            </div>
+            
+            <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700/60 text-left space-y-2 text-xs font-semibold">
+                <div class="flex justify-between items-center text-slate-400">
+                    <span>Số lần thoát Fullscreen:</span>
+                    <strong id="violationFullscreenCount" class="text-amber-400 font-extrabold text-sm">0</strong>
+                </div>
+                <div class="flex justify-between items-center text-slate-400">
+                    <span>Số lần chuyển Tab / Mất focus:</span>
+                    <strong id="violationTabCount" class="text-amber-400 font-extrabold text-sm">0</strong>
+                </div>
+                <div class="flex justify-between items-center text-slate-400 border-t border-slate-700/60 pt-2">
+                    <span>Tổng số lần vi phạm:</span>
+                    <strong id="violationTotalCount" class="text-red-400 font-black text-base">0 / 3</strong>
+                </div>
+            </div>
+
+            <div id="violationActionContainer" class="pt-2">
+                <button type="button" id="btnResumeExam" onclick="window.FullscreenExam?.resumeExam()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-black text-sm transition-all shadow-lg shadow-indigo-600/30 cursor-pointer flex items-center justify-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path></svg>
+                    <span>Quay lại Toàn Màn Hình để Tiếp Tục</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entrance Confirmation Modal -->
+    <div id="examEntranceModal" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-8 sm:p-10 max-w-lg w-full text-center shadow-2xl space-y-6">
+            <div class="w-20 h-20 rounded-2xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center mx-auto shadow-inner">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <div class="space-y-2">
+                <span class="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 text-xs font-black uppercase tracking-wider">
+                    Chế độ thi trực tuyến bảo mật
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-black text-white">Sẵn sàng bắt đầu bài kiểm tra?</h2>
+                <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+                    Khi nhấn bắt đầu, bài thi sẽ chuyển sang chế độ <strong>Toàn màn hình (Fullscreen)</strong>. Bạn không được chuyển tab hoặc rời màn hình trong suốt quá trình làm bài.
+                </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-800/60 border border-slate-700/60 text-left text-xs text-slate-300 space-y-2">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Tự động chuyển toàn màn hình khi làm bài.</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Tự động lưu câu trả lời theo thời gian thực.</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-amber-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span>Rời toàn màn hình hoặc chuyển tab sẽ bị ghi nhận vi phạm.</span>
+                </div>
+            </div>
+
+            <button type="button" id="btnStartExam" onclick="window.FullscreenExam?.startExam()" class="w-full py-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:opacity-95 text-white font-extrabold text-sm transition-all shadow-xl shadow-indigo-600/30 cursor-pointer flex items-center justify-center gap-2 transform hover:scale-[1.02]">
+                <span>Bắt đầu làm bài thi</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="~/js/fullscreen-exam.js" asp-append-version="true"></script>
+    <partial name="_ToastNotifications" />
+    <partial name="_AdminCustomModal" />
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

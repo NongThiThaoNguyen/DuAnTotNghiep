@@ -117,7 +117,7 @@ public static class LearningPathPrompt
         sb.AppendLine();
         sb.AppendLine("=== YÊU CẦU ===");
         sb.AppendLine($"Hãy tạo lộ trình {totalWeeks} tuần với 3 giai đoạn (Foundation → Practice → Mastery).");
-        sb.AppendLine("Mỗi giai đoạn khoảng 4-6 modules, xen kẽ bài học và quiz.");
+        sb.AppendLine("Mỗi giai đoạn khoảng 4-6 modules: sắp xếp Topic/Lesson/Practice/Review trước, Quiz checkpoint ở cuối giai đoạn.");
         sb.AppendLine("Chỉ dùng resource_id từ danh sách trên. Trả về JSON hợp lệ, không có markdown.");
 
         return sb.ToString();

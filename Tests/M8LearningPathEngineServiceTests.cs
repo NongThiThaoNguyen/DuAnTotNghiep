@@ -164,6 +164,28 @@ public class M8LearningPathEngineServiceTests
     }
 
     [Fact]
+    public async Task GenerateInitialPathAsync_WhenAiInterleavesQuiz_PlacesQuizAfterLearningNodes()
+    {
+        using var context = CreateContext();
+        SeedReadyStudent(context);
+        SeedCatalog(context);
+        await context.SaveChangesAsync();
+
+        var service = CreateService(context, new OutOfOrderLearningPathAiService());
+
+        var path = await service.GenerateInitialPathAsync(7, 20);
+        var nodes = (await context.StudentLearningPaths
+                .Include(currentPath => currentPath.LearningPathNodes)
+                .SingleAsync(currentPath => currentPath.Id == path.Id))
+            .LearningPathNodes
+            .OrderBy(node => node.OrderIndex)
+            .ToList();
+
+        Assert.Equal(new[] { NodeType.Lesson, NodeType.Topic, NodeType.Quiz }, nodes.Select(node => node.NodeType));
+        Assert.Equal(nodes[1].Id, nodes[2].RequiredNodeId);
+    }
+
+    [Fact]
     public async Task GenerateInitialPathAsync_WhenAiFails_UsesMatchingPublishedTemplate()
     {
         using var context = CreateContext();
@@ -736,6 +758,61 @@ public class M8LearningPathEngineServiceTests
                                 TopicId = 30,
                                 EstimatedMinutes = 20,
                                 AiReason = "Priority weakness",
+                                PathPhase = "Foundation"
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        public Task<(bool IsValid, string[] Errors)> ValidateAiOutputAsync(
+            LearningPathOutputDto output,
+            LearningPathInputDto input)
+        {
+            return Task.FromResult((true, Array.Empty<string>()));
+        }
+    }
+
+    private sealed class OutOfOrderLearningPathAiService : ILearningPathAiService
+    {
+        public Task<LearningPathOutputDto> GeneratePathFromAiAsync(LearningPathInputDto input)
+        {
+            return Task.FromResult(new LearningPathOutputDto
+            {
+                PathTitle = "Out of order path",
+                Summary = "Quiz was returned before the lesson.",
+                TotalWeeks = 1,
+                Phases =
+                {
+                    new LearningPathOutputPhaseDto
+                    {
+                        PhaseName = "Foundation",
+                        Weeks = 1,
+                        Nodes =
+                        {
+                            new LearningPathOutputNodeDto
+                            {
+                                NodeTitle = "Checkpoint",
+                                ActionType = NodeType.Quiz,
+                                QuizId = 50,
+                                EstimatedMinutes = 10,
+                                PathPhase = "Foundation"
+                            },
+                            new LearningPathOutputNodeDto
+                            {
+                                NodeTitle = "Lesson",
+                                ActionType = NodeType.Lesson,
+                                LessonId = 40,
+                                EstimatedMinutes = 20,
+                                PathPhase = "Foundation"
+                            },
+                            new LearningPathOutputNodeDto
+                            {
+                                NodeTitle = "Topic",
+                                ActionType = NodeType.Topic,
+                                TopicId = 30,
+                                EstimatedMinutes = 20,
                                 PathPhase = "Foundation"
                             }
                         }

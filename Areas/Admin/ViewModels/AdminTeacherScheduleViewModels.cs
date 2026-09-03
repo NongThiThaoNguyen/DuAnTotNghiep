@@ -27,6 +27,7 @@ public class AdminTeacherScheduleListItemViewModel
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public string? Classroom { get; set; }
+    public string? MeetUrl { get; set; }
 }
 
 public class AdminTeacherScheduleListViewModel
@@ -66,6 +67,9 @@ public class AdminTeacherScheduleFormViewModel
 
     [StringLength(255)]
     public string? Classroom { get; set; }
+
+    [StringLength(500)]
+    public string? MeetUrl { get; set; }
 
     public List<SelectListItem> AvailableTeachers { get; set; } = new();
     public List<SelectListItem> AvailableTopics { get; set; } = new();

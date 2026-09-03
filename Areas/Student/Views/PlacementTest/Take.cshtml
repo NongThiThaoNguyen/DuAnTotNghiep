@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = Model.TestTitle;
-    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    Layout = "~/Views/Shared/_ExamLayout.cshtml";
 
     // Gather all questions across all sections for pagination & palette
     var allQuestionsList = new List<(int Index, int SectionId, string SectionTitle, string SkillName, string? Instruction, DuAnTotNghiep.Models.ViewModels.PlacementTest.TestQuestionViewModel Question)>();
@@ -326,6 +326,19 @@
         let isSubmitting = false;
 
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Fullscreen Exam Engine
+            if (window.FullscreenExam) {
+                window.FullscreenExam.init({
+                    attemptId: parseInt(attemptId),
+                    attemptType: 'PLACEMENT_TEST',
+                    maxViolations: @Model.MaxViolations,
+                    reportUrl: '/Student/PlacementTest/ReportViolation',
+                    formId: 'testForm',
+                    autoSubmitOnMaxViolations: true,
+                    terminationUrl: '/Student/PlacementTest/Intro?allowRetake=true'
+                });
+            }
+
             // Timer setup
             var timeLimitMinutes = @(Model.EndTime.HasValue ? 1 : 0);
             if (timeLimitMinutes === 0) {
@@ -543,7 +556,11 @@
                 btn.innerText = "Đang nộp bài...";
             });
 
-            form.submit();
+            if (window.FullscreenExam) {
+                window.FullscreenExam.submitExamForm();
+            } else {
+                form.submit();
+            }
         }
     </script>
 }

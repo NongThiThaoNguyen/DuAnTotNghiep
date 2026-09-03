@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -16,6 +16,12 @@ public partial class QuizAttempt
     public DateTime? SubmittedAt { get; set; }
 
     public decimal? Score { get; set; }
+
+    public int FullscreenExitCount { get; set; } = 0;
+
+    public int TabSwitchCount { get; set; } = 0;
+
+    public string? ViolationLog { get; set; }
 
     public string Status { get; set; } = null!;
 

@@ -70,16 +70,35 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
 
             var students = await query.OrderByDescending(u => u.CreatedAt).ToListAsync();
             var studentIds = students.Select(u => u.Id).ToList();
-            var attendanceGroups = await _context.Attendances.AsNoTracking()
+
+            var attendances = await _context.Attendances.AsNoTracking()
                 .Where(a => studentIds.Contains(a.StudentId))
+                .Select(a => new { a.StudentId, a.Status })
+                .ToListAsync();
+
+            var attendanceGroups = attendances
                 .GroupBy(a => a.StudentId)
-                .Select(g => new
-                {
-                    StudentId = g.Key,
-                    Total = g.Count(),
-                    Present = g.Count(a => a.Status == "PRESENT" || a.Status == "LATE")
-                })
-                .ToDictionaryAsync(x => x.StudentId);
+                .ToDictionary(
+                    g => g.Key,
+                    g => new
+                    {
+                        Total = g.Count(),
+                        Present = g.Count(a => a.Status == "PRESENT" || a.Status == "LATE")
+                    });
+
+            var testAttempts = await _context.TestAttempts.AsNoTracking()
+                .Where(a => studentIds.Contains(a.StudentId) && (a.Status == "GRADED" || a.Status == "SUBMITTED"))
+                .Select(a => new { a.StudentId, a.TotalScore, a.SubmittedAt, a.StartedAt })
+                .ToListAsync();
+
+            var latestAssessments = testAttempts
+                .GroupBy(a => a.StudentId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => new
+                    {
+                        Score = g.OrderByDescending(x => x.SubmittedAt ?? x.StartedAt).Select(x => x.TotalScore).FirstOrDefault()
+                    });
 
             var rows = students.Select(student =>
             {
@@ -88,6 +107,16 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                 var rate = total == 0 ? 0 : Math.Round(attendance!.Present * 100m / total, 2);
                 var latestPath = student.StudentLearningPaths.OrderByDescending(p => p.UpdatedAt).FirstOrDefault();
 
+                string evalScore = "Chưa có";
+                if (latestAssessments.TryGetValue(student.Id, out var assess) && assess.Score.HasValue)
+                {
+                    evalScore = $"{assess.Score.Value:0.#}";
+                }
+                else if (student.StudentLearningProfile?.TargetScore.HasValue == true)
+                {
+                    evalScore = $"{student.StudentLearningProfile.TargetScore.Value:0.#}";
+                }
+
                 return new StudentListItemViewModel
                 {
                     Id = student.Id,
@@ -95,6 +124,7 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
                     Email = student.Email,
                     Status = student.Status,
                     LevelName = student.StudentLearningProfile?.CurrentLevel?.Name ?? "Chưa có",
+                    EvaluationScore = evalScore,
                     PathStatus = latestPath?.Status ?? "Chưa có",
                     AttendanceRate = rate,
                     CreatedAt = student.CreatedAt

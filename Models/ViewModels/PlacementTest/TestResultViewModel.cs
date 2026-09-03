@@ -7,6 +7,7 @@ namespace DuAnTotNghiep.Models.ViewModels.PlacementTest
     public class TestResultViewModel
     {
         public int AttemptId { get; set; }
+        public int PlacementTestId { get; set; }
         public decimal TotalScore { get; set; }
         public decimal MaxScore { get; set; }
         public decimal Percentage { get; set; }

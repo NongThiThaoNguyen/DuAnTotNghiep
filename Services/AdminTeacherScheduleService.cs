@@ -10,10 +10,12 @@ namespace DuAnTotNghiep.Services;
 public class AdminTeacherScheduleService : IAdminTeacherScheduleService
 {
     private readonly ApplicationDbContext _context;
+    private readonly IGoogleMeetService _meetService;
 
-    public AdminTeacherScheduleService(ApplicationDbContext context)
+    public AdminTeacherScheduleService(ApplicationDbContext context, IGoogleMeetService meetService)
     {
         _context = context;
+        _meetService = meetService;
     }
 
     public async Task<AdminTeacherScheduleListViewModel> GetSchedulesAsync(AdminTeacherScheduleFilterViewModel filter)
@@ -69,7 +71,8 @@ public class AdminTeacherScheduleService : IAdminTeacherScheduleService
                 TopicName = s.Topic != null ? s.Topic.Title : "Không đính kèm",
                 StartTime = s.StartTime,
                 EndTime = s.EndTime,
-                Classroom = s.Classroom
+                Classroom = s.Classroom,
+                MeetUrl = s.MeetUrl
             })
             .ToListAsync();
 
@@ -121,7 +124,8 @@ public class AdminTeacherScheduleService : IAdminTeacherScheduleService
             Description = schedule.Description,
             StartTime = schedule.StartTime,
             EndTime = schedule.EndTime,
-            Classroom = schedule.Classroom
+            Classroom = schedule.Classroom,
+            MeetUrl = schedule.MeetUrl
         };
 
         await PopulateOptionsAsync(model);
@@ -141,11 +145,19 @@ public class AdminTeacherScheduleService : IAdminTeacherScheduleService
             StartTime = model.StartTime,
             EndTime = model.EndTime,
             Classroom = model.Classroom,
+            MeetUrl = string.IsNullOrWhiteSpace(model.MeetUrl) ? null : model.MeetUrl,
             CreatedAt = DateTime.UtcNow
         };
 
         _context.Schedules.Add(schedule);
         await _context.SaveChangesAsync();
+
+        if (string.IsNullOrWhiteSpace(schedule.MeetUrl))
+        {
+            schedule.MeetUrl = _meetService.GenerateMeetUrl(schedule.Id, schedule.Title);
+            await _context.SaveChangesAsync();
+        }
+
         return schedule.Id;
     }
 
@@ -166,6 +178,14 @@ public class AdminTeacherScheduleService : IAdminTeacherScheduleService
         schedule.StartTime = model.StartTime;
         schedule.EndTime = model.EndTime;
         schedule.Classroom = model.Classroom;
+        if (!string.IsNullOrWhiteSpace(model.MeetUrl))
+        {
+            schedule.MeetUrl = model.MeetUrl;
+        }
+        else if (string.IsNullOrWhiteSpace(schedule.MeetUrl))
+        {
+            schedule.MeetUrl = _meetService.GenerateMeetUrl(schedule.Id, schedule.Title);
+        }
 
         await _context.SaveChangesAsync();
         return true;

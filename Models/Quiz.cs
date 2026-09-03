@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace DuAnTotNghiep.Models;
@@ -20,6 +20,10 @@ public partial class Quiz
     public int? TimeLimitMinutes { get; set; }
 
     public decimal? PassingScore { get; set; }
+
+    public bool IsExamMode { get; set; } = false;
+
+    public int MaxViolations { get; set; } = 3;
 
     public string Status { get; set; } = null!;
 

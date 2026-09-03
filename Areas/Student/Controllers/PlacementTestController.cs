@@ -6,6 +6,10 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System;
+using Microsoft.EntityFrameworkCore;
+
+using DuAnTotNghiep.Data;
+using DuAnTotNghiep.Models.DTOs.Exam;
 
 namespace DuAnTotNghiep.Areas.Student.Controllers
 {
@@ -15,11 +19,16 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
     {
         private readonly IPlacementTestService _placementTestService;
         private readonly IPlacementRequirementService _requirementService;
+        private readonly ApplicationDbContext _context;
 
-        public PlacementTestController(IPlacementTestService placementTestService, IPlacementRequirementService requirementService)
+        public PlacementTestController(
+            IPlacementTestService placementTestService,
+            IPlacementRequirementService requirementService,
+            ApplicationDbContext context)
         {
             _placementTestService = placementTestService;
             _requirementService = requirementService;
+            _context = context;
         }
 
         private int GetUserId()
@@ -30,32 +39,55 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Intro()
+        public async Task<IActionResult> Intro(bool allowRetake = false)
         {
             var userId = GetUserId();
             var flowStatus = await _requirementService.GetStudentFlowStatusAsync(userId);
-            
-            if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.Completed)
+
+            // Nếu không phải retake, giữ nguyên logic redirect cũ
+            if (!allowRetake)
             {
-                if (!string.IsNullOrWhiteSpace(flowStatus.RedirectUrl))
+                if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.Completed)
                 {
-                    return Redirect(flowStatus.RedirectUrl);
-                }
+                    if (!string.IsNullOrWhiteSpace(flowStatus.RedirectUrl))
+                    {
+                        return Redirect(flowStatus.RedirectUrl);
+                    }
 
-                if (flowStatus.AttemptId.HasValue)
+                    if (flowStatus.AttemptId.HasValue)
+                    {
+                        return RedirectToAction("Result", new { attemptId = flowStatus.AttemptId.Value });
+                    }
+
+                    return RedirectToAction("Suggestion");
+                }
+                if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.PlacementInProgress)
                 {
-                    return RedirectToAction("Result", new { attemptId = flowStatus.AttemptId.Value });
+                    return Redirect(flowStatus.RedirectUrl!);
                 }
-
-                return RedirectToAction("Suggestion");
-            }
-            if (flowStatus.Status == DuAnTotNghiep.Models.DTOs.PlacementTest.PlacementFlowStatus.PlacementInProgress)
-            {
-                return Redirect(flowStatus.RedirectUrl!);
             }
 
+            ViewBag.IsRetake = allowRetake;
             var availableTest = await _placementTestService.GetAvailableTestForStudentAsync(userId);
-            return View(availableTest); // availableTest can be null if no test is published
+            
+            // Nếu retake nhưng GetAvailableTestForStudentAsync trả null (vì test đã completed),
+            // lấy lại test active đầu tiên
+            if (availableTest == null && allowRetake)
+            {
+                var suggestion = await _placementTestService.BuildPlacementTestSuggestionAsync(userId);
+                if (suggestion != null)
+                {
+                    availableTest = new PlacementTestDto
+                    {
+                        Id = suggestion.SuggestedTestId,
+                        Title = suggestion.SuggestedTestTitle,
+                        Description = suggestion.SuggestedTestDescription,
+                        TimeLimitMinutes = suggestion.TimeLimitMinutes
+                    };
+                }
+            }
+
+            return View(availableTest);
         }
 
         [HttpGet]
@@ -147,13 +179,59 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Submit(int attemptId)
+        public async Task<IActionResult> ReportViolation([FromBody] ViolationReportDto dto)
+        {
+            var studentId = GetUserId();
+            if (studentId <= 0) return Unauthorized();
+
+            var attempt = await _context.TestAttempts.FindAsync(dto.AttemptId);
+            if (attempt != null && attempt.StudentId == studentId)
+            {
+                attempt.FullscreenExitCount = dto.FullscreenExitCount;
+                attempt.TabSwitchCount = dto.TabSwitchCount;
+                if (!string.IsNullOrEmpty(dto.Details))
+                {
+                    attempt.ViolationLog = dto.Details;
+                }
+
+                var totalViolations = dto.FullscreenExitCount + dto.TabSwitchCount;
+                if (totalViolations >= 3)
+                {
+                    var answers = await _context.TestAnswers
+                        .Where(answer => answer.AttemptId == attempt.Id)
+                        .ToListAsync();
+                    _context.TestAnswers.RemoveRange(answers);
+                    _context.TestAttempts.Remove(attempt);
+                    await _context.SaveChangesAsync();
+                    return Ok(new { success = true, terminated = true });
+                }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return Ok(new { success = true, terminated = false });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Submit(int attemptId, int fullscreenExitCount = 0, int tabSwitchCount = 0, string? violationLog = null)
         {
             var studentId = GetUserId();
             var result = await _placementTestService.SubmitAttemptAsync(attemptId, studentId, new List<AnswerInputDto>());
 
             if (result.IsSuccess)
             {
+                var attempt = await _context.TestAttempts.FindAsync(attemptId);
+                if (attempt != null)
+                {
+                    attempt.FullscreenExitCount = Math.Max(attempt.FullscreenExitCount, fullscreenExitCount);
+                    attempt.TabSwitchCount = Math.Max(attempt.TabSwitchCount, tabSwitchCount);
+                    if (!string.IsNullOrEmpty(violationLog))
+                    {
+                        attempt.ViolationLog = violationLog;
+                    }
+                    await _context.SaveChangesAsync();
+                }
+
                 TempData["SuccessMessage"] = "Nộp bài thành công!";
                 return RedirectToAction("Result", new { attemptId = attemptId });
             }
@@ -161,6 +239,24 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             {
                 TempData["ErrorMessage"] = "Có lỗi xảy ra khi nộp bài: " + result.Message;
                 return RedirectToAction("Intro");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Retake(int testId)
+        {
+            var userId = GetUserId();
+            try
+            {
+                var attempt = await _placementTestService.StartRetakeAttemptAsync(userId, testId);
+                TempData["SuccessMessage"] = "Bắt đầu làm lại bài kiểm tra đầu vào!";
+                return RedirectToAction("Take", new { attemptId = attempt.Id });
+            }
+            catch (System.Exception ex)
+            {
+                TempData["ErrorMessage"] = "Không thể bắt đầu thi lại: " + ex.Message;
+                return RedirectToAction("Intro", new { allowRetake = true });
             }
         }
 

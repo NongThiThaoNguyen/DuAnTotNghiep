@@ -82,7 +82,11 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
             clearInterval(timerInterval);
-            document.getElementById("quizForm")?.submit();
+            if (window.FullscreenExam) {
+                window.FullscreenExam.submitExamForm();
+            } else {
+                document.getElementById("quizForm")?.submit();
+            }
         });
     }
 });

@@ -262,9 +262,16 @@ public class LearningPathEngineService : ILearningPathEngineService
         var now = DateTime.UtcNow;
         var path = LearningPathEntityFactory.CreatePath(output, profile, studentId, competencyAnalysisId, now);
         var nodes = output.Phases
-            .SelectMany(p => p.Nodes)
+            .SelectMany(p => p.Nodes.Where(node => node.ActionType != NodeType.Quiz)
+                .Concat(p.Nodes.Where(node => node.ActionType == NodeType.Quiz)))
             .Select((n, index) => LearningPathEntityFactory.CreateNode(n, path, index + 1, now))
             .ToList();
+
+        // Thiết lập cây điều kiện tiên quyết (Prerequisite Tree)
+        for (int i = 1; i < nodes.Count; i++)
+        {
+            nodes[i].RequiredNode = nodes[i - 1];
+        }
 
         return (path, nodes);
     }

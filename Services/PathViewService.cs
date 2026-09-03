@@ -38,6 +38,8 @@ namespace DuAnTotNghiep.Services
                     .ThenInclude(n => n.Quiz)
                 .Include(p => p.LearningPathNodes)
                     .ThenInclude(n => n.PracticeTask)
+                .Include(p => p.LearningPathNodes)
+                    .ThenInclude(n => n.RequiredNode)
                 .AsNoTrackingWithIdentityResolution()
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.StudentId == userId && p.Status == "ACTIVE");
@@ -47,7 +49,7 @@ namespace DuAnTotNghiep.Services
                 return new LearningPathPageViewModel
                 {
                     HasPath = false,
-                    PathTitle = "Chua co lo trinh hoc",
+                    PathTitle = "Chưa có lộ trình học",
                     PathStatus = "NONE"
                 };
             }
@@ -57,11 +59,32 @@ namespace DuAnTotNghiep.Services
                 .ThenBy(n => n.Id)
                 .ToList();
 
+            // Tính điểm năng lực tích lũy của Khóa A (Phase 1)
+            var courseAQuizScores = await GetCourseAQuizAverageScoreAsync(userId, path.Id);
+
             var nodeViewModels = new List<PathNodeViewModel>();
             foreach (var node in orderedNodes)
             {
-                nodeViewModels.Add(await MapNodeAsync(node));
+                nodeViewModels.Add(await MapNodeAsync(node, courseAQuizScores));
             }
+
+            var totalNodes = orderedNodes.Count;
+            var completedCount = orderedNodes.Count(n => n.Status.Equals(ProgressStatus.Completed, StringComparison.OrdinalIgnoreCase));
+            bool isPathCompleted = totalNodes > 0 && completedCount == totalNodes;
+
+            // Lấy thông tin trình độ hiện tại và kế tiếp
+            var profile = await _context.StudentLearningProfiles
+                .Include(p => p.CurrentLevel)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(p => p.UserId == userId);
+
+            string currentLevelName = profile?.CurrentLevel?.Name ?? "A1";
+            int currentLevelOrder = profile?.CurrentLevel?.OrderIndex ?? 1;
+
+            var nextLevel = await _context.EnglishProficiencyLevels
+                .Where(l => l.OrderIndex > currentLevelOrder && l.IsActive)
+                .OrderBy(l => l.OrderIndex)
+                .FirstOrDefaultAsync();
 
             var today = DateOnly.FromDateTime(DateTime.Today);
             var todayTasks = nodeViewModels
@@ -87,7 +110,7 @@ namespace DuAnTotNghiep.Services
                 PathId = path.Id,
                 PathTitle = path.Title,
                 PathDescription = path.Description,
-                PathStatus = path.Status,
+                PathStatus = isPathCompleted ? "COMPLETED" : path.Status,
                 StartDate = path.StartDate,
                 TargetEndDate = path.TargetEndDate,
                 GeneratedByAi = path.GeneratedByAi,
@@ -95,7 +118,12 @@ namespace DuAnTotNghiep.Services
                 HasPath = true,
                 Nodes = nodeViewModels,
                 TodayTasks = todayTasks,
-                Progress = await BuildProgressSummaryAsync(userId, orderedNodes)
+                Progress = await BuildProgressSummaryAsync(userId, orderedNodes),
+                IsPathCompleted = isPathCompleted,
+                CanTakeLevelUpAssessment = isPathCompleted,
+                CurrentLevelName = currentLevelName,
+                NextLevelName = nextLevel?.Name ?? "A2 (Sơ cấp nâng cao)",
+                NextLevelId = nextLevel?.Id
             };
         }
 
@@ -134,7 +162,35 @@ namespace DuAnTotNghiep.Services
                 return false;
             }
 
-            return IsOpenableStatus(node.Status);
+            if (!IsOpenableStatus(node.Status))
+            {
+                return false;
+            }
+
+            // Kiểm tra điều kiện tiên quyết (Prerequisite Tree)
+            if (node.RequiredNodeId.HasValue)
+            {
+                var reqNode = await _context.LearningPathNodes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(n => n.Id == node.RequiredNodeId.Value);
+
+                if (reqNode != null && !reqNode.Status.Equals(ProgressStatus.Completed, StringComparison.OrdinalIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            // Kiểm tra điều kiện năng lực đối với Khóa B (Phase 2)
+            if (IsCourseBNode(node))
+            {
+                var courseAScore = await GetCourseAQuizAverageScoreAsync(userId, node.LearningPathId);
+                if (courseAScore < 70m)
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public async Task<bool> TryUnlockNextNodesAsync(int completedNodeId, int userId)
@@ -197,9 +253,10 @@ namespace DuAnTotNghiep.Services
             return true;
         }
 
-        private async Task<PathNodeViewModel> MapNodeAsync(LearningPathNode node)
+        private async Task<PathNodeViewModel> MapNodeAsync(LearningPathNode node, decimal courseAQuizScores)
         {
             var targetUrl = await BuildNodeTargetUrlAsync(node);
+            bool isCourseB = IsCourseBNode(node);
 
             return new PathNodeViewModel
             {
@@ -219,7 +276,13 @@ namespace DuAnTotNghiep.Services
                 CompletedAt = node.CompletedAt,
                 ScheduledDate = node.ScheduledDate,
                 TopicName = node.Topic?.Title,
-                PathPhase = node.PathPhase
+                PathPhase = node.PathPhase,
+                RequiredNodeId = node.RequiredNodeId,
+                RequiredNodeTitle = node.RequiredNode?.NodeTitle,
+                CourseName = node.Topic?.Title ?? (node.PathPhase != null ? $"Khóa {node.PathPhase}" : null),
+                IsCompetencyGated = isCourseB,
+                RequiredCompetencyScore = isCourseB ? 70m : null,
+                CurrentCompetencyScore = isCourseB ? courseAQuizScores : null
             };
         }
 
@@ -250,11 +313,22 @@ namespace DuAnTotNghiep.Services
 
         private async Task<bool> UnlockNextNodeAsync(LearningPathNode completedNode)
         {
+            // Tìm node tiếp theo dựa trên RequiredNodeId hoặc OrderIndex
             var nextNode = await _context.LearningPathNodes
-                .Where(n => n.LearningPathId == completedNode.LearningPathId && n.OrderIndex > completedNode.OrderIndex)
+                .Where(n => n.LearningPathId == completedNode.LearningPathId && (n.RequiredNodeId == completedNode.Id || (n.OrderIndex > completedNode.OrderIndex && !n.RequiredNodeId.HasValue)))
                 .OrderBy(n => n.OrderIndex)
                 .ThenBy(n => n.Id)
                 .FirstOrDefaultAsync();
+
+            if (nextNode == null)
+            {
+                // Thử tìm theo OrderIndex kế tiếp
+                nextNode = await _context.LearningPathNodes
+                    .Where(n => n.LearningPathId == completedNode.LearningPathId && n.OrderIndex > completedNode.OrderIndex)
+                    .OrderBy(n => n.OrderIndex)
+                    .ThenBy(n => n.Id)
+                    .FirstOrDefaultAsync();
+            }
 
             if (nextNode == null)
             {
@@ -266,9 +340,62 @@ namespace DuAnTotNghiep.Services
                 return true;
             }
 
+            // Nếu node kế tiếp thuộc Khóa B: Kiểm tra điều kiện năng lực (Competency Gate)
+            if (IsCourseBNode(nextNode))
+            {
+                var studentId = (await _context.StudentLearningPaths.FindAsync(completedNode.LearningPathId))?.StudentId ?? 0;
+                var courseAScore = await GetCourseAQuizAverageScoreAsync(studentId, completedNode.LearningPathId);
+                if (courseAScore < 70m)
+                {
+                    nextNode.Status = ProgressStatus.Locked;
+                    nextNode.AiReason = $"Cần đạt tối thiểu 70% ở Khóa A (Điểm hiện tại: {courseAScore:0.#}%). Hãy làm bài ôn tập để mở khóa.";
+                    _context.LearningPathNodes.Update(nextNode);
+                    return false;
+                }
+            }
+
             nextNode.Status = ProgressStatus.Available;
             _context.LearningPathNodes.Update(nextNode);
             return true;
+        }
+
+        private static bool IsCourseBNode(LearningPathNode node)
+        {
+            if (string.IsNullOrEmpty(node.PathPhase)) return false;
+            return node.PathPhase.Contains("B", StringComparison.OrdinalIgnoreCase) ||
+                   node.PathPhase.Contains("Khóa B", StringComparison.OrdinalIgnoreCase) ||
+                   node.PathPhase.Contains("Phase 2", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private async Task<decimal> GetCourseAQuizAverageScoreAsync(int studentId, int pathId)
+        {
+            var courseANodeIds = await _context.LearningPathNodes
+                .Where(n => n.LearningPathId == pathId &&
+                           (n.PathPhase == null || n.PathPhase.Contains("A") || n.PathPhase.Contains("Khóa A") || n.PathPhase.Contains("Phase 1")))
+                .Select(n => n.Id)
+                .ToListAsync();
+
+            if (!courseANodeIds.Any()) return 100m;
+
+            var scores = await _context.StudyActivityLogs
+                .Where(a => a.StudentId == studentId &&
+                            a.LearningPathNodeId.HasValue &&
+                            courseANodeIds.Contains(a.LearningPathNodeId.Value) &&
+                            a.Score.HasValue)
+                .Select(a => a.Score!.Value)
+                .ToListAsync();
+
+            if (!scores.Any())
+            {
+                // Nếu chưa có log quiz nhưng hoàn thành các node bài học Khóa A thì mặc định 75%
+                var completedCount = await _context.LearningPathNodes
+                    .CountAsync(n => courseANodeIds.Contains(n.Id) && n.Status == ProgressStatus.Completed);
+                return completedCount > 0 ? 80m : 0m;
+            }
+
+            // Chuẩn hóa score nếu tính trên thang 10 sang thang 100
+            var avg = scores.Average();
+            return avg <= 10m ? avg * 10m : avg;
         }
 
         private static string InferActivityType(string nodeType)

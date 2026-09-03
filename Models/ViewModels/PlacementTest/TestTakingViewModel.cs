@@ -10,6 +10,8 @@ namespace DuAnTotNghiep.Models.ViewModels.PlacementTest
         public DateTime ServerTime { get; set; }
         public DateTime? EndTime { get; set; }
         public int? RemainingSeconds { get; set; }
+        public bool IsExamMode { get; set; } = true;
+        public int MaxViolations { get; set; } = 3;
         public string Status { get; set; } = null!;
         public List<TestSectionViewModel> Sections { get; set; } = new();
     }

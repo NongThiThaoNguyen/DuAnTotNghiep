@@ -107,19 +107,6 @@ namespace DuAnTotNghiep.Areas.Admin.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ExportAttendanceReport()
-        {
-            try
-            {
-                var content = await _exportService.ExportAttendanceReportAsync();
-                return File(content, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", $"AttendanceReport_{DateTime.Now:yyyyMMddHHmmss}.xlsx");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Lỗi khi xuất dữ liệu: " + ex.Message;
-                return RedirectToAction("AttendanceSummary", "Reports");
-            }
-        }
+
     }
 }

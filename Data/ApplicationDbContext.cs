@@ -1404,6 +1404,12 @@ public partial class ApplicationDbContext : DbContext
                 .HasDefaultValue("DRAFT")
                 .HasColumnName("status");
             entity.Property(e => e.TimeLimitMinutes).HasColumnName("time_limit_minutes");
+            entity.Property(e => e.IsExamMode)
+                .HasDefaultValue(false)
+                .HasColumnName("is_exam_mode");
+            entity.Property(e => e.MaxViolations)
+                .HasDefaultValue(3)
+                .HasColumnName("max_violations");
             entity.Property(e => e.Title)
                 .HasMaxLength(255)
                 .HasColumnName("title");
@@ -1481,6 +1487,13 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnName("status");
             entity.Property(e => e.StudentId).HasColumnName("student_id");
             entity.Property(e => e.SubmittedAt).HasColumnName("submitted_at");
+            entity.Property(e => e.FullscreenExitCount)
+                .HasDefaultValue(0)
+                .HasColumnName("fullscreen_exit_count");
+            entity.Property(e => e.TabSwitchCount)
+                .HasDefaultValue(0)
+                .HasColumnName("tab_switch_count");
+            entity.Property(e => e.ViolationLog).HasColumnName("violation_log");
 
             entity.HasOne(d => d.Quiz).WithMany(p => p.QuizAttempts)
                 .HasForeignKey(d => d.QuizId)
@@ -2021,6 +2034,13 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.TotalScore)
                 .HasColumnType("decimal(6, 2)")
                 .HasColumnName("total_score");
+            entity.Property(e => e.FullscreenExitCount)
+                .HasDefaultValue(0)
+                .HasColumnName("fullscreen_exit_count");
+            entity.Property(e => e.TabSwitchCount)
+                .HasDefaultValue(0)
+                .HasColumnName("tab_switch_count");
+            entity.Property(e => e.ViolationLog).HasColumnName("violation_log");
 
             entity.HasOne(d => d.EstimatedLevel).WithMany(p => p.TestAttempts)
                 .HasForeignKey(d => d.EstimatedLevelId)
@@ -2401,6 +2421,8 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.StartTime).HasColumnName("start_time");
             entity.Property(e => e.EndTime).HasColumnName("end_time");
             entity.Property(e => e.Classroom).HasMaxLength(255).HasColumnName("classroom");
+            entity.Property(e => e.MeetUrl).HasMaxLength(500).HasColumnName("meet_url");
+            entity.Property(e => e.MeetNotificationSent).HasDefaultValue(false).HasColumnName("meet_notification_sent");
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("(sysutcdatetime())").HasColumnName("created_at");
 
             entity.HasOne(d => d.Teacher).WithMany()

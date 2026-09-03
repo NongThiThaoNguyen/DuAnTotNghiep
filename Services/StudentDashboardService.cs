@@ -15,11 +15,16 @@ namespace DuAnTotNghiep.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IPathViewService _pathViewService;
+        private readonly IGoogleMeetService _meetService;
 
-        public StudentDashboardService(ApplicationDbContext context, IPathViewService pathViewService)
+        public StudentDashboardService(
+            ApplicationDbContext context,
+            IPathViewService pathViewService,
+            IGoogleMeetService meetService)
         {
             _context = context;
             _pathViewService = pathViewService;
+            _meetService = meetService;
         }
 
         public async Task<StudentDashboardViewModel> GetDashboardAsync(int userId)
@@ -257,6 +262,12 @@ namespace DuAnTotNghiep.Services
 
             if (nextSchedule != null)
             {
+                var meetUrl = nextSchedule.MeetUrl;
+                if (string.IsNullOrWhiteSpace(meetUrl))
+                {
+                    meetUrl = _meetService.GenerateMeetUrl(nextSchedule.Id, nextSchedule.Title);
+                }
+
                 upcomingSchedule = new UpcomingScheduleViewModel
                 {
                     Id = nextSchedule.Id,
@@ -264,6 +275,7 @@ namespace DuAnTotNghiep.Services
                     StartTime = nextSchedule.StartTime,
                     EndTime = nextSchedule.EndTime,
                     Classroom = nextSchedule.Classroom,
+                    MeetUrl = meetUrl,
                     TeacherName = nextSchedule.Teacher?.FullName ?? "Giảng viên",
                     TopicTitle = nextSchedule.Topic?.Title
                 };

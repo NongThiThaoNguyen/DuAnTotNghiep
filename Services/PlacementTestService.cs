@@ -114,7 +114,7 @@ namespace DuAnTotNghiep.Services
             };
         }
 
-        public async Task<bool> CanStartAttemptAsync(int studentId, int placementTestId)
+        public async Task<bool> CanStartAttemptAsync(int studentId, int placementTestId, bool allowRetake = false)
         {
             var test = await _testRepository.GetByIdAsync(placementTestId);
             if (test == null || (test.Status != "PUBLISHED" && test.Status != "ACTIVE"))
@@ -122,14 +122,17 @@ namespace DuAnTotNghiep.Services
                 return false;
             }
 
-            var allAttempts = await _attemptRepository.GetAllAsync();
-            var existingCompleted = allAttempts
-                .Any(a => a.StudentId == studentId && a.PlacementTestId == placementTestId && 
-                         (a.Status == "SUBMITTED" || a.Status == "GRADED" || a.Status == "COMPLETED"));
-
-            if (existingCompleted)
+            if (!allowRetake)
             {
-                return false;
+                var allAttempts = await _attemptRepository.GetAllAsync();
+                var existingCompleted = allAttempts
+                    .Any(a => a.StudentId == studentId && a.PlacementTestId == placementTestId && 
+                             (a.Status == "SUBMITTED" || a.Status == "GRADED" || a.Status == "COMPLETED"));
+
+                if (existingCompleted)
+                {
+                    return false;
+                }
             }
 
             return true;
@@ -424,6 +427,92 @@ namespace DuAnTotNghiep.Services
             }
         }
 
+        public async Task<TestAttemptDto> StartRetakeAttemptAsync(int studentId, int placementTestId)
+        {
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var canStart = await CanStartAttemptAsync(studentId, placementTestId, allowRetake: true);
+                if (!canStart)
+                {
+                    throw new InvalidOperationException("Cannot retake test. Test may not exist or is not active.");
+                }
+
+                var allAttempts = await _attemptRepository.GetAllAsync();
+                var existingAttempt = allAttempts
+                    .FirstOrDefault(a => a.StudentId == studentId && a.PlacementTestId == placementTestId && a.Status == "IN_PROGRESS");
+
+                if (existingAttempt != null)
+                {
+                    var test = await _testRepository.GetByIdAsync(placementTestId);
+                    if (test!.TimeLimitMinutes.HasValue && test.TimeLimitMinutes.Value > 0)
+                    {
+                        var expireTime = existingAttempt.StartedAt.AddMinutes(test.TimeLimitMinutes.Value);
+                        if (DateTime.UtcNow > expireTime)
+                        {
+                            existingAttempt.Status = "EXPIRED";
+                            _dbContext.TestAttempts.Update(existingAttempt);
+                            await _dbContext.SaveChangesAsync();
+                            // Continue to create new attempt below
+                        }
+                        else
+                        {
+                            await transaction.CommitAsync();
+                            return new TestAttemptDto
+                            {
+                                Id = existingAttempt.Id,
+                                PlacementTestId = existingAttempt.PlacementTestId,
+                                StudentId = existingAttempt.StudentId,
+                                StartedAt = existingAttempt.StartedAt,
+                                Status = existingAttempt.Status
+                            };
+                        }
+                    }
+                    else
+                    {
+                        await transaction.CommitAsync();
+                        return new TestAttemptDto
+                        {
+                            Id = existingAttempt.Id,
+                            PlacementTestId = existingAttempt.PlacementTestId,
+                            StudentId = existingAttempt.StudentId,
+                            StartedAt = existingAttempt.StartedAt,
+                            Status = existingAttempt.Status
+                        };
+                    }
+                }
+
+                // Create new retake attempt
+                var newAttempt = new TestAttempt
+                {
+                    StudentId = studentId,
+                    PlacementTestId = placementTestId,
+                    StartedAt = DateTime.UtcNow,
+                    Status = "IN_PROGRESS"
+                };
+
+                await _attemptRepository.AddAsync(newAttempt);
+                await _attemptRepository.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                await _auditService.LogAsync(studentId, "RETAKE_PLACEMENT_TEST", "TestAttempt", newAttempt.Id);
+
+                return new TestAttemptDto
+                {
+                    Id = newAttempt.Id,
+                    PlacementTestId = newAttempt.PlacementTestId,
+                    StudentId = newAttempt.StudentId,
+                    StartedAt = newAttempt.StartedAt,
+                    Status = newAttempt.Status
+                };
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+
         public async Task<SubmitResultDto> SubmitAttemptAsync(int attemptId, int studentId, List<AnswerInputDto> answers)
         {
             await using var transaction = await _dbContext.Database.BeginTransactionAsync();
@@ -586,6 +675,7 @@ namespace DuAnTotNghiep.Services
             return new TestResultViewModel
             {
                 AttemptId = attempt.Id,
+                PlacementTestId = attempt.PlacementTestId,
                 TotalScore = attempt.TotalScore ?? 0,
                 MaxScore = attempt.PlacementTest.TotalScore,
                 Percentage = estimatedLevel.Percentage,

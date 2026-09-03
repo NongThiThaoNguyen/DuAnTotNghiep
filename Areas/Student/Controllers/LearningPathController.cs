@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using DuAnTotNghiep.Data;
 using DuAnTotNghiep.Helpers;
+using DuAnTotNghiep.Models;
 using DuAnTotNghiep.Models.Enums;
 using DuAnTotNghiep.Models.Exceptions;
 using DuAnTotNghiep.Models.ViewModels.Student;
@@ -21,9 +22,10 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
         private readonly ApplicationDbContext _context;
         private readonly ILogger<LearningPathController> _logger;
         private readonly ILearningPathEngineService? _learningPathEngineService;
+        private readonly ILevelUpAssessmentService? _levelUpAssessmentService;
 
         public LearningPathController(IPathViewService pathViewService, ApplicationDbContext context)
-            : this(pathViewService, context, NullLogger<LearningPathController>.Instance)
+            : this(pathViewService, context, NullLogger<LearningPathController>.Instance, null, null)
         {
         }
 
@@ -31,10 +33,17 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             IPathViewService pathViewService,
             ApplicationDbContext context,
             ILogger<LearningPathController> logger)
+            : this(pathViewService, context, logger, null, null)
         {
-            _pathViewService = pathViewService;
-            _context = context;
-            _logger = logger;
+        }
+
+        public LearningPathController(
+            IPathViewService pathViewService,
+            ApplicationDbContext context,
+            ILogger<LearningPathController> logger,
+            ILearningPathEngineService learningPathEngineService)
+            : this(pathViewService, context, logger, learningPathEngineService, null)
+        {
         }
 
         [ActivatorUtilitiesConstructor]
@@ -42,10 +51,14 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             IPathViewService pathViewService,
             ApplicationDbContext context,
             ILogger<LearningPathController> logger,
-            ILearningPathEngineService learningPathEngineService)
-            : this(pathViewService, context, logger)
+            ILearningPathEngineService? learningPathEngineService,
+            ILevelUpAssessmentService? levelUpAssessmentService)
         {
+            _pathViewService = pathViewService;
+            _context = context;
+            _logger = logger;
             _learningPathEngineService = learningPathEngineService;
+            _levelUpAssessmentService = levelUpAssessmentService;
         }
 
         private int GetUserId()
@@ -259,6 +272,95 @@ namespace DuAnTotNghiep.Areas.Student.Controllers
             };
 
             return View(vm);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> LevelUpAssessment()
+        {
+            var userId = GetUserId();
+            if (_levelUpAssessmentService == null)
+            {
+                TempData["ErrorMessage"] = "Dịch vụ đánh giá thăng hạng chưa sẵn sàng.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var model = await _levelUpAssessmentService.GetLevelUpAssessmentAsync(userId);
+            if (model == null)
+            {
+                TempData["ErrorMessage"] = "Hiện chưa có bài đánh giá thăng hạng khả dụng cho trình độ của bạn.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReportViolation([FromBody] DuAnTotNghiep.Models.DTOs.Exam.ViolationReportDto dto)
+        {
+            var userId = GetUserId();
+            if (userId <= 0) return Unauthorized();
+
+            var log = new StudyActivityLog
+            {
+                StudentId = userId,
+                ActivityType = "LEVEL_UP_VIOLATION",
+                DurationMinutes = 0,
+                Metadata = $"Exits: {dto.FullscreenExitCount}, TabSwitches: {dto.TabSwitchCount}, Details: {dto.Details}",
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.StudyActivityLogs.Add(log);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitLevelUpAssessment(int testId, IFormCollection form)
+        {
+            var userId = GetUserId();
+            if (_levelUpAssessmentService == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            var answers = new Dictionary<int, string>();
+            foreach (var key in form.Keys)
+            {
+                if (key.StartsWith("question_", StringComparison.OrdinalIgnoreCase) &&
+                    int.TryParse(key.Replace("question_", "", StringComparison.OrdinalIgnoreCase), out int qId))
+                {
+                    answers[qId] = form[key].ToString();
+                }
+            }
+
+            try
+            {
+                var result = await _levelUpAssessmentService.SubmitLevelUpAssessmentAsync(userId, testId, answers);
+
+                // Save violation stats if present in form
+                if (int.TryParse(form["FullscreenExitCount"], out int fsExits) && fsExits > 0 ||
+                    int.TryParse(form["TabSwitchCount"], out int tabSwitches) && tabSwitches > 0)
+                {
+                    var log = new StudyActivityLog
+                    {
+                        StudentId = userId,
+                        ActivityType = "LEVEL_UP_EXAM_COMPLETED",
+                        DurationMinutes = 15,
+                        Metadata = $"Exits: {form["FullscreenExitCount"]}, TabSwitches: {form["TabSwitchCount"]}, Logs: {form["ViolationLog"]}",
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.StudyActivityLogs.Add(log);
+                    await _context.SaveChangesAsync();
+                }
+
+                return View("LevelUpResult", result);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Có lỗi xảy ra: " + ex.Message;
+                return RedirectToAction(nameof(LevelUpAssessment));
+            }
         }
 
         private ILearningPathEngineService LearningPathEngineService

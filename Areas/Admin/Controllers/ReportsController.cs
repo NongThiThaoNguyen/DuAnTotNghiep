@@ -30,10 +30,7 @@ public class ReportsController : Controller
         return View(await _reportService.GetTeacherActivityReportAsync());
     }
 
-    public async Task<IActionResult> AttendanceSummary()
-    {
-        return View(await _reportService.GetAttendanceSummaryAsync());
-    }
+
 
     public async Task<IActionResult> QuizPerformance()
     {

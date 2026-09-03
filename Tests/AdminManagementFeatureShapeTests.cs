@@ -6,7 +6,6 @@ public class AdminManagementFeatureShapeTests
 {
     private static readonly string[] ControllerNames =
     [
-        "StudentAttendanceController",
         "StudentQuizController",
         "StudentAssignmentController",
         "TeacherManagementController",
@@ -19,14 +18,13 @@ public class AdminManagementFeatureShapeTests
 
     private static readonly Dictionary<string, string[]> RequiredActions = new()
     {
-        ["StudentAttendanceController"] = ["Index", "ByTopic", "Export"],
         ["StudentQuizController"] = ["Index", "Details"],
         ["StudentAssignmentController"] = ["Index", "Details"],
         ["TeacherManagementController"] = ["Index", "Profile", "Performance"],
         ["TeacherResourceAdminController"] = ["Index", "Approve", "Reject", "Delete"],
         ["QuizManagementController"] = ["Index", "Details", "Attempts", "Delete"],
         ["AssignmentManagementController"] = ["Index", "Submissions", "Delete"],
-        ["ReportsController"] = ["Index", "StudentProgress", "TeacherActivity", "AttendanceSummary", "QuizPerformance"],
+        ["ReportsController"] = ["Index", "StudentProgress", "TeacherActivity", "QuizPerformance"],
         ["ChatMonitorController"] = ["Index", "TeacherChats", "AiTutorSessions"]
     };
 
@@ -44,7 +42,6 @@ public class AdminManagementFeatureShapeTests
 
     private static readonly string[] RequiredViewFiles =
     [
-        "StudentAttendance/Index.cshtml",
         "StudentQuiz/Index.cshtml",
         "StudentQuiz/Details.cshtml",
         "StudentAssignment/Index.cshtml",
@@ -61,7 +58,6 @@ public class AdminManagementFeatureShapeTests
         "Reports/Index.cshtml",
         "Reports/StudentProgress.cshtml",
         "Reports/TeacherActivity.cshtml",
-        "Reports/AttendanceSummary.cshtml",
         "Reports/QuizPerformance.cshtml",
         "ChatMonitor/Index.cshtml",
         "ChatMonitor/TeacherChats.cshtml",

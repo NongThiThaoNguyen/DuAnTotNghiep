@@ -9,6 +9,9 @@ public class QuizViewModel
     public string Title { get; set; } = "";
     public string Description { get; set; } = "";
     public int TimeLimitMinutes { get; set; }
+    public bool IsExamMode { get; set; } = false;
+    public int MaxViolations { get; set; } = 3;
+    public int AttemptId { get; set; }
     public int TotalQuestions => Questions.Count;
 
     public List<QuizQuestionViewModel> Questions { get; set; } = new();

@@ -1,0 +1,126 @@
+@model DuAnTotNghiep.Models.ViewModels.LearningPath.LevelUpAssessmentViewModel
+@{
+    ViewData["Title"] = "Đánh giá thăng hạng trình độ";
+    Layout = "~/Views/Shared/_ExamLayout.cshtml";
+}
+
+<div class="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 space-y-8 font-sans">
+    <!-- Header Banner -->
+    <div class="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 rounded-3xl p-8 sm:p-10 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-white/10 blur-2xl"></div>
+        <div class="relative z-10 space-y-3">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider">
+                <svg class="w-4 h-4 text-amber-300" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+                Level-Up Assessment · Phòng Thi Bảo Mật
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-black">@Model.TestTitle</h1>
+            <p class="text-indigo-100 text-sm sm:text-base max-w-2xl leading-relaxed">
+                @Model.Description
+            </p>
+            <div class="flex flex-wrap items-center gap-4 pt-3 text-xs font-bold">
+                <span class="bg-black/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                    Trình độ hiện tại: <strong class="text-amber-300 font-extrabold">@Model.CurrentLevelName</strong>
+                </span>
+                <span class="bg-black/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                    Mục tiêu thăng hạng: <strong class="text-green-300 font-extrabold">@Model.TargetLevelName</strong>
+                </span>
+                <span class="bg-black/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                    Thời gian: <strong class="text-white font-extrabold">@Model.TimeLimitMinutes phút</strong>
+                </span>
+                <span class="bg-black/20 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                    Điểm đạt yêu cầu: <strong class="text-white font-extrabold">&ge; 70%</strong>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Test Form -->
+    <form id="levelUpForm" asp-action="SubmitLevelUpAssessment" method="post" class="space-y-8">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="testId" value="@Model.TestId" />
+
+        @for (int s = 0; s < Model.Sections.Count; s++)
+        {
+            var secItem = Model.Sections[s];
+            <div class="bg-slate-800/90 rounded-3xl border border-slate-700/80 shadow-sm overflow-hidden">
+                <div class="bg-slate-900/80 border-b border-slate-700/80 px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-400 block">Phần @(s + 1) - @secItem.SkillName</span>
+                        <h2 class="text-lg font-black text-white">@secItem.SectionName</h2>
+                    </div>
+                    @if (!string.IsNullOrEmpty(secItem.Instruction))
+                    {
+                        <span class="text-xs text-slate-400 italic max-w-xs text-right">@secItem.Instruction</span>
+                    }
+                </div>
+
+                <div class="p-6 space-y-6 divide-y divide-slate-700/60">
+                    @for (int q = 0; q < secItem.Questions.Count; q++)
+                    {
+                        var question = secItem.Questions[q];
+                        <div class="pt-4 first:pt-0 space-y-3">
+                            <div class="flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-indigo-500/20 text-indigo-400 font-black text-xs flex items-center justify-center shrink-0 mt-0.5 border border-indigo-500/30">
+                                    @(q + 1)
+                                </span>
+                                <div class="font-bold text-slate-100 text-sm leading-relaxed">
+                                    @question.QuestionText
+                                </div>
+                            </div>
+
+                            @if (question.Options != null && question.Options.Any())
+                            {
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pl-9">
+                                    @foreach (var opt in question.Options)
+                                    {
+                                        <label class="exam-option-label">
+                                            <input type="radio" name="question_@question.QuestionId" value="@opt.OptionId" class="text-indigo-600 focus:ring-indigo-500" required />
+                                            <span class="text-xs font-semibold text-slate-200">@opt.OptionText</span>
+                                        </label>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="pl-9">
+                                    <input type="text" name="question_@question.QuestionId" placeholder="Nhập câu trả lời của bạn..." class="w-full rounded-xl bg-slate-900 border-slate-700 text-slate-100 text-xs px-4 py-2.5 focus:border-indigo-500 focus:ring-indigo-500" required />
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+
+        <div class="flex items-center justify-center gap-4 pt-4 pb-12">
+            <button type="button" id="btnSubmitLevelUp" onclick="submitAssessment()" class="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-extrabold text-sm transition-all shadow-xl shadow-indigo-600/30 flex items-center gap-2 cursor-pointer">
+                <span>Nộp bài & Đánh giá thăng hạng</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.FullscreenExam) {
+                window.FullscreenExam.init({
+                    attemptId: @Model.TestId,
+                    attemptType: 'LEVEL_UP',
+                    maxViolations: @Model.MaxViolations,
+                    reportUrl: '/Student/LearningPath/ReportViolation',
+                    formId: 'levelUpForm'
+                });
+            }
+        });
+
+        function submitAssessment() {
+            if (window.FullscreenExam) {
+                window.FullscreenExam.submitExamForm();
+            } else {
+                document.getElementById('levelUpForm').submit();
+            }
+        }
+    </script>
+}

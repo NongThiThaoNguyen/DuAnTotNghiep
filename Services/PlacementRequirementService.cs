@@ -48,17 +48,7 @@ namespace DuAnTotNghiep.Services
                 .OrderByDescending(a => a.StartedAt)
                 .ToListAsync();
 
-            var completedAttempt = attempts.FirstOrDefault(a => a.Status == "SUBMITTED" || a.Status == "GRADED");
-            if (completedAttempt != null)
-            {
-                return new PlacementFlowResultDto 
-                { 
-                    Status = PlacementFlowStatus.Completed,
-                    AttemptId = completedAttempt.Id,
-                    RedirectUrl = $"/Student/PlacementTest/Result?attemptId={completedAttempt.Id}"
-                };
-            }
-
+            // Ưu tiên kiểm tra lượt thi đang làm trước (hỗ trợ retake)
             var inProgressAttempt = attempts.FirstOrDefault(a => a.Status == "IN_PROGRESS");
             if (inProgressAttempt != null)
             {
@@ -67,6 +57,17 @@ namespace DuAnTotNghiep.Services
                     Status = PlacementFlowStatus.PlacementInProgress,
                     AttemptId = inProgressAttempt.Id,
                     RedirectUrl = $"/Student/PlacementTest/Take/{inProgressAttempt.Id}"
+                };
+            }
+
+            var completedAttempt = attempts.FirstOrDefault(a => a.Status == "SUBMITTED" || a.Status == "GRADED");
+            if (completedAttempt != null)
+            {
+                return new PlacementFlowResultDto 
+                { 
+                    Status = PlacementFlowStatus.Completed,
+                    AttemptId = completedAttempt.Id,
+                    RedirectUrl = $"/Student/PlacementTest/Result?attemptId={completedAttempt.Id}"
                 };
             }
 

@@ -128,6 +128,7 @@ builder.Services.AddScoped<IStudentSettingService, StudentSettingService>();
 builder.Services.AddScoped<INotesService, NotesService>();
 builder.Services.AddScoped<ILearningPathEngineService, LearningPathEngineService>();
 builder.Services.AddScoped<ILearningPathAiService, GeminiLearningPathAiService>();
+builder.Services.AddScoped<ILevelUpAssessmentService, LevelUpAssessmentService>();
 builder.Services.AddScoped<ILearningPathComplianceService, LearningPathComplianceService>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.IPromptTemplateService, PromptTemplateService>();
 builder.Services.AddScoped<DuAnTotNghiep.Services.Interfaces.IPromptTemplateService, PromptTemplateService>();
@@ -146,6 +147,8 @@ builder.Services.AddScoped<ITeacherQuizService, TeacherQuizService>();
 builder.Services.AddScoped<ITeacherGradingService, TeacherGradingService>();
 builder.Services.AddScoped<ITeacherScheduleService, TeacherScheduleService>();
 builder.Services.AddScoped<IAdminTeacherScheduleService, AdminTeacherScheduleService>();
+builder.Services.AddScoped<IGoogleMeetService, GoogleMeetService>();
+builder.Services.AddHostedService<DuAnTotNghiep.Services.Background.OnlineClassBackgroundService>();
 builder.Services.AddHttpClient<IAdminTeacherScheduleAiService, AdminTeacherScheduleAiService>(client =>
 {
     client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
@@ -159,6 +162,7 @@ builder.Services.AddHttpClient<GeminiHttpClient>(client =>
 builder.Services.AddScoped<IAttendanceService, AttendanceService>();
 builder.Services.AddScoped<ITeacherResourceService, TeacherResourceService>();
 builder.Services.AddScoped<ITeacherMessageService, TeacherMessageService>();
+builder.Services.AddScoped<IStudentMessageService, StudentMessageService>();
 builder.Services.AddScoped<ITeacherAssignmentService, TeacherAssignmentService>();
 builder.Services.AddScoped<ITeacherProfileService, TeacherProfileService>();
 builder.Services.AddScoped<ITeacherReportService, TeacherReportService>();

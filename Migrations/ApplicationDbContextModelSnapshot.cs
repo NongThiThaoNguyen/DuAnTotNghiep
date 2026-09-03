@@ -707,6 +707,108 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("chat_messages", (string)null);
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.ClassSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassroomId")
+                        .HasColumnType("int")
+                        .HasColumnName("classroom_id");
+
+                    b.Property<int>("DayOfWeek")
+                        .HasColumnType("int")
+                        .HasColumnName("day_of_week");
+
+                    b.Property<TimeSpan>("EndTime")
+                        .HasColumnType("time")
+                        .HasColumnName("end_time");
+
+                    b.Property<TimeSpan>("StartTime")
+                        .HasColumnType("time")
+                        .HasColumnName("start_time");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassroomId");
+
+                    b.ToTable("class_schedules", (string)null);
+                });
+
+            modelBuilder.Entity("DuAnTotNghiep.Models.Classroom", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ClassName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("class_name");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_date");
+
+                    b.Property<int>("LevelId")
+                        .HasColumnType("int")
+                        .HasColumnName("level_id");
+
+                    b.Property<int>("MaxStudents")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(30)
+                        .HasColumnName("max_students");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("start_date");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("ACTIVE")
+                        .HasColumnName("status");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int")
+                        .HasColumnName("teacher_id");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("updated_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LevelId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("classrooms", (string)null);
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.CompetencyAnalysis", b =>
                 {
                     b.Property<int>("Id")
@@ -935,7 +1037,7 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("varchar(20)")
                         .HasColumnName("level_code");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at")
@@ -966,7 +1068,7 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int")
                         .HasColumnName("order_index");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at")
@@ -998,7 +1100,7 @@ namespace DuAnTotNghiep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at")
@@ -1036,7 +1138,7 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasColumnName("skill_name");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at")
@@ -1059,6 +1161,52 @@ namespace DuAnTotNghiep.Migrations
                     b.ToTable("english_skills", (string)null);
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.Enrollment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ClassroomId")
+                        .HasColumnType("int")
+                        .HasColumnName("classroom_id");
+
+                    b.Property<DateTime?>("DroppedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("dropped_at");
+
+                    b.Property<DateTime>("EnrolledAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("enrolled_at")
+                        .HasDefaultValueSql("(sysutcdatetime())");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("ACTIVE")
+                        .HasColumnName("status");
+
+                    b.Property<int>("StudentId")
+                        .HasColumnType("int")
+                        .HasColumnName("student_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassroomId");
+
+                    b.HasIndex("StudentId", "ClassroomId")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_enrollments_student_classroom");
+
+                    b.ToTable("enrollments", (string)null);
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.LearningGoal", b =>
                 {
                     b.Property<int>("Id")
@@ -1068,7 +1216,7 @@ namespace DuAnTotNghiep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("created_at")
@@ -1106,7 +1254,7 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int")
                         .HasColumnName("order_index");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasColumnName("updated_at")
@@ -2316,6 +2464,18 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("description");
 
+                    b.Property<bool>("IsExamMode")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("is_exam_mode");
+
+                    b.Property<int>("MaxViolations")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(3)
+                        .HasColumnName("max_violations");
+
                     b.Property<decimal?>("PassingScore")
                         .HasColumnType("decimal(6, 2)")
                         .HasColumnName("passing_score");
@@ -2432,6 +2592,12 @@ namespace DuAnTotNghiep.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("FullscreenExitCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("fullscreen_exit_count");
+
                     b.Property<int>("QuizId")
                         .HasColumnType("int")
                         .HasColumnName("quiz_id");
@@ -2462,6 +2628,16 @@ namespace DuAnTotNghiep.Migrations
                     b.Property<DateTime?>("SubmittedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("submitted_at");
+
+                    b.Property<int>("TabSwitchCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("tab_switch_count");
+
+                    b.Property<string>("ViolationLog")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("violation_log");
 
                     b.HasKey("Id")
                         .HasName("PK__quiz_att__3213E83F46B04B87");
@@ -2864,6 +3040,17 @@ namespace DuAnTotNghiep.Migrations
                     b.Property<DateTime>("EndTime")
                         .HasColumnType("datetime2")
                         .HasColumnName("end_time");
+
+                    b.Property<bool>("MeetNotificationSent")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("meet_notification_sent");
+
+                    b.Property<string>("MeetUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("meet_url");
 
                     b.Property<DateTime>("StartTime")
                         .HasColumnType("datetime2")
@@ -3479,6 +3666,12 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("int")
                         .HasColumnName("estimated_level_id");
 
+                    b.Property<int>("FullscreenExitCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("fullscreen_exit_count");
+
                     b.Property<int>("PlacementTestId")
                         .HasColumnType("int")
                         .HasColumnName("placement_test_id");
@@ -3506,9 +3699,19 @@ namespace DuAnTotNghiep.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("submitted_at");
 
+                    b.Property<int>("TabSwitchCount")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0)
+                        .HasColumnName("tab_switch_count");
+
                     b.Property<decimal?>("TotalScore")
                         .HasColumnType("decimal(6, 2)")
                         .HasColumnName("total_score");
+
+                    b.Property<string>("ViolationLog")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("violation_log");
 
                     b.HasKey("Id")
                         .HasName("PK__test_att__3213E83FE21DABC0");
@@ -4135,6 +4338,39 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("Sender");
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.ClassSchedule", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.Classroom", "Classroom")
+                        .WithMany("ClassSchedules")
+                        .HasForeignKey("ClassroomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_class_schedules_classrooms");
+
+                    b.Navigation("Classroom");
+                });
+
+            modelBuilder.Entity("DuAnTotNghiep.Models.Classroom", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.EnglishProficiencyLevel", "Level")
+                        .WithMany()
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_classrooms_levels");
+
+                    b.HasOne("DuAnTotNghiep.Models.User", "Teacher")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_classrooms_teachers");
+
+                    b.Navigation("Level");
+
+                    b.Navigation("Teacher");
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.CompetencyAnalysis", b =>
                 {
                     b.HasOne("DuAnTotNghiep.Models.EnglishProficiencyLevel", "CurrentLevel")
@@ -4249,6 +4485,27 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("CreatedByNavigation");
 
                     b.Navigation("UpdatedByNavigation");
+                });
+
+            modelBuilder.Entity("DuAnTotNghiep.Models.Enrollment", b =>
+                {
+                    b.HasOne("DuAnTotNghiep.Models.Classroom", "Classroom")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("ClassroomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_enrollments_classrooms");
+
+                    b.HasOne("DuAnTotNghiep.Models.User", "Student")
+                        .WithMany("Enrollments")
+                        .HasForeignKey("StudentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_enrollments_students");
+
+                    b.Navigation("Classroom");
+
+                    b.Navigation("Student");
                 });
 
             modelBuilder.Entity("DuAnTotNghiep.Models.LearningGoal", b =>
@@ -5199,6 +5456,13 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("AiTutorMessages");
                 });
 
+            modelBuilder.Entity("DuAnTotNghiep.Models.Classroom", b =>
+                {
+                    b.Navigation("ClassSchedules");
+
+                    b.Navigation("Enrollments");
+                });
+
             modelBuilder.Entity("DuAnTotNghiep.Models.CompetencyAnalysis", b =>
                 {
                     b.Navigation("CompetencySkillScores");
@@ -5434,6 +5698,8 @@ namespace DuAnTotNghiep.Migrations
                     b.Navigation("CompetencyAnalyses");
 
                     b.Navigation("ContentComplianceReviews");
+
+                    b.Navigation("Enrollments");
 
                     b.Navigation("LearningPathTemplates");
 

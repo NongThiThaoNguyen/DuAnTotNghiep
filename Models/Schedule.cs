@@ -32,6 +32,11 @@ public class Schedule
     [StringLength(255)]
     public string? Classroom { get; set; }
 
+    [StringLength(500)]
+    public string? MeetUrl { get; set; }
+
+    public bool MeetNotificationSent { get; set; } = false;
+
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public virtual User Teacher { get; set; } = null!;
