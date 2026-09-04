@@ -30,6 +30,11 @@ namespace DuAnTotNghiep.Services.Interfaces
         Task<EnrollmentSuccessViewModel?> GetCurrentEnrollmentAsync(int studentId);
 
         /// <summary>
+        /// Lấy các buổi học của lớp mà Student đã đăng ký trong một tuần.
+        /// </summary>
+        Task<StudentScheduleViewModel> GetStudentScheduleAsync(int studentId, DateTime weekStart);
+
+        /// <summary>
         /// Kiểm tra Student đã hoàn thành Placement Test chưa
         /// </summary>
         Task<bool> HasCompletedPlacementTestAsync(int studentId);

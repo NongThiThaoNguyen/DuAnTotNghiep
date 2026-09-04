@@ -190,7 +190,7 @@ public class AILearnSeeder
 
         // 7. Seed 100 Quiz Questions
         int totalQuestions = await _context.QuestionBanks.CountAsync();
-        if (totalQuestions < 100)
+        if (totalQuestions < 100 || await _context.Quizzes.AnyAsync())
         {
             int index = 1;
             foreach (var course in courses)
@@ -223,16 +223,35 @@ public class AILearnSeeder
 
                 // Add 10 questions for this quiz
                 var existingQs = await _context.QuizQuestions.CountAsync(qq => qq.QuizId == quiz.Id);
+                var quizSeeds = GetQuizQuestionSeeds(course.TopicCode);
+                var existingQuizQuestions = await _context.QuizQuestions
+                    .Where(qq => qq.QuizId == quiz.Id)
+                    .OrderBy(qq => qq.OrderIndex)
+                    .Include(qq => qq.Question)
+                    .ThenInclude(qb => qb.QuestionOptions)
+                    .ToListAsync();
+
+                for (int seedIndex = 0; seedIndex < existingQuizQuestions.Count && seedIndex < quizSeeds.Count; seedIndex++)
+                {
+                    var existingQuestion = existingQuizQuestions[seedIndex].Question;
+                    if (existingQuestion.QuestionText.StartsWith("Đây là câu hỏi trắc nghiệm số", StringComparison.Ordinal))
+                    {
+                        ApplyQuizSeed(existingQuestion, quizSeeds[seedIndex]);
+                    }
+                }
+                await _context.SaveChangesAsync();
+
                 for (int q = existingQs; q < 10; q++)
                 {
+                    var seed = quizSeeds[q % quizSeeds.Count];
                     var qb = new QuestionBank
                     {
                         TopicId = course.Id,
                         SkillId = course.SkillId,
                         QuestionType = "MCQ",
-                        QuestionText = $"Đây là câu hỏi trắc nghiệm số {q + 1} của khóa học {course.Title}. Hãy chọn đáp án chính xác nhất?",
-                        CorrectAnswer = "A",
-                        Explanation = $"Giải thích chi tiết tại sao đáp án A là chính xác cho câu hỏi số {q + 1}. Cấu trúc ngữ pháp và từ vựng áp dụng ở đây rất thông dụng.",
+                        QuestionText = seed.QuestionText,
+                        CorrectAnswer = seed.CorrectAnswer,
+                        Explanation = seed.Explanation,
                         DifficultyLevel = "MEDIUM",
                         SourceType = "SYSTEM",
                         ReviewStatus = "APPROVED",
@@ -242,10 +261,10 @@ public class AILearnSeeder
                     _context.QuestionBanks.Add(qb);
                     await _context.SaveChangesAsync();
 
-                    var optA = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án A (Chính xác)", IsCorrect = true, OrderIndex = 1 };
-                    var optB = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án B (Không chính xác)", IsCorrect = false, OrderIndex = 2 };
-                    var optC = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án C (Sai cấu trúc)", IsCorrect = false, OrderIndex = 3 };
-                    var optD = new QuestionOption { QuestionId = qb.Id, OptionText = "Đáp án D (Thiếu từ)", IsCorrect = false, OrderIndex = 4 };
+                    var optA = new QuestionOption { QuestionId = qb.Id, OptionText = seed.Options[0], IsCorrect = seed.CorrectIndex == 0, OrderIndex = 1 };
+                    var optB = new QuestionOption { QuestionId = qb.Id, OptionText = seed.Options[1], IsCorrect = seed.CorrectIndex == 1, OrderIndex = 2 };
+                    var optC = new QuestionOption { QuestionId = qb.Id, OptionText = seed.Options[2], IsCorrect = seed.CorrectIndex == 2, OrderIndex = 3 };
+                    var optD = new QuestionOption { QuestionId = qb.Id, OptionText = seed.Options[3], IsCorrect = seed.CorrectIndex == 3, OrderIndex = 4 };
 
                     _context.QuestionOptions.AddRange(optA, optB, optC, optD);
                     await _context.SaveChangesAsync();
@@ -745,6 +764,7 @@ public class AILearnSeeder
 
     private async Task SeedOrUpdateRichLessonsAsync(List<LearningTopic> courses, int? teacherUserId)
     {
+        const string courseVideoUrl = "https://www.youtube.com/embed/dQw4w9WgXcQ";
         var templates = GetCourseLessonTemplates();
         var allTopics = await _context.LearningTopics.ToListAsync();
 
@@ -803,8 +823,8 @@ public class AILearnSeeder
                     lesson.Title = data.Title;
                     lesson.Summary = data.Summary;
                     lesson.Content = data.Content;
-                    lesson.ContentType = data.ContentType;
-                    lesson.VideoUrl = data.VideoUrl;
+                    lesson.ContentType = "VIDEO_LINK";
+                    lesson.VideoUrl = courseVideoUrl;
                     lesson.EstimatedMinutes = 15 + (i * 3);
                     lesson.ReviewStatus = "APPROVED";
                     if (teacherUserId.HasValue) lesson.CreatedBy = teacherUserId;
@@ -819,8 +839,8 @@ public class AILearnSeeder
                         Title = data.Title,
                         Summary = data.Summary,
                         Content = data.Content,
-                        ContentType = data.ContentType,
-                        VideoUrl = data.VideoUrl,
+                        ContentType = "VIDEO_LINK",
+                        VideoUrl = courseVideoUrl,
                         EstimatedMinutes = 15 + (i * 3),
                         SourceType = "SYSTEM",
                         ReviewStatus = "APPROVED",
@@ -1280,6 +1300,209 @@ public class AILearnSeeder
                  "ARTICLE", null)
             }
         };
+    }
+
+    private sealed record QuizSeedQuestion(string QuestionText, string[] Options, int CorrectIndex, string Explanation)
+    {
+        public string CorrectAnswer => ((char)('A' + CorrectIndex)).ToString();
+    }
+
+    private static List<QuizSeedQuestion> GetQuizQuestionSeeds(string? topicCode)
+    {
+        var questions = topicCode switch
+        {
+            "COURSE_IELTS_65" => new[]
+            {
+                new QuizSeedQuestion("Choose the correct sentence for an IELTS speaking answer: I ___ English for three years.", new[] { "study", "have studied", "am study", "studied" }, 1, "Use the present perfect for an action that began in the past and continues now."),
+                new QuizSeedQuestion("Which phrase is best for introducing an example in an IELTS essay?", new[] { "For instance", "At the end", "By the way", "In the past" }, 0, "For instance introduces a specific example in formal writing."),
+                new QuizSeedQuestion("Which word has the closest meaning to 'significant' in an IELTS text?", new[] { "minor", "important", "temporary", "uncertain" }, 1, "Significant means important or notable."),
+                new QuizSeedQuestion("What should a strong IELTS Task 2 introduction include?", new[] { "Only a question", "A background and clear thesis", "A long personal story", "A list of sources" }, 1, "A concise background sentence and a clear thesis answer the task."),
+                new QuizSeedQuestion("Which linking word shows contrast?", new[] { "Moreover", "Therefore", "However", "For example" }, 2, "However introduces an opposing idea."),
+            },
+            "COURSE_TOEIC_500" => new[]
+            {
+                new QuizSeedQuestion("The manager will ___ the meeting at 9 a.m.", new[] { "attend", "attendance", "attended", "attending" }, 0, "After will, use the base verb attend."),
+                new QuizSeedQuestion("Please ___ the form before Friday.", new[] { "submit", "submission", "submits", "submitted" }, 0, "Submit is the verb needed after please."),
+                new QuizSeedQuestion("What does 'deadline' mean?", new[] { "a meeting room", "the final time to finish something", "a salary increase", "a job interview" }, 1, "A deadline is the latest time by which something must be completed."),
+                new QuizSeedQuestion("The documents ___ by the assistant yesterday.", new[] { "prepare", "prepared", "were prepared", "are preparing" }, 2, "Use the past passive for documents completed yesterday."),
+                new QuizSeedQuestion("Which phrase is used to make a polite request?", new[] { "Could you please...?", "You must now.", "Do it quickly.", "I refuse to..." }, 0, "Could you please...? is a polite business request."),
+            },
+            "COURSE_COMM_DAILY" => new[]
+            {
+                new QuizSeedQuestion("What is a natural response to 'How are you?'", new[] { "I'm fine, thanks.", "At five o'clock.", "It's mine.", "In the kitchen." }, 0, "I'm fine, thanks is a natural response to a greeting."),
+                new QuizSeedQuestion("Could you ___ me the way to the station?", new[] { "tell", "say", "speak", "talk" }, 0, "Use tell someone the way."),
+                new QuizSeedQuestion("Which expression is used to make a suggestion?", new[] { "Why don't we...?", "I have finished.", "It belongs to me.", "See you yesterday." }, 0, "Why don't we...? introduces a suggestion."),
+                new QuizSeedQuestion("'Would you like some tea?' is an offer. What is a polite acceptance?", new[] { "Yes, please.", "No, I am.", "It is tea.", "Yesterday." }, 0, "Yes, please politely accepts an offer."),
+                new QuizSeedQuestion("Choose the correct sentence for a daily routine.", new[] { "I usually go to work by bus.", "I usually going work.", "I go usually yesterday.", "I am go to work." }, 0, "Use the present simple for regular routines."),
+            },
+            "COURSE_GRAM_FOUND" => new[]
+            {
+                new QuizSeedQuestion("She ___ to school every day.", new[] { "go", "goes", "going", "gone" }, 1, "A third-person singular subject takes goes in the present simple."),
+                new QuizSeedQuestion("They ___ dinner when I called.", new[] { "have", "were having", "are having", "had have" }, 1, "Use the past continuous for an action in progress in the past."),
+                new QuizSeedQuestion("I have lived here ___ 2020.", new[] { "for", "since", "during", "from" }, 1, "Since is used with a starting point in time."),
+                new QuizSeedQuestion("If it rains, we ___ at home.", new[] { "stay", "stayed", "would stayed", "staying" }, 0, "The first conditional uses present simple in the if-clause."),
+                new QuizSeedQuestion("There ___ two books on the desk.", new[] { "is", "are", "was", "be" }, 1, "Use are with the plural noun two books."),
+            },
+            "COURSE_LIST_PRO" => new[]
+            {
+                new QuizSeedQuestion("What does a speaker usually do first in a listening question about a timetable?", new[] { "Predict possible times", "Write an essay", "Translate every word", "Ignore the headings" }, 0, "Predicting from headings helps you listen for times and schedule details."),
+                new QuizSeedQuestion("Which word signals a correction in a conversation?", new[] { "Actually", "Finally", "Usually", "Because" }, 0, "Actually often introduces corrected information."),
+                new QuizSeedQuestion("In listening practice, what is a distractor?", new[] { "The correct answer", "Information that sounds plausible but is wrong", "A speaker's name", "A question title" }, 1, "A distractor is misleading information designed to test careful listening."),
+                new QuizSeedQuestion("Choose the phrase that asks someone to repeat information.", new[] { "Could you say that again?", "I agree completely.", "That is mine.", "It starts at noon." }, 0, "Could you say that again? is a request for repetition."),
+                new QuizSeedQuestion("Which skill helps most when listening for a number?", new[] { "Listening for keywords and units", "Reading the whole dictionary", "Speaking very loudly", "Memorising a paragraph" }, 0, "Numbers are easier to catch when you listen for the keyword and its unit."),
+            },
+            "COURSE_READ_ADV" => new[]
+            {
+                new QuizSeedQuestion("What is skimming used for?", new[] { "Finding the general idea quickly", "Checking every spelling error", "Memorising all details", "Translating each sentence" }, 0, "Skimming means reading quickly for the main idea."),
+                new QuizSeedQuestion("What is scanning used for?", new[] { "Finding a specific fact", "Writing a conclusion", "Learning pronunciation", "Guessing the topic" }, 0, "Scanning searches a text for a particular detail such as a name or date."),
+                new QuizSeedQuestion("A pronoun reference question asks you to identify...", new[] { "what a word refers to", "the author's age", "the page number", "the font size" }, 0, "Reference questions test links between pronouns and earlier nouns."),
+                new QuizSeedQuestion("Which word is closest in meaning to 'decline'?", new[] { "increase", "decrease", "explain", "discover" }, 1, "Decline means decrease or fall."),
+                new QuizSeedQuestion("What should you do when a reading passage contains an unfamiliar word?", new[] { "Use context clues", "Stop immediately", "Choose the longest answer", "Skip the whole passage" }, 0, "Nearby words and sentence meaning often reveal an unfamiliar word."),
+            },
+            "COURSE_PRON_IPA" => new[]
+            {
+                new QuizSeedQuestion("How many vowel sounds are in the word 'ship'?", new[] { "One", "Two", "Three", "Four" }, 0, "Ship contains one vowel sound, /ɪ/."),
+                new QuizSeedQuestion("Which pair is a minimal pair?", new[] { "ship and sheep", "book and books", "play and playing", "quick and quickly" }, 0, "Ship and sheep differ in one vowel sound."),
+                new QuizSeedQuestion("Which sound is voiced?", new[] { "/z/", "/s/", "/p/", "/t/" }, 0, "The vocal cords vibrate when producing /z/."),
+                new QuizSeedQuestion("Where is the main stress in 'photograph'?", new[] { "PHO-to-graph", "pho-TO-graph", "pho-to-GRAPH", "All syllables equally" }, 0, "Photograph is stressed on the first syllable."),
+                new QuizSeedQuestion("Which sound begins the word 'think'?", new[] { "/θ/", "/t/", "/f/", "/s/" }, 0, "Think begins with the voiceless dental fricative /θ/."),
+            },
+            "COURSE_VOCAB_IELTS" => new[]
+            {
+                new QuizSeedQuestion("Which word means 'a chance to do something'?", new[] { "opportunity", "obstacle", "outcome", "requirement" }, 0, "Opportunity means a favourable chance."),
+                new QuizSeedQuestion("Choose the correct collocation.", new[] { "make a decision", "do a decision", "build a decision", "create a decision" }, 0, "Make a decision is the standard collocation."),
+                new QuizSeedQuestion("The word 'sustainable' is most related to...", new[] { "long-term environmental balance", "short-term fashion", "fast travel", "personal height" }, 0, "Sustainable describes something that can continue without exhausting resources."),
+                new QuizSeedQuestion("What is the opposite of 'expand'?", new[] { "reduce", "develop", "increase", "extend" }, 0, "Reduce is the opposite of expand."),
+                new QuizSeedQuestion("Which word is most formal in academic writing?", new[] { "children", "kids", "little ones", "youngsters" }, 0, "Children is the neutral formal choice."),
+            },
+            "COURSE_COMM_OFFICE" => new[]
+            {
+                new QuizSeedQuestion("Could you ___ the report to everyone?", new[] { "forward", "forwards", "forwarding", "forwarded" }, 0, "Forward is the base verb after could."),
+                new QuizSeedQuestion("Which phrase is appropriate for ending a professional email?", new[] { "Kind regards", "See ya", "Bye-bye", "Whatever" }, 0, "Kind regards is a polite professional closing."),
+                new QuizSeedQuestion("The meeting has been ___ until Monday.", new[] { "postponed", "postpone", "postponing", "postpones" }, 0, "The present perfect passive needs the past participle postponed."),
+                new QuizSeedQuestion("What does 'agenda' mean in a meeting?", new[] { "a list of topics", "a salary slip", "an office key", "a holiday" }, 0, "An agenda lists the topics to be discussed."),
+                new QuizSeedQuestion("Which sentence politely disagrees?", new[] { "I see your point, but...", "You are wrong.", "No way.", "Stop talking." }, 0, "I see your point, but... acknowledges the other view before disagreeing."),
+            },
+            "COURSE_WRITE_ACAD" => new[]
+            {
+                new QuizSeedQuestion("Where is the thesis statement usually placed in an academic essay introduction?", new[] { "At the end of the introduction", "In the title", "After the conclusion", "In a footnote" }, 0, "The thesis commonly closes the introduction and states the writer's position."),
+                new QuizSeedQuestion("Which linking word introduces a result?", new[] { "Consequently", "Although", "Meanwhile", "For instance" }, 0, "Consequently introduces a result or consequence."),
+                new QuizSeedQuestion("Which sentence is most academic?", new[] { "Evidence suggests that public transport reduces congestion.", "Public transport is super cool.", "I kinda like buses.", "Buses are, like, good." }, 0, "Academic style uses precise and objective language."),
+                new QuizSeedQuestion("A body paragraph should normally develop...", new[] { "one central idea", "many unrelated ideas", "only the title", "a new essay question" }, 0, "One central idea keeps a body paragraph coherent."),
+                new QuizSeedQuestion("What should a conclusion avoid?", new[] { "Introducing a completely new main idea", "Restating the position", "Summarising key points", "Giving a final recommendation" }, 0, "A conclusion should not introduce an unexplained new argument."),
+            },
+            _ => new[]
+            {
+                new QuizSeedQuestion("Choose the correct sentence.", new[] { "She studies English every day.", "She study English every day.", "She studying English.", "She studieds English." }, 0, "Use studies with the third-person singular subject she."),
+                new QuizSeedQuestion("Which word means 'important'?", new[] { "significant", "ordinary", "empty", "brief" }, 0, "Significant means important or notable."),
+                new QuizSeedQuestion("Choose the correct preposition: interested ___ English.", new[] { "in", "on", "at", "for" }, 0, "The correct collocation is interested in."),
+                new QuizSeedQuestion("Which phrase introduces an example?", new[] { "For example", "In contrast", "As a result", "In conclusion" }, 0, "For example introduces a specific example."),
+                new QuizSeedQuestion("What is the main purpose of a quiz?", new[] { "To check understanding", "To hide information", "To remove practice", "To skip learning" }, 0, "A quiz checks whether the learner understands the lesson."),
+            }
+        };
+
+        return questions.Concat(GetAdditionalQuizSeeds(topicCode)).ToList();
+    }
+
+    private static IEnumerable<QuizSeedQuestion> GetAdditionalQuizSeeds(string? topicCode)
+    {
+        return topicCode switch
+        {
+            "COURSE_IELTS_65" => new[]
+            {
+                new QuizSeedQuestion("Which answer best supports an opinion in IELTS Speaking Part 3?", new[] { "I think it is useful because it saves time.", "Yes, I do.", "At seven o'clock.", "It is on the table." }, 0, "A developed answer gives an opinion and a reason."),
+                new QuizSeedQuestion("Choose the correct passive sentence for an IELTS report.", new[] { "The figures were collected in 2024.", "The figures collected in 2024.", "The figures are collect in 2024.", "The figures was collecting in 2024." }, 0, "Use were collected for a plural subject in the past passive."),
+                new QuizSeedQuestion("Which phrase is suitable for showing partial agreement?", new[] { "While this may be true, ...", "No way at all.", "I do not know yesterday.", "Because of example." }, 0, "While this may be true introduces a balanced counterargument."),
+                new QuizSeedQuestion("What is the main purpose of a topic sentence?", new[] { "To state the paragraph's central idea", "To list every example", "To repeat the title", "To add an unrelated fact" }, 0, "A topic sentence guides the reader to the paragraph's main idea."),
+                new QuizSeedQuestion("Which word best completes: The number of users has ___ rapidly.", new[] { "increased", "increase", "increasing", "increases" }, 0, "Has is followed by the past participle increased."),
+            },
+            "COURSE_TOEIC_500" or "COURSE_COMM_OFFICE" => new[]
+            {
+                new QuizSeedQuestion("Please find the attached file and ___ it carefully.", new[] { "review", "reviewing", "reviewed", "reviews" }, 0, "Use the base verb after and in this instruction."),
+                new QuizSeedQuestion("The conference room is available ___ 2 p.m.", new[] { "until", "during", "since", "already" }, 0, "Until shows the time an availability period ends."),
+                new QuizSeedQuestion("Who is responsible ___ preparing the minutes?", new[] { "for", "to", "at", "with" }, 0, "The correct collocation is responsible for."),
+                new QuizSeedQuestion("Which document usually lists a job applicant's experience?", new[] { "A resume", "An invoice", "An agenda", "A receipt" }, 0, "A resume summarises education and work experience."),
+                new QuizSeedQuestion("The client asked us ___ the proposal by Monday.", new[] { "to revise", "revising", "revised", "revise" }, 0, "Ask someone to do something uses to plus the base verb."),
+            },
+            "COURSE_COMM_DAILY" => new[]
+            {
+                new QuizSeedQuestion("What can you say when you do not hear someone clearly?", new[] { "Sorry, could you repeat that?", "I am repeat.", "You are noise.", "Repeat yesterday." }, 0, "This is a polite request for repetition."),
+                new QuizSeedQuestion("Choose the natural way to invite a friend.", new[] { "Would you like to join us?", "Do you joining us?", "You like join?", "Join us yesterday?" }, 0, "Would you like to...? is a natural invitation."),
+                new QuizSeedQuestion("What is a polite reply to 'Thank you'?", new[] { "You're welcome.", "I thank.", "Never thank.", "Welcome you yesterday." }, 0, "You're welcome is the standard response."),
+                new QuizSeedQuestion("Choose the correct sentence about a current action.", new[] { "I am waiting for the bus.", "I waiting the bus.", "I am wait bus.", "I waits for bus." }, 0, "Present continuous uses am/is/are plus V-ing."),
+                new QuizSeedQuestion("Which expression politely asks for permission?", new[] { "May I open the window?", "I open window now.", "Open it for me.", "Window yesterday." }, 0, "May I...? is a polite request for permission."),
+            },
+            "COURSE_GRAM_FOUND" => new[]
+            {
+                new QuizSeedQuestion("She has ___ her keys.", new[] { "lost", "lose", "losing", "loses" }, 0, "Present perfect uses has plus the past participle lost."),
+                new QuizSeedQuestion("Choose the correct question.", new[] { "Did you see the film?", "Did you saw the film?", "Do you saw the film?", "Were you see the film?" }, 0, "After did, use the base verb see."),
+                new QuizSeedQuestion("This book is ___ than that one.", new[] { "more interesting", "most interesting", "interest", "interestingly" }, 0, "Use the comparative form more interesting with than."),
+                new QuizSeedQuestion("You ___ wear a seat belt in a car.", new[] { "must", "must to", "can to", "are" }, 0, "Must is followed directly by the base verb."),
+                new QuizSeedQuestion("The letter was ___ yesterday.", new[] { "sent", "send", "sending", "sends" }, 0, "Was is followed by the past participle in the passive voice."),
+            },
+            "COURSE_LIST_PRO" => new[]
+            {
+                new QuizSeedQuestion("Before listening, what should you do with the questions?", new[] { "Underline key words", "Cover the options", "Read them after the recording", "Translate nothing" }, 0, "Underlining key words prepares you to listen for relevant details."),
+                new QuizSeedQuestion("Which phrase often signals the main point?", new[] { "The important thing is...", "By the way...", "See you later...", "Excuse me, where...?" }, 0, "The important thing is often introduces the main point."),
+                new QuizSeedQuestion("If a speaker changes an answer, which information should you choose?", new[] { "The final corrected information", "The first number always", "The longest phrase", "No information" }, 0, "The final correction normally gives the intended answer."),
+                new QuizSeedQuestion("What does 'approximately' mean in a recording?", new[] { "About", "Exactly", "Never", "Before" }, 0, "Approximately means about or roughly."),
+                new QuizSeedQuestion("Which detail is commonly tested in form filling?", new[] { "A name or phone number", "A paragraph opinion", "A book review", "A thesis statement" }, 0, "Forms commonly require specific factual details."),
+            },
+            "COURSE_READ_ADV" => new[]
+            {
+                new QuizSeedQuestion("What is the best first step before reading a long passage?", new[] { "Read the title and headings", "Translate every word", "Memorise the final paragraph", "Ignore the topic" }, 0, "Titles and headings provide a quick prediction of the text's topic."),
+                new QuizSeedQuestion("Which word signals an example?", new[] { "For example", "Nevertheless", "Therefore", "Unless" }, 0, "For example introduces supporting evidence."),
+                new QuizSeedQuestion("If a statement is 'not given', it means the passage...", new[] { "does not provide enough information", "clearly proves it", "directly contradicts it", "repeats it twice" }, 0, "Not given means the text neither confirms nor denies the statement."),
+                new QuizSeedQuestion("What is an inference?", new[] { "A conclusion based on clues", "A copied title", "A spelling error", "A page number" }, 0, "An inference is a conclusion drawn from evidence in the text."),
+                new QuizSeedQuestion("Which strategy helps with a matching headings task?", new[] { "Identify each paragraph's main idea", "Match the longest heading", "Use the first word only", "Ignore paragraph structure" }, 0, "Matching headings requires the central idea of each paragraph."),
+            },
+            "COURSE_PRON_IPA" => new[]
+            {
+                new QuizSeedQuestion("Which word has the /iː/ sound?", new[] { "sheep", "ship", "shep", "shop" }, 0, "Sheep contains the long vowel /iː/."),
+                new QuizSeedQuestion("Which pair differs in the final consonant?", new[] { "cap and cab", "cat and cart", "seat and sit", "ship and sheep" }, 0, "Cap ends /p/ while cab ends /b/."),
+                new QuizSeedQuestion("What does sentence stress mainly highlight?", new[] { "Important words", "Every article", "Silent letters", "Punctuation only" }, 0, "Content words usually receive greater stress in a sentence."),
+                new QuizSeedQuestion("Which sound is voiceless?", new[] { "/f/", "/v/", "/z/", "/d/" }, 0, "The vocal cords do not vibrate for /f/."),
+                new QuizSeedQuestion("Which word has stress on the second syllable?", new[] { "reLAX", "TAble", "TEAcher", "WINdow" }, 0, "Relax is stressed on the second syllable."),
+            },
+            "COURSE_VOCAB_IELTS" => new[]
+            {
+                new QuizSeedQuestion("Which word means a serious difficulty?", new[] { "challenge", "benefit", "reward", "advantage" }, 0, "Challenge means a difficult task or problem."),
+                new QuizSeedQuestion("Choose the correct collocation.", new[] { "conduct research", "make research", "do a research", "build research" }, 0, "Conduct research is the standard academic collocation."),
+                new QuizSeedQuestion("What does 'allocate' mean?", new[] { "distribute for a purpose", "remove completely", "translate quickly", "celebrate loudly" }, 0, "Allocate means distribute resources for a particular purpose."),
+                new QuizSeedQuestion("The opposite of 'temporary' is...", new[] { "permanent", "brief", "short", "weekly" }, 0, "Permanent means lasting for a long or unlimited time."),
+                new QuizSeedQuestion("Which word best completes: a ___ amount of evidence", new[] { "substantial", "substance", "substantially", "substantiate" }, 0, "Substantial is the adjective modifying amount."),
+            },
+            "COURSE_WRITE_ACAD" => new[]
+            {
+                new QuizSeedQuestion("Which sentence is a clear thesis statement?", new[] { "Universities should offer more online courses because they improve access and flexibility.", "Online courses.", "This essay has many words.", "There are some things to discuss." }, 0, "A thesis gives a clear position and previews the main reasons."),
+                new QuizSeedQuestion("Which phrase adds a supporting point?", new[] { "Furthermore", "In contrast", "Nevertheless", "On the contrary" }, 0, "Furthermore adds another supporting point."),
+                new QuizSeedQuestion("Choose the correct academic verb: The study ___ that exercise improves sleep.", new[] { "demonstrates", "demonstrate", "demonstrating", "demonstrateds" }, 0, "The singular subject study takes demonstrates."),
+                new QuizSeedQuestion("What is paraphrasing?", new[] { "Restating an idea in different words", "Copying every word", "Deleting the argument", "Adding unrelated evidence" }, 0, "Paraphrasing preserves meaning while changing wording and structure."),
+                new QuizSeedQuestion("Which feature improves cohesion?", new[] { "Clear references and logical linking", "Random topic changes", "Repeated titles", "Very long sentences only" }, 0, "References and logical links help ideas flow between sentences."),
+            },
+            _ => new[]
+            {
+                new QuizSeedQuestion("Choose the correct past form: They ___ the lesson yesterday.", new[] { "reviewed", "review", "reviewing", "reviews" }, 0, "Use the past simple reviewed with yesterday."),
+                new QuizSeedQuestion("Which phrase shows a result?", new[] { "As a result", "For instance", "Although", "Meanwhile" }, 0, "As a result introduces a consequence."),
+                new QuizSeedQuestion("Choose the correct word: She is ___ in music.", new[] { "interested", "interest", "interesting", "interestingly" }, 0, "Use interested to describe a person's feeling."),
+                new QuizSeedQuestion("What is a synonym of 'begin'?", new[] { "start", "finish", "stop", "forget" }, 0, "Start means begin."),
+                new QuizSeedQuestion("Which sentence is correct?", new[] { "He can speak English.", "He can speaks English.", "He can speaking English.", "He can spoke English." }, 0, "A modal verb is followed by the base verb.")
+            }
+        };
+    }
+
+    private static void ApplyQuizSeed(QuestionBank question, QuizSeedQuestion seed)
+    {
+        question.QuestionText = seed.QuestionText;
+        question.CorrectAnswer = seed.CorrectAnswer;
+        question.Explanation = seed.Explanation;
+        question.UpdatedAt = DateTime.UtcNow;
+
+        foreach (var option in question.QuestionOptions.OrderBy(option => option.OrderIndex).Take(seed.Options.Length).Select((option, index) => new { option, index }))
+        {
+            option.option.OptionText = seed.Options[option.index];
+            option.option.IsCorrect = option.index == seed.CorrectIndex;
+        }
     }
 }
 

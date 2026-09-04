@@ -119,28 +119,36 @@
                 </div>
             </div>
 
-            <!-- Mark Complete -->
-            <form asp-controller="Lesson" asp-action="MarkCompleted" asp-route-id="@Model.LessonId" method="post">
-                @Html.AntiForgeryToken()
-                @if (Model.IsCompleted)
-                {
-                    <button class="c26-btn c26-btn-success" disabled aria-label="Bài học đã hoàn thành">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m5 13 4 4L19 7"/>
-                        </svg>
-                        Đã hoàn thành
-                    </button>
-                }
-                else
-                {
-                    <button type="submit" class="c26-btn c26-btn-primary" aria-label="Đánh dấu bài học hoàn thành">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m5 13 4 4L19 7"/>
-                        </svg>
-                        Đánh dấu hoàn thành
-                    </button>
-                }
-            </form>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                <a href="@Url.Action("DownloadPdf", "Lesson", new { id = Model.LessonId })"
+                   class="c26-btn c26-btn-outline" aria-label="Tải bài học dạng PDF" title="Tải bài học dạng PDF">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v12m0 0 4-4m-4 4-4-4M5 21h14"/>
+                    </svg>
+                    Tải PDF
+                </a>
+                <form asp-controller="Lesson" asp-action="MarkCompleted" asp-route-id="@Model.LessonId" method="post">
+                    @Html.AntiForgeryToken()
+                    @if (Model.IsCompleted)
+                    {
+                        <button class="c26-btn c26-btn-success" disabled aria-label="Bài học đã hoàn thành">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m5 13 4 4L19 7"/>
+                            </svg>
+                            Đã hoàn thành
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="submit" class="c26-btn c26-btn-primary" aria-label="Đánh dấu bài học hoàn thành">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" style="width:15px;height:15px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="m5 13 4 4L19 7"/>
+                            </svg>
+                            Đánh dấu hoàn thành
+                        </button>
+                    }
+                </form>
+            </div>
         </div>
 
         <!-- ── TABS ──────────────────────────────────────────── -->

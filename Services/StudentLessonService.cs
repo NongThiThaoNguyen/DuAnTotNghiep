@@ -537,7 +537,7 @@ namespace DuAnTotNghiep.Services
                 {
                     Title = $"Tài liệu tóm tắt bài giảng - {lesson.Title}.pdf",
                     FileType = "PDF",
-                    FileUrl = "/document/Tenses_Masterclass_Bai_1.pdf"
+                    FileUrl = $"/Lesson/DownloadPdf/{lesson.Id}"
                 },
                 new LessonResourceViewModel
                 {

@@ -15,52 +15,44 @@
     <link rel="stylesheet" href="~/css/quiz.css" asp-append-version="true" />
 }
 
-<div class="@(Model.IsExamMode ? "max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8 w-full font-sans space-y-6" : "card-ailearn")">
+@if (Model.IsExamMode)
+{
+<div class="exam-quiz quiz-taking-shell">
     <!-- Header -->
-    <div class="@(Model.IsExamMode ? "bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg sticky top-4 z-30" : "quiz-header")">
+    <div class="quiz-taking-header">
         <div>
-            <div class="flex items-center gap-2 mb-2">
-                <span class="@(Model.IsExamMode ? "px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 text-xs font-black uppercase tracking-wider" : "purple-badge")">
-                    Khóa học: @Model.CourseTitle
-                </span>
-                @if (Model.IsExamMode)
-                {
-                    <span class="px-3 py-1 rounded-full bg-red-500/20 text-red-400 border border-red-500/30 text-xs font-black uppercase tracking-wider">
-                        Chế độ thi bảo mật
-                    </span>
-                }
+            <div class="quiz-taking-meta">
+                <span class="quiz-badge">@Model.CourseTitle</span>
+                <span class="quiz-badge quiz-badge-security">Chế độ thi bảo mật</span>
             </div>
-            <h2 class="@(Model.IsExamMode ? "text-xl sm:text-2xl font-black text-white" : "h4 font-weight-bold mb-0")">@Model.Title</h2>
+            <h1>@Model.Title</h1>
         </div>
-        <div class="@(Model.IsExamMode ? "bg-slate-900/80 border border-slate-700 px-4 py-2.5 rounded-xl flex items-center gap-3 shrink-0 text-indigo-400" : "quiz-timer")">
-            <i class="fa-regular fa-clock text-lg animate-pulse"></i>
-            <span id="timerValue" data-limit="@Model.TimeLimitMinutes" class="font-mono font-black text-xl text-white">@Model.TimeLimitMinutes:00</span>
+        <div class="quiz-header-actions">
+            <div class="quiz-taking-timer">
+                <i class="fa-regular fa-clock"></i>
+                <span id="timerValue" data-limit="@Model.TimeLimitMinutes">@Model.TimeLimitMinutes:00</span>
+            </div>
+            <button type="button" class="quiz-submit-top" id="submitQuizBtn">Nộp bài <i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+        <div class="quiz-progress">
+            <div><span>Tiến độ bài làm: <strong id="answeredCountText">0</strong> / @Model.TotalQuestions câu</span><strong id="answeredPercentText">0%</strong></div>
+            <div class="quiz-progress-track"><span id="progressBar"></span></div>
         </div>
     </div>
 
-    <!-- Instructions -->
-    <p class="@(Model.IsExamMode ? "text-slate-400 text-sm italic px-2" : "text-muted small mb-4")">@Model.Description</p>
-
-    <!-- Quiz Form -->
-    <form asp-controller="Quiz" asp-action="Submit" method="post" id="quizForm" class="space-y-6">
+    <form asp-controller="Quiz" asp-action="Submit" method="post" id="quizForm" class="quiz-taking-grid">
         @Html.AntiForgeryToken()
         <input type="hidden" name="quizId" value="@Model.QuizId" />
-
         @for (int i = 0; i < Model.Questions.Count; i++)
         {
             var q = Model.Questions[i];
-            <div class="@(Model.IsExamMode ? "bg-slate-800/80 border border-slate-700/80 rounded-2xl p-6 space-y-4 shadow-sm" : "question-container")" data-question-id="@q.Id">
-                <div class="flex items-start gap-3">
-                    <span class="w-7 h-7 rounded-full bg-indigo-600 text-white font-black text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                        @(i + 1)
-                    </span>
-                    <h3 class="@(Model.IsExamMode ? "text-base font-bold text-slate-100 leading-relaxed" : "question-text")">@q.QuestionText</h3>
+            <div class="quiz-current-question @(i == 0 ? "is-current" : "is-hidden")" data-question-id="@q.Id" data-question-index="@(i + 1)">
+                <div class="quiz-question-heading">
+                    <span class="quiz-question-number">@(i + 1)</span>
+                    <div><span class="quiz-question-label">Câu @(i + 1) / @Model.TotalQuestions</span><h2>@q.QuestionText</h2></div>
                 </div>
-                
-                <!-- Hidden input for selected option -->
                 <input type="hidden" name="answers[@q.Id]" class="selected-option-input" />
-
-                <div class="@(Model.IsExamMode ? "grid grid-cols-1 sm:grid-cols-2 gap-3 pl-10" : "quiz-options-list")">
+                <div class="quiz-answer-grid">
                     @{
                         string[] letters = new string[] { "A", "B", "C", "D" };
                     }
@@ -68,23 +60,55 @@
                     {
                         var opt = q.Options[o];
                         var letter = letters[o % 4];
-                        <div class="@(Model.IsExamMode ? "exam-option-label quiz-option-item" : "quiz-option-item")" data-letter="@letter">
-                            <div class="@(Model.IsExamMode ? "exam-option-letter" : "quiz-option-letter")">@letter</div>
-                            <div class="@(Model.IsExamMode ? "text-xs font-semibold text-slate-200" : "quiz-option-text")">@opt.OptionText</div>
+                        <div class="exam-option-label" data-letter="@letter">
+                            <div class="exam-option-letter">@letter</div>
+                            <div class="exam-option-text">@opt.OptionText</div>
                         </div>
                     }
                 </div>
+                <div class="quiz-question-footer">
+                    <button type="button" class="quiz-nav-button quiz-prev-button" data-quiz-prev>Câu trước <i class="fa-solid fa-chevron-left"></i></button>
+                    <span>@(i + 1) / @Model.TotalQuestions</span>
+                    <button type="button" class="quiz-nav-button quiz-next-button" data-quiz-next>Câu tiếp theo <i class="fa-solid fa-chevron-right"></i></button>
+                </div>
             </div>
         }
-
-        <div class="flex justify-end pt-4 pb-8">
-            <button type="button" class="@(Model.IsExamMode ? "px-8 py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:opacity-95 text-white font-black text-sm shadow-xl shadow-indigo-600/30 transition-all cursor-pointer flex items-center gap-2" : "btn-primary-ailearn")" id="submitQuizBtn">
-                <span>Nộp bài kiểm tra</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </button>
-        </div>
+        <aside class="quiz-question-palette">
+            <div class="quiz-palette-heading"><h2><i class="fa-solid fa-list"></i> Danh sách câu hỏi</h2><span>@Model.TotalQuestions câu</span></div>
+            <div class="quiz-palette-legend"><span><i class="is-answered"></i> Đã chọn</span><span><i></i> Chưa làm</span></div>
+            <div class="quiz-palette-list">
+                @for (int i = 0; i < Model.Questions.Count; i++)
+                {
+                    <button type="button" class="quiz-palette-button @(i == 0 ? "is-current" : "")" data-quiz-index="@(i + 1)">@(i + 1)</button>
+                }
+            </div>
+            <button type="button" class="quiz-submit-side" id="submitQuizBtnSide">Nộp bài thi <i class="fa-solid fa-arrow-right"></i></button>
+        </aside>
     </form>
 </div>
+}
+else
+{
+<div class="card-ailearn">
+    <div class="quiz-header">
+        <div><span class="purple-badge">Khóa học: @Model.CourseTitle</span><h2 class="h4 font-weight-bold mb-0">@Model.Title</h2></div>
+        <div class="quiz-timer"><i class="fa-regular fa-clock"></i><span id="timerValue" data-limit="@Model.TimeLimitMinutes">@Model.TimeLimitMinutes:00</span></div>
+    </div>
+    <p class="text-muted small mb-4">@Model.Description</p>
+    <form asp-controller="Quiz" asp-action="Submit" method="post" id="quizForm">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="quizId" value="@Model.QuizId" />
+        @for (int i = 0; i < Model.Questions.Count; i++)
+        {
+            var q = Model.Questions[i];
+            <div class="question-container" data-question-id="@q.Id"><h3 class="question-text">@(i + 1). @q.QuestionText</h3><input type="hidden" name="answers[@q.Id]" class="selected-option-input" /><div class="quiz-options-list">
+                @for (int o = 0; o < q.Options.Count; o++) { var opt = q.Options[o]; <div class="quiz-option-item" data-letter="@("ABCD"[o % 4])"><div class="quiz-option-letter">@("ABCD"[o % 4])</div><div class="quiz-option-text">@opt.OptionText</div></div> }
+            </div></div>
+        }
+        <div class="flex justify-end pt-4 pb-8"><button type="button" class="btn-primary-ailearn" id="submitQuizBtn">Nộp bài kiểm tra</button></div>
+    </form>
+</div>
+}
 
 @section Scripts {
     <script src="~/js/quiz.js" asp-append-version="true"></script>

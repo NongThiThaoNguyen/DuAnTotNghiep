@@ -1,0 +1,68 @@
+@using System.Globalization
+@model DuAnTotNghiep.Models.ViewModels.Student.StudentScheduleViewModel
+
+@{
+    ViewData["Title"] = "Lịch học";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+    var previousWeek = Model.WeekStart.AddDays(-7).ToString("yyyy-MM-dd");
+    var nextWeek = Model.WeekStart.AddDays(7).ToString("yyyy-MM-dd");
+    var today = DateTime.Today.Date;
+}
+
+<div class="container mx-auto">
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-800">Lịch học</h1>
+            <p class="text-sm text-slate-500">Các buổi học trong lớp bạn đã đăng ký</p>
+        </div>
+        <div class="flex items-center gap-2">
+            <a href="@Url.Action("Index", new { weekStart = previousWeek })" class="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50">‹ Tuần trước</a>
+            <a href="@Url.Action("Index")" class="px-3 py-2 bg-blue-600 rounded-xl text-sm font-semibold text-white hover:bg-blue-700">Tuần này</a>
+            <a href="@Url.Action("Index", new { weekStart = nextWeek })" class="px-3 py-2 border border-slate-200 rounded-xl text-sm text-slate-600 hover:bg-slate-50">Tuần sau ›</a>
+        </div>
+    </div>
+
+    @if (!Model.HasEnrollment)
+    {
+        <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center">
+            <h2 class="text-lg font-bold text-slate-800 mb-2">Bạn chưa có lớp học</h2>
+            <p class="text-sm text-slate-500 mb-5">Hãy đăng ký lớp để lịch học xuất hiện tại đây.</p>
+            <a href="/Student/ClassEnrollment" class="inline-flex px-4 py-2 bg-blue-600 text-white rounded-xl text-sm font-semibold hover:bg-blue-700">Chọn lớp học</a>
+        </div>
+    }
+    else
+    {
+        <p class="text-sm font-semibold text-slate-600 mb-4">@Model.WeekStart.ToString("dd/MM/yyyy") - @Model.WeekEnd.ToString("dd/MM/yyyy")</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            @foreach (var day in Model.Days)
+            {
+                var isToday = day.Date.Date == today;
+                <section class="bg-white rounded-2xl border @(isToday ? "border-blue-400 shadow-md" : "border-slate-200 shadow-sm") p-4 min-h-[180px]">
+                    <header class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                        <h2 class="font-bold @(isToday ? "text-blue-600" : "text-slate-800")">@day.Date.ToString("dddd", new CultureInfo("vi-VN"))</h2>
+                        <span class="text-xs text-slate-400">@day.Date.ToString("dd/MM")</span>
+                    </header>
+                    @if (day.Items.Count == 0)
+                    {
+                        <p class="text-sm text-slate-400 italic">Không có buổi học</p>
+                    }
+                    else
+                    {
+                        foreach (var item in day.Items)
+                        {
+                            <div class="border-l-4 border-blue-500 bg-blue-50 rounded-r-xl p-3 mb-2">
+                                <p class="font-bold text-sm text-slate-800">@item.StartTime.ToString(@"hh\:mm") - @item.EndTime.ToString(@"hh\:mm")</p>
+                                <p class="text-sm text-slate-700 mt-1">@item.ClassName</p>
+                                <p class="text-xs text-slate-500 mt-1">GV: @item.TeacherName</p>
+                                @if (item.EnrollmentStatus == "PENDING_TEACHER")
+                                {
+                                    <span class="inline-block text-[10px] font-semibold text-amber-700 mt-2">Đang chờ phân giáo viên</span>
+                                }
+                            </div>
+                        }
+                    }
+                </section>
+            }
+        </div>
+    }
+</div>

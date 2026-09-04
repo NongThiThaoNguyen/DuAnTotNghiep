@@ -479,6 +479,19 @@ public class TeacherStudentChatRowViewModel
     public string StudentName { get; set; } = string.Empty;
     public int MessageCount { get; set; }
     public DateTime LastMessageAt { get; set; }
+    public string LastMessageText { get; set; } = string.Empty;
+    public string ClassNames { get; set; } = "Chưa xác định";
+    public int UnreadCount { get; set; }
+    public string Status => UnreadCount > 0 ? "Có tin chưa đọc" : "Đã đọc";
+}
+
+public class AdminChatMessageViewModel
+{
+    public int Id { get; set; }
+    public string SenderName { get; set; } = string.Empty;
+    public string SenderRole { get; set; } = string.Empty;
+    public string MessageText { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
 }
 
 public class AiTutorSessionRowViewModel

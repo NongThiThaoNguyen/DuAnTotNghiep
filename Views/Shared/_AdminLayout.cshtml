@@ -221,24 +221,6 @@
         .fs-6 { font-size: 1rem; }
         .fs-7 { font-size: 0.8125rem; }
 
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            margin-right: -0.5rem;
-            margin-left: -0.5rem;
-        }
-
-        .row > [class*="col-"] {
-            padding-right: 0.5rem;
-            padding-left: 0.5rem;
-            width: 100%;
-        }
-
-        .row > .col {
-            flex: 1 0 0%;
-            padding-right: 0.5rem;
-            padding-left: 0.5rem;
-        }
 
         .row-cols-1 > .col {
             flex: 0 0 auto;
@@ -633,24 +615,6 @@
                     </span>
                 </a>
 
-                <span class="mb-4 block text-[11px] font-bold uppercase tracking-wider text-slate-400">Quản trị viên</span>
-                <ul class="rs-nav-list space-y-1 mb-6">
-                    <li class="admin-nav-section-title">Tổng quan</li>
-                    <li>
-                        <a class="@NavClass("Home")" asp-area="Admin" asp-controller="Home" asp-action="Index">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                            </svg>
-                            Tổng quan
-                        </a>
-                    </li>
-                    <li class="admin-nav-section-title">Tài khoản & học viên</li>
-                    <li>
-                        <a class="@NavClass("User")" asp-area="Admin" asp-controller="User" asp-action="Index">
-                            <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                            </svg>
-                            Quản lý tài khoản
                         </a>
                     </li>
                     <li>
@@ -838,6 +802,8 @@
                             Lịch sử hệ thống
                         </a>
                     </li>
+                    @if (ViewData["ShowAdminSystemLinks"] as bool? == true)
+                    {
                     <li>
                         <a class="@NavClass("Settings")" asp-area="Admin" asp-controller="Settings" asp-action="Index">
                             <svg class="w-5 h-5 text-slate-400 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -856,6 +822,7 @@
                             Trạng thái hệ thống
                         </a>
                     </li>
+                    }
                 </ul>
             </div>
             <div class="admin-sidebar-footer rs-sidebar-footer">

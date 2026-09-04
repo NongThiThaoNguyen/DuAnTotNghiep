@@ -264,6 +264,63 @@ namespace DuAnTotNghiep.Services
             };
         }
 
+        public async Task<StudentScheduleViewModel> GetStudentScheduleAsync(int studentId, DateTime weekStart)
+        {
+            weekStart = weekStart.Date;
+            var weekEnd = weekStart.AddDays(6);
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Classroom)
+                    .ThenInclude(c => c.Teacher)
+                .Include(e => e.Classroom)
+                    .ThenInclude(c => c.ClassSchedules)
+                .Where(e => e.StudentId == studentId
+                    && (e.Status == "ACTIVE" || e.Status == "PENDING_TEACHER"))
+                .ToListAsync();
+
+            var vm = new StudentScheduleViewModel
+            {
+                WeekStart = weekStart,
+                HasEnrollment = enrollments.Count > 0,
+                Days = Enumerable.Range(0, 7)
+                    .Select(offset => new StudentScheduleDayViewModel { Date = weekStart.AddDays(offset) })
+                    .ToList()
+            };
+
+            foreach (var enrollment in enrollments)
+            {
+                for (var date = weekStart; date <= weekEnd; date = date.AddDays(1))
+                {
+                    var classroom = enrollment.Classroom;
+                    if (date.Date < classroom.StartDate.Date
+                        || (classroom.EndDate.HasValue && date.Date > classroom.EndDate.Value.Date))
+                    {
+                        continue;
+                    }
+
+                    var scheduleDay = date.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)date.DayOfWeek;
+                    foreach (var schedule in classroom.ClassSchedules.Where(s => s.DayOfWeek == scheduleDay))
+                    {
+                        vm.Days[(int)(date - weekStart).TotalDays].Items.Add(new StudentScheduleItemViewModel
+                        {
+                            Date = date,
+                            StartTime = schedule.StartTime,
+                            EndTime = schedule.EndTime,
+                            ClassName = classroom.ClassName,
+                            TeacherName = classroom.Teacher?.FullName ?? "Chưa gán giáo viên",
+                            EnrollmentStatus = enrollment.Status
+                        });
+                    }
+                }
+            }
+
+            foreach (var day in vm.Days)
+            {
+                day.Items = day.Items.OrderBy(item => item.StartTime).ToList();
+            }
+
+            return vm;
+        }
+
         public async Task<bool> HasCompletedPlacementTestAsync(int studentId)
         {
             return await _context.TestAttempts.AnyAsync(a =>

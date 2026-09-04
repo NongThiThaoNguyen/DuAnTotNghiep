@@ -57,14 +57,7 @@ namespace DuAnTotNghiep.Services
                 await _context.SaveChangesAsync();
 
                 // Add sample questions
-                var defaultQuestions = new[]
-                {
-                    ("Choose the correct word: 'He is very _______ in learning English.'", "interested", new[] { "interested", "interest", "interesting", "interestingly" }, "Adjective describing feelings."),
-                    ("What is the synonym of 'essential'?", "vital", new[] { "vital", "optional", "minor", "trivial" }, "'Essential' means vital."),
-                    ("She succeeded _______ passing the final exam.", "in", new[] { "in", "on", "at", "with" }, "Succeed in V-ing."),
-                    ("Which sentence is grammatically correct?", "If I were you, I would accept the offer.", new[] { "If I were you, I would accept the offer.", "If I am you, I will accept the offer.", "If I was you, I will accept the offer.", "If I had been you, I accept." }, "Second conditional rule."),
-                    ("What does 'break a leg' mean?", "Good luck!", new[] { "Good luck!", "Break your leg", "Run fast", "Be quiet" }, "Idiom for wishing good luck.")
-                };
+                var defaultQuestions = GetDefaultQuestions(topic.Title);
 
                 int qIndex = 1;
                 foreach (var (qText, correctAns, opts, exp) in defaultQuestions)
@@ -284,6 +277,54 @@ namespace DuAnTotNghiep.Services
             }
 
             return quizzes;
+        }
+
+        private static (string QuestionText, string CorrectAnswer, string[] Options, string Explanation)[] GetDefaultQuestions(string title)
+        {
+            if (title.Contains("TOEIC", StringComparison.OrdinalIgnoreCase) || title.Contains("công sở", StringComparison.OrdinalIgnoreCase))
+            {
+                return new[]
+                {
+                    ("The manager will ___ the meeting at 9 a.m.", "attend", new[] { "attend", "attendance", "attended", "attending" }, "After will, use the base verb attend."),
+                    ("Please ___ the attached form before Friday.", "submit", new[] { "submit", "submission", "submits", "submitted" }, "Submit is the verb needed after please."),
+                    ("What does 'deadline' mean?", "the final time to finish something", new[] { "a meeting room", "the final time to finish something", "a salary increase", "a job interview" }, "A deadline is the latest time by which something must be completed."),
+                    ("The documents ___ by the assistant yesterday.", "were prepared", new[] { "prepare", "prepared", "were prepared", "are preparing" }, "Use the past passive for documents completed yesterday."),
+                    ("Which phrase makes a polite business request?", "Could you please...?", new[] { "Could you please...?", "Do it now.", "You must do it.", "I refuse to..." }, "Could you please...? is a polite business request.")
+                };
+            }
+
+            if (title.Contains("nghe", StringComparison.OrdinalIgnoreCase) || title.Contains("listening", StringComparison.OrdinalIgnoreCase))
+            {
+                return new[]
+                {
+                    ("Which word signals a correction in a conversation?", "Actually", new[] { "Actually", "Finally", "Usually", "Because" }, "Actually often introduces corrected information."),
+                    ("In listening practice, what is a distractor?", "Information that sounds plausible but is wrong", new[] { "The correct answer", "Information that sounds plausible but is wrong", "A speaker's name", "A question title" }, "A distractor is misleading information designed to test careful listening."),
+                    ("Choose the phrase that asks someone to repeat information.", "Could you say that again?", new[] { "Could you say that again?", "I agree completely.", "That is mine.", "It starts at noon." }, "This phrase is a request for repetition."),
+                    ("What should you listen for when answering a timetable question?", "Times and schedule keywords", new[] { "Times and schedule keywords", "Every adjective", "The speaker's accent", "Unrelated opinions" }, "Times and schedule keywords help locate the answer."),
+                    ("Which strategy helps with numbers in a recording?", "Listen for the number and its unit", new[] { "Listen for the number and its unit", "Translate every word", "Ignore the context", "Read the answer aloud" }, "The unit and surrounding context confirm a number.")
+                };
+            }
+
+            if (title.Contains("đọc", StringComparison.OrdinalIgnoreCase) || title.Contains("reading", StringComparison.OrdinalIgnoreCase))
+            {
+                return new[]
+                {
+                    ("What is skimming used for?", "Finding the general idea quickly", new[] { "Finding the general idea quickly", "Checking every spelling error", "Memorising all details", "Translating each sentence" }, "Skimming means reading quickly for the main idea."),
+                    ("What is scanning used for?", "Finding a specific fact", new[] { "Finding a specific fact", "Writing a conclusion", "Learning pronunciation", "Guessing the topic" }, "Scanning searches for a particular detail such as a name or date."),
+                    ("What should you do with an unfamiliar word?", "Use context clues", new[] { "Use context clues", "Stop immediately", "Choose the longest answer", "Skip the whole passage" }, "Nearby words often reveal the meaning of an unfamiliar word."),
+                    ("Which word is closest in meaning to 'decline'?", "decrease", new[] { "increase", "decrease", "explain", "discover" }, "Decline means decrease or fall."),
+                    ("A reference question asks you to identify...", "what a word refers to", new[] { "what a word refers to", "the author's age", "the page number", "the font size" }, "Reference questions test links between pronouns and earlier nouns.")
+                };
+            }
+
+            return new[]
+            {
+                ("Choose the correct sentence.", "She studies English every day.", new[] { "She studies English every day.", "She study English every day.", "She studying English.", "She studieds English." }, "Use studies with the third-person singular subject she."),
+                ("Choose the correct preposition: interested ___ English.", "in", new[] { "in", "on", "at", "for" }, "The correct collocation is interested in."),
+                ("Which word means 'important'?", "significant", new[] { "significant", "ordinary", "empty", "brief" }, "Significant means important or notable."),
+                ("Which phrase introduces an example?", "For example", new[] { "For example", "In contrast", "As a result", "In conclusion" }, "For example introduces a specific example."),
+                ("If it rains, we ___ at home.", "stay", new[] { "stay", "stayed", "would stayed", "staying" }, "The first conditional uses present simple in the if-clause.")
+            };
         }
     }
 }
