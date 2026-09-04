@@ -34,6 +34,8 @@ namespace DuAnTotNghiep.Services.Interfaces
         /// </summary>
         Task<StudentScheduleViewModel> GetStudentScheduleAsync(int studentId, DateTime weekStart);
 
+        Task EnsureStudentSchedulesAsync(int studentId);
+
         /// <summary>
         /// Kiểm tra Student đã hoàn thành Placement Test chưa
         /// </summary>

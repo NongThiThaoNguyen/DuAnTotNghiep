@@ -14,6 +14,8 @@ public class Schedule
     [ForeignKey("Teacher")]
     public int TeacherId { get; set; }
 
+    public int? ClassroomId { get; set; }
+
     [ForeignKey("Topic")]
     public int? TopicId { get; set; }
 
@@ -40,5 +42,6 @@ public class Schedule
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     public virtual User Teacher { get; set; } = null!;
+    public virtual Classroom? ClassroomNavigation { get; set; }
     public virtual LearningTopic? Topic { get; set; }
 }

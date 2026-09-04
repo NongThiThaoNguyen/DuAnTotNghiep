@@ -2415,6 +2415,7 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("schedules");
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
+            entity.Property(e => e.ClassroomId).HasColumnName("classroom_id");
             entity.Property(e => e.TopicId).HasColumnName("topic_id");
             entity.Property(e => e.Title).HasMaxLength(255).HasColumnName("title");
             entity.Property(e => e.Description).HasColumnName("description");
@@ -2434,6 +2435,11 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.TopicId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_schedules_learning_topics");
+
+            entity.HasOne(d => d.ClassroomNavigation).WithMany()
+                .HasForeignKey(d => d.ClassroomId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_schedules_classrooms");
         });
 
         modelBuilder.Entity<StudentNote>(entity =>

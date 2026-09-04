@@ -166,4 +166,15 @@ public class TeacherSchedulesController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> GenerateMeet(int id)
+    {
+        var generated = await _scheduleService.GenerateMeetUrlAsync(id);
+        TempData[generated ? "SuccessMessage" : "ErrorMessage"] = generated
+            ? "Đã tạo Google Meet cho lịch học."
+            : "Không tìm thấy lịch học cần tạo Google Meet.";
+        return RedirectToAction(nameof(Index));
+    }
 }

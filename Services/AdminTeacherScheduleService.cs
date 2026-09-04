@@ -204,6 +204,23 @@ public class AdminTeacherScheduleService : IAdminTeacherScheduleService
         return true;
     }
 
+    public async Task<bool> GenerateMeetUrlAsync(int id)
+    {
+        var schedule = await _context.Schedules.FirstOrDefaultAsync(s => s.Id == id);
+        if (schedule == null)
+        {
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(schedule.MeetUrl))
+        {
+            schedule.MeetUrl = _meetService.GenerateMeetUrl(schedule.Id, schedule.Title);
+            await _context.SaveChangesAsync();
+        }
+
+        return true;
+    }
+
     private static void NormalizeFilter(AdminTeacherScheduleFilterViewModel filter)
     {
         filter.Page = Math.Max(1, filter.Page);

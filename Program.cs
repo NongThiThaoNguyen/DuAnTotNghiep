@@ -98,6 +98,7 @@ builder.Services.AddScoped<IPlacementTestQuestionService, PlacementTestQuestionS
 builder.Services.AddScoped<IPlacementTestValidationService, PlacementTestValidationService>();
 builder.Services.AddScoped<IPlacementRequirementService, PlacementRequirementService>();
 builder.Services.AddScoped<IClassEnrollmentService, ClassEnrollmentService>();
+builder.Services.AddHostedService<ScheduleMeetBackgroundService>();
 builder.Services.AddScoped<ILearningTopicService, LearningTopicService>();
 builder.Services.AddScoped<IReferenceSourceService, ReferenceSourceService>();
 builder.Services.AddScoped<IValidateLicenseService, ValidateLicenseService>();

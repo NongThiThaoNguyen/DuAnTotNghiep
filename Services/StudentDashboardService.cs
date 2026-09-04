@@ -252,10 +252,16 @@ namespace DuAnTotNghiep.Services
             // 8. Fetch Upcoming Schedule
             UpcomingScheduleViewModel? upcomingSchedule = null;
             var now = DateTime.Now;
+            var activeClassroomId = await _context.Enrollments
+                .Where(e => e.StudentId == userId && e.Status == "ACTIVE")
+                .Select(e => (int?)e.ClassroomId)
+                .FirstOrDefaultAsync();
             var nextSchedule = await _context.Schedules
                 .Include(s => s.Teacher)
                 .Include(s => s.Topic)
-                .Where(s => s.StartTime >= now || s.EndTime >= now)
+                .Where(s => activeClassroomId.HasValue
+                    && s.ClassroomId == activeClassroomId.Value
+                    && (s.StartTime >= now || s.EndTime >= now))
                 .OrderBy(s => s.StartTime)
                 .AsNoTracking()
                 .FirstOrDefaultAsync();

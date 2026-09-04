@@ -271,10 +271,7 @@ namespace DuAnTotNghiep.Services
             var enrollments = await _context.Enrollments
                 .Include(e => e.Classroom)
                     .ThenInclude(c => c.Teacher)
-                .Include(e => e.Classroom)
-                    .ThenInclude(c => c.ClassSchedules)
-                .Where(e => e.StudentId == studentId
-                    && (e.Status == "ACTIVE" || e.Status == "PENDING_TEACHER"))
+                .Where(e => e.StudentId == studentId && e.Status == "ACTIVE")
                 .ToListAsync();
 
             var vm = new StudentScheduleViewModel
@@ -286,39 +283,56 @@ namespace DuAnTotNghiep.Services
                     .ToList()
             };
 
-            foreach (var enrollment in enrollments)
+            var classroomIds = enrollments.Select(e => e.ClassroomId).ToList();
+            var schedules = await _context.Schedules
+                .Include(s => s.Teacher)
+                .Where(s => s.ClassroomId.HasValue
+                    && classroomIds.Contains(s.ClassroomId.Value)
+                    && s.StartTime < weekEnd.AddDays(1)
+                    && s.EndTime >= weekStart)
+                .OrderBy(s => s.StartTime)
+                .AsNoTracking()
+                .ToListAsync();
+
+            foreach (var schedule in schedules)
             {
-                for (var date = weekStart; date <= weekEnd; date = date.AddDays(1))
+                var classroom = enrollments.First(e => e.ClassroomId == schedule.ClassroomId).Classroom;
+                var day = vm.Days.FirstOrDefault(d => d.Date.Date == schedule.StartTime.Date);
+                if (day == null)
                 {
-                    var classroom = enrollment.Classroom;
-                    if (date.Date < classroom.StartDate.Date
-                        || (classroom.EndDate.HasValue && date.Date > classroom.EndDate.Value.Date))
-                    {
-                        continue;
-                    }
-
-                    var scheduleDay = date.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)date.DayOfWeek;
-                    foreach (var schedule in classroom.ClassSchedules.Where(s => s.DayOfWeek == scheduleDay))
-                    {
-                        vm.Days[(int)(date - weekStart).TotalDays].Items.Add(new StudentScheduleItemViewModel
-                        {
-                            Date = date,
-                            StartTime = schedule.StartTime,
-                            EndTime = schedule.EndTime,
-                            ClassName = classroom.ClassName,
-                            TeacherName = classroom.Teacher?.FullName ?? "Chưa gán giáo viên",
-                            EnrollmentStatus = enrollment.Status
-                        });
-                    }
+                    continue;
                 }
-            }
-
-            foreach (var day in vm.Days)
-            {
-                day.Items = day.Items.OrderBy(item => item.StartTime).ToList();
+                day.Items.Add(new StudentScheduleItemViewModel
+                {
+                    Date = schedule.StartTime.Date,
+                    StartTime = schedule.StartTime.TimeOfDay,
+                    EndTime = schedule.EndTime.TimeOfDay,
+                    ClassName = classroom.ClassName,
+                    TeacherName = schedule.Teacher?.FullName ?? classroom.Teacher?.FullName ?? "Chưa gán giáo viên",
+                    EnrollmentStatus = "ACTIVE"
+                });
             }
 
             return vm;
+        }
+
+        public async Task EnsureStudentSchedulesAsync(int studentId)
+        {
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Classroom)
+                    .ThenInclude(c => c.ClassSchedules)
+                .Where(e => e.StudentId == studentId && e.Status == "ACTIVE")
+                .ToListAsync();
+
+            foreach (var enrollment in enrollments)
+            {
+                await CreateClassSchedulesAsync(enrollment.Classroom);
+            }
+
+            if (enrollments.Count > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
         }
 
         public async Task<bool> HasCompletedPlacementTestAsync(int studentId)
@@ -513,6 +527,7 @@ namespace DuAnTotNghiep.Services
             // 1. Kiểm tra enrollment đang ở trạng thái AWAITING_CONFIRMATION hoặc PENDING_TEACHER
             var pendingEnrollments = await _context.Enrollments
                 .Include(e => e.Classroom)
+                    .ThenInclude(c => c.ClassSchedules)
                 .Where(e => e.StudentId == studentId && (e.Status == "AWAITING_CONFIRMATION" || e.Status == "PENDING_TEACHER"))
                 .ToListAsync();
 
@@ -524,7 +539,13 @@ namespace DuAnTotNghiep.Services
             {
                 if (activeEnrollments.Any())
                 {
-                    // Học sinh đã có enrollment ACTIVE chính thức
+                    var activeEnrollment = await _context.Enrollments
+                        .Include(e => e.Classroom)
+                            .ThenInclude(c => c.ClassSchedules)
+                        .Where(e => e.StudentId == studentId && e.Status == "ACTIVE")
+                        .FirstAsync();
+                    await CreateClassSchedulesAsync(activeEnrollment.Classroom);
+                    await _context.SaveChangesAsync();
                     return (true, null);
                 }
                 return (false, "Không tìm thấy thông tin đăng ký chờ xác nhận. Vui lòng thực hiện chọn lớp và giáo viên trước.");
@@ -536,6 +557,7 @@ namespace DuAnTotNghiep.Services
             // 2. Chuyển trạng thái Enrollment → ACTIVE (Đã chính thức phân lớp & giáo viên)
             targetEnrollment.Status = "ACTIVE";
             targetEnrollment.EnrolledAt = DateTime.UtcNow;
+            await CreateClassSchedulesAsync(targetEnrollment.Classroom);
 
             // Xóa/hủy các bản ghi enrollment chờ khác (tránh trùng lặp hoặc thuộc nhiều lớp)
             foreach (var other in pendingEnrollments.Skip(1))
@@ -568,6 +590,46 @@ namespace DuAnTotNghiep.Services
 
             await _context.SaveChangesAsync();
             return (true, null);
+        }
+
+        private async Task CreateClassSchedulesAsync(Classroom classroom)
+        {
+            if (classroom.TeacherId <= 0 || !classroom.ClassSchedules.Any())
+            {
+                return;
+            }
+
+            var startDate = classroom.StartDate.Date;
+            var endDate = (classroom.EndDate ?? startDate.AddMonths(3)).Date;
+            var existing = await _context.Schedules
+                .Where(s => s.ClassroomId == classroom.Id)
+                .Select(s => new { s.StartTime, s.EndTime })
+                .ToListAsync();
+
+            for (var date = startDate; date <= endDate; date = date.AddDays(1))
+            {
+                var dayOfWeek = date.DayOfWeek == DayOfWeek.Sunday ? 7 : (int)date.DayOfWeek;
+                foreach (var classSchedule in classroom.ClassSchedules.Where(s => s.DayOfWeek == dayOfWeek))
+                {
+                    var start = date.Add(classSchedule.StartTime);
+                    var end = date.Add(classSchedule.EndTime);
+                    if (existing.Any(s => s.StartTime == start && s.EndTime == end))
+                    {
+                        continue;
+                    }
+
+                    _context.Schedules.Add(new Schedule
+                    {
+                        TeacherId = classroom.TeacherId,
+                        ClassroomId = classroom.Id,
+                        Title = classroom.ClassName,
+                        Description = classroom.Description,
+                        StartTime = start,
+                        EndTime = end,
+                        Classroom = classroom.ClassName
+                    });
+                }
+            }
         }
 
         public async Task<TeacherSelectedSuccessViewModel?> GetFinalSuccessInfoAsync(int studentId)

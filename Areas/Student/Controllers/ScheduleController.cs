@@ -32,6 +32,7 @@ public class ScheduleController : Controller
         var monday = selectedDate.Date.AddDays(selectedDate.DayOfWeek == DayOfWeek.Sunday
             ? -6
             : DayOfWeek.Monday - selectedDate.DayOfWeek);
+        await _enrollmentService.EnsureStudentSchedulesAsync(userId);
         var vm = await _enrollmentService.GetStudentScheduleAsync(userId, monday);
         return View(vm);
     }

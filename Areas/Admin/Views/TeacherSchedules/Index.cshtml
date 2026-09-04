@@ -301,6 +301,15 @@
                                         <a asp-action="Edit" asp-route-id="@item.Id" class="rs-filter-btn-secondary px-2.5 text-xs" style="height: 1.85rem;" title="Sửa lịch">
                                             Sửa
                                         </a>
+                                        @if (string.IsNullOrWhiteSpace(item.MeetUrl))
+                                        {
+                                            <form asp-action="GenerateMeet" asp-route-id="@item.Id" method="post" class="inline">
+                                                @Html.AntiForgeryToken()
+                                                <button type="submit" class="rs-filter-btn-secondary px-2.5 text-xs text-emerald-700 hover:text-emerald-800" style="height: 1.85rem;" title="Tạo Google Meet">
+                                                    Tạo Meet
+                                                </button>
+                                            </form>
+                                        }
                                         <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="inline" onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch này?');">
                                             @Html.AntiForgeryToken()
                                             <button type="submit" class="rs-filter-btn-secondary px-2.5 text-xs text-rose-600 hover:text-rose-700" style="height: 1.85rem;" title="Xóa lịch">

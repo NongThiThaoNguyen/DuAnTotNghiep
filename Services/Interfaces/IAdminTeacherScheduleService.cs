@@ -10,4 +10,5 @@ public interface IAdminTeacherScheduleService
     Task<int> CreateScheduleAsync(AdminTeacherScheduleFormViewModel model);
     Task<bool> UpdateScheduleAsync(AdminTeacherScheduleFormViewModel model);
     Task<bool> DeleteScheduleAsync(int id);
+    Task<bool> GenerateMeetUrlAsync(int id);
 }
